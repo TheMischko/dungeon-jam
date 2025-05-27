@@ -18,6 +18,7 @@ import {configDotenv} from "dotenv";
 
 configDotenv();
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN || "ERROR";
+const ENV = process.env.ENV || "production";
 console.log("DISCORD_TOKEN", DISCORD_TOKEN);
 
 /** Sample rate of the audio context */
@@ -180,7 +181,12 @@ app.on("ready", async () => {
 
   win.contentView.addChildView(youtubeTab);
   youtubeTab.webContents.openDevTools();
-  await youtubeTab.webContents.loadURL("https://youtube.com/");
+  if(ENV === "development"){
+    await youtubeTab.webContents.loadURL("http://localhost:4200/");
+  } else {
+    await youtubeTab.webContents.loadURL("https://youtube.com/");
+  }
+
   youtubeTab.setBounds({ x: 820, y: 0, width: 820, height: 720 });
 
   win.contentView.addChildView(captureTab);

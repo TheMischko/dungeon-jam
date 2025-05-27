@@ -3,9 +3,14 @@
   "version": "1.0.0",
   "main": "build/index.js",
   "scripts": {
-    "copyfiles": "copyfiles -f src/index.html build && copyfiles -f src/PCMStream.worklet.js build && copyfiles -f .env build",
-    "compile": "tsc && npm run copyfiles",
-    "start": "npm run compile && electron build/index.js"
+    "copyfiles:basic": "copyfiles -f src/index.html build && copyfiles -f src/PCMStream.worklet.js build",
+    "copyfiles:dev": "npm run copyfiles:basic && copyfiles -f .env build",
+    "copyfiles:prod": "npm run copyfiles:basic && copyfiles -f .prod.env build && npx yshx mv build/.prod.env build/.env",
+    "build:frontend": "cd frontend && npm run build && cd ..",
+    "compile:dev": "tsc && npm run copyfiles:dev && npm run build:frontend",
+    "compile:prod": "tsc && npm run copyfiles:prod && npm run build:frontend",
+    "start": "tsc && npm run copyfiles:dev && electron build/index.js",
+    "start:frontend": "cd frontend && npm run start && cd .."
   },
   "private": true,
   "author": "",
@@ -24,6 +29,7 @@
     "ws": "^8.18.2"
   },
   "devDependencies": {
-    "@types/ws": "^8.18.1"
+    "@types/ws": "^8.18.1",
+    "concurrently": "^9.1.2"
   }
 }
