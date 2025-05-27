@@ -45,7 +45,7 @@ const FRAME_DURATION_SECONDS = FRAME_DURATION / 1000;
 const FRAME_SIZE =
   (SAMPLE_RATE * FRAME_DURATION_SECONDS * NUM_CHANNELS) / BYTES_PER_SAMPLE;
 
-const indexHTML = path.join(__dirname, "index.html");
+const indexHTML = path.join(__dirname, "sound-capture", "index.html");
 
 async function setupAudioCapture(window: BrowserWindow, captureTab: WebContentsView, youtubeTab: WebContentsView){
   try {
@@ -158,7 +158,7 @@ app.on("ready", async () => {
     width: 1640,
     height: 720,
     webPreferences: {
-      preload: path.join(__dirname, "preload.js"),
+      preload: path.join(__dirname, "sound-capture","preload.js"),
       devTools: true,
       contextIsolation: true,
     }
@@ -166,7 +166,7 @@ app.on("ready", async () => {
 
   const captureTab = new WebContentsView({
     webPreferences: {
-      preload: path.join(__dirname, "preload.js"),
+      preload: path.join(__dirname, "sound-capture", "preload.js"),
       contextIsolation: true,
     }
   });

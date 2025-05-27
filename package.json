@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "build/index.js",
   "scripts": {
-    "copyfiles:basic": "copyfiles -f src/index.html build && copyfiles -f src/PCMStream.worklet.js build",
+    "copyfiles:basic": "copyfiles -f src/sound-capture/index.html build/sound-capture && copyfiles -f src/sound-capture/PCMStream.worklet.js build/sound-capture",
     "copyfiles:dev": "npm run copyfiles:basic && copyfiles -f .env build",
     "copyfiles:prod": "npm run copyfiles:basic && copyfiles -f .prod.env build && npx yshx mv build/.prod.env build/.env",
     "build:frontend": "cd frontend && npm run build && cd ..",

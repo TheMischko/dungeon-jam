@@ -11,7 +11,7 @@
   },
   "files": [
     "src/index.ts",
-    "src/preload.ts",
-    "src/capture.ts"
+    "src/sound-capture/preload.ts",
+    "src/sound-capture/capture.ts"
   ]
 }

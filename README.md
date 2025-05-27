@@ -15,4 +15,4 @@ DISCORD_TOKEN="..."
 
 
 Disclaimer:
-- File [PCMStream.worklet.js](src/PCMStream.worklet.js) comes from [https://github.com/owlbear-rodeo/kenku-fm](https://github.com/owlbear-rodeo/kenku-fm) repo.
+- File [PCMStream.worklet.js](src/sound-capture/PCMStream.worklet.js) comes from [https://github.com/owlbear-rodeo/kenku-fm](https://github.com/owlbear-rodeo/kenku-fm) repo.
