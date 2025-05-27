@@ -27,11 +27,9 @@ export class ViewManager {
       },
     });
 
-    const preload = path.join(__dirname, 'sound-capture', 'preload.js');
     const captureTab = new WebContentsView({
       webPreferences: {
         ...defaultPreferences,
-        preload,
       },
     });
     appWindow.contentView.addChildView(captureTab);
@@ -41,7 +39,6 @@ export class ViewManager {
     const topBarTab = new WebContentsView({
       webPreferences: {
         ...defaultPreferences,
-        preload,
       },
     });
     appWindow.contentView.addChildView(topBarTab);
@@ -51,7 +48,6 @@ export class ViewManager {
     const sideBarTab = new WebContentsView({
       webPreferences: {
         ...defaultPreferences,
-        preload,
       },
     });
     appWindow.contentView.addChildView(sideBarTab);
@@ -65,9 +61,9 @@ export class ViewManager {
     const frontendTab = new WebContentsView({
       webPreferences: {
         ...defaultPreferences,
-        preload,
       },
     });
+    frontendTab.webContents.openDevTools();
     frontendTab.webContents.setAudioMuted(true);
     appWindow.contentView.addChildView(frontendTab);
     frontendTab.setBounds({

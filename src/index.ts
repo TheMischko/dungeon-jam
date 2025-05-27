@@ -108,12 +108,13 @@ app.on('ready', async () => {
     const buffer = Buffer.from(data as ArrayLike<number>);
     encoder.write(buffer);
   });
-
+  const preload = path.join(__dirname, 'sound-capture', 'preload.js');
   const viewManager = await ViewManager.create(
     1280,
     800,
     {
       contextIsolation: true,
+      preload,
     },
     indexHTML,
   );
