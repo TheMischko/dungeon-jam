@@ -22,6 +22,7 @@ import { opus } from 'prism-media';
 import Encoder = opus.Encoder;
 import { configDotenv } from 'dotenv';
 import { DiscordManager } from './main/managers/discord.manager';
+import { ViewManager } from './main/managers/view.manager';
 
 configDotenv();
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN || 'ERROR';
@@ -108,46 +109,19 @@ app.on('ready', async () => {
     encoder.write(buffer);
   });
 
-  const win = new BrowserWindow({
-    width: 1640,
-    height: 720,
-    webPreferences: {
-      preload: path.join(__dirname, 'sound-capture', 'preload.js'),
-      devTools: true,
+  const viewManager = await ViewManager.create(
+    1280,
+    800,
+    {
       contextIsolation: true,
     },
-  });
+    indexHTML,
+  );
 
-  const captureTab = new WebContentsView({
-    webPreferences: {
-      preload: path.join(__dirname, 'sound-capture', 'preload.js'),
-      contextIsolation: true,
-    },
-  });
-
-  const youtubeTab = new WebContentsView({
-    webPreferences: {
-      preload: path.join(__dirname, 'sound-capture', 'preload.js'),
-      contextIsolation: true,
-    },
-  });
-  youtubeTab.webContents.setAudioMuted(true);
-
-  win.contentView.addChildView(youtubeTab);
-  youtubeTab.webContents.openDevTools();
-  if (ENV === 'development') {
-    await youtubeTab.webContents.loadURL('http://localhost:4200/');
-  } else {
-    await youtubeTab.webContents.loadURL('https://youtube.com/');
-  }
-
-  youtubeTab.setBounds({ x: 820, y: 0, width: 820, height: 720 });
-
-  win.contentView.addChildView(captureTab);
-  captureTab.webContents.openDevTools();
-  await captureTab.webContents.loadURL(indexHTML);
-  captureTab.setBounds({ x: 0, y: 0, width: 820, height: 720 });
-
-  await setupAudioCapture(win, captureTab, youtubeTab);
+  await setupAudioCapture(
+    viewManager.appWindow,
+    viewManager.captureTab,
+    viewManager.frontendTab,
+  );
   await setupDiscord(DISCORD_TOKEN, encoder);
 });
