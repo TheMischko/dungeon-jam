@@ -5,13 +5,11 @@
     "strict": true,
     "esModuleInterop": true,
     "outDir": "./build",
+    "rootDir": ".",
+    "baseUrl": ".",
     "paths": {
-      "@shared/*": ["./shared/*"]
+      "@shared/*": ["shared/*"]
     }
   },
-  "files": [
-    "src/index.ts",
-    "src/sound-capture/preload.ts",
-    "src/sound-capture/capture.ts"
-  ]
+  "include": ["src/**/*", "shared/**/*"]
 }

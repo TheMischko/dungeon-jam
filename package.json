@@ -1,15 +1,15 @@
 {
   "name": "sound-capture",
   "version": "1.0.0",
-  "main": "build/index.js",
+  "main": "build/src/index.js",
   "scripts": {
-    "copyfiles:basic": "copyfiles -f src/sound-capture/index.html build/sound-capture && copyfiles -f src/sound-capture/PCMStream.worklet.js build/sound-capture",
+    "copyfiles:basic": "copyfiles -f src/sound-capture/index.html build/src/sound-capture && copyfiles -f src/sound-capture/PCMStream.worklet.js build/src/sound-capture",
     "copyfiles:dev": "npm run copyfiles:basic && copyfiles -f .env build",
     "copyfiles:prod": "npm run copyfiles:basic && copyfiles -f .prod.env build && npx yshx mv build/.prod.env build/.env",
     "build:frontend": "cd frontend && npm run build && cd ..",
-    "compile:dev": "tsc && npm run copyfiles:dev && npm run build:frontend",
-    "compile:prod": "tsc && npm run copyfiles:prod && npm run build:frontend",
-    "start": "tsc && npm run copyfiles:dev && electron build/index.js",
+    "compile:dev": "tsc --build && npm run copyfiles:dev && npm run build:frontend",
+    "compile:prod": "tsc --build && npm run copyfiles:prod && npm run build:frontend",
+    "start": "tsc --build && npm run copyfiles:dev && electron build/src/index.js",
     "start:frontend": "cd frontend && npm run start && cd .."
   },
   "private": true,
