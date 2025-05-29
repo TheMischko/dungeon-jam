@@ -18,6 +18,8 @@
   letter-spacing: 0.01em;
 }
 
+$font: 'Noto Sans', sans-serif;
+
 
 @mixin default-font(){
   font-family: 'Noto Sans', sans-serif;
