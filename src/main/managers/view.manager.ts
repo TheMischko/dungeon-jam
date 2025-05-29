@@ -1,88 +1,129 @@
-import { BrowserWindow, WebContentsView, WebPreferences } from 'electron';
+import {
+  BrowserWindow,
+  Rectangle,
+  WebContentsView,
+  WebPreferences,
+  WillResizeDetails,
+} from 'electron';
 import path from 'node:path';
+import { FrontendTab } from './tabs/frontend.tab';
+import { TopBarTab } from './tabs/top-bar.tab';
+import { SideBarTab } from './tabs/side-bar.tab';
+import { BaseTab } from './tabs/base-tab';
 
 export class ViewManager {
-  private static SIDEBAR_WIDTH = 0.3;
-  private static TOPBAR_HEIGHT = 0.1;
+  private static _instance: ViewManager | null = null;
 
   constructor(
     public appWindow: BrowserWindow,
     public captureTab: WebContentsView,
-    public frontendTab: WebContentsView,
-    public topBarTab: WebContentsView,
-    public sideBarTab: WebContentsView,
+    public frontendTab: BaseTab,
+    public topBarTab: BaseTab,
+    public sideBarTab: BaseTab,
   ) {}
 
-  static async create(
+  static async getInstance(config?: {
+    width: number;
+    height: number;
+    defaultPreferences: Partial<WebPreferences>;
+    indexHTML: string;
+  }): Promise<ViewManager> {
+    if (!ViewManager._instance && !config) {
+      throw new Error('ViewManager needs to initialized with config first.');
+    }
+
+    if (!ViewManager._instance && config) {
+      const appWindow = ViewManager.createWindow(
+        config.width,
+        config.height,
+        config.defaultPreferences,
+      );
+      const captureTab = await ViewManager.createCaptureTab(
+        appWindow,
+        config.defaultPreferences,
+        config.indexHTML,
+      );
+      const frontendTab = await ViewManager.createAndLoadTab(
+        () => new FrontendTab(appWindow, config.defaultPreferences),
+      );
+      const topBarTab = await ViewManager.createAndLoadTab(
+        () => new TopBarTab(appWindow, config.defaultPreferences),
+      );
+      const sideBarTab = await ViewManager.createAndLoadTab(
+        () => new SideBarTab(appWindow, config.defaultPreferences),
+      );
+
+      ViewManager._instance = new ViewManager(
+        appWindow,
+        captureTab,
+        frontendTab,
+        topBarTab,
+        sideBarTab,
+      );
+      ViewManager._instance.initializeEventListeners();
+    }
+
+    return this._instance!;
+  }
+
+  private static createWindow(
     width: number,
     height: number,
     defaultPreferences: Partial<WebPreferences>,
-    indexHTML: string,
-  ): Promise<ViewManager> {
+  ): BrowserWindow {
     const appWindow = new BrowserWindow({
-      width,
-      height,
+      width: width,
+      height: height,
       webPreferences: {
         ...defaultPreferences,
       },
     });
+    return appWindow;
+  }
 
+  private static async createAndLoadTab<T extends BaseTab>(
+    factory: () => T,
+  ): Promise<T> {
+    const tab = factory();
+    await tab.load();
+    return tab;
+  }
+
+  private static async createCaptureTab(
+    appWindow: BrowserWindow,
+    defaultPreferences: Partial<WebPreferences>,
+    indexHTML: string,
+  ): Promise<WebContentsView> {
+    const capturePreload = path.join(
+      __dirname,
+      '../',
+      '../',
+      'sound-capture',
+      'preload.js',
+    );
     const captureTab = new WebContentsView({
       webPreferences: {
         ...defaultPreferences,
+        preload: capturePreload,
       },
     });
     appWindow.contentView.addChildView(captureTab);
     await captureTab.webContents.loadURL(indexHTML);
+    return captureTab;
+  }
 
-    const topBarHeight = height * ViewManager.TOPBAR_HEIGHT;
-    const topBarTab = new WebContentsView({
-      webPreferences: {
-        ...defaultPreferences,
+  public get tabs(): BaseTab[] {
+    return [this.frontendTab, this.topBarTab, this.sideBarTab];
+  }
+
+  private initializeEventListeners(): void {
+    this.appWindow.on(
+      'will-resize',
+      (event, newBounds: Rectangle, details: WillResizeDetails) => {
+        this.tabs.forEach((tab) => {
+          tab.resize(newBounds);
+        });
       },
-    });
-    appWindow.contentView.addChildView(topBarTab);
-    topBarTab.setBounds({ x: 0, y: 0, width, height: topBarHeight });
-
-    const sideBarWidth = width * ViewManager.SIDEBAR_WIDTH;
-    const sideBarTab = new WebContentsView({
-      webPreferences: {
-        ...defaultPreferences,
-      },
-    });
-    appWindow.contentView.addChildView(sideBarTab);
-    sideBarTab.setBounds({
-      x: 0,
-      y: topBarHeight,
-      width: sideBarWidth,
-      height: height - topBarHeight,
-    });
-
-    const frontendTab = new WebContentsView({
-      webPreferences: {
-        ...defaultPreferences,
-      },
-    });
-    frontendTab.webContents.openDevTools();
-    frontendTab.webContents.setAudioMuted(true);
-    appWindow.contentView.addChildView(frontendTab);
-    frontendTab.setBounds({
-      x: sideBarWidth,
-      y: topBarHeight,
-      width: width - sideBarWidth,
-      height: height - topBarHeight,
-    });
-
-    await frontendTab.webContents.loadURL('http://localhost:4200/');
-    await sideBarTab.webContents.loadURL('http://localhost:4201/');
-    await topBarTab.webContents.loadURL('http://localhost:4202/');
-
-    return new ViewManager(
-      appWindow,
-      captureTab,
-      frontendTab,
-      topBarTab,
-      sideBarTab,
     );
   }
 }

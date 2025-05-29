@@ -1,23 +1,7 @@
 import { app, BrowserWindow, ipcMain, WebContentsView } from 'electron';
 import * as path from 'node:path';
 import { RawData, WebSocket, WebSocketServer } from 'ws';
-import {
-  AudioPlayer,
-  createAudioResource,
-  joinVoiceChannel,
-  NoSubscriberBehavior,
-  StreamType,
-  VoiceConnectionStatus,
-} from '@discordjs/voice';
-import {
-  Client,
-  Collection,
-  GatewayIntentBits,
-  OAuth2Guild,
-  VoiceChannel,
-} from 'discord.js';
 import { Readable } from 'node:stream';
-import ffmpegPath from 'ffmpeg-static';
 import { opus } from 'prism-media';
 import Encoder = opus.Encoder;
 import { configDotenv } from 'dotenv';
@@ -108,21 +92,21 @@ app.on('ready', async () => {
     const buffer = Buffer.from(data as ArrayLike<number>);
     encoder.write(buffer);
   });
-  const preload = path.join(__dirname, 'sound-capture', 'preload.js');
-  const viewManager = await ViewManager.create(
-    1280,
-    800,
-    {
+  const preload = path.join(__dirname, 'preload.js');
+  const viewManager = await ViewManager.getInstance({
+    width: 1280,
+    height: 800,
+    defaultPreferences: {
       contextIsolation: true,
       preload,
     },
     indexHTML,
-  );
+  });
 
   await setupAudioCapture(
     viewManager.appWindow,
     viewManager.captureTab,
-    viewManager.frontendTab,
+    viewManager.frontendTab.tab,
   );
   await setupDiscord(DISCORD_TOKEN, encoder);
 });

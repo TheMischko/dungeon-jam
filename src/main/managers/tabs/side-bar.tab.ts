@@ -1,0 +1,17 @@
+import { BaseTab, TabPreferences } from './base-tab';
+import { BrowserWindow } from 'electron';
+import { getSideBarRect } from './tab-config';
+
+export class SideBarTab extends BaseTab {
+  constructor(parent: BrowserWindow, preferences: TabPreferences) {
+    super(parent, preferences);
+  }
+
+  async load(): Promise<void> {
+    await this.tab.webContents.loadURL('http://localhost:4201/');
+  }
+
+  resize(bounds: Electron.CrossProcessExports.Rectangle) {
+    this.tab.setBounds(getSideBarRect(bounds.width, bounds.height));
+  }
+}
