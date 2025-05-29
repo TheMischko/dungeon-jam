@@ -1,10 +1,20 @@
+@import "colors";
+@import "typography";
+
+html{
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
 html, body{
   margin: 0;
   padding: 0;
   width: 100%;
   height: 100%;
-  background: white;
+  background: $background-deep;
   overflow: hidden;
+  @include default-font();
 }
 app-root {
   display: block;
@@ -13,7 +23,8 @@ app-root {
   box-sizing: border-box;
   margin: 8px 8px 0 8px;
   padding: 8px;
-  background: aquamarine;
+  background: $background-main;
+  color: $text-main;
 
   & > *{
     box-sizing: border-box;

@@ -30,6 +30,10 @@
               {
                 "glob": "**/*",
                 "input": "projects/main/public"
+              },
+              {
+                "glob": "**/*",
+                "input": "projects/general/assets"
               }
             ],
             "styles": [
@@ -96,6 +100,10 @@
               {
                 "glob": "**/*",
                 "input": "projects/main/public"
+              },
+              {
+                "glob": "**/*",
+                "input": "projects/general/assets"
               }
             ],
             "styles": [
@@ -134,6 +142,10 @@
               {
                 "glob": "**/*",
                 "input": "projects/sidebar/public"
+              },
+              {
+                "glob": "**/*",
+                "input": "projects/general/assets"
               }
             ],
             "styles": [
@@ -197,6 +209,10 @@
               {
                 "glob": "**/*",
                 "input": "projects/sidebar/public"
+              },
+              {
+                "glob": "**/*",
+                "input": "projects/general/assets"
               }
             ],
             "styles": [
@@ -235,6 +251,10 @@
               {
                 "glob": "**/*",
                 "input": "projects/topbar/public"
+              },
+              {
+                "glob": "**/*",
+                "input": "projects/general/assets"
               }
             ],
             "styles": [
@@ -298,6 +318,10 @@
               {
                 "glob": "**/*",
                 "input": "projects/topbar/public"
+              },
+              {
+                "glob": "**/*",
+                "input": "projects/general/assets"
               }
             ],
             "styles": [
