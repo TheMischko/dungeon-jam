@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron';
-import { GeneralChannels } from '@shared/models/channels.model';
+import { GeneralChannels } from '../shared/models/channels.model';
 
 const generalApi = {
   getOS(): Promise<string> {
@@ -9,7 +9,7 @@ const generalApi = {
       }, 10000);
 
       ipcRenderer
-        .invoke(GeneralChannels.GET_OS)
+        .invoke(GeneralChannels.getOs)
         .then((data: string) => {
           clearTimeout(timeoutRef);
           resolve(data);

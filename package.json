@@ -7,9 +7,10 @@
     "copyfiles:dev": "npm run copyfiles:basic && copyfiles -f .env build",
     "copyfiles:prod": "npm run copyfiles:basic && copyfiles -f .prod.env build && npx yshx mv build/.prod.env build/.env",
     "build:frontend": "cd frontend && npm run build && cd ..",
-    "compile:dev": "tsc --build && npm run copyfiles:dev && npm run build:frontend",
-    "compile:prod": "tsc --build && npm run copyfiles:prod && npm run build:frontend",
-    "start": "tsc --build && npm run copyfiles:dev && electron build/src/index.js",
+    "build:preload": "node build-reload.js",
+    "compile:dev": "tsc --build && npm run copyfiles:dev && npm run build:preload && npm run build:frontend",
+    "compile:prod": "tsc --build && npm run copyfiles:prod && npm run build:preload && npm run build:frontend",
+    "start": "tsc --build && npm run copyfiles:dev && npm run build:preload && electron build/src/index.js",
     "start:frontend": "cd frontend && npm run start && cd .."
   },
   "private": true,
@@ -30,6 +31,7 @@
   },
   "devDependencies": {
     "@types/ws": "^8.18.1",
-    "concurrently": "^9.1.2"
+    "concurrently": "^9.1.2",
+    "esbuild": "^0.25.5"
   }
 }
