@@ -7,6 +7,7 @@ import Encoder = opus.Encoder;
 import { configDotenv } from 'dotenv';
 import { DiscordManager } from './main/managers/discord.manager';
 import { ViewManager } from './main/managers/view.manager';
+import { TrackManager } from './main/managers/track.manager';
 
 configDotenv();
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN || 'ERROR';
@@ -62,9 +63,11 @@ function setupWebsocketServer(
   messageCallback?: (msg: RawData) => Promise<void>,
 ) {
   const websocketServer = new WebSocketServer({ port: 17253 });
+  console.log('Websocket server started on', websocketServer.address());
   ipcMain.handle('get-websocket', () => websocketServer.address());
 
   websocketServer.on('connection', async (socket: WebSocket) => {
+    console.log('Got a new connection to a Websocket server');
     socket.on('message', async (data: RawData) => {
       await (messageCallback
         ? messageCallback(data)
@@ -109,5 +112,5 @@ app.on('ready', async () => {
     viewManager.frontendTab.tab,
   );
   await setupDiscord(DISCORD_TOKEN, encoder);
-  // await TrackManager.getInstance();
+  await TrackManager.getInstance();
 });

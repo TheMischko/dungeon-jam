@@ -1,5 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron';
-import { GeneralChannels } from '../shared/models/channels.model';
+import { GeneralChannels } from '@shared/models/channels.model';
+import TrackApi from './preload/track-api';
 
 const generalApi = {
   getOS(): Promise<string> {
@@ -25,7 +26,9 @@ const generalApi = {
 declare global {
   interface Window {
     GENERAL_API: typeof generalApi;
+    TRACK_API: typeof TrackApi;
   }
 }
 
 contextBridge.exposeInMainWorld('GENERAL_API', generalApi);
+contextBridge.exposeInMainWorld('trackApi', TrackApi);

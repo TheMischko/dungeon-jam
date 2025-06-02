@@ -53,7 +53,7 @@ export class ViewManager {
         () => new SideBarTab(appWindow, config.defaultPreferences),
       );
 
-      captureTab.webContents.openDevTools({
+      frontendTab.tab.webContents.openDevTools({
         mode: 'detach',
       });
 
@@ -123,7 +123,7 @@ export class ViewManager {
   private initializeEventListeners(): void {
     this.appWindow.on(
       'will-resize',
-      (event, newBounds: Rectangle, details: WillResizeDetails) => {
+      (event, newBounds: Rectangle, _: WillResizeDetails) => {
         this.tabs.forEach((tab) => {
           tab.resize(newBounds);
         });
