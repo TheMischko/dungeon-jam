@@ -5,7 +5,7 @@ import { getMainTabRect } from './tab-config';
 export class FrontendTab extends BaseTab {
   constructor(parent: BrowserWindow, preferences: TabPreferences) {
     super(parent, preferences);
-    this.openDevTools();
+    this.tab.webContents.setAudioMuted(true);
   }
 
   async load(): Promise<void> {

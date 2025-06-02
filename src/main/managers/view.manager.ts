@@ -53,6 +53,10 @@ export class ViewManager {
         () => new SideBarTab(appWindow, config.defaultPreferences),
       );
 
+      captureTab.webContents.openDevTools({
+        mode: 'detach',
+      });
+
       ViewManager._instance = new ViewManager(
         appWindow,
         captureTab,
@@ -97,7 +101,7 @@ export class ViewManager {
     const capturePreload = path.join(
       __dirname,
       '../',
-      '../',
+      'src',
       'sound-capture',
       'preload.js',
     );

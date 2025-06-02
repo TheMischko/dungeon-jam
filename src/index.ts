@@ -109,4 +109,5 @@ app.on('ready', async () => {
     viewManager.frontendTab.tab,
   );
   await setupDiscord(DISCORD_TOKEN, encoder);
+  // await TrackManager.getInstance();
 });
