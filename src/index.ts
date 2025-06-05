@@ -8,6 +8,7 @@ import { configDotenv } from 'dotenv';
 import { DiscordManager } from './main/managers/discord.manager';
 import { ViewManager } from './main/managers/view.manager';
 import { TrackManager } from './main/managers/track.manager';
+import {RedirectManager} from "./main/managers/redirect.manager";
 
 configDotenv();
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN || 'ERROR';
@@ -113,4 +114,5 @@ app.on('ready', async () => {
   );
   await setupDiscord(DISCORD_TOKEN, encoder);
   await TrackManager.getInstance();
+  await RedirectManager.getInstance();
 });

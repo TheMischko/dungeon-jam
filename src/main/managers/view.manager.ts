@@ -10,6 +10,7 @@ import { FrontendTab } from './tabs/frontend.tab';
 import { TopBarTab } from './tabs/top-bar.tab';
 import { SideBarTab } from './tabs/side-bar.tab';
 import { BaseTab } from './tabs/base-tab';
+import {AppChannel} from "@shared/models/channels.model";
 
 export class ViewManager {
   private static _instance: ViewManager | null = null;
@@ -112,12 +113,24 @@ export class ViewManager {
       },
     });
     appWindow.contentView.addChildView(captureTab);
-    await captureTab.webContents.loadURL(indexHTML);
+    await captureTab.webContents.loadFile(indexHTML);
     return captureTab;
   }
 
   public get tabs(): BaseTab[] {
     return [this.frontendTab, this.topBarTab, this.sideBarTab];
+  }
+
+  public broadcast<T, V extends T[]>(
+    channel: AppChannel,
+    senderProcessId: number | null = null,
+    ...data: V): void {
+    this.tabs.forEach(baseTab => {
+      if(baseTab.tab.webContents.getProcessId() === senderProcessId){
+        return;
+      }
+      baseTab.tab.webContents.send(channel, ...data)
+    })
   }
 
   private initializeEventListeners(): void {

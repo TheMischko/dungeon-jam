@@ -1,11 +1,6 @@
-// export enum GeneralChannels {
-//   GET_OS = 'GET_OS',
-// }
-//
-// export type Channel = GeneralChannels;
-
-export const GeneralChannels = {
-  getOs: 'GET_OS',
+export enum GeneralChannels {
+  GET_OS = 'GET_OS',
+  REDIRECT = 'redirect'
 };
 
 export enum TrackChannel {
@@ -13,3 +8,7 @@ export enum TrackChannel {
   GET_BY_ID = 'tracks/get-by-id',
   INSERT = 'tracks/add',
 }
+
+export type AppChannel =
+  | GeneralChannels
+  | TrackChannel

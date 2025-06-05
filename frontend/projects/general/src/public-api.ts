@@ -2,5 +2,5 @@
  * Public API Surface of general
  */
 
-export * from './lib/general.service';
+export * from './lib/redirect.service';
 export * from './lib/general.component';
