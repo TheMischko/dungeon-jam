@@ -1,5 +1,4 @@
 import {Component, inject} from '@angular/core';
-import { RouterOutlet } from '@angular/router';
 import { Howl } from 'howler';
 import { MatButton } from '@angular/material/button';
 import {RedirectService} from '../../../general/src/lib/redirect.service';
@@ -12,6 +11,7 @@ import {RedirectService} from '../../../general/src/lib/redirect.service';
 })
 export class AppComponent {
   private readonly redirectService = inject(RedirectService);
+
   title = 'main';
 
   private howler: Howl;

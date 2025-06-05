@@ -112,7 +112,12 @@ app.on('ready', async () => {
     viewManager.captureTab,
     viewManager.frontendTab.tab,
   );
-  await setupDiscord(DISCORD_TOKEN, encoder);
+  try{
+    await setupDiscord(DISCORD_TOKEN, encoder);
+  } catch (e) {
+    console.error(e);
+  }
+
   await TrackManager.getInstance();
   await RedirectManager.getInstance();
 });
