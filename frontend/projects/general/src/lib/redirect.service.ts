@@ -16,6 +16,10 @@ export class RedirectService {
     return this.redirectSubject.asObservable();
   }
 
+  triggerRedirect(path: RedirectPath): void{
+    (window as unknown as GeneralApiWindow).GENERAL_API.triggerRedirect(path);
+  }
+
   private handleRedirect(path: RedirectPath): void{
     this.redirectSubject.next(path);
   }
@@ -24,5 +28,6 @@ export class RedirectService {
 type GeneralApiWindow = {
   GENERAL_API: {
     registerRedirect: (callback: (path: RedirectPath) => void|Promise<void>) => void
+    triggerRedirect: (path: RedirectPath) => void
   }
 }
