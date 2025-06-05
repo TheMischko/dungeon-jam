@@ -1,7 +1,7 @@
 @use '@angular/material' as mat;
-@use 'styles_theme-colors' as custom;
-@import "colors";
-@import "typography";
+@use './styles_theme-colors' as custom;
+@use './colors' as col;
+@use './typography' as typo;
 
 html {
   @include mat.theme((
@@ -11,18 +11,14 @@ html {
       tertiary: custom.$tertiary-palette,
     ),
     typography: (
-      plain-family: $font,
-      brand-family: $font,
+      plain-family: typo.$font,
+      brand-family: typo.$font,
       bold-weight: 800,
       medium-weight: 500,
       regular-weight: 300
     ),
     density: 0,
   ));
-
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
 }
 
 html, body{
@@ -30,9 +26,9 @@ html, body{
   padding: 0;
   width: 100%;
   height: 100%;
-  background: $background-deep;
+  background: col.$background-deep;
   overflow: hidden;
-  @include default-font();
+  @include typo.default-font();
 }
 app-root {
   display: block;
@@ -41,8 +37,8 @@ app-root {
   box-sizing: border-box;
   margin: 8px 8px 0 8px;
   padding: 8px;
-  background: $background-main;
-  color: $text-main;
+  background: col.$background-main;
+  color: col.$text-main;
 
   & > *{
     box-sizing: border-box;

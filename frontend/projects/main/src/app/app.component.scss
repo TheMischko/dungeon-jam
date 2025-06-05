@@ -1,5 +1,5 @@
-@import "typography";
+@use "typography" as typo;
 
 h1 {
-  @include default-font();
+  @include typo.default-font();
 }
