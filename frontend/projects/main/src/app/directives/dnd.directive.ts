@@ -1,13 +1,14 @@
-import {Directive, HostBinding, inject, input, output} from '@angular/core';
-import {AudioFilesService} from '../services/audio-files.service';
+import { Directive, HostBinding, inject, input, output } from '@angular/core';
+import { AudioFilesService } from '../services/audio-files.service';
+import { AudioTrack } from '@shared/models/track.model';
 
 @Directive({
-  selector: '[appDnd]'
+  selector: '[appDnd]',
 })
 export class DndDirective {
   accept = input<string>('.*');
 
-  filesDropped = output<string[]>();
+  filesDropped = output<AudioTrack[]>();
 
   audioFilesService = inject(AudioFilesService);
 
@@ -16,6 +17,6 @@ export class DndDirective {
   constructor() {
     this.audioFilesService.registerDrop((paths) => {
       this.filesDropped.emit(paths);
-    })
+    });
   }
 }

@@ -1,14 +1,15 @@
-import {Component, inject} from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Howl } from 'howler';
 import { MatButton } from '@angular/material/button';
-import {RouterOutlet} from '@angular/router';
-import {RoutingListenerService} from './services/routing-listener.service';
+import { RouterOutlet } from '@angular/router';
+import { RoutingListenerService } from './services/routing-listener.service';
+import { MatDialogModule } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
-  imports: [MatButton, RouterOutlet],
+  imports: [MatButton, RouterOutlet, MatDialogModule],
 })
 export class AppComponent {
   private readonly routingListenerService = inject(RoutingListenerService);

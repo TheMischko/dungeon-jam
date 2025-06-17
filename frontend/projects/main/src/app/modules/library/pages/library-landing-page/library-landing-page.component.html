@@ -1,4 +1,5 @@
-<app-songs-drop-in-zone>
+<app-songs-drop-in-zone (dropped)="openUploadDialog($event)">
   <p>library-landing-page works!</p>
+  <button mat-flat-button (click)="openUploadDialog()">Upload</button>
 </app-songs-drop-in-zone>
 

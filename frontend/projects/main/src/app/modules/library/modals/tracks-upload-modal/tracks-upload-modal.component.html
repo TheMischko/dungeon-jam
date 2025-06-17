@@ -1,0 +1,10 @@
+<div class="content">
+  <div class="header">
+    <h1>{{ title }}</h1>
+  </div>
+  <ul>
+    @for(track of tracks; track track.author){
+      <li>{{track.title}}</li>
+    }
+  </ul>
+</div>
