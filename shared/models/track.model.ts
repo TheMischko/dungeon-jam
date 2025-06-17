@@ -4,3 +4,10 @@ export interface Track {
   url: string;
   author?: string;
 }
+
+export interface AudioTrack {
+  title: string,
+  fullPath: string,
+  author?: string,
+  length: number
+}

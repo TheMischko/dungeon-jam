@@ -2,6 +2,7 @@ import { contextBridge, ipcRenderer } from 'electron';
 import { GeneralChannels } from '@shared/models/channels.model';
 import TrackApi from './preload/track-api';
 import {RedirectPath} from "@shared/models/redirect.model";
+import AudioFileApi from "./preload/audio-file-api";
 
 const generalApi = {
   triggerRedirect(path: RedirectPath){
@@ -18,8 +19,10 @@ declare global {
   interface Window {
     GENERAL_API: typeof generalApi;
     TRACK_API: typeof TrackApi;
+    AUDIO_FILES_API: typeof AudioFileApi
   }
 }
 
 contextBridge.exposeInMainWorld('GENERAL_API', generalApi);
 contextBridge.exposeInMainWorld('trackApi', TrackApi);
+contextBridge.exposeInMainWorld('AUDIO_FILES_API', AudioFileApi)

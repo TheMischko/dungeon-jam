@@ -9,6 +9,7 @@ import { DiscordManager } from './main/managers/discord.manager';
 import { ViewManager } from './main/managers/view.manager';
 import { TrackManager } from './main/managers/track.manager';
 import {RedirectManager} from "./main/managers/redirect.manager";
+import {FilesManager} from "./main/managers/files.manager";
 
 configDotenv();
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN || 'ERROR';
@@ -102,6 +103,7 @@ app.on('ready', async () => {
     height: 800,
     defaultPreferences: {
       contextIsolation: true,
+      nodeIntegration: false,
       preload,
     },
     indexHTML,
@@ -120,4 +122,5 @@ app.on('ready', async () => {
 
   await TrackManager.getInstance();
   await RedirectManager.getInstance();
+  await FilesManager.getInstance();
 });
