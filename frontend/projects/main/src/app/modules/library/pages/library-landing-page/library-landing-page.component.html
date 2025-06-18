@@ -1,5 +1,12 @@
 <app-songs-drop-in-zone (dropped)="openUploadDialog($event)">
-  <p>library-landing-page works!</p>
   <button mat-flat-button (click)="openUploadDialog()">Upload</button>
+  @if(tracks().length === 0){
+    <p>There are no tracks yet. Upload them by dragging some audio files into this page.</p>
+  } @else {
+    @for (track of tracks(); track track){
+      <p>{{track.name}} | {{track.author ?? 'None'}}</p>
+    }
+  }
+
 </app-songs-drop-in-zone>
 

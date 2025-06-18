@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AudioTrack } from '@shared/models/track.model';
 import { Observable, Subject } from 'rxjs';
+import { AudioApiWindow } from '../models/window-api.model';
 
 @Injectable({
   providedIn: 'root',
@@ -28,12 +29,3 @@ export class AudioFilesService {
     return subject.asObservable();
   }
 }
-
-type AudioApiWindow = Window &
-  typeof globalThis & {
-    AUDIO_FILES_API: {
-      fetchAudioData: (files: FileList) => Promise<void>;
-      registerFileDrop: (callback: (paths: AudioTrack[]) => void) => void;
-      uploadTracks: (tracks: AudioTrack[]) => Promise<void>;
-    };
-  };
