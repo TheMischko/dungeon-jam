@@ -1,6 +1,6 @@
 export enum GeneralChannels {
   GET_OS = 'GET_OS',
-  REDIRECT = 'redirect'
+  REDIRECT = 'redirect',
 }
 
 export enum TrackChannel {
@@ -10,10 +10,8 @@ export enum TrackChannel {
 }
 
 export enum AudioFileChannel {
-  FETCH_DATA = 'audio/fetch-data'
+  FETCH_DATA = 'audio/fetch-data',
+  UPLOAD = 'audio/upload',
 }
 
-export type AppChannel =
-  | GeneralChannels
-  | TrackChannel
-  | AudioFileChannel
+export type AppChannel = GeneralChannels | TrackChannel | AudioFileChannel;

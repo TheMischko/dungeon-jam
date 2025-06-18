@@ -56,14 +56,11 @@ export class TracksUploadModalComponent {
       this.forms.insert(
         index,
         new FormGroup({
-          path: new FormControl(track.fullPath),
+          path: new FormControl({ value: track.fullPath, disabled: true }),
           title: new FormControl(track.title, [Validators.required]),
           author: new FormControl(track.author || null),
         }),
       );
-    });
-    this.forms.controls.forEach((form) => {
-      form.controls['path'].disable();
     });
   }
 
@@ -76,12 +73,22 @@ export class TracksUploadModalComponent {
   }
 
   cancel() {
-    this.dialog.close();
+    this.dialog.close(null);
   }
 
   nextStep() {
     if (this.currentStep() === this.tracks.length - 1 && this.forms.valid) {
-      this.dialog.close();
+      const result: AudioTrack[] = this.forms.controls.map((group, index) => {
+        const value = group.value;
+        return {
+          title: value.title!,
+          fullPath: this.tracks[index].fullPath,
+          author: value.author || undefined,
+          length: this.tracks[index].length,
+        };
+      });
+      this.dialog.close(result);
+      return;
     }
 
     this.currentStep.set(this.currentStep() + 1);

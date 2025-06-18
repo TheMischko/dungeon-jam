@@ -11,20 +11,21 @@ const fetchAudioData = async (paths: string[]): Promise<AudioTrack[]> => {
 const registerFileDrop = (callback: (paths: AudioTrack[]) => void) => {
   window.addEventListener('drop', async (e) => {
     e.preventDefault();
-    const files = [...e.dataTransfer!.files];
-    console.log(files);
-    const paths = files
+    const paths = [...e.dataTransfer!.files]
       .filter((file) => audioRegExp.test(file.type))
       .map((file) => webUtils.getPathForFile(file));
-    console.log(paths);
     const data = await fetchAudioData([...paths]);
-    console.log(data);
     callback(data);
   });
   window.addEventListener('dragover', (e) => e.preventDefault());
 };
 
+const uploadTracks = async (tracks: AudioTrack[]) => {
+  return await ipcRenderer.invoke(AudioFileChannel.UPLOAD, tracks);
+};
+
 export default {
   fetchAudioData,
   registerFileDrop,
+  uploadTracks,
 };

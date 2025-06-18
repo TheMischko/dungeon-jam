@@ -1,7 +1,7 @@
 import { DatabaseWrapper } from '../database/database';
-import { Track } from '@shared/models/track.model';
+import { AudioTrack, Track } from '@shared/models/track.model';
 import { ipcMain } from 'electron';
-import { TrackChannel } from '@shared/models/channels.model';
+import { AudioFileChannel, TrackChannel } from '@shared/models/channels.model';
 import { v4 as uuid } from 'uuid';
 
 export class TrackManager {
@@ -33,6 +33,13 @@ export class TrackManager {
         return await this.insert(name, url, author);
       },
     );
+
+    ipcMain.handle(AudioFileChannel.UPLOAD, async (_, tracks: AudioTrack[]) => {
+      const promises = tracks.map((track: AudioTrack) => {
+        return this.insert(track.title, track.fullPath, track.author);
+      });
+      await Promise.all(promises);
+    });
   }
 
   getAll(): Track[] {
