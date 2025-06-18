@@ -1,10 +1,36 @@
-<div class="content">
+<div class="wrapper">
   <div class="header">
     <h1>{{ title }}</h1>
   </div>
-  <ul>
-    @for(track of tracks; track track.author){
-      <li>{{track.title}}</li>
-    }
-  </ul>
+
+  <div class="content">
+    <mat-form-field [formGroup]="forms.controls[currentStep()]" appearance="outline">
+      <mat-label>File</mat-label>
+      <input matInput formControlName="path" [disabled]="true">
+    </mat-form-field>
+    <mat-form-field [formGroup]="forms.controls[currentStep()]" appearance="outline">
+      <mat-label>Title</mat-label>
+      <input matInput formControlName="title">
+    </mat-form-field>
+
+    <mat-form-field [formGroup]="forms.controls[currentStep()]" appearance="outline">
+      <mat-label>Author</mat-label>
+      <input matInput formControlName="author">
+    </mat-form-field>
+  </div>
+
+  <div class="footer">
+    <div class="steps">
+      @for(track of tracks; track track){
+        <span class="step-dot" [class.active]="$index === currentStep()"></span>
+      }
+    </div>
+    <div class="buttons">
+      @if(currentStep() > 0){
+        <button mat-flat-button (click)="previousStep()">Previous</button>
+      }
+      <button mat-flat-button (click)="nextStep()">{{isLastStep() ? 'Finish' : 'Next'}}</button>
+      <button mat-flat-button color="tertiary" (click)="cancel()">Cancel</button>
+    </div>
+  </div>
 </div>

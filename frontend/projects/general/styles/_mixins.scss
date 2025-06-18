@@ -1,7 +1,5 @@
 @use 'colors' as col;
 
 @mixin base-dialog(){
-  padding: 1rem;
-  background-color: col.$background-main;
   color: col.$text-main;
 }

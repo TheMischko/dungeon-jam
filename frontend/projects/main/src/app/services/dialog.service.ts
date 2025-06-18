@@ -19,8 +19,9 @@ export class DialogService {
       disableClose: true,
       scrollStrategy: new NoopScrollStrategy(),
       data: null,
-      width: '800px',
-      height: '800px',
+      width: '700px',
+      maxWidth: '90vw',
+      panelClass: 'app-dialog-container',
       ...dialogConfig,
     };
 
