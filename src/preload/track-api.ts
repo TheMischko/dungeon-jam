@@ -13,9 +13,16 @@ const getTrackById = async (id: string): Promise<Track | null> => {
 const createTrack = async (
   name: string,
   url: string,
+  duration: number,
   author?: string,
 ): Promise<Track> => {
-  return await ipcRenderer.invoke(TrackChannel.INSERT, name, url, author);
+  return await ipcRenderer.invoke(
+    TrackChannel.INSERT,
+    name,
+    url,
+    duration,
+    author,
+  );
 };
 
 export default {

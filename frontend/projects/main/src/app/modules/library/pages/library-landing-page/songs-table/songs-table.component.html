@@ -18,6 +18,10 @@
     <mat-header-cell mat-header-cell *matHeaderCellDef>Author</mat-header-cell>
     <mat-cell *matCellDef="let row">{{row.author}}</mat-cell>
   </ng-container>
+  <ng-container matColumnDef="duration">
+    <mat-header-cell mat-header-cell *matHeaderCellDef>Length</mat-header-cell>
+    <mat-cell *matCellDef="let row">{{row.duration | trackDuration}}</mat-cell>
+  </ng-container>
 
   <mat-header-row  *matHeaderRowDef="displayedColumns"></mat-header-row >
   <mat-row (mouseenter)="hoverStart(row)" (mouseleave)="hoverEnd(row)" [class.active-row]="isActiveRow(row)" *matRowDef="let row; columns: displayedColumns;"></mat-row>

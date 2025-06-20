@@ -9,8 +9,14 @@
 
 .table{
   background: none;
+  overflow-y: auto;
+  padding-bottom: 1rem;
   .mat-column-play{
     max-width: 10%;
     min-width: 50px;
+  }
+  .mat-column-duration{
+    max-width: 20%;
+    min-width: 80px;
   }
 }

@@ -14,6 +14,7 @@ export type AudioApiWindow = Window &
       createTrack: (
         name: string,
         url: string,
+        duration: number,
         author?: string,
       ) => Promise<Track>;
     };

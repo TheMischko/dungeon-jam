@@ -29,14 +29,25 @@ export class TrackManager {
 
     ipcMain.handle(
       TrackChannel.INSERT,
-      async (_, name: string, url: string, author?: string) => {
-        return await this.insert(name, url, author);
+      async (
+        _,
+        name: string,
+        url: string,
+        duration: number,
+        author?: string,
+      ) => {
+        return await this.insert(name, url, duration, author);
       },
     );
 
     ipcMain.handle(AudioFileChannel.UPLOAD, async (_, tracks: AudioTrack[]) => {
       const promises = tracks.map((track: AudioTrack) => {
-        return this.insert(track.title, track.fullPath, track.author);
+        return this.insert(
+          track.title,
+          track.fullPath,
+          track.length,
+          track.author,
+        );
       });
       await Promise.all(promises);
     });
@@ -50,7 +61,12 @@ export class TrackManager {
     return this.getAll()?.find((track) => track.id === id);
   }
 
-  async insert(name: string, url: string, author?: string): Promise<Track> {
+  async insert(
+    name: string,
+    url: string,
+    duration: number,
+    author?: string,
+  ): Promise<Track> {
     const tracks = this.getAll();
     const id = uuid();
     const newTrack = {
@@ -58,6 +74,7 @@ export class TrackManager {
       name,
       url,
       author,
+      duration,
     };
     tracks.push(newTrack);
     await this.database.updateTable('tracks', tracks);
