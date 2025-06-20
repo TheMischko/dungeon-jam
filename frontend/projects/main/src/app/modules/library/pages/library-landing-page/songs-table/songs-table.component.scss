@@ -1,0 +1,16 @@
+@use 'colors' as col;
+
+:host{
+  .active-row{
+    background: col.$background-hover;
+  }
+
+}
+
+.table{
+  background: none;
+  .mat-column-play{
+    max-width: 10%;
+    min-width: 50px;
+  }
+}

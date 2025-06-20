@@ -2,6 +2,7 @@
 
 $background-main: #13171c;
 $background-deep: color.scale($background-main, $lightness: -20%);
+$background-hover: color.scale($background-main, $lightness: 20%);
 
 $primary: #1ea193;
 $primary-light: #27d1bf;

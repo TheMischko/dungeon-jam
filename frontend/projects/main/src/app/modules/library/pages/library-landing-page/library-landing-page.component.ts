@@ -6,10 +6,11 @@ import { SongsDropInZoneComponent } from './songs-drop-in-zone/songs-drop-in-zon
 import { AudioTrack, Track } from '@shared/models/track.model';
 import { AudioFilesService } from '../../../../services/audio-files.service';
 import { TrackService } from '../../../../services/track.service';
+import {SongsTableComponent} from './songs-table/songs-table.component';
 
 @Component({
   selector: 'app-library-landing-page',
-  imports: [MatButton, SongsDropInZoneComponent],
+  imports: [MatButton, SongsDropInZoneComponent, SongsTableComponent],
   templateUrl: './library-landing-page.component.html',
   styleUrl: './library-landing-page.component.scss',
 })
