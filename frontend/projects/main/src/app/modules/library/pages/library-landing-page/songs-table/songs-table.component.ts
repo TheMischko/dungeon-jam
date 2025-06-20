@@ -1,4 +1,4 @@
-import { Component, input, signal } from '@angular/core';
+import { Component, input, output, signal } from '@angular/core';
 import {
   MatCell,
   MatCellDef,
@@ -39,7 +39,11 @@ import { TrackDurationPipe } from '../../../../../../../../general/src/lib/pipes
 })
 export class SongsTableComponent {
   readonly tracks = input<Track[]>([]);
+  readonly playingTrackId = input<string | null>();
   readonly activeRow = signal<Track | null>(null);
+
+  readonly playTrack = output<Track>();
+  readonly pauseTrack = output();
 
   readonly displayedColumns = ['play', 'title', 'author', 'duration'];
 
@@ -55,6 +59,21 @@ export class SongsTableComponent {
 
   isActiveRow(track: Track): boolean {
     return this.activeRow()?.id === track.id;
+  }
+
+  isTrackPlaying(track: Track) {
+    if (!this.playingTrackId()) {
+      return false;
+    }
+    return this.playingTrackId() === track.id;
+  }
+
+  play(track: Track) {
+    this.playTrack.emit(track);
+  }
+
+  pause() {
+    this.pauseTrack.emit();
   }
 
   readonly PlayIcon = iconSet.PlayIcon;

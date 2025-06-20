@@ -3,7 +3,7 @@
   @if(tracks().length === 0){
     <p>There are no tracks yet. Upload them by dragging some audio files into this page.</p>
   } @else {
-    <app-songs-table [tracks]="tracks()"></app-songs-table>
+    <app-songs-table [tracks]="tracks()" [playingTrackId]="playingTrackId()" (playTrack)="playTrack($event)" (pauseTrack)="pauseTrack()"></app-songs-table>
   }
 
 </app-songs-drop-in-zone>

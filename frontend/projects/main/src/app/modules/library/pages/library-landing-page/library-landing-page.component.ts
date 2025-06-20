@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { TracksUploadModalComponent } from '../../modals/tracks-upload-modal/tracks-upload-modal.component';
 import { MatButton } from '@angular/material/button';
 import { DialogService } from '../../../../services/dialog.service';
@@ -6,7 +6,13 @@ import { SongsDropInZoneComponent } from './songs-drop-in-zone/songs-drop-in-zon
 import { AudioTrack, Track } from '@shared/models/track.model';
 import { AudioFilesService } from '../../../../services/audio-files.service';
 import { TrackService } from '../../../../services/track.service';
-import {SongsTableComponent} from './songs-table/songs-table.component';
+import { SongsTableComponent } from './songs-table/songs-table.component';
+import { PlaybackService } from '../../../../services/playback.service';
+import { toSignal } from '@angular/core/rxjs-interop';
+import {
+  initialPlaybackState,
+  PlaybackState,
+} from '../../../../models/playback.model';
 
 @Component({
   selector: 'app-library-landing-page',
@@ -18,8 +24,20 @@ export class LibraryLandingPageComponent implements OnInit {
   private readonly dialogService = inject(DialogService);
   private readonly audioFilesService = inject(AudioFilesService);
   private readonly trackService = inject(TrackService);
+  private readonly playbackService = inject(PlaybackService);
 
-  tracks = signal<Track[]>([]);
+  readonly playbackState = toSignal(this.playbackService.playback$, {
+    initialValue: initialPlaybackState,
+  });
+  readonly playingTrackId = computed(() => {
+    const state: PlaybackState = this.playbackState();
+    if (state.isPlaying && state.currentTrack) {
+      return state.currentTrack.id;
+    }
+    return null;
+  });
+
+  readonly tracks = signal<Track[]>([]);
 
   ngOnInit() {
     this.trackService.getAllTracks().subscribe((tracks) => {
@@ -43,11 +61,21 @@ export class LibraryLandingPageComponent implements OnInit {
         return;
       }
       this.audioFilesService.uploadAudioTracks(tracks).subscribe(() => {
-        console.log('uploaded');
         this.trackService.getAllTracks().subscribe((tracks) => {
           this.tracks.set(tracks);
         });
       });
     });
+  }
+
+  playTrack(track: Track) {
+    const trackIndex = this.tracks().findIndex(
+      (libraryTrack) => libraryTrack.id === track.id,
+    );
+    this.playbackService.play(track, this.tracks().slice(trackIndex + 1));
+  }
+
+  pauseTrack() {
+    this.playbackService.pause();
   }
 }

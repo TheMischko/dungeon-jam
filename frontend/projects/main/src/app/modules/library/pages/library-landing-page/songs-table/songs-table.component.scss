@@ -1,21 +1,24 @@
 @use 'colors' as col;
 
-:host{
-  .active-row{
-    background: col.$background-hover;
-  }
-
-}
-
-.table{
+.table {
   background: none;
   overflow-y: auto;
   padding-bottom: 1rem;
-  .mat-column-play{
+
+  .mat-mdc-row {
+    transition: color 0.25s ease;
+  }
+  .active-row {
+    background: col.$background-hover;
+  }
+  .playing {
+    color: col.$primary;
+  }
+  .mat-column-play {
     max-width: 10%;
     min-width: 50px;
   }
-  .mat-column-duration{
+  .mat-column-duration {
     max-width: 20%;
     min-width: 80px;
   }
