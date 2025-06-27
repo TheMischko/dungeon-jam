@@ -1,0 +1,62 @@
+@use 'colors' as col;
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+.container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  width: 100%;
+  color: white;
+  user-select: none;
+
+  &:hover .progress-bar {
+    height: 8px;
+  }
+
+  .progress-bar {
+    position: relative;
+    flex: 1;
+
+    width: 100%;
+    height: 4px;
+    background: col.$background-hover;
+
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    transform: scaleY(100%);
+    transition: height 0.2s ease-out;
+
+    .pointer {
+      position: absolute;
+      top: 50%;
+
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      transform: translateY(-50%);
+      background: col.$primary-light;
+      transition:
+        height,
+        width 0.1s ease-in;
+      cursor: pointer;
+
+      &:hover {
+        width: 24px;
+        height: 24px;
+      }
+    }
+
+    .fill {
+      display: block;
+      height: 100%;
+      background: col.$primary-light;
+    }
+  }
+}

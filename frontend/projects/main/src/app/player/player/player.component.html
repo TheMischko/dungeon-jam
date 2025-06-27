@@ -24,5 +24,12 @@
       (clicked)="skipNext.emit()"
     ></lib-icon-button>
   </div>
+
+  <app-player-bar
+    class="duration-bar"
+    [duration]="playBackState().duration"
+    [position]="playBackState().position"
+    (seek)="seek($event)"
+  ></app-player-bar>
 </div>
 <div class="volume"></div>
