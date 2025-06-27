@@ -1,0 +1,49 @@
+@switch (type()){ @case (ButtonType.Flat){
+<button
+  mat-flat-button
+  [color]="color()"
+  [disabled]="disabled()"
+  [ngClass]="buttonClass()"
+  (click)="buttonClicked()"
+>
+  <ng-container *ngTemplateOutlet="content"></ng-container>
+</button>
+} @case (ButtonType.Raised){
+<button
+  mat-raised-button
+  [color]="color()"
+  [disabled]="disabled()"
+  [ngClass]="buttonClass()"
+  (click)="buttonClicked()"
+>
+  <ng-container *ngTemplateOutlet="content"></ng-container>
+</button>
+} @case (ButtonType.Stroked){
+<button
+  mat-stroked-button
+  [color]="color()"
+  [disabled]="disabled()"
+  [ngClass]="buttonClass()"
+  (click)="buttonClicked()"
+>
+  <ng-container *ngTemplateOutlet="content"></ng-container>
+</button>
+} @default {
+<button
+  mat-button
+  [color]="color()"
+  [disabled]="disabled()"
+  [ngClass]="buttonClass()"
+  (click)="buttonClicked()"
+>
+  <ng-container *ngTemplateOutlet="content"></ng-container>
+</button>
+} }
+
+<ng-template #content>
+  <lucide-icon
+    [size]="iconSize()"
+    [img]="icon()"
+    [ngClass]="iconClass()"
+  ></lucide-icon>
+</ng-template>

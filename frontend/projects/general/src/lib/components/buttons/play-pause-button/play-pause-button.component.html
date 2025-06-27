@@ -1,0 +1,13 @@
+@if(state() === 'pause'){
+<lib-icon-button
+  [icon]="pauseIcon"
+  [type]="ButtonType.Default"
+  size="regular"
+></lib-icon-button>
+} @else {
+<lib-icon-button
+  [icon]="playIcon"
+  [type]="ButtonType.Default"
+  size="regular"
+></lib-icon-button>
+}

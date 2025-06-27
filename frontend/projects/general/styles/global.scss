@@ -4,24 +4,27 @@
 @use './typography' as typo;
 
 html {
-  @include mat.theme((
-    color: (
-      theme-type: dark,
-      primary: custom.$primary-palette,
-      tertiary: custom.$tertiary-palette,
-    ),
-    typography: (
-      plain-family: typo.$font,
-      brand-family: typo.$font,
-      bold-weight: 800,
-      medium-weight: 500,
-      regular-weight: 300
-    ),
-    density: 0,
-  ));
+  @include mat.theme(
+    (
+      color: (
+        theme-type: dark,
+        primary: custom.$primary-palette,
+        tertiary: custom.$tertiary-palette,
+      ),
+      typography: (
+        plain-family: typo.$font,
+        brand-family: typo.$font,
+        bold-weight: 800,
+        medium-weight: 500,
+        regular-weight: 300,
+      ),
+      density: 0,
+    )
+  );
 }
 
-html, body{
+html,
+body {
   margin: 0;
   padding: 0;
   width: 100%;
@@ -40,20 +43,19 @@ app-root {
   background: col.$background-main;
   color: col.$text-main;
 
-  & > *{
+  & > * {
     box-sizing: border-box;
   }
 }
 
-.app-dialog-container{
+.app-dialog-container {
   box-shadow: 1px 2px 5px 5px rgba(0, 0, 0, 0.3);
 
   width: auto !important;
   max-width: 90vw;
   max-height: 90vh;
 
-
-  .mat-mdc-dialog-surface{
+  .mat-mdc-dialog-surface {
     display: flex !important;
     align-items: center;
     justify-content: center;
@@ -65,7 +67,34 @@ app-root {
   }
 }
 
-.icon-small{
+.icon-small {
   max-width: 16px;
   max-height: 16px;
+}
+.icon-regular {
+  max-width: 24px;
+  max-height: 24px;
+}
+.icon-large {
+  max-width: 32px;
+  max-height: 32px;
+}
+
+button.mdc-button.button-small {
+  height: 26px;
+  width: 26px;
+  min-width: 26px;
+  padding-top: 3px;
+}
+button.mdc-button.button-regular {
+  height: 42px;
+  width: 42px;
+  min-width: 42px;
+  padding-top: 4px;
+}
+button.mdc-button.button-large {
+  height: 56px;
+  width: 56px;
+  min-width: 56px;
+  padding-top: 3px;
 }
