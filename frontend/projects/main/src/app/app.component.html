@@ -1,5 +1,9 @@
-<button mat-flat-button (click)="togglePlay()">{{ playing ? 'pause' : 'play' }}</button>
+<button mat-flat-button (click)="togglePlay()">
+  {{ playing ? 'pause' : 'play' }}
+</button>
 <br />
 <div class="page-container">
   <router-outlet />
 </div>
+
+<app-player></app-player>

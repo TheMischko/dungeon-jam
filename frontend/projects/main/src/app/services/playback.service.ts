@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, tap } from 'rxjs';
+import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { initialPlaybackState, PlaybackState } from '../models/playback.model';
 import { Track } from '@shared/models/track.model';
 
@@ -10,7 +10,9 @@ export class PlaybackService {
   private readonly state = new BehaviorSubject<PlaybackState>(
     initialPlaybackState,
   );
-  readonly playback$ = this.state.asObservable().pipe(tap(console.log));
+  readonly playback$: Observable<PlaybackState> = this.state
+    .asObservable()
+    .pipe(tap(console.log));
 
   play(track?: Track, queue?: Track[]) {
     const current = this.state.getValue();

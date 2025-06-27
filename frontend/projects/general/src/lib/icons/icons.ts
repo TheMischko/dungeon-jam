@@ -1,6 +1,13 @@
-import {PauseIcon, PlayIcon} from 'lucide-angular';
+import {
+  PauseIcon,
+  PlayIcon,
+  SkipBackIcon,
+  SkipForwardIcon,
+} from 'lucide-angular';
 
 export const iconSet = {
   PlayIcon: PlayIcon,
-  PauseIcon: PauseIcon
-}
+  PauseIcon: PauseIcon,
+  PrevIcon: SkipBackIcon,
+  NextIcon: SkipForwardIcon,
+};

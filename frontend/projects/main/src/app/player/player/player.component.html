@@ -1,0 +1,28 @@
+<div class="info">
+  <p>{{ currentTrack()?.name || '' }}</p>
+  <p>{{ currentTrack()?.author || '' }}</p>
+</div>
+<div class="controls">
+  <!-- Prev -->
+  <div class="buttons">
+    <lib-icon-button
+      [icon]="prevIcon"
+      size="regular"
+      (clicked)="skipPrev.emit()"
+    ></lib-icon-button>
+
+    <!-- Play/Pause -->
+    <lib-play-pause-button
+      [state]="playPauseState()"
+      (toggle)="togglePlayPause($event)"
+    ></lib-play-pause-button>
+
+    <!-- Next -->
+    <lib-icon-button
+      [icon]="nextIcon"
+      size="regular"
+      (clicked)="skipNext.emit()"
+    ></lib-icon-button>
+  </div>
+</div>
+<div class="volume"></div>
