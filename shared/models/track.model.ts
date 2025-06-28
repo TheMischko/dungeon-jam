@@ -12,3 +12,8 @@ export interface AudioTrack {
   author?: string;
   length: number;
 }
+
+export interface FileBase64 {
+  base64: string;
+  mimeType: string;
+}

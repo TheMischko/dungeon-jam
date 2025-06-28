@@ -1,4 +1,4 @@
-import { AudioTrack, Track } from '@shared/models/track.model';
+import { AudioTrack, FileBase64, Track } from '@shared/models/track.model';
 
 export type AudioApiWindow = Window &
   typeof globalThis & {
@@ -6,6 +6,7 @@ export type AudioApiWindow = Window &
       fetchAudioData: (files: FileList) => Promise<void>;
       registerFileDrop: (callback: (paths: AudioTrack[]) => void) => void;
       uploadTracks: (tracks: AudioTrack[]) => Promise<void>;
+      loadFileBase64: (filePath: string) => Promise<FileBase64>;
     };
   } & {
     TRACK_API: {

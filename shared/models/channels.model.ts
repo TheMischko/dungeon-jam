@@ -12,6 +12,7 @@ export enum TrackChannel {
 export enum AudioFileChannel {
   FETCH_DATA = 'audio/fetch-data',
   UPLOAD = 'audio/upload',
+  LOAD_FILE = 'audio/load-file',
 }
 
 export type AppChannel = GeneralChannels | TrackChannel | AudioFileChannel;
