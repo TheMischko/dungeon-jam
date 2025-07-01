@@ -1,7 +1,8 @@
-import { Injectable } from '@angular/core';
-import { Track } from '@shared/models/track.model';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { AudioApiWindow } from '../models/window-api.model';
+import {Injectable} from '@angular/core';
+import {Track} from '@shared/models/track.model';
+import {BehaviorSubject, Observable} from 'rxjs';
+import {AudioApiWindow} from '../models/window-api.model';
+import {PlayingTrackState} from '../models/playback.model';
 
 @Injectable({
   providedIn: 'root',
@@ -11,6 +12,7 @@ export class AudioPlayerService {
   private howl?: Howl;
   private positionSubject = new BehaviorSubject<number>(0);
   private timerId?: number;
+  private trackStateSubject = new BehaviorSubject<PlayingTrackState>(PlayingTrackState.NONE);
 
   private trackDataCache = new Map<string, Blob>();
 
@@ -18,20 +20,14 @@ export class AudioPlayerService {
     return this.positionSubject.asObservable();
   }
 
+  get state$(): Observable<PlayingTrackState> {
+    return this.trackStateSubject.asObservable();
+  }
+
   async play(track: Track) {
     this.stop();
     const trackData = await this.getTrackData(track);
-    this.howl = new Howl({
-      src: [URL.createObjectURL(trackData)],
-      html5: true,
-    });
-    this.howl.on('play', () => {
-      if (this.howl) {
-        const position = this.howl.seek();
-        this.positionSubject.next(position);
-        this.setupWatchdog();
-      }
-    });
+    this.howl = this.createHowl(URL.createObjectURL(trackData));
     this.howl.play();
   }
 
@@ -65,6 +61,26 @@ export class AudioPlayerService {
       return;
     }
     this.howl.seek(position);
+  }
+
+  private createHowl(src: string): Howl{
+    const howl = new Howl({
+      src: [src],
+      html5: true,
+      format: ''
+    });
+    howl.on('play', () => {
+      if (this.howl) {
+        this.trackStateSubject.next(PlayingTrackState.PLAYING);
+        const position = this.howl.seek();
+        this.positionSubject.next(position);
+        this.setupWatchdog();
+      }
+    });
+    howl.on('end', () => {
+      this.trackStateSubject.next(PlayingTrackState.ENDED);
+    })
+    return howl;
   }
 
   private setupWatchdog() {

@@ -17,3 +17,11 @@ export const initialPlaybackState: PlaybackState = {
   position: 0,
   duration: 0,
 };
+
+export enum PlayingTrackState {
+  NONE = 'NONE',
+  LOADED = 'LOADED',
+  PLAYING = 'PLAYING',
+  ENDING_SOON = 'ENDING_SOON',
+  ENDED = 'ENDED'
+}

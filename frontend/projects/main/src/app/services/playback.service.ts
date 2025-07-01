@@ -1,6 +1,6 @@
-import { effect, inject, Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { initialPlaybackState, PlaybackState } from '../models/playback.model';
+import {effect, inject, Injectable, OnDestroy} from '@angular/core';
+import {BehaviorSubject, Observable, Subscription} from 'rxjs';
+import {initialPlaybackState, PlaybackState, PlayingTrackState} from '../models/playback.model';
 import { Track } from '@shared/models/track.model';
 import { AudioPlayerService } from './audio-player.service';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -8,7 +8,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 @Injectable({
   providedIn: 'root',
 })
-export class PlaybackService {
+export class PlaybackService implements OnDestroy{
   readonly audioPlayerService = inject(AudioPlayerService);
   private readonly state = new BehaviorSubject<PlaybackState>(
     initialPlaybackState,
@@ -17,6 +17,7 @@ export class PlaybackService {
   readonly playerPosition = toSignal(this.audioPlayerService.position$, {
     initialValue: 0,
   });
+  private readonly trackStateSubscription: Subscription;
 
   constructor() {
     effect(() => {
@@ -24,6 +25,11 @@ export class PlaybackService {
       const current = this.state.getValue();
       this.state.next({ ...current, position: currentPosition });
     });
+    this.trackStateSubscription = this.audioPlayerService.state$.subscribe((state) => this.handleTrackStateChange(state))
+  }
+
+  ngOnDestroy() {
+    this.trackStateSubscription.unsubscribe();
   }
 
   async play(track?: Track, queue?: Track[]) {
@@ -92,5 +98,18 @@ export class PlaybackService {
     const current = this.state.getValue();
     this.state.next({ ...current, position: newPos });
     this.audioPlayerService.seek(newPos);
+  }
+
+  private async handleTrackStateChange(trackState: PlayingTrackState): Promise<void>{
+    console.log(trackState)
+    switch (trackState) {
+      case PlayingTrackState.ENDED:
+        await this.handleTrackEnded();
+        break;
+    }
+  }
+
+  private async handleTrackEnded() {
+    await this.playNext();
   }
 }
