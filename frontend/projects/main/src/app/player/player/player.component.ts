@@ -1,7 +1,5 @@
-import { Component, computed, inject, output, signal } from '@angular/core';
-import { PlaybackService } from '../../services/playback.service';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { initialPlaybackState } from '../../models/playback.model';
+import {Component, computed, input, output} from '@angular/core';
+import { PlaybackState} from '../../models/playback.model';
 import { PlayPauseButtonComponent } from '../../../../../general/src/lib/components/buttons/play-pause-button/play-pause-button.component';
 import { iconSet } from '../../../../../general/src/lib/icons/icons';
 import { IconButtonComponent } from '../../../../../general/src/lib/components/buttons/icon-button/icon-button.component';
@@ -20,21 +18,17 @@ import { LucideAngularModule } from 'lucide-angular';
   styleUrl: './player.component.scss',
 })
 export class PlayerComponent {
-  playbackService = inject(PlaybackService);
-  playBackState = toSignal(this.playbackService.playback$, {
-    initialValue: initialPlaybackState,
-  });
+  playBackState = input.required<PlaybackState>();
   currentTrack = computed(() => this.playBackState().currentTrack);
   playing = computed(() => this.playBackState().isPlaying);
   playPauseState = computed(() => (this.playing() ? 'pause' : 'play'));
   queueCount = computed(() => this.playBackState().queue.length);
 
-  posSig = signal<number>(50);
-
   skipPrev = output<void>();
   skipNext = output<void>();
   play = output<void>();
   pause = output<void>();
+  seek = output<number>();
 
   readonly prevIcon = iconSet.PrevIcon;
   readonly nextIcon = iconSet.NextIcon;
@@ -42,16 +36,9 @@ export class PlayerComponent {
 
   togglePlayPause(action: 'play' | 'pause') {
     if (action === 'pause') {
-      this.playbackService.pause();
       this.pause.emit();
       return;
     }
-    this.playbackService.play();
     this.play.emit();
-  }
-
-  seek(seekPos: number) {
-    this.posSig.set(seekPos);
-    this.playbackService.seek(seekPos);
   }
 }

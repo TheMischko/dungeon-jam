@@ -29,7 +29,7 @@
     class="duration-bar"
     [duration]="playBackState().duration"
     [position]="playBackState().position"
-    (seek)="seek($event)"
+    (seek)="seek.emit($event)"
   ></app-player-bar>
 </div>
 <div class="volume">

@@ -1,0 +1,8 @@
+<app-player
+  [playBackState]="playBackState()"
+  (play)="play()"
+  (pause)="pause()"
+  (skipNext)="playNextTrack()"
+  (skipPrev)="playPrevTrack()"
+  (seek)="seek($event)"
+></app-player>

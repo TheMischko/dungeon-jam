@@ -4,13 +4,13 @@ import { MatButton } from '@angular/material/button';
 import { RouterOutlet } from '@angular/router';
 import { RoutingListenerService } from './services/routing-listener.service';
 import { MatDialogModule } from '@angular/material/dialog';
-import { PlayerComponent } from './player/player/player.component';
+import {PlayerSmartComponent} from './player/player-smart/player-smart.component';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
-  imports: [MatButton, RouterOutlet, MatDialogModule, PlayerComponent],
+  imports: [MatButton, RouterOutlet, MatDialogModule, PlayerSmartComponent],
 })
 export class AppComponent {
   private readonly routingListenerService = inject(RoutingListenerService);

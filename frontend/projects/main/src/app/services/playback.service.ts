@@ -62,7 +62,7 @@ export class PlaybackService {
     this.audioPlayerService.pause();
   }
 
-  async next() {
+  async playNext() {
     const current = this.state.getValue();
     const nextState = { ...current, position: 0 };
     if (current.queue.length > 0) {
@@ -75,6 +75,10 @@ export class PlaybackService {
       nextState.position = 0;
       nextState.isPlaying = true;
       await this.audioPlayerService.play(nextState.currentTrack);
+    } else {
+      // TO-DO: Clear currently played song and stop playing.
+      this.pause();
+      return;
     }
     this.state.next(nextState);
   }
