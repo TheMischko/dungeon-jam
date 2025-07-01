@@ -32,4 +32,11 @@
     (seek)="seek($event)"
   ></app-player-bar>
 </div>
-<div class="volume"></div>
+<div class="volume">
+  @if(queueCount() > 0){
+  <div class="queue-display">
+    <lucide-icon [img]="playlistIcon"></lucide-icon>
+    <span class="queue-count">{{ queueCount() }}</span>
+  </div>
+  }
+</div>

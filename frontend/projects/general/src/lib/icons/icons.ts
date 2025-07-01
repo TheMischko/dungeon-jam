@@ -1,4 +1,5 @@
 import {
+  ListMusicIcon,
   PauseIcon,
   PlayIcon,
   SkipBackIcon,
@@ -10,4 +11,5 @@ export const iconSet = {
   PauseIcon: PauseIcon,
   PrevIcon: SkipBackIcon,
   NextIcon: SkipForwardIcon,
+  PlaylistIcon: ListMusicIcon,
 };

@@ -46,4 +46,15 @@
       gap: 1rem;
     }
   }
+
+  .queue-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .queue-count {
+      padding-bottom: 6px;
+      padding-left: 4px;
+    }
+  }
 }

@@ -6,10 +6,16 @@ import { PlayPauseButtonComponent } from '../../../../../general/src/lib/compone
 import { iconSet } from '../../../../../general/src/lib/icons/icons';
 import { IconButtonComponent } from '../../../../../general/src/lib/components/buttons/icon-button/icon-button.component';
 import { PlayerBarComponent } from './player-bar/player-bar.component';
+import { LucideAngularModule } from 'lucide-angular';
 
 @Component({
   selector: 'app-player',
-  imports: [PlayPauseButtonComponent, IconButtonComponent, PlayerBarComponent],
+  imports: [
+    PlayPauseButtonComponent,
+    IconButtonComponent,
+    PlayerBarComponent,
+    LucideAngularModule,
+  ],
   templateUrl: './player.component.html',
   styleUrl: './player.component.scss',
 })
@@ -21,6 +27,7 @@ export class PlayerComponent {
   currentTrack = computed(() => this.playBackState().currentTrack);
   playing = computed(() => this.playBackState().isPlaying);
   playPauseState = computed(() => (this.playing() ? 'pause' : 'play'));
+  queueCount = computed(() => this.playBackState().queue.length);
 
   posSig = signal<number>(50);
 
@@ -31,6 +38,7 @@ export class PlayerComponent {
 
   readonly prevIcon = iconSet.PrevIcon;
   readonly nextIcon = iconSet.NextIcon;
+  readonly playlistIcon = iconSet.PlaylistIcon;
 
   togglePlayPause(action: 'play' | 'pause') {
     if (action === 'pause') {
