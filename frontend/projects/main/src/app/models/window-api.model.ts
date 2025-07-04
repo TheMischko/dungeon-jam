@@ -1,4 +1,4 @@
-import { AudioTrack, FileBase64, Track } from '@shared/models/track.model';
+import {AudioTrack, FileBase64, StoredPlayback, Track} from '@shared/models/track.model';
 
 export type AudioApiWindow = Window &
   typeof globalThis & {
@@ -19,4 +19,9 @@ export type AudioApiWindow = Window &
         author?: string,
       ) => Promise<Track>;
     };
-  };
+  } & {
+    PLAYBACK_API: {
+      loadState: () => Promise<StoredPlayback>;
+      updateState: (newState: StoredPlayback) => void;
+    }
+  }

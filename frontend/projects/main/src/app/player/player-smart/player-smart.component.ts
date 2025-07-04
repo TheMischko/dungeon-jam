@@ -44,4 +44,8 @@ export class PlayerSmartComponent {
       this.playbackService.seek(newPos);
     }
   }
+
+  changeVolume(volume: number) {
+    this.playbackService.changeVolume(volume);
+  }
 }

@@ -1,14 +1,16 @@
 import {effect, inject, Injectable, OnDestroy} from '@angular/core';
 import {BehaviorSubject, Observable, Subscription} from 'rxjs';
 import {initialPlaybackState, PlaybackState, PlayingTrackState} from '../models/playback.model';
-import { Track } from '@shared/models/track.model';
+import {StoredPlayback, Track} from '@shared/models/track.model';
 import { AudioPlayerService } from './audio-player.service';
 import { toSignal } from '@angular/core/rxjs-interop';
+import {AudioApiWindow} from '../models/window-api.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PlaybackService implements OnDestroy{
+  private readonly window = <AudioApiWindow>window;
   readonly audioPlayerService = inject(AudioPlayerService);
   private readonly state = new BehaviorSubject<PlaybackState>(
     initialPlaybackState,
@@ -26,10 +28,17 @@ export class PlaybackService implements OnDestroy{
       this.state.next({ ...current, position: currentPosition });
     });
     this.trackStateSubscription = this.audioPlayerService.state$.subscribe((state) => this.handleTrackStateChange(state))
+    this.loadInitState();
   }
 
   ngOnDestroy() {
     this.trackStateSubscription.unsubscribe();
+  }
+
+  loadInitState(){
+    this.window.PLAYBACK_API.loadState().then((state) => {
+      this.changeVolume(state.volume);
+    })
   }
 
   async play(track?: Track, queue?: Track[]) {
@@ -100,8 +109,31 @@ export class PlaybackService implements OnDestroy{
     this.audioPlayerService.seek(newPos);
   }
 
+  changeVolume(volume: number){
+    const volumeNormalized = Math.max(0, Math.min(volume, 1));
+    const current = this.state.getValue();
+    const newState = {
+      ...current,
+      volume: volumeNormalized
+    }
+    this.audioPlayerService.setVolume(volume);
+    this.state.next(newState);
+    this.updateStoredState(newState)
+  }
+
+  private updateStoredState(state: PlaybackState): void{
+    this.window.PLAYBACK_API.updateState(
+      this.getStoredStateFromState(state)
+    );
+  }
+
+  private getStoredStateFromState(state: PlaybackState): StoredPlayback {
+    return {
+      volume: state.volume
+    }
+  }
+
   private async handleTrackStateChange(trackState: PlayingTrackState): Promise<void>{
-    console.log(trackState)
     switch (trackState) {
       case PlayingTrackState.ENDED:
         await this.handleTrackEnded();

@@ -3,7 +3,7 @@ import {
   PauseIcon,
   PlayIcon,
   SkipBackIcon,
-  SkipForwardIcon,
+  SkipForwardIcon, Volume1Icon, Volume2Icon, VolumeXIcon,
 } from 'lucide-angular';
 
 export const iconSet = {
@@ -13,3 +13,9 @@ export const iconSet = {
   NextIcon: SkipForwardIcon,
   PlaylistIcon: ListMusicIcon,
 };
+
+export const volumeIconSet = {
+  MutedIcon: VolumeXIcon,
+  LowIcon: Volume1Icon,
+  NormalIcon: Volume2Icon
+}

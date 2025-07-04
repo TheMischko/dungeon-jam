@@ -1,0 +1,11 @@
+<div class="volume-control">
+  <lucide-icon [img]="volumeIcon()"></lucide-icon>
+  <mat-slider
+    [min]="0"
+    [max]="1"
+    [step]="0.025"
+    class="slider"
+  >
+    <input matSliderThumb [formControl]="control">
+  </mat-slider>
+</div>

@@ -17,3 +17,7 @@ export interface FileBase64 {
   base64: string;
   mimeType: string;
 }
+
+export interface StoredPlayback {
+  volume: number;
+}

@@ -15,4 +15,9 @@ export enum AudioFileChannel {
   LOAD_FILE = 'audio/load-file',
 }
 
-export type AppChannel = GeneralChannels | TrackChannel | AudioFileChannel;
+export enum PlaybackChannel {
+  LOAD = 'playback/load',
+  UPDATE = 'playback/update'
+}
+
+export type AppChannel = GeneralChannels | TrackChannel | AudioFileChannel | PlaybackChannel;

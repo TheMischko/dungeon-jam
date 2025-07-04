@@ -5,6 +5,7 @@ import { iconSet } from '../../../../../general/src/lib/icons/icons';
 import { IconButtonComponent } from '../../../../../general/src/lib/components/buttons/icon-button/icon-button.component';
 import { PlayerBarComponent } from './player-bar/player-bar.component';
 import { LucideAngularModule } from 'lucide-angular';
+import { VolumeControlComponent } from './volume-control/volume-control.component';
 
 @Component({
   selector: 'app-player',
@@ -13,6 +14,7 @@ import { LucideAngularModule } from 'lucide-angular';
     IconButtonComponent,
     PlayerBarComponent,
     LucideAngularModule,
+    VolumeControlComponent,
   ],
   templateUrl: './player.component.html',
   styleUrl: './player.component.scss',
@@ -23,12 +25,14 @@ export class PlayerComponent {
   playing = computed(() => this.playBackState().isPlaying);
   playPauseState = computed(() => (this.playing() ? 'pause' : 'play'));
   queueCount = computed(() => this.playBackState().queue.length);
+  volume = computed(() => this.playBackState().volume);
 
   skipPrev = output<void>();
   skipNext = output<void>();
   play = output<void>();
   pause = output<void>();
   seek = output<number>();
+  volumeChange = output<number>();
 
   readonly prevIcon = iconSet.PrevIcon;
   readonly nextIcon = iconSet.NextIcon;

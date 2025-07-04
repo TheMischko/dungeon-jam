@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {Injectable, signal} from '@angular/core';
 import {Track} from '@shared/models/track.model';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {AudioApiWindow} from '../models/window-api.model';
@@ -13,6 +13,7 @@ export class AudioPlayerService {
   private positionSubject = new BehaviorSubject<number>(0);
   private timerId?: number;
   private trackStateSubject = new BehaviorSubject<PlayingTrackState>(PlayingTrackState.NONE);
+  private volume = signal<number>(1);
 
   private trackDataCache = new Map<string, Blob>();
 
@@ -63,11 +64,17 @@ export class AudioPlayerService {
     this.howl.seek(position);
   }
 
+  setVolume(volume: number): void{
+    this.volume.set(volume);
+    this.howl?.volume(volume);
+  }
+
   private createHowl(src: string): Howl{
     const howl = new Howl({
       src: [src],
       html5: true,
-      format: ''
+      format: '',
+      volume: this.volume(),
     });
     howl.on('play', () => {
       if (this.howl) {

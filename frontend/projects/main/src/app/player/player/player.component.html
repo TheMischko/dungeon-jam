@@ -39,4 +39,10 @@
     <span class="queue-count">{{ queueCount() }}</span>
   </div>
   }
+  <div class="volume-wrapper">
+    <app-volume-control
+      [volume]="volume()"
+      (changed)="volumeChange.emit($event)"
+    ></app-volume-control>
+  </div>
 </div>

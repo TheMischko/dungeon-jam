@@ -10,6 +10,7 @@ import { ViewManager } from './main/managers/view.manager';
 import { TrackManager } from './main/managers/track.manager';
 import {RedirectManager} from "./main/managers/redirect.manager";
 import {FilesManager} from "./main/managers/files.manager";
+import {StoredPlaybackManager} from "./main/managers/stored-playback.manager";
 
 configDotenv();
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN || 'ERROR';
@@ -87,6 +88,8 @@ async function setupDiscord(token: string, stream: Readable): Promise<void> {
 }
 
 app.on('ready', async () => {
+  // TO-DO: Move down
+  await StoredPlaybackManager.getInstance();
   const encoder = new Encoder({
     channels: NUM_CHANNELS,
     frameSize: FRAME_SIZE,
@@ -119,8 +122,8 @@ app.on('ready', async () => {
   } catch (e) {
     console.error(e);
   }
-
   await TrackManager.getInstance();
   await RedirectManager.getInstance();
   await FilesManager.getInstance();
+  //TO-DO: Postpone loading UI until all managers are loaded.
 });
