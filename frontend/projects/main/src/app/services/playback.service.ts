@@ -12,13 +12,16 @@ import {AudioApiWindow} from '../models/window-api.model';
 export class PlaybackService implements OnDestroy{
   private readonly window = <AudioApiWindow>window;
   readonly audioPlayerService = inject(AudioPlayerService);
+
   private readonly state = new BehaviorSubject<PlaybackState>(
     initialPlaybackState,
   );
   readonly playback$: Observable<PlaybackState> = this.state.asObservable();
+
   readonly playerPosition = toSignal(this.audioPlayerService.position$, {
     initialValue: 0,
   });
+  private readonly PLAY_PREV_DURATION_BREAKPOINT_SEC = 5;
   private readonly trackStateSubscription: Subscription;
 
   constructor() {
@@ -46,6 +49,7 @@ export class PlaybackService implements OnDestroy{
     if (queue && track) {
       this.state.next({
         ...current,
+        history: [],
         currentTrack: track,
         queue,
         isPlaying: true,
@@ -96,6 +100,29 @@ export class PlaybackService implements OnDestroy{
       return;
     }
     this.state.next(nextState);
+  }
+
+  async playPrev(): Promise<void> {
+    const current = this.state.getValue();
+    if(!current.currentTrack){
+      return;
+    }
+    if(current.position > this.PLAY_PREV_DURATION_BREAKPOINT_SEC){
+      this.seek(0);
+      return;
+    }
+
+    if(current.history.length > 0){
+      const prevTrack = current.history.pop()!;
+      current.queue.unshift(current.currentTrack);
+      this.state.next({
+        ...current,
+        currentTrack: prevTrack,
+        position: 0,
+        isPlaying: true
+      });
+      await this.audioPlayerService.play(prevTrack);
+    }
   }
 
   seek(newPos: number) {

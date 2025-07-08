@@ -35,7 +35,7 @@ export class PlayerSmartComponent {
   }
 
   async playPrevTrack() {
-
+    await this.playbackService.playPrev();
   }
 
   async seek(newPos: number) {
