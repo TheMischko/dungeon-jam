@@ -23,6 +23,12 @@
       size="regular"
       (clicked)="skipNext.emit()"
     ></lib-icon-button>
+
+    <!-- Repeat -->
+    <app-repeat-state-button
+      [repeatState]="repeat()"
+      (clicked)="repeatChange.emit()"
+    ></app-repeat-state-button>
   </div>
 
   <app-player-bar

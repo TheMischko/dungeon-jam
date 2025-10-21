@@ -1,0 +1,9 @@
+<lib-icon-button
+  [icon]="RepeatIcon"
+  [size]="size()"
+  [ngClass]="buttonClass()"
+  (clicked)="clicked.emit()"
+></lib-icon-button>
+@if(showSingleIndicator()){
+  <span class="single-indicator">1</span>
+}

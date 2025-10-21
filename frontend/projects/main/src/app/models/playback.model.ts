@@ -1,12 +1,19 @@
 import {StoredPlayback, Track} from '@shared/models/track.model';
 
+export enum RepeatState {
+  NONE,
+  SINGLE,
+  ALL
+}
+
 export type PlaybackState = {
   currentTrack: Track | null,
   queue: Track[],
   history: Track[],
   isPlaying: boolean,
   position: number,
-  duration: number
+  duration: number,
+  repeat: RepeatState
 } & StoredPlayback
 
 export const initialPlaybackState: PlaybackState = {
@@ -16,7 +23,8 @@ export const initialPlaybackState: PlaybackState = {
   isPlaying: false,
   position: 0,
   duration: 0,
-  volume: 1
+  volume: 1,
+  repeat: RepeatState.NONE
 };
 
 export enum PlayingTrackState {

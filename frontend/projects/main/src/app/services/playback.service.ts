@@ -1,9 +1,9 @@
 import {effect, inject, Injectable, OnDestroy} from '@angular/core';
 import {BehaviorSubject, Observable, Subscription} from 'rxjs';
-import {initialPlaybackState, PlaybackState, PlayingTrackState} from '../models/playback.model';
+import {initialPlaybackState, PlaybackState, PlayingTrackState, RepeatState} from '../models/playback.model';
 import {StoredPlayback, Track} from '@shared/models/track.model';
-import { AudioPlayerService } from './audio-player.service';
-import { toSignal } from '@angular/core/rxjs-interop';
+import {AudioPlayerService} from './audio-player.service';
+import {toSignal} from '@angular/core/rxjs-interop';
 import {AudioApiWindow} from '../models/window-api.model';
 
 @Injectable({
@@ -84,21 +84,29 @@ export class PlaybackService implements OnDestroy{
   async playNext() {
     const current = this.state.getValue();
     const nextState = { ...current, position: 0 };
+    if (current.currentTrack) {
+      nextState.history.push(current.currentTrack);
+    }
+
     if (current.queue.length > 0) {
-      if (current.currentTrack) {
-        nextState.history.push(current.currentTrack);
-      }
       nextState.currentTrack = current.queue[0];
       nextState.queue = current.queue.slice(1);
-      nextState.duration = nextState.currentTrack.duration;
-      nextState.position = 0;
-      nextState.isPlaying = true;
-      await this.audioPlayerService.play(nextState.currentTrack);
     } else {
-      // TO-DO: Clear currently played song and stop playing.
-      this.pause();
-      return;
+      if(current.repeat === RepeatState.ALL){
+        const newQueue = [...nextState.history];
+        nextState.history = [];
+        nextState.currentTrack = newQueue[0];
+        nextState.queue = newQueue.slice(1);
+      } else {
+        // TO-DO: Clear currently played song and stop playing.
+        this.pause();
+        return;
+      }
     }
+    nextState.duration = nextState.currentTrack.duration;
+    nextState.position = 0;
+    nextState.isPlaying = true;
+    await this.audioPlayerService.play(nextState.currentTrack);
     this.state.next(nextState);
   }
 
@@ -148,6 +156,27 @@ export class PlaybackService implements OnDestroy{
     this.updateStoredState(newState)
   }
 
+  changeRepeat(){
+    const current = this.state.getValue();
+    const currentRepeat = current.repeat;
+    let nextRepeat: RepeatState;
+    switch (true){
+      case (currentRepeat === RepeatState.ALL):
+        nextRepeat = RepeatState.NONE;
+        break;
+      case (currentRepeat === RepeatState.SINGLE):
+        nextRepeat = RepeatState.ALL
+        break;
+      default:
+        nextRepeat = RepeatState.SINGLE;
+        break;
+    }
+    this.state.next({
+      ...current,
+      repeat: nextRepeat
+    })
+  }
+
   private updateStoredState(state: PlaybackState): void{
     this.window.PLAYBACK_API.updateState(
       this.getStoredStateFromState(state)
@@ -169,6 +198,11 @@ export class PlaybackService implements OnDestroy{
   }
 
   private async handleTrackEnded() {
+    if(this.state.getValue().repeat === RepeatState.SINGLE){
+      this.seek(0);
+      await this.play();
+      return;
+    }
     await this.playNext();
   }
 }

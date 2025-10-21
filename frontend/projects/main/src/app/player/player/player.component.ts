@@ -6,6 +6,7 @@ import { IconButtonComponent } from '../../../../../general/src/lib/components/b
 import { PlayerBarComponent } from './player-bar/player-bar.component';
 import { LucideAngularModule } from 'lucide-angular';
 import { VolumeControlComponent } from './volume-control/volume-control.component';
+import {RepeatStateButtonComponent} from './repeat-state-button/repeat-state-button.component';
 
 @Component({
   selector: 'app-player',
@@ -15,6 +16,7 @@ import { VolumeControlComponent } from './volume-control/volume-control.componen
     PlayerBarComponent,
     LucideAngularModule,
     VolumeControlComponent,
+    RepeatStateButtonComponent,
   ],
   templateUrl: './player.component.html',
   styleUrl: './player.component.scss',
@@ -26,6 +28,7 @@ export class PlayerComponent {
   playPauseState = computed(() => (this.playing() ? 'pause' : 'play'));
   queueCount = computed(() => this.playBackState().queue.length);
   volume = computed(() => this.playBackState().volume);
+  repeat = computed(() => this.playBackState().repeat);
 
   skipPrev = output<void>();
   skipNext = output<void>();
@@ -33,6 +36,7 @@ export class PlayerComponent {
   pause = output<void>();
   seek = output<number>();
   volumeChange = output<number>();
+  repeatChange = output<void>();
 
   readonly prevIcon = iconSet.PrevIcon;
   readonly nextIcon = iconSet.NextIcon;

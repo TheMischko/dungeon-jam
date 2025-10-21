@@ -48,4 +48,8 @@ export class PlayerSmartComponent {
   changeVolume(volume: number) {
     this.playbackService.changeVolume(volume);
   }
+
+  changeRepeat() {
+    this.playbackService.changeRepeat();
+  }
 }
