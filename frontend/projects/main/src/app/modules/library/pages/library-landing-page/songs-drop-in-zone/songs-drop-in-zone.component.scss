@@ -1,18 +1,18 @@
-.drop-zone-wrapper{
+.drop-zone-wrapper {
   display: block;
   padding: 1rem;
   border: 1px solid white;
 
-  .content{
-    display: contents;
+  .content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
   }
 
-  &.file-over{
+  &.file-over {
     background: red;
-    .content{
+    .content {
       display: none;
     }
   }
 }
-
-

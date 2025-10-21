@@ -1,9 +1,14 @@
 import {
   ListMusicIcon,
   PauseIcon,
-  PlayIcon, Repeat2Icon,
+  PlayIcon,
+  Repeat2Icon,
+  SearchIcon,
   SkipBackIcon,
-  SkipForwardIcon, Volume1Icon, Volume2Icon, VolumeXIcon,
+  SkipForwardIcon,
+  Volume1Icon,
+  Volume2Icon,
+  VolumeXIcon,
 } from 'lucide-angular';
 
 export const iconSet = {
@@ -12,11 +17,15 @@ export const iconSet = {
   PrevIcon: SkipBackIcon,
   NextIcon: SkipForwardIcon,
   PlaylistIcon: ListMusicIcon,
-  RepeatIcon: Repeat2Icon
+  RepeatIcon: Repeat2Icon,
+};
+
+export const formIconSet = {
+  SearchIcon: SearchIcon,
 };
 
 export const volumeIconSet = {
   MutedIcon: VolumeXIcon,
   LowIcon: Volume1Icon,
-  NormalIcon: Volume2Icon
-}
+  NormalIcon: Volume2Icon,
+};

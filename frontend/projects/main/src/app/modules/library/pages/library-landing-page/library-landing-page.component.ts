@@ -1,4 +1,11 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  LOCALE_ID,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { TracksUploadModalComponent } from '../../modals/tracks-upload-modal/tracks-upload-modal.component';
 import { MatButton } from '@angular/material/button';
 import { DialogService } from '../../../../services/dialog.service';
@@ -25,6 +32,7 @@ export class LibraryLandingPageComponent implements OnInit {
   private readonly audioFilesService = inject(AudioFilesService);
   private readonly trackService = inject(TrackService);
   private readonly playbackService = inject(PlaybackService);
+  private readonly locale = inject(LOCALE_ID);
 
   readonly playbackState = toSignal(this.playbackService.playback$, {
     initialValue: initialPlaybackState,
@@ -36,8 +44,20 @@ export class LibraryLandingPageComponent implements OnInit {
     }
     return null;
   });
+  readonly displayTracks = computed<Track[]>(() => {
+    const searchValue = this.currentSearchValue();
+
+    return this.tracks().filter((track) => {
+      return (
+        track?.author?.toLocaleLowerCase(this.locale).includes(searchValue) ||
+        track.name.toLocaleLowerCase(this.locale).includes(searchValue) ||
+        track.author?.toLocaleLowerCase(this.locale)?.includes(searchValue)
+      );
+    });
+  });
 
   readonly tracks = signal<Track[]>([]);
+  readonly currentSearchValue = signal<string>('');
 
   ngOnInit() {
     this.trackService.getAllTracks().subscribe((tracks) => {
@@ -72,10 +92,17 @@ export class LibraryLandingPageComponent implements OnInit {
     const trackIndex = this.tracks().findIndex(
       (libraryTrack) => libraryTrack.id === track.id,
     );
-    this.playbackService.play(track, this.tracks().slice(trackIndex + 1));
+    this.playbackService.play(
+      track,
+      this.displayTracks().slice(trackIndex + 1),
+    );
   }
 
   pauseTrack() {
     this.playbackService.pause();
+  }
+
+  searchTracks(searchValue: string) {
+    this.currentSearchValue.set(searchValue.toLocaleLowerCase(this.locale));
   }
 }

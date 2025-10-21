@@ -1,3 +1,10 @@
+<!-- Search bar -->
+<lib-search-bar
+  class="search-bar"
+  (search)="search.emit($event)"
+></lib-search-bar>
+
+<!-- Table -->
 <mat-table [dataSource]="tracks()" class="table">
   <ng-container matColumnDef="play">
     <mat-header-cell *matHeaderCellDef></mat-header-cell>

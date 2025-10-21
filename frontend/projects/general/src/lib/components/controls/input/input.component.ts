@@ -8,11 +8,17 @@ import {
   model,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { MatFormField, MatInput, MatLabel } from '@angular/material/input';
+import {
+  MatFormField,
+  MatInput,
+  MatLabel,
+  MatPrefix,
+} from '@angular/material/input';
+import { LucideAngularModule, LucideIconData } from 'lucide-angular';
 
 @Component({
   selector: 'lib-input',
-  imports: [MatFormField, MatInput, MatLabel],
+  imports: [MatFormField, MatInput, MatLabel, MatPrefix, LucideAngularModule],
   templateUrl: './input.component.html',
   styleUrl: './input.component.css',
   providers: [
@@ -28,6 +34,7 @@ export class InputComponent<V = string | number | null>
 {
   readonly label = input.required<string>();
   readonly disabled = input<boolean>(false);
+  readonly iconPrefix = input<LucideIconData>();
 
   readonly input = output<V>();
   readonly touched = output<void>();
