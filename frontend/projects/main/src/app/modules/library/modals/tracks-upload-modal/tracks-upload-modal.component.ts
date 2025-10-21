@@ -13,7 +13,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { MatFormField, MatInput, MatLabel } from '@angular/material/input';
+import { InputComponent } from '../../../../../../../general/src/lib/components/controls/input/input.component';
 
 export type TracksUploadModalData = {
   title: string;
@@ -22,14 +22,7 @@ export type TracksUploadModalData = {
 
 @Component({
   selector: 'app-tracks-upload-modal',
-  imports: [
-    MatDialogModule,
-    MatButton,
-    MatFormField,
-    MatLabel,
-    MatInput,
-    ReactiveFormsModule,
-  ],
+  imports: [MatDialogModule, MatButton, ReactiveFormsModule, InputComponent],
   templateUrl: './tracks-upload-modal.component.html',
   styleUrl: './tracks-upload-modal.component.scss',
   standalone: true,

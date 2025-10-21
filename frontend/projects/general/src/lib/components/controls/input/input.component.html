@@ -1,0 +1,10 @@
+<mat-form-field appearance="outline" class="form-field">
+  <mat-label>{{ label() }}</mat-label>
+  <input
+    matInput
+    [value]="value()"
+    [disabled]="isDisabled()"
+    (blur)="touched.emit()"
+    (input)="onInputChange($event)"
+  />
+</mat-form-field>
