@@ -1,0 +1,14 @@
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+
+  .prefix-icon{
+    padding-left: 4px;
+  }
+
+  .form-field{
+    width: 100%;
+    height: 100%;
+  }
+}

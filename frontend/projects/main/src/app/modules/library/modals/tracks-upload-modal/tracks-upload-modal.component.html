@@ -3,34 +3,28 @@
     <h1>{{ title }}</h1>
   </div>
 
-  <div class="content">
-    <mat-form-field [formGroup]="forms.controls[currentStep()]" appearance="outline">
-      <mat-label>File</mat-label>
-      <input matInput formControlName="path">
-    </mat-form-field>
-    <mat-form-field [formGroup]="forms.controls[currentStep()]" appearance="outline">
-      <mat-label>Title</mat-label>
-      <input matInput formControlName="title">
-    </mat-form-field>
-
-    <mat-form-field [formGroup]="forms.controls[currentStep()]" appearance="outline">
-      <mat-label>Author</mat-label>
-      <input matInput formControlName="author">
-    </mat-form-field>
-  </div>
+  <form class="content" [formGroup]="forms.controls[currentStep()]">
+    <lib-input formControlName="path" label="File"></lib-input>
+    <lib-input formControlName="title" label="Title"></lib-input>
+    <lib-input formControlName="author" label="Author"></lib-input>
+  </form>
 
   <div class="footer">
     <div class="steps">
       @for(track of tracks; track track){
-        <span class="step-dot" [class.active]="$index === currentStep()"></span>
+      <span class="step-dot" [class.active]="$index === currentStep()"></span>
       }
     </div>
     <div class="buttons">
       @if(currentStep() > 0){
-        <button mat-flat-button (click)="previousStep()">Previous</button>
+      <button mat-flat-button (click)="previousStep()">Previous</button>
       }
-      <button mat-flat-button (click)="nextStep()">{{isLastStep() ? 'Finish' : 'Next'}}</button>
-      <button mat-flat-button color="tertiary" (click)="cancel()">Cancel</button>
+      <button mat-flat-button (click)="nextStep()">
+        {{ isLastStep() ? 'Finish' : 'Next' }}
+      </button>
+      <button mat-flat-button color="tertiary" (click)="cancel()">
+        Cancel
+      </button>
     </div>
   </div>
 </div>

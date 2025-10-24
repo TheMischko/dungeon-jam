@@ -1,10 +1,17 @@
 <app-songs-drop-in-zone (dropped)="openUploadDialog($event)">
   <button mat-flat-button (click)="openUploadDialog()">Upload</button>
   @if(tracks().length === 0){
-    <p>There are no tracks yet. Upload them by dragging some audio files into this page.</p>
+  <p>
+    There are no tracks yet. Upload them by dragging some audio files into this
+    page.
+  </p>
   } @else {
-    <app-songs-table [tracks]="tracks()" [playingTrackId]="playingTrackId()" (playTrack)="playTrack($event)" (pauseTrack)="pauseTrack()"></app-songs-table>
+  <app-songs-table
+    [tracks]="displayTracks()"
+    [playingTrackId]="playingTrackId()"
+    (playTrack)="playTrack($event)"
+    (pauseTrack)="pauseTrack()"
+    (search)="searchTracks($event)"
+  ></app-songs-table>
   }
-
 </app-songs-drop-in-zone>
-

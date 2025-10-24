@@ -1,0 +1,19 @@
+<mat-form-field appearance="outline" class="form-field">
+  <mat-label>{{ label() }}</mat-label>
+  @if (iconPrefix()){
+  <span matPrefix>
+    <lucide-icon
+      [size]="16"
+      [img]="iconPrefix()"
+      class="icon-16 prefix-icon"
+    ></lucide-icon>
+  </span>
+  }
+  <input
+    matInput
+    [value]="value() ?? null"
+    [disabled]="isDisabled()"
+    (blur)="touched.emit()"
+    (input)="onInputChange($event)"
+  />
+</mat-form-field>

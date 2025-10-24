@@ -16,6 +16,7 @@ import { LucideAngularModule } from 'lucide-angular';
 import { iconSet } from '../../../../../../../../general/src/lib/icons/icons';
 import { MatIconButton } from '@angular/material/button';
 import { TrackDurationPipe } from '../../../../../../../../general/src/lib/pipes/track-duration.pipe';
+import { SearchBarComponent } from '../../../../../../../../general/src/lib/components/controls/search-bar/search-bar.component';
 
 @Component({
   selector: 'app-songs-table',
@@ -33,6 +34,7 @@ import { TrackDurationPipe } from '../../../../../../../../general/src/lib/pipes
     LucideAngularModule,
     MatIconButton,
     TrackDurationPipe,
+    SearchBarComponent,
   ],
   templateUrl: './songs-table.component.html',
   styleUrl: './songs-table.component.scss',
@@ -44,6 +46,7 @@ export class SongsTableComponent {
 
   readonly playTrack = output<Track>();
   readonly pauseTrack = output();
+  readonly search = output<string>();
 
   readonly displayedColumns = ['play', 'title', 'author', 'duration'];
 
