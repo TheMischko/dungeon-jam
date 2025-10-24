@@ -80,4 +80,8 @@ export class TrackManager {
     await this.database.updateTable('tracks', tracks);
     return this.get(id)!;
   }
+
+  public static __resetForTests(): void {
+    TrackManager._instance = undefined as unknown as TrackManager;
+  }
 }

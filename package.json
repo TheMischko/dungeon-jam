@@ -14,7 +14,7 @@
     "start:frontend": "cd frontend && npm run start && cd ..",
     "test:electron": "vitest run",
     "test:electron:watch": "vitest watch",
-    "test:electron:coverage": "vitest run --coverage && vite preview --outDir ./coverage",
+    "test:electron:coverage": "concurrently \"vitest watch --coverage\" \"vite preview --outDir ./coverage\"",
     "test:electron:preview": "vitest watch --ui ",
     "test": "npm run test:electron && cd frontend && npm run test -- --watch=false && cd ..",
     "test:watch": "concurrently \"npm run test:electron:watch\" \"cd frontend && npm run test && cd ..\"",
