@@ -11,7 +11,13 @@
     "compile:dev": "npm run build:electron && npm run copyfiles:dev && npm run build:frontend",
     "compile:prod": "npm run build:electron && npm run copyfiles:prod && npm run build:frontend",
     "start": "npm run build:electron && npm run copyfiles:dev && electron build/src/index.js",
-    "start:frontend": "cd frontend && npm run start && cd .."
+    "start:frontend": "cd frontend && npm run start && cd ..",
+    "test:electron": "vitest run",
+    "test:electron:watch": "vitest watch",
+    "test:electron:coverage": "vitest run --coverage",
+    "test": "npm run test:electron && cd frontend && npm run test -- --watch=false && cd ..",
+    "test:watch": "concurrently \"npm run test:electron:watch\" \"cd frontend && npm run test && cd ..\"",
+    "test:coverage": "npm run test:electron:coverage && cd frontend && npm run ng -- test --code-coverage --watch=false && cd .."
   },
   "private": true,
   "author": "",
@@ -35,9 +41,13 @@
   },
   "devDependencies": {
     "@types/mime-types": "^3.0.1",
+    "@types/node": "^20.10.0",
     "@types/ws": "^8.18.1",
+    "@vitest/coverage-v8": "^1.0.4",
+    "@vitest/ui": "^1.0.4",
     "concurrently": "^9.1.2",
     "esbuild": "^0.25.5",
-    "esbuild-node-externals": "^1.18.0"
+    "esbuild-node-externals": "^1.18.0",
+    "vitest": "^1.0.4"
   }
 }
