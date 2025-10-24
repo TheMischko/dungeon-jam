@@ -4,13 +4,15 @@ import {
   mockDatabase,
   mockDatabaseInstance,
 } from '../testing/mocks/mock-database';
-vi.mock('electron', () => mockElectron);
-vi.mock('./../database/database', () => mockDatabase);
 import { setupTestEnvironment, triggerIpcMainHandle } from '../testing/setup';
 import { AudioFileChannel, TrackChannel } from '@shared/models/channels.model';
 import { TrackManager } from './track.manager';
 import { AudioTrack, Track } from '@shared/models/track.model';
 import { mockAudioTrack, mockTrack } from '../testing/mocks/mock-track.data';
+import { SortDirection } from '@shared/models/common.model';
+
+vi.mock('electron', () => mockElectron);
+vi.mock('./../database/database', () => mockDatabase);
 
 describe('TrackManager', () => {
   let trackManager: TrackManager;
@@ -23,6 +25,7 @@ describe('TrackManager', () => {
 
   afterEach(() => {
     vi.clearAllMocks();
+    vi.restoreAllMocks();
   });
 
   describe('getInstance', () => {
@@ -54,7 +57,7 @@ describe('TrackManager', () => {
       const track: Track = mockTrack();
       vi.spyOn(trackManager, 'insert').mockReturnValue(Promise.resolve(track));
 
-      triggerIpcMainHandle(
+      await triggerIpcMainHandle(
         TrackChannel.INSERT,
         track.name,
         track.url,
@@ -84,10 +87,66 @@ describe('TrackManager', () => {
     });
   });
 
-  it('getAll should read database table to fetch the data', () => {
-    trackManager.getAll();
+  describe('getAll', () => {
+    it('getAll should read database table to fetch the all data', () => {
+      const dataSet: Track[] = [mockTrack(), mockTrack(), mockTrack()];
+      mockDatabaseInstance.readTable.mockImplementation(() => dataSet);
+      const data = trackManager.getAll();
 
-    expect(mockDatabaseInstance.readTable).toHaveBeenCalledWith('tracks');
+      expect(mockDatabaseInstance.readTable).toHaveBeenCalledWith('tracks');
+      expect(data.length).toEqual(dataSet.length);
+    });
+
+    it('should filter the results by query value', () => {
+      const testFilter = 'Love';
+      const dataSet: Track[] = [
+        mockTrack(),
+        mockTrack({ name: `${testFilter} of Life` }),
+        mockTrack({ author: `KillAllYou${testFilter}` }),
+        mockTrack(),
+      ];
+
+      mockDatabaseInstance.readTable.mockImplementation(() => dataSet);
+
+      const results = trackManager.getAll({ filter: testFilter });
+
+      expect(results.length).toBe(2);
+    });
+
+    it('should sort by default by name', () => {
+      const trackOfA = mockTrack({ name: 'Abc' });
+      const trackOfH = mockTrack({ name: 'Hijk' });
+      const trackOfZ = mockTrack({ name: 'Zzz' });
+
+      mockDatabaseInstance.readTable.mockImplementation(() => [
+        trackOfH,
+        trackOfZ,
+        trackOfA,
+      ]);
+
+      const results = trackManager.getAll({ sortDirection: SortDirection.ASC });
+
+      expect(results).toEqual([trackOfA, trackOfH, trackOfZ]);
+    });
+
+    it('should sort the values by author DESC', () => {
+      const trackOfA = mockTrack({ author: 'Abc' });
+      const trackOfH = mockTrack({ author: 'Hijk' });
+      const trackOfZ = mockTrack({ author: 'Zzz' });
+
+      mockDatabaseInstance.readTable.mockImplementation(() => [
+        trackOfH,
+        trackOfZ,
+        trackOfA,
+      ]);
+
+      const results = trackManager.getAll({
+        sortBy: 'author',
+        sortDirection: SortDirection.DESC,
+      });
+
+      expect(results).toEqual([trackOfZ, trackOfH, trackOfA]);
+    });
   });
 
   it('get should fetch a record with the matching id', () => {

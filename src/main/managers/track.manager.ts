@@ -3,6 +3,8 @@ import { AudioTrack, Track } from '@shared/models/track.model';
 import { ipcMain } from 'electron';
 import { AudioFileChannel, TrackChannel } from '@shared/models/channels.model';
 import { v4 as uuid } from 'uuid';
+import { QueryRequest } from '@shared/models/request.model';
+import { SortDirection } from '@shared/models/common.model';
 
 export class TrackManager {
   private static _instance: TrackManager;
@@ -19,8 +21,8 @@ export class TrackManager {
   }
 
   private registerChannels(): void {
-    ipcMain.handle(TrackChannel.GET_ALL, () => {
-      return this.getAll();
+    ipcMain.handle(TrackChannel.GET_ALL, (_, query?: QueryRequest) => {
+      return this.getAll(query);
     });
 
     ipcMain.handle(TrackChannel.GET_BY_ID, (_, id: string) => {
@@ -53,8 +55,13 @@ export class TrackManager {
     });
   }
 
-  getAll(): Track[] {
-    return this.database.readTable<Track[]>('tracks') ?? [];
+  getAll(query?: QueryRequest): Track[] {
+    const data = this.database.readTable<Track[]>('tracks') ?? [];
+    return data
+      .filter((track) => this.filterTracks(track, query?.filter))
+      .sort((a, b) =>
+        this.sortTracks(a, b, query?.sortDirection, query?.sortBy),
+      );
   }
 
   get(id: string): Track | undefined {
@@ -83,5 +90,39 @@ export class TrackManager {
 
   public static __resetForTests(): void {
     TrackManager._instance = undefined as unknown as TrackManager;
+  }
+
+  private filterTracks(track: Track, filter?: string): boolean {
+    if (!filter) {
+      return true;
+    }
+    const filterLower = filter.toLowerCase();
+    if (track?.author && track.author.toLowerCase().includes(filterLower)) {
+      return true;
+    }
+    return track.name.toLowerCase().includes(filterLower);
+  }
+
+  private sortTracks(
+    trackA: Track,
+    trackB: Track,
+    direction?: SortDirection,
+    sortBy?: string,
+  ) {
+    if (!direction) {
+      return 0;
+    }
+    type TrackKey = Extract<keyof Omit<Track, 'duration'>, string>;
+    let sortValue: TrackKey = 'name';
+    if (sortBy && ['name', 'author'].includes(sortBy)) {
+      sortValue = sortBy as TrackKey;
+    }
+    const directionNum = direction === SortDirection.ASC ? 1 : -1;
+
+    return (
+      trackA[sortValue]!.toLowerCase().localeCompare(
+        trackB[sortValue]!.toLowerCase(),
+      ) * directionNum
+    );
   }
 }
