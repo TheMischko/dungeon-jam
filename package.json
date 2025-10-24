@@ -14,7 +14,8 @@
     "start:frontend": "cd frontend && npm run start && cd ..",
     "test:electron": "vitest run",
     "test:electron:watch": "vitest watch",
-    "test:electron:coverage": "vitest run --coverage",
+    "test:electron:coverage": "vitest run --coverage && vite preview --outDir ./coverage",
+    "test:electron:preview": "vitest watch --ui ",
     "test": "npm run test:electron && cd frontend && npm run test -- --watch=false && cd ..",
     "test:watch": "concurrently \"npm run test:electron:watch\" \"cd frontend && npm run test && cd ..\"",
     "test:coverage": "npm run test:electron:coverage && cd frontend && npm run ng -- test --code-coverage --watch=false && cd .."
@@ -44,10 +45,11 @@
     "@types/node": "^20.10.0",
     "@types/ws": "^8.18.1",
     "@vitest/coverage-v8": "^1.0.4",
-    "@vitest/ui": "^1.0.4",
+    "@vitest/ui": "^1.6.1",
     "concurrently": "^9.1.2",
     "esbuild": "^0.25.5",
     "esbuild-node-externals": "^1.18.0",
+    "vite": "^7.1.12",
     "vitest": "^1.0.4"
   }
 }

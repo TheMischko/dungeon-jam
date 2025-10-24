@@ -25,6 +25,71 @@ npm run test:coverage          # Generate coverage for both frontend and backend
 
 ---
 
+## Centralized Mock Objects & Data Factories
+
+To reduce duplication across spec files, use the centralized mocks in: `src/main/testing/mocks/`
+
+Refer to: `src/main/testing/mocks/README.md` for full authoring rules.
+
+### Why Use the Mocks Folder?
+- ✅ Eliminates copy/paste of common Electron or domain object mocks
+- ✅ Keeps `vi.mock` object shapes consistent (less drift between tests)
+- ✅ Improves AI assistance: single source of truth for mock structures
+- ✅ Separates mock object declarations (static) from mock setup utilities in `setup.ts`
+
+### File Naming Conventions (from mocks README)
+- Shared mock object modules: `mock-[entity-name].ts` (e.g. `mock-electron.ts`)
+- Data factory functions: `[type-name].data.ts` (e.g. `ipc-main-event.data.ts`)
+
+### Authoring Rules (Preserve These)
+When adding new mocks:
+1. Export a constant for module/object mocks:
+   ```ts
+   // src/main/testing/mocks/mock-electron.ts
+   export const mockElectron = {
+     app: { on: vi.fn(), quit: vi.fn() },
+     ipcMain: { on: vi.fn(), handle: vi.fn() },
+     // ... add only what tests need
+   };
+   ```
+2. Use a factory for data-type instances:
+   ```ts
+   // src/main/testing/mocks/ipc-main-event.data.ts
+   import { v4 as uuid } from 'uuid';
+   export function mockIpcMainEvent(options?: Partial<IpcMainEvent>): IpcMainEvent {
+     return {
+       // minimal viable defaults
+       sender: { send: vi.fn() } as any,
+       processId: Math.ceil(Math.random() * 1000),
+       frameId: 0,
+       // ... other required members
+       ...options,
+     } as IpcMainEvent;
+   }
+   ```
+3. Defaults guidance (from README):
+   - Arrays → `[]`
+   - Strings → short UUID slice (`uuid().slice(0,6)`) or descriptive literal
+   - Numbers → `Math.ceil(Math.random() * X)` (choose sensible X)
+   - Objects → `{}` or `null` if allowed by type
+   - Dates → `new Date()`
+
+### Using Centralized Mocks in Tests
+```ts
+import { mockElectron } from '../testing/mocks/mock-electron';
+vi.mock('electron', () => mockElectron);
+```
+Combine with utilities from `src/main/testing/setup.ts` (documented in `.github/instructions/testing_utilities.md`).
+
+### Where To Document New Mocks
+- Add the file under `src/main/testing/mocks/`
+- Append any new pattern guidance to `src/main/testing/mocks/README.md`
+- Optionally cross-link in `src/main/testing/MOCKING_GUIDE.md` if it is broadly reusable
+
+> Full mock authoring reference: `src/main/testing/mocks/README.md`
+
+---
+
 ## Test File Structure & Setup
 
 ### Backend Service/Manager Tests
@@ -642,18 +707,36 @@ it('should emit trackDeleted event when track is removed', () => {});
 ### Variable Naming
 
 ```typescript
-// Mock data prefixed with 'mock'
-const mockTrack: Track = { ... };
-const mockTracks: Track[] = [ ... };
-const mockDatabase: any = { ... };
+import { Track } from '@shared/models/track.model';
+import { vi } from 'vitest';
 
-// Spy functions use 'mock' prefix too
+// Mock data prefixed with 'mock'
+const mockTrack: Track = {
+  id: 'track-1',
+  name: 'Example Track',
+  url: '/example.mp3',
+  duration: 120,
+  author: 'Example Artist'
+};
+const mockTracks: Track[] = [mockTrack];
+
+// Avoid `any`; use explicit shape or interface for mocks
+interface DatabaseMock {
+  readTable: ReturnType<typeof vi.fn>;
+  updateTable: ReturnType<typeof vi.fn>;
+}
+const mockDatabase: DatabaseMock = {
+  readTable: vi.fn(),
+  updateTable: vi.fn()
+};
+
+// Spy function examples (prefix with mock)
 const mockFn = vi.fn();
 const mockImplementation = vi.fn();
 
 // Manager/service instances use clear names
-let trackManager: TrackManager;
-let discordManager: DiscordManager;
+let trackManager: TrackManager; // assume declared in scope
+let discordManager: DiscordManager; // assume declared in scope
 ```
 
 ---
@@ -857,4 +940,3 @@ When generating Electron test code, AI agents should:
 - Mock file system operations (`fs`, `path`)
 - Mock external services (`discord.js`, `music-metadata`)
 - Mock lowdb database for isolation
-

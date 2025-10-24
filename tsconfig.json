@@ -11,5 +11,9 @@
       "@shared/*": ["shared/*"]
     }
   },
-  "include": ["src/**/*", "shared/**/*"]
+  "include": [
+    "src/**/*",
+    "shared/**/*",
+    "node_modules/vitest/globals.d.ts"
+  ]
 }

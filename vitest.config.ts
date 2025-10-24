@@ -3,10 +3,7 @@ import path from 'path';
 
 export default defineConfig({
   test: {
-    // Use Node environment for Electron backend testing
     environment: 'node',
-
-    // Test file patterns
     include: ['src/**/*.spec.ts'],
     exclude: ['node_modules', 'dist', 'build', 'frontend'],
 
@@ -14,33 +11,24 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html', 'lcov', 'json'],
-      //outputDir: './coverage',
+      include: ['src/main/**/*.ts'],
       exclude: [
         'node_modules/',
         'build/',
         'src/**/*.spec.ts',
+        'src/main/testing/**',
         '**/*.d.ts',
-        '**/index.ts',
+        'src/index.ts',
+        'src/preload.ts',
+        'src/sound-capture/**',
       ],
-      //lines: 80,
-      //functions: 80,
-      //branches: 70,
-      //statements: 80,
+      // Skip processing of generated code
+      skipFull: true,
     },
-
-    // Globals for test functions (describe, it, expect, etc.)
     globals: true,
-
-    // Watch mode settings
     watch: false,
-
-    // Isolate test environments
     isolate: true,
-
-    // Test timeout
     testTimeout: 10000,
-
-    // Hook timeout
     hookTimeout: 10000,
   },
   resolve: {
