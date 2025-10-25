@@ -4,10 +4,11 @@ import {
   GridItemSizeConfig,
   PlaylistGridItemComponent,
 } from './playlist-grid-item/playlist-grid-item.component';
+import { SearchBarComponent } from '@general/components/controls/search-bar/search-bar.component';
 
 @Component({
   selector: 'app-playlist-grid',
-  imports: [PlaylistGridItemComponent],
+  imports: [PlaylistGridItemComponent, SearchBarComponent],
   templateUrl: './playlist-grid.component.html',
   styleUrl: './playlist-grid.component.scss',
 })
@@ -20,6 +21,7 @@ export class PlaylistGridComponent {
   readonly playPlaylist = output<string>();
   readonly pausePlaylist = output<string>();
   readonly playlistClick = output<string>();
+  readonly search = output<string>();
 
   isPlaying(playlistId: string): boolean {
     return this.playingPlaylistId() === playlistId;

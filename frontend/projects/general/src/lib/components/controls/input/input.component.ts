@@ -36,7 +36,7 @@ export class InputComponent<V = string | number | null>
   readonly disabled = input<boolean>(false);
   readonly iconPrefix = input<LucideIconData>();
 
-  readonly input = output<V>();
+  readonly inputChange = output<V>();
   readonly touched = output<void>();
 
   readonly value = model<V>(undefined as V);
@@ -51,16 +51,16 @@ export class InputComponent<V = string | number | null>
     const newValue: V = target?.value as V;
     if (newValue !== undefined) {
       this.writeValue(newValue);
+      this.inputChange.emit(newValue);
     }
   }
 
   writeValue(value: V): void {
     this.value.set(value);
-    this.input.emit(value);
     this.touched.emit();
   }
   registerOnChange(fn: any): void {
-    this.input.subscribe(fn);
+    this.inputChange.subscribe(fn);
   }
   registerOnTouched(fn: any): void {
     this.touched.subscribe(fn);

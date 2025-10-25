@@ -1,12 +1,21 @@
 <div class="wrapper">
-  <input
-    type="range"
-    [min]="0"
-    [max]="100"
-    [step]="5"
-    [value]="75"
-    (input)="sizeInput($event)"
-  />
+  <div class="controls">
+    <div class="filters">Filters</div>
+    <div class="search">
+      <lib-search-bar (search)="search.emit($event)"></lib-search-bar>
+    </div>
+    <div class="size-control">
+      <input
+        type="range"
+        [min]="0"
+        [max]="100"
+        [step]="5"
+        [value]="75"
+        (input)="sizeInput($event)"
+      />
+    </div>
+  </div>
+
   <div class="grid-content">
     @for (playlist of dataSet(); track trackPlaylist(playlist)){
     <app-playlist-grid-item

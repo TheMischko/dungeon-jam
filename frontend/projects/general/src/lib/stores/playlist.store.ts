@@ -6,8 +6,8 @@ import {
   withState,
 } from '@ngrx/signals';
 import {
-  addEntities,
   entityConfig,
+  setAllEntities,
   withEntities,
 } from '@ngrx/signals/entities';
 import { Playlist } from '@shared/models/playlist.model';
@@ -40,7 +40,7 @@ export const PlaylistStore = signalStore(
         switchMap((options) => {
           return playlistApiService.getAllPlaylists(options).pipe(
             tap((playlists) => {
-              patchState(store, addEntities(playlists));
+              patchState(store, setAllEntities(playlists));
             }),
             catchError((err) => {
               console.error(err);
