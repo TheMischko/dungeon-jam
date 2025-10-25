@@ -41,6 +41,10 @@ module.exports = function (config) {
       resolve: {
         alias: {
           '@shared': require('path').resolve(__dirname, '../shared'),
+          '@general': require('path').resolve(
+            __dirname,
+            './projects/general/src/public-api.ts',
+          ),
         },
       },
     },

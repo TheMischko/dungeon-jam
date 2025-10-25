@@ -21,6 +21,12 @@
       "@shared/*": [
         "../shared/*"
       ],
+      "@general": [
+        "./projects/general/src/public-api.ts"
+      ],
+      "@general/*": [
+        "./projects/general/src/lib/*"
+      ],
       "general": [
         "./dist/general"
       ]
