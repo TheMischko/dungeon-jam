@@ -28,7 +28,7 @@ export const playlistsMock: Playlist[] = [
     name: "Dragon's den",
     tags: ['dragon', 'hostile', 'dungeon', 'danger', 'indoor'],
     imageUrl:
-      'https://cdnb.artstation.com/p/marketplace/presentation_assets/003/750/807/large/file.jpg?1717246138',
+      'https://wallup.net/wp-content/uploads/2019/09/821054-dungeons-dragons-forgotten-realms-magic-rpg-action-adventure-puzzle-fantasy-warrior-dragon.jpg',
     trackIds: Array(57).fill('1'),
     dateCreated: new Date(),
     dateUpdated: new Date(),

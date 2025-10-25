@@ -14,9 +14,8 @@ import { Playlist } from '@shared/models/playlist.model';
 import { inject } from '@angular/core';
 import { PlaylistApiService } from '@general/services/playlist-api.service';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { catchError, EMPTY, finalize, of, pipe, switchMap, tap } from 'rxjs';
+import { catchError, EMPTY, finalize, pipe, switchMap, tap } from 'rxjs';
 import { QueryRequest } from '@shared/models/request.model';
-import { playlistsMock } from '@general/stores/playlists.mock';
 
 type PlaylistStoreState = {
   loading: boolean;
@@ -38,8 +37,8 @@ export const PlaylistStore = signalStore(
         tap(() => {
           patchState(store, { loading: true });
         }),
-        switchMap((_) => {
-          return of(playlistsMock).pipe(
+        switchMap((options) => {
+          return playlistApiService.getAllPlaylists(options).pipe(
             tap((playlists) => {
               patchState(store, addEntities(playlists));
             }),

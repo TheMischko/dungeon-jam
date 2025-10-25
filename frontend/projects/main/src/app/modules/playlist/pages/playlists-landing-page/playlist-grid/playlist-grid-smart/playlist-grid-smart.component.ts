@@ -19,7 +19,7 @@ export class PlaylistGridSmartComponent implements OnInit {
   readonly playingPlaylistId = signal<string | null>(null);
   readonly searchFilter = signal<string>('');
   readonly sortDirection = signal<SortDirection>(SortDirection.ASC);
-  readonly sortBy = signal<Extract<keyof Playlist, string>>('dateCreated');
+  readonly sortBy = signal<Extract<keyof Playlist, string>>('order');
 
   readonly dataSet = this.playlistStore.entities;
 

@@ -8,9 +8,10 @@ import { configDotenv } from 'dotenv';
 import { DiscordManager } from './main/managers/discord.manager';
 import { ViewManager } from './main/managers/view.manager';
 import { TrackManager } from './main/managers/track.manager';
-import {RedirectManager} from "./main/managers/redirect.manager";
-import {FilesManager} from "./main/managers/files.manager";
-import {StoredPlaybackManager} from "./main/managers/stored-playback.manager";
+import { PlaylistManager } from './main/managers/playlist.manager';
+import { RedirectManager } from './main/managers/redirect.manager';
+import { FilesManager } from './main/managers/files.manager';
+import { StoredPlaybackManager } from './main/managers/stored-playback.manager';
 
 configDotenv();
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN || 'ERROR';
@@ -117,12 +118,13 @@ app.on('ready', async () => {
     viewManager.captureTab,
     viewManager.frontendTab.tab,
   );
-  try{
+  try {
     await setupDiscord(DISCORD_TOKEN, encoder);
   } catch (e) {
     console.error(e);
   }
   await TrackManager.getInstance();
+  await PlaylistManager.getInstance();
   await RedirectManager.getInstance();
   await FilesManager.getInstance();
   //TO-DO: Postpone loading UI until all managers are loaded.
