@@ -1,4 +1,6 @@
 import {
+  Grid2x2Icon,
+  Grid3x3Icon,
   ListMusicIcon,
   PauseIcon,
   PlayIcon,
@@ -18,6 +20,8 @@ export const iconSet = {
   NextIcon: SkipForwardIcon,
   PlaylistIcon: ListMusicIcon,
   RepeatIcon: Repeat2Icon,
+  GridBigIcon: Grid2x2Icon,
+  GridSmallIcon: Grid3x3Icon,
 };
 
 export const formIconSet = {

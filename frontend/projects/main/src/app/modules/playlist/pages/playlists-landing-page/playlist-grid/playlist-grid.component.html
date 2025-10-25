@@ -5,13 +5,14 @@
       <lib-search-bar (search)="search.emit($event)"></lib-search-bar>
     </div>
     <div class="size-control">
-      <input
-        type="range"
-        [min]="0"
-        [max]="100"
-        [step]="5"
+      <lib-range-slider
+        [minValue]="0"
+        [maxValue]="100"
+        [stepSize]="5"
         [value]="75"
-        (input)="sizeInput($event)"
+        [prefix]="gridSmallIcon"
+        [suffix]="gridBigIcon"
+        (inputChange)="sizeInput($event)"
       />
     </div>
   </div>

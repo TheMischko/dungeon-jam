@@ -38,3 +38,12 @@ build({
   entryPoints: ['./src/sound-capture/preload.ts'],
   outfile: './build/src/sound-capture/preload.js',
 }).catch(() => process.exit(1));
+
+// Sound capture frontend script
+build({
+  ...sharedConfig,
+  entryPoints: ['./src/sound-capture/capture.ts'],
+  outfile: './build/src/sound-capture/capture.js',
+  platform: 'browser',
+  format: 'iife',
+}).catch(() => process.exit(1));

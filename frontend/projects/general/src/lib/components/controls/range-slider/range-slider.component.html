@@ -1,0 +1,31 @@
+@if(prefix()){
+  @if(prefixIcon()){
+    <lucide-icon
+      class="prefix side-icon"
+      [img]="prefixIcon()"
+      [size]="iconSize()"
+    ></lucide-icon>
+  } @else {
+    <span class="prefix side-text">{{ prefix() }}</span>
+  }
+}
+<mat-slider
+  [min]="minValue()"
+  [max]="maxValue()"
+  [step]="stepSize()"
+  (input)="changeValue($event)"
+  class="slider"
+>
+  <input matSliderThumb [value]="value()" />
+</mat-slider>
+@if(suffix()){
+  @if(suffixIcon()){
+    <lucide-icon
+      class="prefix side-icon"
+      [img]="suffixIcon()"
+      [size]="iconSize()"
+    ></lucide-icon>
+  } @else {
+    <span class="prefix side-text">{{ suffix() }}</span>
+  }
+}

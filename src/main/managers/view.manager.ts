@@ -10,7 +10,7 @@ import { FrontendTab } from './tabs/frontend.tab';
 import { TopBarTab } from './tabs/top-bar.tab';
 import { SideBarTab } from './tabs/side-bar.tab';
 import { BaseTab } from './tabs/base-tab';
-import {AppChannel} from "@shared/models/channels.model";
+import { AppChannel } from '@shared/models/channels.model';
 
 export class ViewManager {
   private static _instance: ViewManager | null = null;
@@ -54,7 +54,7 @@ export class ViewManager {
         () => new SideBarTab(appWindow, config.defaultPreferences),
       );
 
-      frontendTab.tab.webContents.openDevTools({
+      captureTab.webContents.openDevTools({
         mode: 'detach',
       });
 
@@ -124,13 +124,14 @@ export class ViewManager {
   public broadcast<T, V extends T[]>(
     channel: AppChannel,
     senderProcessId: number | null = null,
-    ...data: V): void {
-    this.tabs.forEach(baseTab => {
-      if(baseTab.tab.webContents.getProcessId() === senderProcessId){
+    ...data: V
+  ): void {
+    this.tabs.forEach((baseTab) => {
+      if (baseTab.tab.webContents.getProcessId() === senderProcessId) {
         return;
       }
-      baseTab.tab.webContents.send(channel, ...data)
-    })
+      baseTab.tab.webContents.send(channel, ...data);
+    });
   }
 
   private initializeEventListeners(): void {

@@ -5,10 +5,16 @@ import {
   PlaylistGridItemComponent,
 } from './playlist-grid-item/playlist-grid-item.component';
 import { SearchBarComponent } from '@general/components/controls/search-bar/search-bar.component';
+import { RangeSliderComponent } from '@general/components/controls/range-slider/range-slider.component';
+import { iconSet } from '@general/icons/icons';
 
 @Component({
   selector: 'app-playlist-grid',
-  imports: [PlaylistGridItemComponent, SearchBarComponent],
+  imports: [
+    PlaylistGridItemComponent,
+    SearchBarComponent,
+    RangeSliderComponent,
+  ],
   templateUrl: './playlist-grid.component.html',
   styleUrl: './playlist-grid.component.scss',
 })
@@ -23,6 +29,9 @@ export class PlaylistGridComponent {
   readonly playlistClick = output<string>();
   readonly search = output<string>();
 
+  readonly gridBigIcon = iconSet.GridBigIcon;
+  readonly gridSmallIcon = iconSet.GridSmallIcon;
+
   isPlaying(playlistId: string): boolean {
     return this.playingPlaylistId() === playlistId;
   }
@@ -31,8 +40,7 @@ export class PlaylistGridComponent {
     return playlist.id;
   }
 
-  sizeInput(event: Event) {
-    const target = event.target as HTMLInputElement;
-    this.sizeChange.emit(Number(target.value) / 100);
+  sizeInput(value: number) {
+    this.sizeChange.emit(value / 100);
   }
 }
