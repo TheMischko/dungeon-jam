@@ -3,7 +3,8 @@ import { GeneralChannels } from '@shared/models/channels.model';
 import TrackApi from './preload/track-api';
 import { RedirectPath } from '@shared/models/redirect.model';
 import AudioFileApi from './preload/audio-file-api';
-import PlaybackApi from "./preload/playback-api";
+import PlaybackApi from './preload/playback-api';
+import PlaylistApi from './preload/playlist-api';
 
 const generalApi = {
   triggerRedirect(path: RedirectPath) {
@@ -22,6 +23,7 @@ declare global {
     TRACK_API: typeof TrackApi;
     AUDIO_FILES_API: typeof AudioFileApi;
     PLAYBACK_API: typeof PlaybackApi;
+    PLAYLIST_API: typeof PlaylistApi;
   }
 }
 
@@ -29,3 +31,4 @@ contextBridge.exposeInMainWorld('GENERAL_API', generalApi);
 contextBridge.exposeInMainWorld('TRACK_API', TrackApi);
 contextBridge.exposeInMainWorld('AUDIO_FILES_API', AudioFileApi);
 contextBridge.exposeInMainWorld('PLAYBACK_API', PlaybackApi);
+contextBridge.exposeInMainWorld('PLAYLIST_API', PlaylistApi);
