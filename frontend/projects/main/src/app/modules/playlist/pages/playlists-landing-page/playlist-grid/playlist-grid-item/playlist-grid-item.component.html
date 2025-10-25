@@ -1,0 +1,29 @@
+<div
+  class="grid-item"
+  (click)="onPlaylistClick()"
+  (mouseenter)="onMouseEnter()"
+  (mouseleave)="onMouseLeave()"
+>
+  <div class="image-wrapper" [ngStyle]="imageSizeStyle()">
+    @if(isHovering()) {
+    <div
+      class="image-overlay"
+      [ngStyle]="overlaySizeStyle()"
+      (click)="onOverlayButtonClick($event)"
+    >
+      <lucide-icon class="icon" [img]="overlayIcon()"></lucide-icon>
+    </div>
+    }
+    <img [src]="imageSrc()" alt="{{ playlist().name }}" />
+  </div>
+  <div class="properties">
+    <div class="title" [ngStyle]="titleSizeStyle()">{{ playlist().name }}</div>
+    @if(!sizeConfig().hideTags) {
+    <div class="tags" [ngStyle]="tagsSizeStyle()">
+      @for (tag of playlist().tags; track tag){
+      <span class="tag">{{ tag }}</span>
+      }
+    </div>
+    }
+  </div>
+</div>

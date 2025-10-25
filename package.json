@@ -12,6 +12,7 @@
     "compile:prod": "npm run build:electron && npm run copyfiles:prod && npm run build:frontend",
     "start": "npm run build:electron && npm run copyfiles:dev && electron build/src/index.js",
     "start:frontend": "cd frontend && npm run start && cd ..",
+    "test:frontend": "cd frontend && npm run test",
     "test:electron": "vitest run",
     "test:electron:watch": "vitest watch",
     "test:electron:coverage": "concurrently \"vitest watch --coverage\" \"vite preview --outDir ./coverage\"",

@@ -1,0 +1,22 @@
+<div class="wrapper">
+  <input
+    type="range"
+    [min]="0"
+    [max]="100"
+    [step]="5"
+    [value]="75"
+    (input)="sizeInput($event)"
+  />
+  <div class="grid-content">
+    @for (playlist of dataSet(); track trackPlaylist(playlist)){
+    <app-playlist-grid-item
+      [playlist]="playlist"
+      [sizeConfig]="sizeConfig()"
+      [isPlaying]="isPlaying(playlist.id)"
+      (playlistClick)="playlistClick.emit($event)"
+      (playPlaylist)="playPlaylist.emit($event)"
+      (pausePlaylist)="pausePlaylist.emit($event)"
+    ></app-playlist-grid-item>
+    }
+  </div>
+</div>

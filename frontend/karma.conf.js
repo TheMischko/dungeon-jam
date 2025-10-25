@@ -37,5 +37,12 @@ module.exports = function (config) {
     browsers: ['ChromeHeadless'],
     singleRun: false,
     browserNoActivity: 30000,
+    webpack: {
+      resolve: {
+        alias: {
+          '@shared': require('path').resolve(__dirname, '../shared'),
+        },
+      },
+    },
   });
 };

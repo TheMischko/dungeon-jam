@@ -110,7 +110,10 @@
               "projects/main/src/styles.scss",
               "projects/general/styles/global.scss"
             ],
-            "scripts": []
+            "scripts": [],
+            "stylePreprocessorOptions": {
+              "includePaths": ["projects/general/styles"]
+            }
           }
         }
       }
@@ -219,7 +222,10 @@
               "projects/sidebar/src/styles.scss",
               "projects/general/styles/global.scss"
             ],
-            "scripts": []
+            "scripts": [],
+            "stylePreprocessorOptions": {
+              "includePaths": ["projects/general/styles"]
+            }
           }
         }
       }
@@ -328,7 +334,10 @@
               "projects/topbar/src/styles.scss",
               "projects/general/styles/global.scss"
             ],
-            "scripts": []
+            "scripts": [],
+            "stylePreprocessorOptions": {
+              "includePaths": ["projects/general/styles"]
+            }
           }
         }
       }

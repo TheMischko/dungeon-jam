@@ -1,0 +1,9 @@
+<app-playlist-grid
+  [dataSet]="dataSet()"
+  [sizeConfig]="sizeConfig()"
+  [playingPlaylistId]="playingPlaylistId()"
+  (sizeChange)="handleSizeChange($event)"
+  (playPlaylist)="playPlaylist($event)"
+  (pausePlaylist)="pausePlaylist()"
+  (playlistClick)="showPlaylistDetails($event)"
+></app-playlist-grid>
