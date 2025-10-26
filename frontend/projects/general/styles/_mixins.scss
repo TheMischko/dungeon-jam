@@ -1,5 +1,35 @@
 @use 'colors' as col;
 
-@mixin base-dialog(){
+@mixin base-dialog() {
   color: col.$text-main;
+  display: flex;
+
+  .wrapper {
+    width: 500px;
+    display: flex;
+    flex-direction: column;
+
+    .content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 3rem;
+    }
+  }
+
+  .footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: stretch;
+    width: 100%;
+    gap: 1rem;
+
+    .buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+      width: 100%;
+    }
+  }
 }

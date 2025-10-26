@@ -1,9 +1,10 @@
 import { DatabaseWrapper } from '../database/database';
-import { Playlist } from '@shared/models/playlist.model';
+import { Playlist, PlaylistInsertQuery } from '@shared/models/playlist.model';
 import { ipcMain } from 'electron';
 import { PlaylistChannel } from '@shared/models/channels.model';
 import { QueryRequest } from '@shared/models/request.model';
 import { SortDirection } from '@shared/models/common.model';
+import { v4 as uuid } from 'uuid';
 
 export class PlaylistManager {
   private static _instance: PlaylistManager;
@@ -23,6 +24,12 @@ export class PlaylistManager {
     ipcMain.handle(PlaylistChannel.GET_ALL, (_, query?: QueryRequest) => {
       return this.getAll(query);
     });
+    ipcMain.handle(
+      PlaylistChannel.INSERT,
+      async (_, query: PlaylistInsertQuery) => {
+        return await this.insert(query);
+      },
+    );
   }
 
   getAll(query?: QueryRequest): Playlist[] {
@@ -32,6 +39,13 @@ export class PlaylistManager {
       .sort((a, b) =>
         this.sortPlaylists(a, b, query?.sortDirection, query?.sortBy),
       );
+  }
+
+  async insert(query: PlaylistInsertQuery): Promise<Playlist> {
+    const playlists = this.database.readTable<Playlist[]>('playlists') ?? [];
+    const newPlaylist = this.createNewPlaylist(query, playlists.length);
+    await this.database.updateTable('playlists', [...playlists, newPlaylist]);
+    return newPlaylist;
   }
 
   public static __resetForTests(): void {
@@ -85,5 +99,24 @@ export class PlaylistManager {
     }
 
     return 0;
+  }
+
+  private createNewPlaylist(
+    data: PlaylistInsertQuery,
+    order: number,
+  ): Playlist {
+    const id = uuid();
+    const date = new Date();
+    return {
+      id,
+      name: data.name,
+      description: data?.description,
+      order,
+      imageUrl: data?.imageUrl,
+      tags: data?.tags ?? [],
+      dateCreated: date,
+      dateUpdated: date,
+      trackIds: [],
+    };
   }
 }

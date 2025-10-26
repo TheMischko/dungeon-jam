@@ -10,18 +10,24 @@ import {
   setAllEntities,
   withEntities,
 } from '@ngrx/signals/entities';
-import { Playlist } from '@shared/models/playlist.model';
+import { Playlist, PlaylistInsertQuery } from '@shared/models/playlist.model';
 import { inject } from '@angular/core';
 import { PlaylistApiService } from '@general/services/playlist-api.service';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { catchError, EMPTY, finalize, pipe, switchMap, tap } from 'rxjs';
 import { QueryRequest } from '@shared/models/request.model';
+import { SortDirection } from '@shared/models/common.model';
 
 type PlaylistStoreState = {
   loading: boolean;
+  lastLoadQuery: QueryRequest;
 };
 const initialState: PlaylistStoreState = {
   loading: false,
+  lastLoadQuery: {
+    sortBy: 'order',
+    sortDirection: SortDirection.ASC,
+  },
 };
 const playlistConfig = entityConfig({
   entity: type<Playlist>(),
@@ -34,11 +40,11 @@ export const PlaylistStore = signalStore(
   withMethods((store, playlistApiService = inject(PlaylistApiService)) => {
     const load = rxMethod<QueryRequest>(
       pipe(
-        tap(() => {
-          patchState(store, { loading: true });
+        tap((query) => {
+          patchState(store, { loading: true, lastLoadQuery: query });
         }),
-        switchMap((options) => {
-          return playlistApiService.getAllPlaylists(options).pipe(
+        switchMap((query) => {
+          return playlistApiService.getAllPlaylists(query).pipe(
             tap((playlists) => {
               patchState(store, setAllEntities(playlists));
             }),
@@ -53,8 +59,27 @@ export const PlaylistStore = signalStore(
         }),
       ),
     );
+
+    const insertNew = rxMethod<PlaylistInsertQuery>(
+      pipe(
+        tap(() => patchState(store, { loading: true })),
+        switchMap((data) => {
+          return playlistApiService.insertPlaylist(data).pipe(
+            tap(() => {
+              load(store.lastLoadQuery());
+            }),
+            catchError((err) => {
+              console.error(err);
+              patchState(store, { loading: false });
+              return EMPTY;
+            }),
+          );
+        }),
+      ),
+    );
     return {
       load,
+      insertNew,
     };
   }),
 );

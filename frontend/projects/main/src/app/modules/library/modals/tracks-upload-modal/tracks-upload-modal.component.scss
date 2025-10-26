@@ -1,56 +1,26 @@
-@use "mixins" as mix;
-@use "colors" as col;
+@use 'mixins' as mix;
+@use 'colors' as col;
 
-:host{
+:host {
   @include mix.base-dialog();
-  display: flex;
 }
 
-.wrapper{
-  width: 500px;
-  display: flex;
-  flex-direction: column;
-
-  .content{
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 3rem;
-  }
-}
-
-.footer{
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: stretch;
-  width: 100%;
-  gap: 1rem;
-
-  .steps{
+.footer {
+  .steps {
     display: flex;
     align-items: center;
     gap: 1rem;
 
-    .step-dot{
+    .step-dot {
       width: 8px;
       height: 8px;
       border-radius: 50%;
       background: col.$text-main;
       transition: background-color 0.25s ease;
 
-      &.active{
+      &.active {
         background: col.$primary;
       }
     }
   }
-
-  .buttons{
-    display: flex;
-    justify-content: flex-end;
-    gap: 0.5rem;
-    width: 100%;
-  }
 }
-
-

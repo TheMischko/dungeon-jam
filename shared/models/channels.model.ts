@@ -22,6 +22,7 @@ export enum PlaybackChannel {
 
 export enum PlaylistChannel {
   GET_ALL = 'playlists/get-all',
+  INSERT = 'playlists/insert'
 }
 
 export type AppChannel =

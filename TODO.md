@@ -1,0 +1,5 @@
+### Small missing features
+Obviously the project is WIP, so there is just a list of small missing features from the already *implemented* flows.
+- [ ] `LibraryLandingPage` "Upload" button should open a modal to consume the audio files and then open the modal with forms to fill in details
+- [ ] Custom input for tags with suggestions, and auto-splitting into pills
+- [ ] Playlist filters

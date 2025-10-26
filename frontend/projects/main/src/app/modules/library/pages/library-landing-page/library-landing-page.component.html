@@ -1,5 +1,7 @@
 <app-songs-drop-in-zone (dropped)="openUploadDialog($event)">
-  <button mat-flat-button (click)="openUploadDialog()">Upload</button>
+  <button mat-flat-button (click)="openUploadDialog()" [disabled]="true">
+    Upload
+  </button>
   @if(tracks().length === 0){
   <p>
     There are no tracks yet. Upload them by dragging some audio files into this
