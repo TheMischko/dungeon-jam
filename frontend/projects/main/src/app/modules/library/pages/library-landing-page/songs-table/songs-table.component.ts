@@ -13,10 +13,18 @@ import {
 } from '@angular/material/table';
 import { Track } from '@shared/models/track.model';
 import { LucideAngularModule } from 'lucide-angular';
-import { iconSet } from '../../../../../../../../general/src/lib/icons/icons';
+import { actionsIconSet, iconSet } from '@general/icons/icons';
 import { MatIconButton } from '@angular/material/button';
-import { TrackDurationPipe } from '../../../../../../../../general/src/lib/pipes/track-duration.pipe';
-import { SearchBarComponent } from '../../../../../../../../general/src/lib/components/controls/search-bar/search-bar.component';
+import { TrackDurationPipe } from '@general/pipes/track-duration.pipe';
+import { SearchBarComponent } from '@general/components/controls/search-bar/search-bar.component';
+import { IconButtonComponent } from '@general/components/buttons/icon-button/icon-button.component';
+import {
+  MatMenu,
+  MatMenuTrigger,
+  MenuCloseReason,
+} from '@angular/material/menu';
+import { SongTableActionsMenuComponent } from '../song-table-actions-menu/song-table-actions-menu.component';
+import { SongTableActionsPlaylistMenuComponent } from '../song-table-actions-playlist-menu/song-table-actions-playlist-menu.component';
 
 @Component({
   selector: 'app-songs-table',
@@ -35,6 +43,11 @@ import { SearchBarComponent } from '../../../../../../../../general/src/lib/comp
     MatIconButton,
     TrackDurationPipe,
     SearchBarComponent,
+    IconButtonComponent,
+    MatMenuTrigger,
+    MatMenu,
+    SongTableActionsMenuComponent,
+    SongTableActionsPlaylistMenuComponent,
   ],
   templateUrl: './songs-table.component.html',
   styleUrl: './songs-table.component.scss',
@@ -42,13 +55,21 @@ import { SearchBarComponent } from '../../../../../../../../general/src/lib/comp
 export class SongsTableComponent {
   readonly tracks = input<Track[]>([]);
   readonly playingTrackId = input<string | null>();
-  readonly activeRow = signal<Track | null>(null);
 
   readonly playTrack = output<Track>();
   readonly pauseTrack = output();
   readonly search = output<string>();
 
-  readonly displayedColumns = ['play', 'title', 'author', 'duration'];
+  readonly activeRow = signal<Track | null>(null);
+  readonly showPlaylists = signal<boolean>(false);
+
+  readonly displayedColumns = [
+    'play',
+    'title',
+    'author',
+    'duration',
+    'actions',
+  ];
 
   hoverStart(track: Track) {
     this.activeRow.set(track);
@@ -81,4 +102,26 @@ export class SongsTableComponent {
 
   readonly PlayIcon = iconSet.PlayIcon;
   readonly PauseIcon = iconSet.PauseIcon;
+  readonly ActionsIcon = actionsIconSet.ActionsMenu;
+
+  playNext(track: Track): void {
+    console.log(`Play next: ${track.name}`);
+  }
+
+  addToPlaylist(track: Track): void {
+    this.showPlaylists.set(true);
+    console.log(`Add to playlist: ${track.name}`);
+  }
+
+  deleteTrack(track: Track) {
+    console.log(`Remove song: ${track.name}`);
+  }
+
+  actionsClosed(reason: MenuCloseReason) {
+    if (reason !== 'click' || this.showPlaylists()) {
+      setTimeout(() => {
+        this.showPlaylists.set(false);
+      }, 250);
+    }
+  }
 }

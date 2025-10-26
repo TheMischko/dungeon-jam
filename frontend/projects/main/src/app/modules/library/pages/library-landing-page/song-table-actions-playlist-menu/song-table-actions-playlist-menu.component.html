@@ -1,0 +1,5 @@
+@for (playlist of playlists(); track playlist.id){
+<button mat-menu-item (click)="playlistClicked(playlist)">
+  {{ playlist.name }}
+</button>
+}

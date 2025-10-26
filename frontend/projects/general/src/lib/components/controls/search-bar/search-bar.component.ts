@@ -1,6 +1,6 @@
 import { Component, output } from '@angular/core';
 import { InputComponent } from '../input/input.component';
-import { formIconSet } from '../../../icons/icons';
+import { actionsIconSet } from '../../../icons/icons';
 
 @Component({
   selector: 'lib-search-bar',
@@ -10,5 +10,5 @@ import { formIconSet } from '../../../icons/icons';
 })
 export class SearchBarComponent {
   readonly search = output<string>();
-  readonly searchIcon = formIconSet.SearchIcon;
+  readonly searchIcon = actionsIconSet.SearchIcon;
 }

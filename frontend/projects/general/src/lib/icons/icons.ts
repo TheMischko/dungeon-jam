@@ -1,13 +1,17 @@
 import {
+  EllipsisVerticalIcon,
   Grid2x2Icon,
   Grid3x3Icon,
   ListMusicIcon,
+  ListStartIcon,
   PauseIcon,
   PlayIcon,
   Repeat2Icon,
   SearchIcon,
   SkipBackIcon,
   SkipForwardIcon,
+  SquarePlusIcon,
+  Trash2Icon,
   Volume1Icon,
   Volume2Icon,
   VolumeXIcon,
@@ -18,14 +22,18 @@ export const iconSet = {
   PauseIcon: PauseIcon,
   PrevIcon: SkipBackIcon,
   NextIcon: SkipForwardIcon,
+  PlayNextIcon: ListStartIcon,
   PlaylistIcon: ListMusicIcon,
   RepeatIcon: Repeat2Icon,
   GridBigIcon: Grid2x2Icon,
   GridSmallIcon: Grid3x3Icon,
 };
 
-export const formIconSet = {
+export const actionsIconSet = {
   SearchIcon: SearchIcon,
+  DeleteIcon: Trash2Icon,
+  AddIcon: SquarePlusIcon,
+  ActionsMenu: EllipsisVerticalIcon,
 };
 
 export const volumeIconSet = {

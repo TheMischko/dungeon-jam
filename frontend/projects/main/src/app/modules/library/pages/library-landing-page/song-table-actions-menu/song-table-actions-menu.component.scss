@@ -1,0 +1,9 @@
+:host ::ng-deep button .mat-mdc-menu-item-text {
+  display: flex;
+  align-items: center;
+  justify-content: stretch;
+  gap: 0.5rem;
+  lucide-icon {
+    margin-top: 4px;
+  }
+}

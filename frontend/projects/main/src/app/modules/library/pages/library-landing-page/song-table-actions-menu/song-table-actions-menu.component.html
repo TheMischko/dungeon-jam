@@ -1,0 +1,14 @@
+<button mat-menu-item (click)="playNext.emit()">
+  <lucide-icon [img]="playNextIcon"></lucide-icon>
+  <span>Play next</span>
+</button>
+
+<button mat-menu-item (click)="onAddToPlaylist($event)">
+  <lucide-icon [img]="addToPlaylistIcon"></lucide-icon>
+  <span>Add to playlist</span>
+</button>
+
+<button mat-menu-item (click)="delete.emit()">
+  <lucide-icon [img]="deleteIcon"></lucide-icon>
+  <span>Delete</span>
+</button>

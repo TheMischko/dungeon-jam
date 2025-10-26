@@ -6,6 +6,7 @@
 
 <!-- Table -->
 <mat-table [dataSource]="tracks()" class="table">
+  <!-- PLAY -->
   <ng-container matColumnDef="play">
     <mat-header-cell *matHeaderCellDef></mat-header-cell>
     <mat-cell mat-cell *matCellDef="let row">
@@ -20,20 +21,47 @@
       }
     </mat-cell>
   </ng-container>
+
+  <!-- TITLE -->
   <ng-container matColumnDef="title">
     <mat-header-cell *matHeaderCellDef>Title</mat-header-cell>
     <mat-cell mat-cell *matCellDef="let row">{{ row.name }}</mat-cell>
   </ng-container>
+
+  <!-- Author -->
   <ng-container matColumnDef="author">
     <mat-header-cell mat-header-cell *matHeaderCellDef>Author</mat-header-cell>
     <mat-cell *matCellDef="let row">{{ row.author }}</mat-cell>
   </ng-container>
+
+  <!-- Duration -->
   <ng-container matColumnDef="duration">
     <mat-header-cell mat-header-cell *matHeaderCellDef>Length</mat-header-cell>
     <mat-cell *matCellDef="let row">{{
       row.duration | trackDuration
     }}</mat-cell>
   </ng-container>
+
+  <!-- Actions -->
+  <ng-container matColumnDef="actions">
+    <mat-header-cell mat-header-cell *matHeaderCellDef></mat-header-cell>
+    <mat-cell *matCellDef="let row">
+      <lib-icon-button [matMenuTriggerFor]="menu" [icon]="ActionsIcon" />
+      <mat-menu #menu="matMenu" (closed)="actionsClosed($event)">
+        @if (showPlaylists()){
+        <app-song-table-actions-playlist-menu [track]="row" />
+        } @else {
+        <app-song-table-actions-menu
+          (playNext)="playNext(row)"
+          (addToPlaylist)="addToPlaylist(row)"
+          (delete)="deleteTrack(row)"
+        />
+        }
+      </mat-menu>
+    </mat-cell>
+  </ng-container>
+
+  <!-- Rows -->
 
   <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
   <mat-row

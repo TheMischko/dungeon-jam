@@ -1,0 +1,21 @@
+<div class="wrapper">
+  <div class="header">
+    <h1>Create new playlist</h1>
+  </div>
+
+  <form class="content" [formGroup]="form">
+    <lib-input formControlName="name" label="Playlist name"></lib-input>
+    <lib-input formControlName="description" label="Description"></lib-input>
+    <lib-input formControlName="tags" label="Tags"></lib-input>
+    <lib-input formControlName="imageUrl" label="Image URL"></lib-input>
+  </form>
+
+  <div class="footer">
+    <div class="buttons">
+      <button mat-flat-button (click)="save()">Save</button>
+      <button mat-flat-button (click)="cancel()" color="tertiary">
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>
