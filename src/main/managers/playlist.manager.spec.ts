@@ -118,4 +118,129 @@ describe('PlaylistManager', () => {
       expect(result).toEqual([playlist3, playlist2, playlist1]);
     });
   });
+
+  describe('addTracks', () => {
+    it('should add new tracks to playlist', async () => {
+      const playlistId = 'playlist-1';
+      const existingTrackIds = ['track-1', 'track-2'];
+      const newTrackIds = ['track-3', 'track-4'];
+      const playlist = mockPlaylist({
+        id: playlistId,
+        trackIds: existingTrackIds,
+      });
+
+      mockDatabaseInstance.readTable.mockReturnValue([playlist]);
+
+      const result = await playlistManager['addTracks']({
+        [playlistId]: newTrackIds,
+      });
+
+      expect(mockDatabaseInstance.updateTable).toHaveBeenCalledWith(
+        'playlists',
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: playlistId,
+            trackIds: [...existingTrackIds, ...newTrackIds],
+          }),
+        ]),
+      );
+      expect(result.size).toBe(1);
+      expect(result.get(playlistId)?.trackIds).toEqual([
+        ...existingTrackIds,
+        ...newTrackIds,
+      ]);
+    });
+
+    it('should filter out duplicate tracks', async () => {
+      const playlistId = 'playlist-1';
+      const existingTrackIds = ['track-1', 'track-2'];
+      const tracksToAdd = ['track-2', 'track-3', 'track-3'];
+      const playlist = mockPlaylist({
+        id: playlistId,
+        trackIds: existingTrackIds,
+      });
+
+      mockDatabaseInstance.readTable.mockReturnValue([playlist]);
+
+      const result = await playlistManager['addTracks']({
+        [playlistId]: tracksToAdd,
+      });
+
+      expect(result.get(playlistId)?.trackIds).toEqual([
+        'track-1',
+        'track-2',
+        'track-3',
+      ]);
+    });
+
+    it('should return empty Map when no playlists exist', async () => {
+      mockDatabaseInstance.readTable.mockReturnValue(null);
+
+      const result = await playlistManager['addTracks']({
+        'playlist-1': ['track-1'],
+      });
+
+      expect(result.size).toBe(0);
+    });
+
+    it('should not modify playlists that are not in the update data', async () => {
+      const playlist1 = mockPlaylist({
+        id: 'playlist-1',
+        trackIds: ['track-1'],
+      });
+      const playlist2 = mockPlaylist({
+        id: 'playlist-2',
+        trackIds: ['track-2'],
+      });
+
+      mockDatabaseInstance.readTable.mockReturnValue([playlist1, playlist2]);
+
+      const result = await playlistManager['addTracks']({
+        'playlist-1': ['track-3'],
+      });
+
+      expect(result.size).toBe(1);
+      expect(result.has('playlist-1')).toBe(true);
+      expect(result.has('playlist-2')).toBe(false);
+    });
+
+    it('should not modify playlist when no new tracks to add', async () => {
+      const playlistId = 'playlist-1';
+      const existingTrackIds = ['track-1', 'track-2'];
+      const playlist = mockPlaylist({
+        id: playlistId,
+        trackIds: existingTrackIds,
+      });
+
+      mockDatabaseInstance.readTable.mockReturnValue([playlist]);
+
+      const result = await playlistManager['addTracks']({
+        [playlistId]: ['track-1', 'track-2'],
+      });
+
+      expect(result.size).toBe(0);
+    });
+
+    it('should handle multiple playlists in one operation', async () => {
+      const playlist1 = mockPlaylist({
+        id: 'playlist-1',
+        trackIds: ['track-1'],
+      });
+      const playlist2 = mockPlaylist({
+        id: 'playlist-2',
+        trackIds: ['track-2'],
+      });
+
+      mockDatabaseInstance.readTable.mockReturnValue([playlist1, playlist2]);
+
+      const result = await playlistManager['addTracks']({
+        'playlist-1': ['track-3'],
+        'playlist-2': ['track-4'],
+      });
+
+      expect(result.size).toBe(2);
+      expect(result.get('playlist-1')?.trackIds).toContain('track-3');
+      expect(result.get('playlist-2')?.trackIds).toContain('track-4');
+    });
+  });
 });
