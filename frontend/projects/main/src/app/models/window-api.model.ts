@@ -1,4 +1,10 @@
-import {AudioTrack, FileBase64, StoredPlayback, Track} from '@shared/models/track.model';
+import {
+  AudioTrack,
+  FileBase64,
+  PlaylistTracksQuery,
+  StoredPlayback,
+  Track,
+} from '@shared/models/track.model';
 
 export type AudioApiWindow = Window &
   typeof globalThis & {
@@ -12,6 +18,7 @@ export type AudioApiWindow = Window &
     TRACK_API: {
       getAllTracks: () => Promise<Track[]>;
       getTrackById: (id: string) => Promise<Track | null>;
+      getTracksByPlaylist: (query: PlaylistTracksQuery) => Promise<Track[]>;
       createTrack: (
         name: string,
         url: string,
@@ -23,5 +30,5 @@ export type AudioApiWindow = Window &
     PLAYBACK_API: {
       loadState: () => Promise<StoredPlayback>;
       updateState: (newState: StoredPlayback) => void;
-    }
-  }
+    };
+  };

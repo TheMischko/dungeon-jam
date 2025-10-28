@@ -5,6 +5,8 @@ import { GridItemSizeConfig } from '../playlist-grid-item/playlist-grid-item.com
 import { SortDirection } from '@shared/models/common.model';
 import { QueryRequest } from '@shared/models/request.model';
 import { PlaylistStore } from '@general/stores/playlist.store';
+import { Router } from '@angular/router';
+import { playlistRouteStrings } from '../../../../playlist-route-strings';
 
 @Component({
   selector: 'app-playlist-grid-smart',
@@ -14,6 +16,7 @@ import { PlaylistStore } from '@general/stores/playlist.store';
 })
 export class PlaylistGridSmartComponent implements OnInit {
   readonly playlistStore = inject(PlaylistStore);
+  readonly router = inject(Router);
 
   readonly sizeSliderValue = signal<number>(0.75);
   readonly playingPlaylistId = signal<string | null>(null);
@@ -52,8 +55,12 @@ export class PlaylistGridSmartComponent implements OnInit {
     this.playingPlaylistId.set(null);
   }
 
-  showPlaylistDetails(playlistId: string) {
-    console.log(`Navigate to playlist: ${playlistId}`);
+  async showPlaylistDetails(playlistId: string) {
+    await this.router.navigate([
+      playlistRouteStrings.playlists,
+      playlistRouteStrings.detail,
+      playlistId,
+    ]);
   }
 }
 

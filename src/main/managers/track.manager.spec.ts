@@ -4,15 +4,25 @@ import {
   mockDatabase,
   mockDatabaseInstance,
 } from '../testing/mocks/mock-database';
+import {
+  mockPlaylistManager,
+  mockPlaylistManagerInstance,
+} from '../testing/mocks/mock-playlist-manager';
 import { setupTestEnvironment, triggerIpcMainHandle } from '../testing/setup';
 import { AudioFileChannel, TrackChannel } from '@shared/models/channels.model';
 import { TrackManager } from './track.manager';
-import { AudioTrack, Track } from '@shared/models/track.model';
+import {
+  AudioTrack,
+  Track,
+  PlaylistTracksQuery,
+} from '@shared/models/track.model';
 import { mockAudioTrack, mockTrack } from '../testing/mocks/mock-track.data';
+import { mockPlaylist } from '../testing/mocks/mock-playlist.data';
 import { SortDirection } from '@shared/models/common.model';
 
 vi.mock('electron', () => mockElectron);
 vi.mock('./../database/database', () => mockDatabase);
+vi.mock('./playlist.manager', () => mockPlaylistManager);
 
 describe('TrackManager', () => {
   let trackManager: TrackManager;
@@ -51,6 +61,18 @@ describe('TrackManager', () => {
       await triggerIpcMainHandle(TrackChannel.GET_BY_ID, testId);
 
       expect(trackManager.get).toHaveBeenCalledWith(testId);
+    });
+
+    it('should response to GET_PLAYLIST_TRACKS with tracks of the playlist', async () => {
+      const query: PlaylistTracksQuery = {
+        playlistId: 'test-123',
+        filter: 'test',
+      };
+      vi.spyOn(trackManager, 'getByPlaylist').mockResolvedValue([]);
+
+      await triggerIpcMainHandle(TrackChannel.GET_PLAYLIST_TRACKS, query);
+
+      expect(trackManager.getByPlaylist).toHaveBeenCalledWith(query);
     });
 
     it('should handle INSERT request by inserting the track values', async () => {
@@ -146,6 +168,67 @@ describe('TrackManager', () => {
       });
 
       expect(results).toEqual([trackOfZ, trackOfH, trackOfA]);
+    });
+  });
+
+  describe('getByPlaylist', () => {
+    it('should return empty array when playlist does not exist', async () => {
+      mockPlaylistManagerInstance.getById.mockReturnValue(null);
+
+      const query: PlaylistTracksQuery = { playlistId: 'nonexistent' };
+      const result = await trackManager.getByPlaylist(query);
+
+      expect(mockPlaylistManagerInstance.getById).toHaveBeenCalled();
+      expect(result).toEqual([]);
+    });
+
+    it('should return tracks that are in the playlist', async () => {
+      const track1 = mockTrack();
+      const track2 = mockTrack();
+      const track3 = mockTrack();
+      const playlist = mockPlaylist({ trackIds: [track1.id, track2.id] });
+
+      mockPlaylistManagerInstance.getById.mockReturnValue(playlist);
+
+      vi.spyOn(trackManager, 'getAll').mockReturnValue([
+        track1,
+        track2,
+        track3,
+      ]);
+
+      const query: PlaylistTracksQuery = { playlistId: playlist.id };
+      const result = await trackManager.getByPlaylist(query);
+
+      expect(result).toHaveLength(2);
+      expect(result).toContainEqual(track1);
+      expect(result).toContainEqual(track2);
+    });
+
+    it('should filter playlist tracks by query filter parameter', async () => {
+      const track1 = mockTrack({ name: 'Love Song' });
+      const track2 = mockTrack({ name: 'Hate Song' });
+      const track3 = mockTrack({ name: 'Love Album' });
+      const playlist = mockPlaylist({
+        trackIds: [track1.id, track2.id, track3.id],
+      });
+
+      mockPlaylistManagerInstance.getById.mockReturnValue(playlist);
+
+      vi.spyOn(trackManager, 'getAll').mockReturnValue([
+        track1,
+        track2,
+        track3,
+      ]);
+
+      const query: PlaylistTracksQuery = {
+        playlistId: playlist.id,
+        filter: 'Love',
+      };
+      const result = await trackManager.getByPlaylist(query);
+
+      expect(result).toHaveLength(2);
+      expect(result).toContainEqual(track1);
+      expect(result).toContainEqual(track3);
     });
   });
 

@@ -40,6 +40,16 @@ describe('PlaylistManager', () => {
     expect(playlistManager.getAll).toHaveBeenCalled();
   });
 
+  it('should respond to GET_BY_ID message with the matching playlist', async () => {
+    const testId = 'playlist-123';
+    const playlist = mockPlaylist({ id: testId });
+    vi.spyOn(playlistManager, 'getById').mockReturnValue(playlist);
+
+    await triggerIpcMainHandle(PlaylistChannel.GET_BY_ID, testId);
+
+    expect(playlistManager.getById).toHaveBeenCalledWith(testId);
+  });
+
   describe('getAll', () => {
     it('should read database table and return all playlists', () => {
       const dataSet = [mockPlaylist(), mockPlaylist(), mockPlaylist()];
@@ -116,6 +126,46 @@ describe('PlaylistManager', () => {
       });
 
       expect(result).toEqual([playlist3, playlist2, playlist1]);
+    });
+  });
+
+  describe('getById', () => {
+    it('should return the playlist when it exists', () => {
+      const targetPlaylist = mockPlaylist({ id: 'playlist-123' });
+      const otherPlaylist1 = mockPlaylist({ id: 'playlist-456' });
+      const otherPlaylist2 = mockPlaylist({ id: 'playlist-789' });
+
+      mockDatabaseInstance.readTable.mockImplementation(() => [
+        otherPlaylist1,
+        targetPlaylist,
+        otherPlaylist2,
+      ]);
+
+      const result = playlistManager.getById('playlist-123');
+
+      expect(result).toEqual(targetPlaylist);
+    });
+
+    it('should return null when playlist does not exist', () => {
+      const playlist1 = mockPlaylist({ id: 'playlist-123' });
+      const playlist2 = mockPlaylist({ id: 'playlist-456' });
+
+      mockDatabaseInstance.readTable.mockImplementation(() => [
+        playlist1,
+        playlist2,
+      ]);
+
+      const result = playlistManager.getById('nonexistent-id');
+
+      expect(result).toBeNull();
+    });
+
+    it('should return null when no playlists exist in database', () => {
+      mockDatabaseInstance.readTable.mockImplementation(() => null);
+
+      const result = playlistManager.getById('any-id');
+
+      expect(result).toBeNull();
     });
   });
 

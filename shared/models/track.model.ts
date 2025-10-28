@@ -1,3 +1,5 @@
+import { QueryRequest } from '@shared/models/request.model';
+
 export interface Track {
   id: string;
   name: string;
@@ -20,4 +22,8 @@ export interface FileBase64 {
 
 export interface StoredPlayback {
   volume: number;
+}
+
+export interface PlaylistTracksQuery extends QueryRequest {
+  playlistId: string;
 }

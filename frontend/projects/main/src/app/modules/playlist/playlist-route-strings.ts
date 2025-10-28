@@ -1,3 +1,4 @@
 export const playlistRouteStrings = {
-  playlists: 'playlists'
-}
+  playlists: 'playlists',
+  detail: 'detail',
+};

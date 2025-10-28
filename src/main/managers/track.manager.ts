@@ -1,10 +1,15 @@
 import { DatabaseWrapper } from '../database/database';
-import { AudioTrack, Track } from '@shared/models/track.model';
+import {
+  AudioTrack,
+  PlaylistTracksQuery,
+  Track,
+} from '@shared/models/track.model';
 import { ipcMain } from 'electron';
 import { AudioFileChannel, TrackChannel } from '@shared/models/channels.model';
 import { v4 as uuid } from 'uuid';
 import { QueryRequest } from '@shared/models/request.model';
 import { SortDirection } from '@shared/models/common.model';
+import { PlaylistManager } from './playlist.manager';
 
 export class TrackManager {
   private static _instance: TrackManager;
@@ -28,6 +33,13 @@ export class TrackManager {
     ipcMain.handle(TrackChannel.GET_BY_ID, (_, id: string) => {
       return this.get(id);
     });
+
+    ipcMain.handle(
+      TrackChannel.GET_PLAYLIST_TRACKS,
+      (_, query: PlaylistTracksQuery) => {
+        return this.getByPlaylist(query);
+      },
+    );
 
     ipcMain.handle(
       TrackChannel.INSERT,
@@ -66,6 +78,25 @@ export class TrackManager {
 
   get(id: string): Track | undefined {
     return this.getAll()?.find((track) => track.id === id);
+  }
+
+  async getByPlaylist(query: PlaylistTracksQuery): Promise<Track[]> {
+    const playlist = (await PlaylistManager.getInstance()).getById(
+      query.playlistId,
+    );
+    if (!playlist) {
+      return [];
+    }
+    const allTracks = this.getAll();
+    return allTracks
+      .reduce((playlistTracks, track, _, __) => {
+        if (!playlist.trackIds.includes(track.id)) {
+          return playlistTracks;
+        }
+        return [...playlistTracks, track];
+      }, [] as Track[])
+      .filter((track) => this.filterTracks(track, query?.filter))
+      .sort((a, b) => this.sortTracks(a, b));
   }
 
   async insert(

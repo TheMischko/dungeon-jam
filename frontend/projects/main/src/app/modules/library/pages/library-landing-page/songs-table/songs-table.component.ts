@@ -108,9 +108,8 @@ export class SongsTableComponent {
     console.log(`Play next: ${track.name}`);
   }
 
-  addToPlaylist(track: Track): void {
+  addToPlaylist(): void {
     this.showPlaylists.set(true);
-    console.log(`Add to playlist: ${track.name}`);
   }
 
   deleteTrack(track: Track) {

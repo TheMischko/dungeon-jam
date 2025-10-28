@@ -1,4 +1,4 @@
-import { Track } from '@shared/models/track.model';
+import { PlaylistTracksQuery, Track } from '@shared/models/track.model';
 import { ipcRenderer } from 'electron';
 import { TrackChannel } from '@shared/models/channels.model';
 
@@ -8,6 +8,12 @@ const getAllTracks = async (): Promise<Track[]> => {
 
 const getTrackById = async (id: string): Promise<Track | null> => {
   return await ipcRenderer.invoke(TrackChannel.GET_BY_ID, id);
+};
+
+const getTracksByPlaylist = async (
+  query: PlaylistTracksQuery,
+): Promise<Track[]> => {
+  return await ipcRenderer.invoke(TrackChannel.GET_PLAYLIST_TRACKS, query);
 };
 
 const createTrack = async (
@@ -29,4 +35,5 @@ export default {
   getAllTracks,
   getTrackById,
   createTrack,
+  getTracksByPlaylist,
 };

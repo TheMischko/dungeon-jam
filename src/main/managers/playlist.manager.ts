@@ -28,6 +28,9 @@ export class PlaylistManager {
     ipcMain.handle(PlaylistChannel.GET_ALL, (_, query?: QueryRequest) => {
       return this.getAll(query);
     });
+    ipcMain.handle(PlaylistChannel.GET_BY_ID, (_, id: string) => {
+      return this.getById(id);
+    });
     ipcMain.handle(
       PlaylistChannel.INSERT,
       async (_, query: PlaylistInsertQuery) => {
@@ -40,6 +43,11 @@ export class PlaylistManager {
         return await this.addTracks(data);
       },
     );
+  }
+
+  getById(playlistId: string): Playlist | null {
+    const data = this.getAll();
+    return data.find((playlist) => playlist.id === playlistId) ?? null;
   }
 
   getAll(query?: QueryRequest): Playlist[] {

@@ -7,6 +7,7 @@ export enum TrackChannel {
   GET_ALL = 'tracks/get-all',
   GET_BY_ID = 'tracks/get-by-id',
   INSERT = 'tracks/add',
+  GET_PLAYLIST_TRACKS = 'tracks/get-playlist-tracks',
 }
 
 export enum AudioFileChannel {
@@ -22,6 +23,7 @@ export enum PlaybackChannel {
 
 export enum PlaylistChannel {
   GET_ALL = 'playlists/get-all',
+  GET_BY_ID = 'playlists/get',
   INSERT = 'playlists/insert',
   ADD_TRACKS = 'playlists/add-tracks',
 }
