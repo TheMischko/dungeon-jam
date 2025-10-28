@@ -3,10 +3,13 @@
     <h1>{{ title }}</h1>
   </div>
 
-  <form class="content" [formGroup]="forms.controls[currentStep()]">
-    <lib-input formControlName="path" label="File"></lib-input>
-    <lib-input formControlName="title" label="Title"></lib-input>
-    <lib-input formControlName="author" label="Author"></lib-input>
+  <form class="content" [formGroup]="currentForm()">
+    <lib-input [formControl]="currentPathControl()" label="File"></lib-input>
+    <lib-input [formControl]="currentTitleControl()" label="Title"></lib-input>
+    <lib-input
+      [formControl]="currentAuthorControl()"
+      label="Author"
+    ></lib-input>
   </form>
 
   <div class="footer">

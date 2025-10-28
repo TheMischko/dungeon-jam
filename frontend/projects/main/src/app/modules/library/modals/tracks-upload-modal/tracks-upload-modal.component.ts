@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import {
   MAT_DIALOG_DATA,
   MatDialogModule,
@@ -13,7 +13,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { InputComponent } from '../../../../../../../general/src/lib/components/controls/input/input.component';
+import { InputComponent } from '@general/components/controls/input/input.component';
 
 export type TracksUploadModalData = {
   title: string;
@@ -27,7 +27,7 @@ export type TracksUploadModalData = {
   styleUrl: './tracks-upload-modal.component.scss',
   standalone: true,
 })
-export class TracksUploadModalComponent {
+export class TracksUploadModalComponent implements OnInit {
   readonly data = inject<TracksUploadModalData>(MAT_DIALOG_DATA);
   readonly dialog = inject(MatDialogRef);
 
@@ -35,6 +35,18 @@ export class TracksUploadModalComponent {
   readonly isLastStep = computed(
     () => this.currentStep() === this.tracks.length - 1,
   );
+  readonly currentForm = computed(() => {
+    return this.forms.controls[this.currentStep()];
+  });
+  readonly currentPathControl = computed(() => {
+    return this.currentForm().controls.path;
+  });
+  readonly currentTitleControl = computed(() => {
+    return this.currentForm().controls.title;
+  });
+  readonly currentAuthorControl = computed(() => {
+    return this.currentForm().controls.author;
+  });
 
   readonly forms = new FormArray<
     FormGroup<{
@@ -44,7 +56,7 @@ export class TracksUploadModalComponent {
     }>
   >([]);
 
-  constructor() {
+  ngOnInit() {
     this.tracks.forEach((track, index) => {
       this.forms.insert(
         index,
