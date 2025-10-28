@@ -52,6 +52,18 @@
       }
     }
 
+    .tracks-overlay {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      padding: 4px;
+      border-radius: 8px;
+      background: rgba(#000, 0.5);
+    }
+
     img {
       border-radius: 8px;
       max-width: 100%;

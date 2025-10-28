@@ -5,7 +5,12 @@
   (mouseleave)="onMouseLeave()"
 >
   <div class="image-wrapper" [ngStyle]="imageSizeStyle()">
-    @if(isHovering()) {
+    @if(showTrackCount()){
+    <div class="tracks-overlay">
+      <lucide-icon [img]="tracksIcon" [size]="sizeConfig().trackCountSize" />
+      <span [ngStyle]="trackCountSize()">{{ playlist().trackIds.length }}</span>
+    </div>
+    } @if(isHovering()) {
     <div
       class="image-overlay"
       [ngStyle]="overlaySizeStyle()"

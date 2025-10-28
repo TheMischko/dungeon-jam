@@ -1,7 +1,7 @@
 import { Component, computed, input, output, signal } from '@angular/core';
 import { Playlist } from '@shared/models/playlist.model';
 import { NgStyle } from '@angular/common';
-import { iconSet } from '../../../../../../../../../general/src/lib/icons/icons';
+import { iconSet } from '@general/icons/icons';
 import { LucideAngularModule, LucideIconData } from 'lucide-angular';
 
 @Component({
@@ -24,6 +24,7 @@ export class PlaylistGridItemComponent {
   readonly DEFAULT_IMAGE = '/assets/playlist.img';
   readonly playIcon = iconSet.PlayIcon;
   readonly pauseIcon = iconSet.PauseIcon;
+  readonly tracksIcon = iconSet.TracksIcon;
 
   readonly imageSrc = computed<string>(() => {
     return this.playlist()?.imageUrl ?? this.DEFAULT_IMAGE;
@@ -64,6 +65,15 @@ export class PlaylistGridItemComponent {
     }
     return this.playIcon;
   });
+  readonly showTrackCount = computed<boolean>(() => {
+    return !!this.sizeConfig().trackCountSize;
+  });
+  readonly trackCountSize = computed<Record<string, string>>(() => {
+    const sizeConfig = this.sizeConfig();
+    return {
+      'font-size': `${sizeConfig.trackCountSize}px`,
+    };
+  });
 
   onMouseEnter() {
     this.isHovering.set(true);
@@ -90,6 +100,7 @@ export type GridItemSizeConfig = {
   imageSize: number;
   fontSize: number;
   overlaySize: number;
+  trackCountSize?: number;
   titleBold: boolean;
   hideTags: boolean;
   hideTracks: boolean;
