@@ -1,1 +1,31 @@
-<p>playlists-detail-page works!</p>
+<div class="header">
+  <img
+    class="playlist-image"
+    [src]="playlist()?.imageUrl"
+    [alt]="playlist()?.name"
+  />
+  <div class="header-content">
+    <h1>{{ playlist()?.name }}</h1>
+    @if (playlist()?.description){
+    <h2>{{ playlist()?.description }}</h2>
+    }
+  </div>
+  <div class="header-controls">
+    <lib-play-pause-button
+      [state]="playButtonState()"
+      [type]="buttonType"
+      [size]="buttonSize"
+      (toggle)="playPauseClicked($event)"
+    ></lib-play-pause-button>
+  </div>
+</div>
+
+<div class="content">
+  <app-songs-table
+    [tracks]="tracks()"
+    [playingTrackId]="playingTrackId()"
+    (playTrack)="playTrack.emit($event)"
+    (pauseTrack)="pause.emit()"
+    (search)="search.emit($event)"
+  ></app-songs-table>
+</div>

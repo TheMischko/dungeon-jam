@@ -9,6 +9,7 @@ export type PlaylistApiWindow = Window &
   typeof globalThis & {
     PLAYLIST_API: {
       getAllPlaylists: (options: QueryRequest) => Promise<Playlist[]>;
+      getPlaylistById: (playlistId: string) => Promise<Playlist>;
       insertPlaylist: (data: PlaylistInsertQuery) => Promise<Playlist>;
       addTracksToPlaylists: (
         data: PlaylistAddTracksData,

@@ -1,2 +1,10 @@
-<h1>Playlist {{ playlistId() }}</h1>
-<app-songs-table [tracks]="tracks()"></app-songs-table>
+<app-playlists-detail-page
+  [playlist]="playlist()"
+  [tracks]="tracks()"
+  [playingTrackId]="playbackState()?.currentTrack?.id"
+  [playlistPlaying]="isPlaylistPlaying()"
+  (playPlaylist)="playPlaylist()"
+  (playTrack)="playTrack($event)"
+  (pause)="pausePlaying()"
+  (search)="currentFilter.set($event)"
+></app-playlists-detail-page>

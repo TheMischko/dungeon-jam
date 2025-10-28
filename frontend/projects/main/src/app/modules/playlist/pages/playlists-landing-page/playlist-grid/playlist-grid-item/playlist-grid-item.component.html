@@ -6,7 +6,7 @@
 >
   <div class="image-wrapper" [ngStyle]="imageSizeStyle()">
     @if(showTrackCount()){
-    <div class="tracks-overlay">
+    <div class="tracks-overlay small-overlay">
       <lucide-icon [img]="tracksIcon" [size]="sizeConfig().trackCountSize" />
       <span [ngStyle]="trackCountSize()">{{ playlist().trackIds.length }}</span>
     </div>
@@ -17,6 +17,13 @@
       (click)="onOverlayButtonClick($event)"
     >
       <lucide-icon class="icon" [img]="overlayIcon()"></lucide-icon>
+    </div>
+    } @if (isPlaying()) {
+    <div class="is-playing-overlay small-overlay">
+      <lucide-icon
+        [img]="playingIcon"
+        [size]="sizeConfig().trackCountSize ?? 14"
+      ></lucide-icon>
     </div>
     }
     <img [src]="imageSrc()" alt="{{ playlist().name }}" />

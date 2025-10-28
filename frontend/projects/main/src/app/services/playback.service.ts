@@ -1,15 +1,20 @@
-import {effect, inject, Injectable, OnDestroy} from '@angular/core';
-import {BehaviorSubject, Observable, Subscription} from 'rxjs';
-import {initialPlaybackState, PlaybackState, PlayingTrackState, RepeatState} from '../models/playback.model';
-import {StoredPlayback, Track} from '@shared/models/track.model';
-import {AudioPlayerService} from './audio-player.service';
-import {toSignal} from '@angular/core/rxjs-interop';
-import {AudioApiWindow} from '../models/window-api.model';
+import { effect, inject, Injectable, OnDestroy } from '@angular/core';
+import { BehaviorSubject, Observable, Subscription } from 'rxjs';
+import {
+  initialPlaybackState,
+  PlaybackState,
+  PlayingTrackState,
+  RepeatState,
+} from '../models/playback.model';
+import { StoredPlayback, Track } from '@shared/models/track.model';
+import { AudioPlayerService } from './audio-player.service';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { AudioApiWindow } from '../models/window-api.model';
 
 @Injectable({
   providedIn: 'root',
 })
-export class PlaybackService implements OnDestroy{
+export class PlaybackService implements OnDestroy {
   private readonly window = <AudioApiWindow>window;
   readonly audioPlayerService = inject(AudioPlayerService);
 
@@ -30,7 +35,9 @@ export class PlaybackService implements OnDestroy{
       const current = this.state.getValue();
       this.state.next({ ...current, position: currentPosition });
     });
-    this.trackStateSubscription = this.audioPlayerService.state$.subscribe((state) => this.handleTrackStateChange(state))
+    this.trackStateSubscription = this.audioPlayerService.state$.subscribe(
+      (state) => this.handleTrackStateChange(state),
+    );
     this.loadInitState();
   }
 
@@ -38,13 +45,13 @@ export class PlaybackService implements OnDestroy{
     this.trackStateSubscription.unsubscribe();
   }
 
-  loadInitState(){
+  loadInitState() {
     this.window.PLAYBACK_API.loadState().then((state) => {
       this.changeVolume(state.volume);
-    })
+    });
   }
 
-  async play(track?: Track, queue?: Track[]) {
+  async play(track?: Track, queue?: Track[], playlistId?: string) {
     const current = this.state.getValue();
     if (queue && track) {
       this.state.next({
@@ -54,6 +61,7 @@ export class PlaybackService implements OnDestroy{
         queue,
         isPlaying: true,
         duration: track.duration,
+        playlistId,
         position: 0,
       });
       await this.audioPlayerService.play(track);
@@ -92,7 +100,7 @@ export class PlaybackService implements OnDestroy{
       nextState.currentTrack = current.queue[0];
       nextState.queue = current.queue.slice(1);
     } else {
-      if(current.repeat === RepeatState.ALL){
+      if (current.repeat === RepeatState.ALL) {
         const newQueue = [...nextState.history];
         nextState.history = [];
         nextState.currentTrack = newQueue[0];
@@ -112,22 +120,22 @@ export class PlaybackService implements OnDestroy{
 
   async playPrev(): Promise<void> {
     const current = this.state.getValue();
-    if(!current.currentTrack){
+    if (!current.currentTrack) {
       return;
     }
-    if(current.position > this.PLAY_PREV_DURATION_BREAKPOINT_SEC){
+    if (current.position > this.PLAY_PREV_DURATION_BREAKPOINT_SEC) {
       this.seek(0);
       return;
     }
 
-    if(current.history.length > 0){
+    if (current.history.length > 0) {
       const prevTrack = current.history.pop()!;
       current.queue.unshift(current.currentTrack);
       this.state.next({
         ...current,
         currentTrack: prevTrack,
         position: 0,
-        isPlaying: true
+        isPlaying: true,
       });
       await this.audioPlayerService.play(prevTrack);
     }
@@ -144,28 +152,28 @@ export class PlaybackService implements OnDestroy{
     this.audioPlayerService.seek(newPos);
   }
 
-  changeVolume(volume: number){
+  changeVolume(volume: number) {
     const volumeNormalized = Math.max(0, Math.min(volume, 1));
     const current = this.state.getValue();
     const newState = {
       ...current,
-      volume: volumeNormalized
-    }
+      volume: volumeNormalized,
+    };
     this.audioPlayerService.setVolume(volume);
     this.state.next(newState);
-    this.updateStoredState(newState)
+    this.updateStoredState(newState);
   }
 
-  changeRepeat(){
+  changeRepeat() {
     const current = this.state.getValue();
     const currentRepeat = current.repeat;
     let nextRepeat: RepeatState;
-    switch (true){
-      case (currentRepeat === RepeatState.ALL):
+    switch (true) {
+      case currentRepeat === RepeatState.ALL:
         nextRepeat = RepeatState.NONE;
         break;
-      case (currentRepeat === RepeatState.SINGLE):
-        nextRepeat = RepeatState.ALL
+      case currentRepeat === RepeatState.SINGLE:
+        nextRepeat = RepeatState.ALL;
         break;
       default:
         nextRepeat = RepeatState.SINGLE;
@@ -173,23 +181,23 @@ export class PlaybackService implements OnDestroy{
     }
     this.state.next({
       ...current,
-      repeat: nextRepeat
-    })
+      repeat: nextRepeat,
+    });
   }
 
-  private updateStoredState(state: PlaybackState): void{
-    this.window.PLAYBACK_API.updateState(
-      this.getStoredStateFromState(state)
-    );
+  private updateStoredState(state: PlaybackState): void {
+    this.window.PLAYBACK_API.updateState(this.getStoredStateFromState(state));
   }
 
   private getStoredStateFromState(state: PlaybackState): StoredPlayback {
     return {
-      volume: state.volume
-    }
+      volume: state.volume,
+    };
   }
 
-  private async handleTrackStateChange(trackState: PlayingTrackState): Promise<void>{
+  private async handleTrackStateChange(
+    trackState: PlayingTrackState,
+  ): Promise<void> {
     switch (trackState) {
       case PlayingTrackState.ENDED:
         await this.handleTrackEnded();
@@ -198,7 +206,7 @@ export class PlaybackService implements OnDestroy{
   }
 
   private async handleTrackEnded() {
-    if(this.state.getValue().repeat === RepeatState.SINGLE){
+    if (this.state.getValue().repeat === RepeatState.SINGLE) {
       this.seek(0);
       await this.play();
       return;

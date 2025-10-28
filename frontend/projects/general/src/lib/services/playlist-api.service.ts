@@ -27,6 +27,19 @@ export class PlaylistApiService {
     return subject.asObservable();
   }
 
+  getById(playlistId: string): Observable<Playlist | null> {
+    const subject = new Subject<Playlist>();
+    this.window.PLAYLIST_API.getPlaylistById(playlistId)
+      .then((playlist) => {
+        subject.next(playlist);
+        subject.complete();
+      })
+      .catch((error) => {
+        subject.error(error);
+      });
+    return subject.asObservable();
+  }
+
   insertPlaylist(data: PlaylistInsertQuery): Observable<Playlist> {
     const subject = new Subject<Playlist>();
     this.window.PLAYLIST_API.insertPlaylist(data)

@@ -11,6 +11,10 @@ const getAllPlaylists = async (options: QueryRequest): Promise<Playlist[]> => {
   return await ipcRenderer.invoke(PlaylistChannel.GET_ALL, options);
 };
 
+const getPlaylistById = async (playlistId: string): Promise<Playlist> => {
+  return await ipcRenderer.invoke(PlaylistChannel.GET_BY_ID, playlistId);
+};
+
 const insertPlaylist = async (data: PlaylistInsertQuery): Promise<Playlist> => {
   return await ipcRenderer.invoke(PlaylistChannel.INSERT, data);
 };
@@ -23,6 +27,7 @@ const addTracksToPlaylists = async (
 
 export default {
   getAllPlaylists,
+  getPlaylistById,
   insertPlaylist,
   addTracksToPlaylists,
 };

@@ -1,7 +1,7 @@
 import { Component, computed, input, output, signal } from '@angular/core';
 import { Playlist } from '@shared/models/playlist.model';
 import { NgStyle } from '@angular/common';
-import { iconSet } from '@general/icons/icons';
+import { iconSet, volumeIconSet } from '@general/icons/icons';
 import { LucideAngularModule, LucideIconData } from 'lucide-angular';
 
 @Component({
@@ -25,6 +25,7 @@ export class PlaylistGridItemComponent {
   readonly playIcon = iconSet.PlayIcon;
   readonly pauseIcon = iconSet.PauseIcon;
   readonly tracksIcon = iconSet.TracksIcon;
+  readonly playingIcon = volumeIconSet.NormalIcon;
 
   readonly imageSrc = computed<string>(() => {
     return this.playlist()?.imageUrl ?? this.DEFAULT_IMAGE;

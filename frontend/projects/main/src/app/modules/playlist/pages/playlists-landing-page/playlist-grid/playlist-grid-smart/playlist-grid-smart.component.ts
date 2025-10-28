@@ -7,6 +7,10 @@ import { QueryRequest } from '@shared/models/request.model';
 import { PlaylistStore } from '@general/stores/playlist.store';
 import { Router } from '@angular/router';
 import { playlistRouteStrings } from '../../../../playlist-route-strings';
+import { PlaybackService } from '../../../../../../services/playback.service';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { map, take } from 'rxjs';
+import { TrackService } from '../../../../../../services/track.service';
 
 @Component({
   selector: 'app-playlist-grid-smart',
@@ -16,10 +20,11 @@ import { playlistRouteStrings } from '../../../../playlist-route-strings';
 })
 export class PlaylistGridSmartComponent implements OnInit {
   readonly playlistStore = inject(PlaylistStore);
+  readonly playbackService = inject(PlaybackService);
+  readonly trackService = inject(TrackService);
   readonly router = inject(Router);
 
   readonly sizeSliderValue = signal<number>(0.75);
-  readonly playingPlaylistId = signal<string | null>(null);
   readonly searchFilter = signal<string>('');
   readonly sortDirection = signal<SortDirection>(SortDirection.ASC);
   readonly sortBy = signal<Extract<keyof Playlist, string>>('order');
@@ -35,6 +40,11 @@ export class PlaylistGridSmartComponent implements OnInit {
     sortBy: this.sortBy(),
     sortDirection: this.sortDirection(),
   }));
+  readonly playingPlaylistId = toSignal(
+    this.playbackService.playback$.pipe(
+      map((state) => (state.isPlaying ? state.playlistId : undefined)),
+    ),
+  );
 
   ngOnInit() {
     this.playlistStore.load(this.queryOptions);
@@ -48,11 +58,18 @@ export class PlaylistGridSmartComponent implements OnInit {
   }
 
   playPlaylist(playlistId: string) {
-    this.playingPlaylistId.set(playlistId);
+    this.trackService
+      .getTracksByPlaylist({
+        playlistId,
+      })
+      .pipe(take(1))
+      .subscribe(async (tracks) => {
+        await this.playbackService.play(tracks[0], tracks.slice(1), playlistId);
+      });
   }
 
   pausePlaylist() {
-    this.playingPlaylistId.set(null);
+    this.playbackService.pause();
   }
 
   async showPlaylistDetails(playlistId: string) {

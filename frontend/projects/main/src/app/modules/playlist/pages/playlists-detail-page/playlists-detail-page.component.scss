@@ -1,0 +1,44 @@
+:host {
+  display: block;
+  padding-bottom: 150px;
+}
+.header {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  .header-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: 0.25rem 1rem;
+    min-height: 200px;
+
+    h1 {
+      margin: 0.5rem 0;
+    }
+    h2 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: normal;
+    }
+  }
+  .header-controls {
+    padding: 1rem;
+  }
+  .playlist-image {
+    position: absolute;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.content {
+  height: 100%;
+  padding: 1rem;
+}

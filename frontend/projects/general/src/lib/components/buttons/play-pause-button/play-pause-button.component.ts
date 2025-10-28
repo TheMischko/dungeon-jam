@@ -12,6 +12,7 @@ import { ButtonSize, ButtonType } from '../../../../../models/button.model';
 export class PlayPauseButtonComponent {
   readonly size = input<ButtonSize>('regular');
   readonly state = input.required<'play' | 'pause'>();
+  readonly type = input<ButtonType>(ButtonType.Default);
   readonly toggle = output<'play' | 'pause'>();
 
   clicked() {

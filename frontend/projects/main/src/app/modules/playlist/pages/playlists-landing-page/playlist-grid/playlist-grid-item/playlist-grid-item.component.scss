@@ -53,15 +53,32 @@
     }
 
     .tracks-overlay {
-      display: flex;
-      align-items: center;
-      justify-content: center;
       position: absolute;
       top: 6px;
       right: 6px;
+    }
+
+    .is-playing-overlay {
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      color: col.$primary-light;
+      &.small-overlay {
+        padding: 6px;
+      }
+    }
+
+    .small-overlay {
+      display: flex;
+      align-items: center;
+      justify-content: center;
       padding: 4px;
       border-radius: 8px;
       background: rgba(#000, 0.5);
+
+      lucide-icon {
+        margin-bottom: -4px;
+      }
     }
 
     img {
