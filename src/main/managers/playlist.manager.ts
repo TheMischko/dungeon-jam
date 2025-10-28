@@ -1,5 +1,9 @@
 import { DatabaseWrapper } from '../database/database';
-import { Playlist, PlaylistInsertQuery } from '@shared/models/playlist.model';
+import {
+  Playlist,
+  PlaylistAddTracksData,
+  PlaylistInsertQuery,
+} from '@shared/models/playlist.model';
 import { ipcMain } from 'electron';
 import { PlaylistChannel } from '@shared/models/channels.model';
 import { QueryRequest } from '@shared/models/request.model';
@@ -28,6 +32,12 @@ export class PlaylistManager {
       PlaylistChannel.INSERT,
       async (_, query: PlaylistInsertQuery) => {
         return await this.insert(query);
+      },
+    );
+    ipcMain.handle(
+      PlaylistChannel.ADD_TRACKS,
+      async (_, data: PlaylistAddTracksData) => {
+        return await this.addTracks(data);
       },
     );
   }
@@ -118,5 +128,48 @@ export class PlaylistManager {
       dateUpdated: date,
       trackIds: [],
     };
+  }
+
+  private async addTracks(
+    data: PlaylistAddTracksData,
+  ): Promise<Map<string, Playlist>> {
+    const playlists = this.database.readTable<Playlist[]>('playlists');
+    if (!playlists) {
+      return new Map();
+    }
+
+    const playlistIdsToUpdate = new Set(Object.keys(data));
+    const modifiedPlaylists: Playlist[] = [];
+
+    const updatedPlaylists = playlists.map<Playlist>((playlist) => {
+      if (!playlistIdsToUpdate.has(playlist.id)) {
+        return playlist;
+      }
+
+      const tracksToAdd = data[playlist.id];
+      const newUniqueTrackIds = Array.from(
+        new Set(
+          tracksToAdd.filter((trackId) => !playlist.trackIds.includes(trackId)),
+        ),
+      );
+
+      if (newUniqueTrackIds.length === 0) {
+        return playlist;
+      }
+
+      const updatedPlaylist: Playlist = {
+        ...playlist,
+        trackIds: [...playlist.trackIds, ...newUniqueTrackIds],
+        dateUpdated: new Date(),
+      };
+
+      modifiedPlaylists.push(updatedPlaylist);
+      return updatedPlaylist;
+    });
+
+    await this.database.updateTable('playlists', updatedPlaylists);
+    return new Map(
+      modifiedPlaylists.map((playlist) => [playlist.id, playlist]),
+    );
   }
 }

@@ -8,9 +8,14 @@ import {
 import {
   entityConfig,
   setAllEntities,
+  setEntities,
   withEntities,
 } from '@ngrx/signals/entities';
-import { Playlist, PlaylistInsertQuery } from '@shared/models/playlist.model';
+import {
+  Playlist,
+  PlaylistAddTracksData,
+  PlaylistInsertQuery,
+} from '@shared/models/playlist.model';
 import { inject } from '@angular/core';
 import { PlaylistApiService } from '@general/services/playlist-api.service';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
@@ -80,9 +85,42 @@ export const PlaylistStore = signalStore(
         }),
       ),
     );
+
+    const addNewTracks = rxMethod<PlaylistAddTracksData>(
+      pipe(
+        tap(() => patchState(store, { loading: true })),
+        switchMap((data) => {
+          if (!Object.keys(data).length) {
+            return EMPTY;
+          }
+          return playlistApiService.addTracks(data).pipe(
+            tap((updated) => {
+              const loadedPlaylistIds = store.ids();
+              const updatedPlaylistIds = Array.from(updated.keys()).filter(
+                (key) => loadedPlaylistIds.includes(key),
+              );
+
+              const updatedPlaylists = Array.from(updated.values()).filter(
+                (playlist) => updatedPlaylistIds.includes(playlist.id),
+              );
+
+              patchState(store, setEntities(updatedPlaylists));
+            }),
+            catchError((err) => {
+              console.error(err);
+              return EMPTY;
+            }),
+            finalize(() => {
+              patchState(store, { loading: false });
+            }),
+          );
+        }),
+      ),
+    );
     return {
       load,
       insertNew,
+      addNewTracks,
     };
   }),
 );

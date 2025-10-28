@@ -37,7 +37,11 @@ export class SongTableActionsPlaylistMenuComponent implements OnInit {
   }
 
   playlistClicked(playlist: Playlist) {
-    // TO-DO: Implement the update playlist flow to Electron
-    console.log(`Track ${this.track()?.name} added to ${playlist.name}.`);
+    if (!this.track()?.id) {
+      return;
+    }
+    this.playlistsStore.addNewTracks({
+      [playlist.id]: [this.track()!.id],
+    });
   }
 }

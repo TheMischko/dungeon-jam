@@ -16,3 +16,8 @@ export interface PlaylistInsertQuery {
   imageUrl?: string;
   tags?: string[];
 }
+
+/**
+ * Collection of track IDs under playlist ID keys.
+ */
+export type PlaylistAddTracksData = { [playlistId: string]: string[] };
