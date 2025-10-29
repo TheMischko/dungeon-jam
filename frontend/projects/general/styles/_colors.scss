@@ -1,4 +1,4 @@
-@use "sass:color";
+@use 'sass:color';
 
 $background-main: #13171c;
 $background-deep: color.scale($background-main, $lightness: -20%);
@@ -8,6 +8,9 @@ $primary: #1ea193;
 $primary-light: #27d1bf;
 $primary-dark: #1c6c66;
 $primary-dark-dark: #142226;
+
+$warning: #fed766;
+$error: #f46036;
 
 $text-main: #dfe1e3;
 $button-inactive: #929292;

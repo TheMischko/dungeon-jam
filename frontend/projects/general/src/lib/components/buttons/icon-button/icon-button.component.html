@@ -1,7 +1,7 @@
 @switch (type()){ @case (ButtonType.Flat){
 <button
   mat-flat-button
-  [color]="color()"
+  [color]="materialColor()"
   [disabled]="disabled()"
   [ngClass]="buttonClass()"
   (click)="buttonClicked()"
@@ -11,7 +11,7 @@
 } @case (ButtonType.Raised){
 <button
   mat-raised-button
-  [color]="color()"
+  [color]="materialColor()"
   [disabled]="disabled()"
   [ngClass]="buttonClass()"
   (click)="buttonClicked()"
@@ -21,7 +21,7 @@
 } @case (ButtonType.Stroked){
 <button
   mat-stroked-button
-  [color]="color()"
+  [color]="materialColor()"
   [disabled]="disabled()"
   [ngClass]="buttonClass()"
   (click)="buttonClicked()"
@@ -31,7 +31,7 @@
 } @default {
 <button
   mat-button
-  [color]="color()"
+  [color]="materialColor()"
   [disabled]="disabled()"
   [ngClass]="buttonClass()"
   (click)="buttonClicked()"

@@ -1,0 +1,10 @@
+<div class="toast" [ngClass]="getToastTypeClass()">
+  <h3 class="toast-title">{{ data.title }}</h3>
+  <p class="toast-message">{{ data.description }}</p>
+  <lib-icon-button
+    class="dismiss-button"
+    [icon]="dismissIcon"
+    color="neutral"
+    (clicked)="hideToast()"
+  ></lib-icon-button>
+</div>

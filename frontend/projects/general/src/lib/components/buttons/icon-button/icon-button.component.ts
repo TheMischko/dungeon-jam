@@ -8,7 +8,7 @@ import { LucideAngularModule, LucideIconData } from 'lucide-angular';
   selector: 'lib-icon-button',
   imports: [MatButton, NgTemplateOutlet, LucideAngularModule, NgClass],
   templateUrl: './icon-button.component.html',
-  styleUrl: './icon-button.component.css',
+  styleUrl: './icon-button.component.scss',
 })
 export class IconButtonComponent {
   readonly icon = input.required<LucideIconData>();
@@ -19,11 +19,22 @@ export class IconButtonComponent {
 
   readonly clicked = output<void>();
 
+  readonly materialColor = computed(() => {
+    const color = this.color();
+    // Only apply Material color if it's a valid Material color
+    return color === 'primary' || color === 'accent' || color === 'warn'
+      ? color
+      : undefined;
+  });
+
   readonly iconClass = computed(() => `icon-${this.size()}`);
-  readonly buttonClass = computed(() => [
-    `button-${this.size()}`,
-    'icon-button',
-  ]);
+  readonly buttonClass = computed(() => {
+    const classes = [`button-${this.size()}`, 'icon-button'];
+    if (this.color() === 'neutral') {
+      classes.push('neutral-button');
+    }
+    return classes;
+  });
   readonly iconSize = computed(() => {
     const size = this.size();
     switch (size) {

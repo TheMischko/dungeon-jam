@@ -1,0 +1,26 @@
+/* Neutral button with white icon and drop shadow */
+.neutral-button {
+  color: white;
+  border: none;
+  lucide-icon {
+    color: white;
+  }
+  ::ng-deep &.mat-mdc-button:not(:disabled) {
+    --mat-button-text-label-text-color: white;
+    color: white;
+  }
+  ::ng-deep &.mat-mdc-button .mat-mdc-button-persistent-ripple::before {
+    --mat-button-text-state-layer-color: white;
+  }
+}
+
+.neutral-button:disabled {
+  background-color: rgba(0, 0, 0, 0.08);
+  color: rgba(255, 255, 255, 0.4);
+  box-shadow: none;
+}
+
+/* Ensure icon color follows button color */
+.neutral-button lucide-icon {
+  color: inherit;
+}

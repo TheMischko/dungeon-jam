@@ -16,6 +16,7 @@ import {
   Volume1Icon,
   Volume2Icon,
   VolumeXIcon,
+  XIcon,
 } from 'lucide-angular';
 
 export const iconSet = {
@@ -36,6 +37,7 @@ export const actionsIconSet = {
   DeleteIcon: Trash2Icon,
   AddIcon: SquarePlusIcon,
   ActionsMenu: EllipsisVerticalIcon,
+  CrossIcon: XIcon,
 };
 
 export const volumeIconSet = {
