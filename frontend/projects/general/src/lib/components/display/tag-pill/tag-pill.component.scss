@@ -1,0 +1,28 @@
+@use 'colors' as col;
+.tag {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+
+  border-radius: 8px;
+  padding: 0.125rem 0.75rem;
+  background: col.$primary;
+  color: col.$text-main;
+
+  .remove-button {
+    border: none;
+    background: none;
+    color: col.$text-main;
+    display: flex;
+    margin-right: -0.75rem;
+    cursor: pointer;
+    lucide-icon {
+      margin-top: 4px;
+    }
+    &:hover {
+      border: none;
+      background: none;
+    }
+  }
+}

@@ -8,7 +8,8 @@
       "schematics": {
         "@schematics/angular:component": {
           "style": "scss",
-          "standalone": true
+          "standalone": true,
+          "changeDetection": "OnPush"
         }
       },
       "root": "projects/main",
@@ -123,7 +124,8 @@
       "schematics": {
         "@schematics/angular:component": {
           "style": "scss",
-          "standalone": true
+          "standalone": true,
+          "changeDetection": "OnPush"
         }
       },
       "root": "projects/sidebar",
@@ -235,7 +237,8 @@
       "schematics": {
         "@schematics/angular:component": {
           "style": "scss",
-          "standalone": true
+          "standalone": true,
+          "changeDetection": "OnPush"
         }
       },
       "root": "projects/topbar",
@@ -344,6 +347,13 @@
     },
     "general": {
       "projectType": "library",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss",
+          "standalone": true,
+          "changeDetection": "OnPush"
+        }
+      },
       "root": "projects/general",
       "sourceRoot": "projects/general/src",
       "prefix": "lib",

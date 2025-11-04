@@ -1,0 +1,8 @@
+<div class="tag" [ngStyle]="colorStyles()">
+  <span>{{ tag().title }}</span>
+  @if(removable()){
+  <button class="remove-button" (click)="removed.emit(this.tag())">
+    <lucide-icon [img]="removeIcon" [size]="16"></lucide-icon>
+  </button>
+  }
+</div>

@@ -1,0 +1,24 @@
+<mat-form-field
+  appearance="outline"
+  [floatLabel]="value().length > 0 ? 'always' : 'auto'"
+>
+  <mat-label>Tags</mat-label>
+  <div class="tags-input">
+    <div class="tags">
+      <lib-tag-list
+        [tags]="tags()"
+        [editable]="true"
+        (removed)="removeTag($event)"
+      ></lib-tag-list>
+    </div>
+    <input
+      matInput
+      class="tag-input"
+      type="text"
+      [value]="inputValue()"
+      (input)="createTag($event)"
+      (keydown)="handleKeyDown($event)"
+      (focusout)="createTagFromRemaining($event)"
+    />
+  </div>
+</mat-form-field>

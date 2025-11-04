@@ -1,0 +1,7 @@
+@for (tag of tags(); track tag.title){
+<lib-tag-pill
+  [tag]="tag"
+  [removable]="editable()"
+  (removed)="tagRemoved($event)"
+></lib-tag-pill>
+}
