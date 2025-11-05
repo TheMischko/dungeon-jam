@@ -121,12 +121,15 @@ export class TagsInputComponent implements ControlValueAccessor {
     }
     const newValue = tags[tags.length - 1];
     this.inputValue.set(newValue);
-    this.value.set(tags.slice(0, -1));
+    const newTags = tags.slice(0, -1);
+    this.value.set(newTags);
+    this.changed.emit(newTags);
   }
 
   removeTag(removedTag: Tag) {
     const oldValue = this.value();
     const filteredValue = oldValue.filter((tag) => tag !== removedTag.title);
     this.value.set(filteredValue);
+    this.changed.emit(filteredValue);
   }
 }
