@@ -5,3 +5,5 @@ export interface QueryRequest {
   sortDirection?: SortDirection;
   sortBy?: string;
 }
+
+export type QueryOptions = QueryRequest;

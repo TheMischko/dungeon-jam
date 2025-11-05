@@ -12,6 +12,7 @@ import { PlaylistManager } from './main/managers/playlist.manager';
 import { RedirectManager } from './main/managers/redirect.manager';
 import { FilesManager } from './main/managers/files.manager';
 import { StoredPlaybackManager } from './main/managers/stored-playback.manager';
+import { TagsManager } from './main/managers/tags.manager';
 
 configDotenv();
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN || 'ERROR';
@@ -127,5 +128,6 @@ app.on('ready', async () => {
   await PlaylistManager.getInstance();
   await RedirectManager.getInstance();
   await FilesManager.getInstance();
+  await TagsManager.getInstance();
   //TO-DO: Postpone loading UI until all managers are loaded.
 });

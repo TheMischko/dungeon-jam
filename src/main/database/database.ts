@@ -1,6 +1,6 @@
 import { JSONFilePreset } from 'lowdb/node';
 import { Low } from 'lowdb';
-import { DatabaseSchema, initDatabase } from './init-database';
+import { DatabaseSchema, DatabaseTable, initDatabase } from './init-database';
 
 export class DatabaseWrapper {
   private static readonly DB_FILE: string = './build/src/db.json';
@@ -16,7 +16,7 @@ export class DatabaseWrapper {
     return DatabaseWrapper._instance!;
   }
 
-  readTable<T>(tableName: keyof DatabaseSchema): T | null {
+  readTable<T>(tableName: DatabaseTable): T | null {
     if (!(tableName in this.database.data)) {
       return null;
     }
@@ -24,10 +24,7 @@ export class DatabaseWrapper {
     return data as T;
   }
 
-  async updateTable<T>(
-    tableName: keyof DatabaseSchema,
-    table: T,
-  ): Promise<void> {
+  async updateTable<T>(tableName: DatabaseTable, table: T): Promise<void> {
     (this.database.data[tableName] as T) = table;
     await this.database.write();
   }
