@@ -28,9 +28,17 @@ export enum PlaylistChannel {
   ADD_TRACKS = 'playlists/add-tracks',
 }
 
+export enum TagChannel {
+  GET_ALL = 'tags/get-all',
+  GET_SUBSET = 'tags/get-subset',
+  SUGGESTION = 'tags/suggestion',
+  INSERT = 'tags/insert'
+}
+
 export type AppChannel =
   | GeneralChannels
   | TrackChannel
   | AudioFileChannel
   | PlaybackChannel
-  | PlaylistChannel;
+  | PlaylistChannel
+  | TagChannel;
