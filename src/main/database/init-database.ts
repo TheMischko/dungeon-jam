@@ -29,5 +29,22 @@ function initPlaylists(): Playlist[] {
 }
 
 function initTags(): TagData[] {
-  return [];
+  return [
+    {
+      id: 'tag-1',
+      title: 'friendly',
+    },
+    {
+      id: 'tag-2',
+      title: 'unfriendly',
+    },
+    {
+      id: 'tag-3',
+      title: 'outdoor',
+    },
+    {
+      id: 'tag-4',
+      title: 'indoor',
+    },
+  ];
 }

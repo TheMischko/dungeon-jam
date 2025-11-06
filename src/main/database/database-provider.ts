@@ -67,12 +67,12 @@ export class DatabaseProvider<T> {
         column !== this.idColumn && typeof data[0][column] === 'string';
       const result = data.filter((item) => {
         const itemVal = isString
-          ? (item[column] as string).toLowerCase()
+          ? (item[column] as string)?.toLowerCase()
           : item[column];
         return values.some((searchVal) => {
           if (isString) {
             return (itemVal as string).includes(
-              (searchVal as string).toLowerCase(),
+              (searchVal as string)?.toLowerCase(),
             );
           }
           return itemVal === searchVal;

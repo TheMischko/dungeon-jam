@@ -2,7 +2,9 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   forwardRef,
+  inject,
   model,
   output,
   signal,
@@ -10,8 +12,9 @@ import {
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MatFormField } from '@angular/material/form-field';
 import { MatInput, MatLabel } from '@angular/material/input';
-import { Tag } from '@shared/models/tag.model';
+import { Tag, TagData } from '@shared/models/tag.model';
 import { TagListComponent } from '@general/components/display/tag-list/tag-list.component';
+import { TagApiService } from '@general/services/tag-api.service';
 
 @Component({
   selector: 'lib-tags-input',
@@ -28,6 +31,8 @@ import { TagListComponent } from '@general/components/display/tag-list/tag-list.
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TagsInputComponent implements ControlValueAccessor {
+  private readonly tagApiService = inject(TagApiService);
+
   readonly value = model<string[]>([]);
   readonly disabled = model<boolean>(false);
 
@@ -36,12 +41,26 @@ export class TagsInputComponent implements ControlValueAccessor {
 
   readonly SEPARATORS = new RegExp(/\,(?=\w)/);
   readonly inputValue = signal<string>('');
+  readonly suggestions = signal<TagData[]>([]);
 
   readonly tags = computed<Tag[]>(() => {
     return this.value().map((tag) => ({
       title: tag,
     }));
   });
+
+  constructor() {
+    effect(() => {
+      const value = this.inputValue();
+      if (value.length === 0) {
+        return;
+      }
+
+      this.tagApiService.getTagSuggestion(value).subscribe((tags) => {
+        this.suggestions.set(tags);
+      });
+    });
+  }
 
   writeValue(value: string[] | string): void {
     if (typeof value === 'string' || !Array.isArray(value)) {
