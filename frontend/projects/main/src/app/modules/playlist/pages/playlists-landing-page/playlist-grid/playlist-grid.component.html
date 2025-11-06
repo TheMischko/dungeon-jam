@@ -18,7 +18,9 @@
   </div>
 
   <div class="grid-content">
-    @for (playlist of dataSet(); track trackPlaylist(playlist)){
+    @if (loading()) {
+    <lib-loader [center]="true" [size]="'large'"></lib-loader>
+    } @else { @for (playlist of dataSet(); track trackPlaylist(playlist)){
     <app-playlist-grid-item
       [playlist]="playlist"
       [sizeConfig]="sizeConfig()"
@@ -27,6 +29,6 @@
       (playPlaylist)="playPlaylist.emit($event)"
       (pausePlaylist)="pausePlaylist.emit($event)"
     ></app-playlist-grid-item>
-    }
+    } }
   </div>
 </div>

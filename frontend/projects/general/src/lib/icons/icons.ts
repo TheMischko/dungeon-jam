@@ -4,6 +4,7 @@ import {
   Grid3x3Icon,
   ListMusicIcon,
   ListStartIcon,
+  LoaderCircleIcon,
   Music2Icon,
   PauseIcon,
   PlayIcon,
@@ -30,6 +31,7 @@ export const iconSet = {
   GridBigIcon: Grid2x2Icon,
   GridSmallIcon: Grid3x3Icon,
   TracksIcon: Music2Icon,
+  LoadingIcon: LoaderCircleIcon,
 };
 
 export const actionsIconSet = {

@@ -1,8 +1,8 @@
 import { Component, computed, input, output, signal } from '@angular/core';
-import { Playlist } from '@shared/models/playlist.model';
 import { NgStyle } from '@angular/common';
 import { iconSet, volumeIconSet } from '@general/icons/icons';
 import { LucideAngularModule, LucideIconData } from 'lucide-angular';
+import { PlaylistViewData } from '../../../../../../../../../general/models/playlist.model';
 
 @Component({
   selector: 'app-playlist-grid-item',
@@ -11,7 +11,7 @@ import { LucideAngularModule, LucideIconData } from 'lucide-angular';
   styleUrl: './playlist-grid-item.component.scss',
 })
 export class PlaylistGridItemComponent {
-  readonly playlist = input.required<Playlist>();
+  readonly playlist = input.required<PlaylistViewData>();
   readonly sizeConfig = input.required<GridItemSizeConfig>();
   readonly isPlaying = input<boolean>(false);
 

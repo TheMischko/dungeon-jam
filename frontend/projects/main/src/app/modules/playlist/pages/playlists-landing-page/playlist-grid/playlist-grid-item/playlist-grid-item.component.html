@@ -33,7 +33,7 @@
     @if(!sizeConfig().hideTags) {
     <div class="tags" [ngStyle]="tagsSizeStyle()">
       @for (tag of playlist().tags; track tag){
-      <span class="tag">{{ tag }}</span>
+      <span class="tag">{{ tag.title }}</span>
       }
     </div>
     }

@@ -1,4 +1,11 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  OnInit,
+  signal,
+  untracked,
+} from '@angular/core';
 import { PlaylistGridComponent } from '../playlist-grid.component';
 import { Playlist } from '@shared/models/playlist.model';
 import { GridItemSizeConfig } from '../playlist-grid-item/playlist-grid-item.component';
@@ -11,6 +18,8 @@ import { PlaybackService } from '../../../../../../services/playback.service';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map, take } from 'rxjs';
 import { TrackService } from '../../../../../../services/track.service';
+import { TagsStore } from '@general/stores/tags.store';
+import { PlaylistViewData } from '../../../../../../../../../general/models/playlist.model';
 
 @Component({
   selector: 'app-playlist-grid-smart',
@@ -20,6 +29,7 @@ import { TrackService } from '../../../../../../services/track.service';
 })
 export class PlaylistGridSmartComponent implements OnInit {
   readonly playlistStore = inject(PlaylistStore);
+  readonly tagsStore = inject(TagsStore);
   readonly playbackService = inject(PlaybackService);
   readonly trackService = inject(TrackService);
   readonly router = inject(Router);
@@ -29,8 +39,24 @@ export class PlaylistGridSmartComponent implements OnInit {
   readonly sortDirection = signal<SortDirection>(SortDirection.ASC);
   readonly sortBy = signal<Extract<keyof Playlist, string>>('order');
 
-  readonly dataSet = this.playlistStore.entities;
+  readonly dataSet = computed<PlaylistViewData[]>(() => {
+    const loading = this.loading();
+    if (loading) {
+      return [];
+    }
+    const tags = untracked(() => this.tagsStore.entityMap());
+    return this.playlistStore.entities().map((playlist) => {
+      const playlistTags = playlist.tags.map((t) => tags[t]).filter((t) => !!t);
+      return {
+        ...playlist,
+        tags: playlistTags,
+      };
+    });
+  });
 
+  readonly loading = computed<boolean>(() => {
+    return this.playlistStore.loading() || this.tagsStore.loading();
+  });
   readonly sizeConfig = computed<GridItemSizeConfig>(() => {
     const sliderVal = this.sizeSliderValue();
     return getSizeConfig(sliderVal);

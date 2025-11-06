@@ -1,5 +1,4 @@
 import { Component, input, output } from '@angular/core';
-import { Playlist } from '@shared/models/playlist.model';
 import {
   GridItemSizeConfig,
   PlaylistGridItemComponent,
@@ -7,6 +6,8 @@ import {
 import { SearchBarComponent } from '@general/components/controls/search-bar/search-bar.component';
 import { RangeSliderComponent } from '@general/components/controls/range-slider/range-slider.component';
 import { iconSet } from '@general/icons/icons';
+import { PlaylistViewData } from '../../../../../../../../general/models/playlist.model';
+import { LoaderComponent } from '@general/components/display/loader/loader.component';
 
 @Component({
   selector: 'app-playlist-grid',
@@ -14,14 +15,16 @@ import { iconSet } from '@general/icons/icons';
     PlaylistGridItemComponent,
     SearchBarComponent,
     RangeSliderComponent,
+    LoaderComponent,
   ],
   templateUrl: './playlist-grid.component.html',
   styleUrl: './playlist-grid.component.scss',
 })
 export class PlaylistGridComponent {
-  readonly dataSet = input<Playlist[]>();
+  readonly dataSet = input.required<PlaylistViewData[]>();
   readonly sizeConfig = input.required<GridItemSizeConfig>();
   readonly playingPlaylistId = input<string | null>();
+  readonly loading = input<boolean>(false);
 
   readonly sizeChange = output<number>();
   readonly playPlaylist = output<string>();
@@ -36,7 +39,7 @@ export class PlaylistGridComponent {
     return this.playingPlaylistId() === playlistId;
   }
 
-  trackPlaylist(playlist: Playlist): string {
+  trackPlaylist(playlist: PlaylistViewData): string {
     return playlist.id;
   }
 
