@@ -6,7 +6,9 @@ import { CreatePlaylistModalComponent } from '../../modals/create-playlist-modal
 import { PlaylistInsertQuery } from '@shared/models/playlist.model';
 import { DialogRef } from '../../../../models/dialog.model';
 import { PlaylistStore } from '@general/stores/playlist.store';
-import { take } from 'rxjs';
+import { combineLatest, map, of, switchMap, take } from 'rxjs';
+import { Tag, TagData } from '@shared/models/tag.model';
+import { TagApiService } from '@general/services/tag-api.service';
 
 @Component({
   selector: 'app-playlists-landing-page',
@@ -17,6 +19,7 @@ import { take } from 'rxjs';
 export class PlaylistsLandingPageComponent {
   readonly dialogService = inject(DialogService);
   readonly playlistStore = inject(PlaylistStore);
+  readonly tagApiService = inject(TagApiService);
 
   private dialogRef:
     | DialogRef<CreatePlaylistModalComponent, PlaylistInsertQuery>
@@ -31,11 +34,41 @@ export class PlaylistsLandingPageComponent {
       CreatePlaylistModalComponent,
       PlaylistInsertQuery
     >(CreatePlaylistModalComponent);
-    this.dialogRef.afterClosed$.pipe(take(1)).subscribe((result) => {
-      if (!result) {
-        return;
-      }
-      this.playlistStore.insertNew(result);
-    });
+    this.dialogRef.afterClosed$
+      .pipe(
+        take(1),
+        switchMap((result) => {
+          if (!result) {
+            return of(result);
+          }
+          const tagsToCreate = result.tags.filter(
+            (tag) => (tag as TagData).id === undefined,
+          );
+          const tagsReady = result.tags.filter(
+            (tag) => (tag as TagData).id !== undefined,
+          );
+          if (tagsToCreate.length === 0) {
+            return of(result);
+          }
+
+          const requests = tagsToCreate.map((tag: Tag) =>
+            this.tagApiService.insertTag(tag),
+          );
+          return combineLatest(requests).pipe(
+            map((tags) => {
+              return {
+                ...result,
+                tags: [...tagsReady, ...tags.map((t) => t.id)],
+              } as PlaylistInsertQuery;
+            }),
+          );
+        }),
+      )
+      .subscribe((result) => {
+        if (!result) {
+          return;
+        }
+        this.playlistStore.insertNew(result);
+      });
   }
 }

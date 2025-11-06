@@ -1,3 +1,5 @@
+import { Tag, TagData } from '@shared/models/tag.model';
+
 export interface Playlist {
   id: string;
   name: string;
@@ -14,7 +16,7 @@ export interface PlaylistInsertQuery {
   name: string;
   description?: string;
   imageUrl?: string;
-  tags?: string[];
+  tags: (Tag | TagData)[];
 }
 
 /**

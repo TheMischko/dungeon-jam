@@ -10,6 +10,7 @@ import { InputComponent } from '@general/components/controls/input/input.compone
 import { MatButton } from '@angular/material/button';
 import { PlaylistInsertQuery } from '@shared/models/playlist.model';
 import { TagsInputComponent } from '@general/components/controls/tags-input/tags-input.component';
+import { Tag, TagData } from '@shared/models/tag.model';
 
 @Component({
   selector: 'app-create-playlist-modal',
@@ -27,7 +28,7 @@ export class CreatePlaylistModalComponent {
     ]),
     description: new FormControl<string | null>(null),
     imageUrl: new FormControl<string | null>(null),
-    tags: new FormControl<string[]>([]),
+    tags: new FormControl<(Tag | TagData)[]>([]),
   });
 
   cancel(): void {

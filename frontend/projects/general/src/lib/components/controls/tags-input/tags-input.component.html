@@ -16,9 +16,20 @@
       class="tag-input"
       type="text"
       [value]="inputValue()"
+      [matAutocomplete]="suggestionBar"
       (input)="createTag($event)"
       (keydown)="handleKeyDown($event)"
       (focusout)="createTagFromRemaining($event)"
     />
   </div>
 </mat-form-field>
+
+<mat-autocomplete #suggestionBar="matAutocomplete">
+  @for (suggestion of suggestions(); track suggestion.id){
+  <mat-option
+    [value]="suggestion.title"
+    (onSelectionChange)="saveSuggestion($event)"
+    >{{ suggestion.title }}</mat-option
+  >
+  }
+</mat-autocomplete>

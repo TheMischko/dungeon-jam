@@ -8,6 +8,7 @@ import {
   model,
   output,
   signal,
+  untracked,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MatFormField } from '@angular/material/form-field';
@@ -15,10 +16,23 @@ import { MatInput, MatLabel } from '@angular/material/input';
 import { Tag, TagData } from '@shared/models/tag.model';
 import { TagListComponent } from '@general/components/display/tag-list/tag-list.component';
 import { TagApiService } from '@general/services/tag-api.service';
+import {
+  MatAutocomplete,
+  MatAutocompleteTrigger,
+  MatOption,
+} from '@angular/material/autocomplete';
 
 @Component({
   selector: 'lib-tags-input',
-  imports: [MatFormField, MatLabel, MatInput, TagListComponent],
+  imports: [
+    MatFormField,
+    MatLabel,
+    MatInput,
+    TagListComponent,
+    MatAutocomplete,
+    MatOption,
+    MatAutocompleteTrigger,
+  ],
   templateUrl: './tags-input.component.html',
   styleUrl: './tags-input.component.scss',
   providers: [
@@ -37,17 +51,13 @@ export class TagsInputComponent implements ControlValueAccessor {
   readonly disabled = model<boolean>(false);
 
   readonly touched = output<void>();
-  readonly changed = output<string[]>();
+  readonly changed = output<(Tag | TagData)[]>();
 
-  readonly SEPARATORS = new RegExp(/\,(?=\w)/);
+  readonly SEPARATORS = new RegExp(/\,(?=\w)?/);
   readonly inputValue = signal<string>('');
   readonly suggestions = signal<TagData[]>([]);
-
-  readonly tags = computed<Tag[]>(() => {
-    return this.value().map((tag) => ({
-      title: tag,
-    }));
-  });
+  readonly tagMap = signal<Record<string, TagData | Tag>>({});
+  readonly tags = computed(() => Object.values(this.tagMap()));
 
   constructor() {
     effect(() => {
@@ -60,6 +70,36 @@ export class TagsInputComponent implements ControlValueAccessor {
         this.suggestions.set(tags);
       });
     });
+
+    effect(() => {
+      const value = this.value();
+      const tagMap = untracked(() => this.tagMap());
+      const tags = value.map((tagName) => {
+        const knownTag = tagMap[tagName] as Tag | TagData | undefined;
+        if (knownTag) {
+          return knownTag;
+        }
+        const suggestions = untracked(() => this.suggestions());
+        const suggestionTag = suggestions.find((tag) => tag.title === tagName);
+        if (suggestionTag) {
+          return suggestionTag;
+        }
+        return {
+          title: tagName,
+        } as Tag;
+      });
+      const newTagMap = tags.reduce(
+        (map, tag, _, __) => {
+          return {
+            ...map,
+            [tag.title]: tag,
+          };
+        },
+        {} as Record<string, TagData | Tag>,
+      );
+      this.tagMap.set(newTagMap);
+      this.changed.emit(tags);
+    });
   }
 
   writeValue(value: string[] | string): void {
@@ -69,7 +109,7 @@ export class TagsInputComponent implements ControlValueAccessor {
     }
     this.value.set(value);
   }
-  registerOnChange(fn: (value: string[]) => void): void {
+  registerOnChange(fn: (value: (Tag | TagData)[]) => void): void {
     this.changed.subscribe(fn);
   }
   registerOnTouched(fn: any): void {
@@ -125,7 +165,6 @@ export class TagsInputComponent implements ControlValueAccessor {
       return;
     }
     this.value.set([...this.value(), trimmedText]);
-    this.changed.emit(this.value());
   }
 
   private editLastTag(event: Event) {
@@ -142,13 +181,17 @@ export class TagsInputComponent implements ControlValueAccessor {
     this.inputValue.set(newValue);
     const newTags = tags.slice(0, -1);
     this.value.set(newTags);
-    this.changed.emit(newTags);
   }
 
   removeTag(removedTag: Tag) {
     const oldValue = this.value();
     const filteredValue = oldValue.filter((tag) => tag !== removedTag.title);
     this.value.set(filteredValue);
-    this.changed.emit(filteredValue);
+  }
+
+  saveSuggestion(event: { source: { value: string } }) {
+    const value = event.source.value as string;
+    this.value.update((tags) => [...tags, value]);
+    this.inputValue.set('');
   }
 }
