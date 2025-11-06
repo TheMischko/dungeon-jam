@@ -117,4 +117,180 @@ describe('DatabaseProvider', () => {
       expect(result).toEqual([]);
     });
   });
+
+  describe('create', () => {
+    it('should create a new entity with generated UUID if no id provided', async () => {
+      const newEntity = { value: 'new', priority: 100 };
+      const result = await provider.create(newEntity);
+
+      expect(result.value).toBe('new');
+      expect(result.priority).toBe(100);
+      expect(result.id).toBeDefined();
+      expect(typeof result.id).toBe('string');
+    });
+
+    it('should create a new entity with provided id if given', async () => {
+      const newEntity = { value: 'new', priority: 100 };
+      const customId = 'custom-id-123';
+      const result = await provider.create(newEntity, customId);
+
+      expect(result.id).toBe(customId);
+      expect(result.value).toBe('new');
+      expect(result.priority).toBe(100);
+    });
+
+    it('should return existing entity if id already exists', async () => {
+      const result = await provider.create(
+        { value: 'duplicate', priority: 999 },
+        dataA.id,
+      );
+
+      expect(result).toEqual(dataA);
+      expect(result.priority).not.toBe(999);
+    });
+
+    it('should add the new entity to the database', async () => {
+      const updateTableSpy = vi.spyOn(databaseMock, 'updateTable');
+      const newEntity = { value: 'new', priority: 100 };
+
+      await provider.create(newEntity);
+
+      expect(updateTableSpy).toHaveBeenCalledOnce();
+      expect(updateTableSpy).toHaveBeenCalledWith(
+        table,
+        expect.arrayContaining([dataA, dataH, dataZ, expect.any(Object)]),
+      );
+    });
+  });
+
+  describe('update', () => {
+    it('should update an existing entity by column match', async () => {
+      const updateTableSpy = vi.spyOn(databaseMock, 'updateTable');
+      const updatedEntity: TestEntity = {
+        ...dataA,
+        value: 'updated',
+        priority: 999,
+      };
+
+      const result = await provider.update('id', dataA.id, updatedEntity);
+
+      expect(result).toEqual(updatedEntity);
+      expect(updateTableSpy).toHaveBeenCalledOnce();
+      expect(updateTableSpy).toHaveBeenCalledWith(
+        table,
+        expect.arrayContaining([updatedEntity, dataH, dataZ]),
+      );
+    });
+
+    it('should update an entity by non-id column', async () => {
+      const updatedEntity: TestEntity = {
+        ...dataH,
+        value: 'completely-new',
+        priority: 555,
+      };
+
+      const result = await provider.update('value', dataH.value, updatedEntity);
+
+      expect(result).toEqual(updatedEntity);
+    });
+
+    it('should create a new entity if no match found', async () => {
+      const createSpy = vi
+        .spyOn(provider, 'create')
+        .mockResolvedValue({ id: 'new', value: 'created', priority: 0 });
+      const newEntity: TestEntity = {
+        id: 'new',
+        value: 'created',
+        priority: 0,
+      };
+
+      const result = await provider.update('id', 'nonexistent-id', newEntity);
+
+      expect(createSpy).toHaveBeenCalledWith(newEntity);
+      expect(result).toEqual(newEntity);
+    });
+
+    it('should replace the entire entity with new value', async () => {
+      const updateTableSpy = vi.spyOn(databaseMock, 'updateTable');
+      const completelyNewEntity: TestEntity = {
+        id: dataA.id,
+        value: 'completely-different',
+        priority: 0,
+      };
+
+      const result = await provider.update('id', dataA.id, completelyNewEntity);
+
+      expect(result).toEqual(completelyNewEntity);
+      const updateCall = updateTableSpy.mock.calls[0][1];
+      expect(updateCall).toEqual([dataZ, completelyNewEntity, dataH]);
+    });
+
+    it('should handle updates to different columns', async () => {
+      const updatedEntity: TestEntity = {
+        ...dataZ,
+        priority: 500,
+      };
+
+      const result = await provider.update(
+        'priority',
+        dataZ.priority,
+        updatedEntity,
+      );
+
+      expect(result.priority).toBe(500);
+      expect(result.id).toBe(dataZ.id);
+    });
+  });
+
+  describe('deleteOne', () => {
+    it('should delete an entity by id', async () => {
+      const updateTableSpy = vi.spyOn(databaseMock, 'updateTable');
+
+      const result = await provider.deleteOne('id', dataA.id);
+
+      expect(result).toBe(true);
+      expect(updateTableSpy).toHaveBeenCalledOnce();
+      expect(updateTableSpy).toHaveBeenCalledWith(
+        table,
+        expect.not.arrayContaining([dataA]),
+      );
+    });
+
+    it('should delete an entity by non-id column', async () => {
+      const updateTableSpy = vi.spyOn(databaseMock, 'updateTable');
+
+      const result = await provider.deleteOne('value', dataH.value);
+
+      expect(result).toBe(true);
+      const updateCall = updateTableSpy.mock.calls[0][1];
+      expect(updateCall).toEqual([dataZ, dataA]);
+    });
+
+    it('should return true even if entity not found', async () => {
+      const updateTableSpy = vi.spyOn(databaseMock, 'updateTable');
+      const result = await provider.deleteOne('id', 'nonexistent-id');
+
+      expect(result).toBe(true);
+      expect(updateTableSpy).not.toHaveBeenCalled();
+    });
+
+    it('should delete only the matching entity', async () => {
+      const updateTableSpy = vi.spyOn(databaseMock, 'updateTable');
+
+      await provider.deleteOne('id', dataZ.id);
+
+      const updateCall = updateTableSpy.mock.calls[0][1];
+      expect(updateCall).toHaveLength(2);
+      expect(updateCall).toEqual([dataA, dataH]);
+    });
+
+    it('should handle deletion with non-string column match', async () => {
+      const updateTableSpy = vi.spyOn(databaseMock, 'updateTable');
+
+      await provider.deleteOne('priority', 25);
+
+      const updateCall = updateTableSpy.mock.calls[0][1];
+      expect(updateCall).not.toEqual(expect.arrayContaining([dataH]));
+    });
+  });
 });
