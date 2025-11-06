@@ -30,7 +30,9 @@ export class DatabaseProvider<T> {
     return new Promise((resolve) => {
       let data: T[] = [...(this.database.readTable<T[]>(this.table) ?? [])];
       if (query?.filter) {
-        data = data.filter((item: T) => this.filter(item, query.filter!));
+        data = data.filter((item: T) =>
+          this.filter(item, query.filter!.toLowerCase()),
+        );
       }
       if (query?.sortBy && query?.sortDirection) {
         data = data.sort((a, b) =>
@@ -64,11 +66,16 @@ export class DatabaseProvider<T> {
       const isString =
         column !== this.idColumn && typeof data[0][column] === 'string';
       const result = data.filter((item) => {
+        const itemVal = isString
+          ? (item[column] as string).toLowerCase()
+          : item[column];
         return values.some((searchVal) => {
           if (isString) {
-            return (item[column] as string).includes(searchVal as string);
+            return (itemVal as string).includes(
+              (searchVal as string).toLowerCase(),
+            );
           }
-          return item[column] === searchVal;
+          return itemVal === searchVal;
         });
       });
       resolve(result);
