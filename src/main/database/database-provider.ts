@@ -3,6 +3,11 @@ import { DatabaseTable } from './init-database';
 import { QueryOptions } from '@shared/models/request.model';
 import { SortDirection } from '@shared/models/common.model';
 import { v4 as uuid } from 'uuid';
+import {
+  DefaultGetSomeOptions,
+  GetSomeMatch,
+  GetSomeOptions,
+} from './database-provider.model';
 
 export class DatabaseProvider<T> {
   private readonly table: DatabaseTable;
@@ -56,29 +61,22 @@ export class DatabaseProvider<T> {
     });
   }
 
-  getSome<V>(column: keyof T, values: V[]): Promise<T[]> {
+  getSome<V>(
+    column: keyof T,
+    values: V[],
+    options: GetSomeOptions = DefaultGetSomeOptions,
+  ): Promise<T[]> {
     return new Promise<T[]>(async (resolve) => {
       const data: T[] = await this.getAll();
       if (data.length === 0) {
         resolve([]);
         return;
       }
-      const isString =
-        column !== this.idColumn && typeof data[0][column] === 'string';
-      const result = data.filter((item) => {
-        const itemVal = isString
-          ? (item[column] as string)?.toLowerCase()
-          : item[column];
-        return values.some((searchVal) => {
-          if (isString) {
-            return (itemVal as string).includes(
-              (searchVal as string)?.toLowerCase(),
-            );
-          }
-          return itemVal === searchVal;
-        });
-      });
-      resolve(result);
+      const result = data.filter((item) =>
+        this.getSomeFilter(item, column, values, options),
+      );
+
+      resolve(result.slice(0, options.limit ?? undefined));
     });
   }
 
@@ -138,7 +136,7 @@ export class DatabaseProvider<T> {
   }
 
   replaceRecord(newRecord: T): Promise<T> {
-    return new Promise<T>(async (resolve) => {
+    return new Promise<T>(async (resolve, reject) => {
       const data = await this.getAll();
       const recordId = newRecord[this.idColumn];
       const existingIndex = data.findIndex(
@@ -146,7 +144,9 @@ export class DatabaseProvider<T> {
       );
 
       if (existingIndex === -1) {
-        resolve(await this.create(newRecord));
+        reject(
+          `Record with id ${recordId} does not exist and cannot be replaced.`,
+        );
         return;
       }
 
@@ -154,6 +154,45 @@ export class DatabaseProvider<T> {
       await this.database.updateTable(this.table, data);
       resolve(newRecord);
     });
+  }
+
+  private getSomeFilter<V>(
+    item: T,
+    column: keyof T,
+    matchValues: V[],
+    options: GetSomeOptions,
+  ): boolean {
+    const itemValue = item[column];
+    switch (options.match) {
+      case GetSomeMatch.CONTAINS:
+        return this.contains(itemValue as string, matchValues as string[]);
+      case GetSomeMatch.STARTS_WITH:
+        return this.startsWith(itemValue as string, matchValues as string[]);
+      default:
+        return this.equalMatch(itemValue as V, matchValues);
+    }
+  }
+
+  private contains<V>(value: V, matchValues: V[]) {
+    if (typeof value === 'string') {
+      return matchValues.some((toMatch) =>
+        (<string>value).toLowerCase().includes((<string>toMatch).toLowerCase()),
+      );
+    }
+    return false;
+  }
+
+  private startsWith<V>(value: V, matchValues: V[]) {
+    if (typeof value === 'string') {
+      return matchValues.some((toMatch) =>
+        (<string>value).startsWith(<string>toMatch),
+      );
+    }
+    return false;
+  }
+
+  private equalMatch<V>(value: V, matchValues: V[]) {
+    return matchValues.some((toMatch) => toMatch === value);
   }
 }
 

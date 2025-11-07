@@ -9,6 +9,7 @@ import {
 import { Tag, TagData } from '@shared/models/tag.model';
 import { DatabaseProviderCreator } from '../database/database-provider-creator';
 import { SortDirection } from '@shared/models/common.model';
+import { GetSomeMatch } from '../database/database-provider.model';
 
 export class TagsManager {
   private static _instance: TagsManager;
@@ -38,7 +39,9 @@ export class TagsManager {
       return await this.tagDatabase.create(data);
     });
     ipcMain.handle(TagChannel.SUGGESTION, async (_, titlePart: string) => {
-      return await this.tagDatabase.getSome('title', [titlePart]);
+      return await this.tagDatabase.getSome('title', [titlePart], {
+        match: GetSomeMatch.STARTS_WITH,
+      });
     });
   }
 

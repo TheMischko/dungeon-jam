@@ -7,6 +7,7 @@ import { DatabaseProvider, FilterFn, SortFn } from './database-provider';
 import { DatabaseWrapper } from './database';
 import { DatabaseTable } from './init-database';
 import { SortDirection } from '@shared/models/common.model';
+import { GetSomeMatch } from './database-provider.model';
 
 vi.mock('./database', () => mockDatabase);
 
@@ -95,18 +96,45 @@ describe('DatabaseProvider', () => {
     });
 
     it('should soft match records that include the value', async () => {
-      const result = await provider.getSome('value', ['']);
-      expect(result).toEqual(dataSet);
-      const resultA = await provider.getSome('value', [
-        dataA.value.slice(0, 1),
-      ]);
+      const resultA = await provider.getSome(
+        'value',
+        [dataA.value.slice(0, 1)],
+        { match: GetSomeMatch.CONTAINS },
+      );
       expect(resultA).toEqual([dataA]);
+    });
+
+    it('should return empty array if match is contains and values are not string', async () => {
+      const result = await provider.getSome('priority', [10], {
+        match: GetSomeMatch.CONTAINS,
+      });
+      expect(result).toEqual([]);
     });
 
     it('should find records for non-string values', async () => {
       const result = await provider.getSome('priority', [10, 50]);
       expect(result.includes(dataA)).toBeTruthy();
       expect(result.includes(dataZ)).toBeTruthy();
+    });
+
+    it('should return matches that start with searched values', async () => {
+      const result = await provider.getSome(
+        'value',
+        [dataH.value.slice(0, 2)],
+        { match: GetSomeMatch.STARTS_WITH },
+      );
+      expect(result[0]).toEqual(dataH);
+      const resultB = await provider.getSome('value', ['test'], {
+        match: GetSomeMatch.STARTS_WITH,
+      });
+      expect(resultB.length).toEqual(0);
+    });
+
+    it('should return empty array if match is startWith and values are not string', async () => {
+      const result = await provider.getSome('priority', [10], {
+        match: GetSomeMatch.STARTS_WITH,
+      });
+      expect(result).toEqual([]);
     });
 
     it('should return empty array if there are no data', async () => {
@@ -291,6 +319,31 @@ describe('DatabaseProvider', () => {
 
       const updateCall = updateTableSpy.mock.calls[0][1];
       expect(updateCall).not.toEqual(expect.arrayContaining([dataH]));
+    });
+  });
+
+  describe('replaceRecord', () => {
+    it('should replace matching record', async () => {
+      const updateTableSpy = vi.spyOn(databaseMock, 'updateTable');
+      const newValue = 'test-123';
+      const dataToReplace: TestEntity = {
+        ...dataA,
+        value: newValue,
+      };
+      const result = await provider.replaceRecord(dataToReplace);
+
+      expect(updateTableSpy).toHaveBeenCalled();
+      expect(result).toEqual(dataToReplace);
+    });
+
+    it('should return error if there is no matching record to replace', async () => {
+      const dataToReplace: TestEntity = {
+        id: 'nonexistent-id',
+        value: 'no-match',
+        priority: 0,
+      };
+
+      expect(provider.replaceRecord(dataToReplace)).rejects.toThrowError();
     });
   });
 });
