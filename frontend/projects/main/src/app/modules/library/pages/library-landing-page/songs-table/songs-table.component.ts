@@ -1,4 +1,12 @@
-import { Component, input, output, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  input,
+  OnInit,
+  output,
+  signal,
+} from '@angular/core';
 import {
   MatCell,
   MatCellDef,
@@ -23,8 +31,15 @@ import {
   MatMenuTrigger,
   MenuCloseReason,
 } from '@angular/material/menu';
-import { SongTableActionsMenuComponent } from '../song-table-actions-menu/song-table-actions-menu.component';
-import { SongTableActionsPlaylistMenuComponent } from '../song-table-actions-playlist-menu/song-table-actions-playlist-menu.component';
+import {
+  ActionsMenuComponent,
+  ActionsMenuBaseConfig,
+  ActionsMenuConfig,
+  ActionsMenuDataConfig,
+} from '@general/components/display/actions-menu/actions-menu.component';
+import { PlaylistStore } from '@general/stores/playlist.store';
+import { Playlist } from '@shared/models/playlist.model';
+import { SortDirection } from '@shared/models/common.model';
 
 @Component({
   selector: 'app-songs-table',
@@ -46,13 +61,14 @@ import { SongTableActionsPlaylistMenuComponent } from '../song-table-actions-pla
     IconButtonComponent,
     MatMenuTrigger,
     MatMenu,
-    SongTableActionsMenuComponent,
-    SongTableActionsPlaylistMenuComponent,
+    ActionsMenuComponent,
   ],
   templateUrl: './songs-table.component.html',
   styleUrl: './songs-table.component.scss',
 })
-export class SongsTableComponent {
+export class SongsTableComponent implements OnInit {
+  readonly playlistsStore = inject(PlaylistStore);
+
   readonly tracks = input<Track[]>([]);
   readonly playingTrackId = input<string | null>();
 
@@ -70,6 +86,61 @@ export class SongsTableComponent {
     'duration',
     'actions',
   ];
+
+  readonly defaultActions: ActionsMenuBaseConfig<Track>[] = [
+    {
+      text: 'Play next',
+      icon: iconSet.PlayNextIcon,
+      onSelected: (track: Track) => this.playNext(track),
+    },
+    {
+      text: 'Add to playlist',
+      icon: actionsIconSet.AddIcon,
+      onSelected: () => this.addToPlaylist(),
+      keepOpen: true,
+    },
+    {
+      text: 'Delete',
+      icon: actionsIconSet.DeleteIcon,
+      onSelected: (track: Track) => this.deleteTrack(track),
+    },
+  ];
+
+  readonly menuPickActions = computed(() => {
+    return this.playlistsStore
+      .entities()
+      .map<ActionsMenuDataConfig<Track, Playlist>>((playlist) => {
+        console.log(playlist);
+        return {
+          text: playlist.name,
+          data: playlist,
+          keepOpen: false,
+          onSelected: (
+            track: Track,
+            config: ActionsMenuDataConfig<Track, Playlist>,
+          ) => {
+            this.playlistsStore.addNewTracks({
+              [config.data!.id]: [track!.id],
+            });
+            this.showPlaylists.set(false);
+          },
+        };
+      });
+  });
+
+  readonly menuActions = computed<ActionsMenuConfig<Track, Playlist>[]>(() => {
+    if (this.showPlaylists()) {
+      return this.menuPickActions();
+    }
+    return this.defaultActions;
+  });
+
+  ngOnInit() {
+    this.playlistsStore.load({
+      sortBy: 'title',
+      sortDirection: SortDirection.ASC,
+    });
+  }
 
   hoverStart(track: Track) {
     this.activeRow.set(track);

@@ -1,0 +1,8 @@
+@for (config of config(); track config.text){
+<button mat-menu-item (click)="actionClicked(item(), config, $event)">
+  @if (config.icon){
+  <lucide-icon [img]="config.icon"></lucide-icon>
+  }
+  <span>{{ config.text }}</span>
+</button>
+}

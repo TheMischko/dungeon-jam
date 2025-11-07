@@ -48,15 +48,7 @@
     <mat-cell *matCellDef="let row">
       <lib-icon-button [matMenuTriggerFor]="menu" [icon]="ActionsIcon" />
       <mat-menu #menu="matMenu" (closed)="actionsClosed($event)">
-        @if (showPlaylists()){
-        <app-song-table-actions-playlist-menu [track]="row" />
-        } @else {
-        <app-song-table-actions-menu
-          (playNext)="playNext(row)"
-          (addToPlaylist)="addToPlaylist()"
-          (delete)="deleteTrack(row)"
-        />
-        }
+        <lib-actions-menu [item]="row" [config]="menuActions()" />
       </mat-menu>
     </mat-cell>
   </ng-container>
