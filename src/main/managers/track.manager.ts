@@ -81,9 +81,9 @@ export class TrackManager {
   }
 
   async getByPlaylist(query: PlaylistTracksQuery): Promise<Track[]> {
-    const playlist = (await PlaylistManager.getInstance()).getById(
-      query.playlistId,
-    );
+    const playlist = await (
+      await PlaylistManager.getInstance()
+    ).getById(query.playlistId);
     if (!playlist) {
       return [];
     }

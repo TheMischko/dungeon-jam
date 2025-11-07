@@ -3,6 +3,7 @@ import {
   Playlist,
   PlaylistAddTracksData,
   PlaylistInsertQuery,
+  PlaylistUpdateQuery,
 } from '@shared/models/playlist.model';
 
 export type PlaylistApiWindow = Window &
@@ -14,5 +15,6 @@ export type PlaylistApiWindow = Window &
       addTracksToPlaylists: (
         data: PlaylistAddTracksData,
       ) => Promise<Map<string, Playlist>>;
+      updatePlaylist: (query: PlaylistUpdateQuery) => Promise<Playlist>;
     };
   };

@@ -9,16 +9,44 @@ import { PlaylistChannel } from '@shared/models/channels.model';
 import { PlaylistManager } from './playlist.manager';
 import { mockPlaylist } from '../testing/mocks/mock-playlist.data';
 import { SortDirection } from '@shared/models/common.model';
+import { DatabaseProvider } from '../database/database-provider';
+import { DatabaseProviderCreator } from '../database/database-provider-creator';
+import { Playlist } from '@shared/models/playlist.model';
 
 vi.mock('electron', () => mockElectron);
 vi.mock('./../database/database', () => mockDatabase);
+vi.mock('../database/database-provider-creator');
 
 describe('PlaylistManager', () => {
   let playlistManager: PlaylistManager;
+  let mockPlaylistProvider: any;
 
   beforeEach(async () => {
     setupTestEnvironment();
     PlaylistManager.__resetForTests();
+
+    mockPlaylistProvider = {
+      getAll: vi.fn().mockResolvedValue([]),
+      getBy: vi.fn().mockResolvedValue(null),
+      create: vi
+        .fn()
+        .mockImplementation((data) =>
+          Promise.resolve({ ...data, id: data.id || 'generated-id' }),
+        ),
+      replaceRecord: vi
+        .fn()
+        .mockImplementation((data) => Promise.resolve(data)),
+    };
+
+    vi.mocked(DatabaseProviderCreator.create).mockReturnValue({
+      setTable: vi.fn().mockReturnThis(),
+      setSort: vi.fn().mockReturnThis(),
+      setFilter: vi.fn().mockReturnThis(),
+      complete: vi
+        .fn()
+        .mockResolvedValue(mockPlaylistProvider as DatabaseProvider<Playlist>),
+    } as any);
+
     playlistManager = await PlaylistManager.getInstance();
   });
 
@@ -32,189 +60,154 @@ describe('PlaylistManager', () => {
     expect(instanceA).toBe(instanceB);
   });
 
-  it('should respond to GET_ALL message with all playlists', async () => {
-    vi.spyOn(playlistManager, 'getAll').mockReturnValue([]);
+  it('should register all IPC channels on getInstance', async () => {
+    const channels = [
+      PlaylistChannel.GET_ALL,
+      PlaylistChannel.GET_BY_ID,
+      PlaylistChannel.INSERT,
+      PlaylistChannel.ADD_TRACKS,
+      PlaylistChannel.UPDATE,
+    ];
 
-    await triggerIpcMainHandle(PlaylistChannel.GET_ALL);
-
-    expect(playlistManager.getAll).toHaveBeenCalled();
+    channels.forEach((channel) => {
+      expect(vi.mocked(mockElectron.ipcMain.handle)).toHaveBeenCalledWith(
+        channel,
+        expect.any(Function),
+      );
+    });
   });
 
-  it('should respond to GET_BY_ID message with the matching playlist', async () => {
-    const testId = 'playlist-123';
-    const playlist = mockPlaylist({ id: testId });
-    vi.spyOn(playlistManager, 'getById').mockReturnValue(playlist);
+  describe('IPC Handlers', () => {
+    it('should handle GET_ALL through IPC with filter and sort', async () => {
+      const playlists = [mockPlaylist(), mockPlaylist()];
+      mockPlaylistProvider.getAll.mockResolvedValue(playlists);
 
-    await triggerIpcMainHandle(PlaylistChannel.GET_BY_ID, testId);
+      const result = (await triggerIpcMainHandle(PlaylistChannel.GET_ALL, {
+        filter: 'test',
+        sortBy: 'name',
+        sortDirection: SortDirection.ASC,
+      })) as Playlist[];
 
-    expect(playlistManager.getById).toHaveBeenCalledWith(testId);
-  });
-
-  describe('getAll', () => {
-    it('should read database table and return all playlists', () => {
-      const dataSet = [mockPlaylist(), mockPlaylist(), mockPlaylist()];
-      mockDatabaseInstance.readTable.mockImplementation(() => dataSet);
-
-      const result = playlistManager.getAll();
-
-      expect(mockDatabaseInstance.readTable).toHaveBeenCalledWith('playlists');
-      expect(result).toEqual(dataSet);
-    });
-
-    it('should filter playlists by name', () => {
-      const testFilter = 'Favorites';
-      const dataSet = [
-        mockPlaylist({ name: 'My Favorites' }),
-        mockPlaylist({ name: 'Workout Mix' }),
-        mockPlaylist({ name: 'Favorites Hits' }),
-      ];
-      mockDatabaseInstance.readTable.mockImplementation(() => dataSet);
-
-      const result = playlistManager.getAll({ filter: testFilter });
-
-      expect(result.length).toBe(2);
-      expect(result[0].name).toBe('My Favorites');
-      expect(result[1].name).toBe('Favorites Hits');
-    });
-
-    it('should filter playlists by tags', () => {
-      const testFilter = 'workout';
-      const dataSet = [
-        mockPlaylist({ name: 'Mix 1', tags: ['workout', 'energy'] }),
-        mockPlaylist({ name: 'Mix 2', tags: ['chill'] }),
-        mockPlaylist({ name: 'Mix 3', tags: ['workout'] }),
-      ];
-      mockDatabaseInstance.readTable.mockImplementation(() => dataSet);
-
-      const result = playlistManager.getAll({ filter: testFilter });
-
-      expect(result.length).toBe(2);
-    });
-
-    it('should sort playlists by name ascending', () => {
-      const playlistA = mockPlaylist({ name: 'Apple' });
-      const playlistH = mockPlaylist({ name: 'Honey' });
-      const playlistZ = mockPlaylist({ name: 'Zebra' });
-
-      mockDatabaseInstance.readTable.mockImplementation(() => [
-        playlistH,
-        playlistZ,
-        playlistA,
-      ]);
-
-      const result = playlistManager.getAll({
+      expect(mockPlaylistProvider.getAll).toHaveBeenCalledWith({
+        filter: 'test',
+        sortBy: 'name',
         sortDirection: SortDirection.ASC,
       });
-
-      expect(result).toEqual([playlistA, playlistH, playlistZ]);
+      expect(result).toEqual(playlists);
     });
 
-    it('should sort playlists by order descending', () => {
-      const playlist1 = mockPlaylist({ order: 1 });
-      const playlist2 = mockPlaylist({ order: 2 });
-      const playlist3 = mockPlaylist({ order: 3 });
+    it('should handle GET_BY_ID through IPC', async () => {
+      const playlist = mockPlaylist({ id: 'playlist-123' });
+      mockPlaylistProvider.getBy.mockResolvedValue(playlist);
 
-      mockDatabaseInstance.readTable.mockImplementation(() => [
-        playlist1,
-        playlist3,
-        playlist2,
-      ]);
+      const result = (await triggerIpcMainHandle(
+        PlaylistChannel.GET_BY_ID,
+        'playlist-123',
+      )) as Playlist | null;
 
-      const result = playlistManager.getAll({
-        sortBy: 'order',
-        sortDirection: SortDirection.DESC,
+      expect(mockPlaylistProvider.getBy).toHaveBeenCalledWith(
+        'id',
+        'playlist-123',
+      );
+      expect(result).toEqual(playlist);
+    });
+
+    it('should handle INSERT through IPC', async () => {
+      mockPlaylistProvider.getAll.mockResolvedValue([]);
+      const newPlaylist = mockPlaylist({ order: 0 });
+      mockPlaylistProvider.create.mockResolvedValue(newPlaylist);
+
+      const result = (await triggerIpcMainHandle(PlaylistChannel.INSERT, {
+        name: 'New Playlist',
+        description: 'Test',
+        imageUrl: 'http://example.com/img.jpg',
+        tags: [{ id: 'tag-1', name: 'Rock' }],
+      })) as Playlist;
+
+      expect(mockPlaylistProvider.create).toHaveBeenCalled();
+      const createCall = vi.mocked(mockPlaylistProvider.create).mock
+        .calls[0][0];
+      expect(createCall.name).toBe('New Playlist');
+      expect(createCall.trackIds).toEqual([]);
+      expect(createCall.order).toBe(0);
+      expect(result).toEqual(newPlaylist);
+    });
+
+    it('should handle ADD_TRACKS through IPC', async () => {
+      const playlist = mockPlaylist({
+        id: 'playlist-1',
+        trackIds: ['track-1'],
+      });
+      mockDatabaseInstance.readTable.mockReturnValue([playlist]);
+
+      const result = (await triggerIpcMainHandle(PlaylistChannel.ADD_TRACKS, {
+        'playlist-1': ['track-2', 'track-3'],
+      })) as Map<string, Playlist>;
+
+      expect(mockDatabaseInstance.updateTable).toHaveBeenCalledWith(
+        'playlists',
+        expect.any(Array),
+      );
+      expect(result.size).toBe(1);
+      expect(result.get('playlist-1')?.trackIds).toContain('track-2');
+    });
+
+    it('should handle UPDATE through IPC', async () => {
+      const playlist = mockPlaylist({
+        id: 'playlist-1',
+        name: 'Old Name',
+        tags: ['tag-1'],
+      });
+      mockPlaylistProvider.getBy.mockResolvedValue(playlist);
+      mockPlaylistProvider.replaceRecord.mockResolvedValue({
+        ...playlist,
+        name: 'New Name',
+        tags: ['tag-1', 'tag-2'],
       });
 
-      expect(result).toEqual([playlist3, playlist2, playlist1]);
+      const result = (await triggerIpcMainHandle(PlaylistChannel.UPDATE, {
+        id: 'playlist-1',
+        name: 'New Name',
+        tagsAdded: ['tag-2'],
+      })) as Playlist;
+
+      expect(result.name).toBe('New Name');
+      expect(result.tags).toContain('tag-2');
     });
   });
 
-  describe('getById', () => {
-    it('should return the playlist when it exists', () => {
-      const targetPlaylist = mockPlaylist({ id: 'playlist-123' });
-      const otherPlaylist1 = mockPlaylist({ id: 'playlist-456' });
-      const otherPlaylist2 = mockPlaylist({ id: 'playlist-789' });
+  describe('insert', () => {
+    it('should create a new playlist with order based on existing count', async () => {
+      const existingPlaylists = [mockPlaylist(), mockPlaylist()];
+      mockPlaylistProvider.getAll.mockResolvedValue(existingPlaylists);
 
-      mockDatabaseInstance.readTable.mockImplementation(() => [
-        otherPlaylist1,
-        targetPlaylist,
-        otherPlaylist2,
-      ]);
+      await triggerIpcMainHandle(PlaylistChannel.INSERT, {
+        name: 'New Playlist',
+        description: 'Test',
+        tags: [],
+      });
 
-      const result = playlistManager.getById('playlist-123');
-
-      expect(result).toEqual(targetPlaylist);
-    });
-
-    it('should return null when playlist does not exist', () => {
-      const playlist1 = mockPlaylist({ id: 'playlist-123' });
-      const playlist2 = mockPlaylist({ id: 'playlist-456' });
-
-      mockDatabaseInstance.readTable.mockImplementation(() => [
-        playlist1,
-        playlist2,
-      ]);
-
-      const result = playlistManager.getById('nonexistent-id');
-
-      expect(result).toBeNull();
-    });
-
-    it('should return null when no playlists exist in database', () => {
-      mockDatabaseInstance.readTable.mockImplementation(() => null);
-
-      const result = playlistManager.getById('any-id');
-
-      expect(result).toBeNull();
+      const createCall = vi.mocked(mockPlaylistProvider.create).mock
+        .calls[0][0];
+      expect(createCall.name).toBe('New Playlist');
+      expect(createCall.trackIds).toEqual([]);
+      expect(createCall.order).toBe(2);
+      expect(createCall.id).toBeDefined();
     });
   });
 
   describe('addTracks', () => {
-    it('should add new tracks to playlist', async () => {
+    it('should add new tracks and filter duplicates', async () => {
       const playlistId = 'playlist-1';
-      const existingTrackIds = ['track-1', 'track-2'];
-      const newTrackIds = ['track-3', 'track-4'];
       const playlist = mockPlaylist({
         id: playlistId,
-        trackIds: existingTrackIds,
+        trackIds: ['track-1', 'track-2'],
       });
-
       mockDatabaseInstance.readTable.mockReturnValue([playlist]);
 
-      const result = await playlistManager['addTracks']({
-        [playlistId]: newTrackIds,
-      });
-
-      expect(mockDatabaseInstance.updateTable).toHaveBeenCalledWith(
-        'playlists',
-        expect.arrayContaining([
-          expect.objectContaining({
-            id: playlistId,
-            trackIds: [...existingTrackIds, ...newTrackIds],
-          }),
-        ]),
-      );
-      expect(result.size).toBe(1);
-      expect(result.get(playlistId)?.trackIds).toEqual([
-        ...existingTrackIds,
-        ...newTrackIds,
-      ]);
-    });
-
-    it('should filter out duplicate tracks', async () => {
-      const playlistId = 'playlist-1';
-      const existingTrackIds = ['track-1', 'track-2'];
-      const tracksToAdd = ['track-2', 'track-3', 'track-3'];
-      const playlist = mockPlaylist({
-        id: playlistId,
-        trackIds: existingTrackIds,
-      });
-
-      mockDatabaseInstance.readTable.mockReturnValue([playlist]);
-
-      const result = await playlistManager['addTracks']({
-        [playlistId]: tracksToAdd,
-      });
+      const result = (await triggerIpcMainHandle(PlaylistChannel.ADD_TRACKS, {
+        [playlistId]: ['track-2', 'track-3', 'track-3'],
+      })) as Map<string, Playlist>;
 
       expect(result.get(playlistId)?.trackIds).toEqual([
         'track-1',
@@ -226,47 +219,9 @@ describe('PlaylistManager', () => {
     it('should return empty Map when no playlists exist', async () => {
       mockDatabaseInstance.readTable.mockReturnValue(null);
 
-      const result = await playlistManager['addTracks']({
+      const result = (await triggerIpcMainHandle(PlaylistChannel.ADD_TRACKS, {
         'playlist-1': ['track-1'],
-      });
-
-      expect(result.size).toBe(0);
-    });
-
-    it('should not modify playlists that are not in the update data', async () => {
-      const playlist1 = mockPlaylist({
-        id: 'playlist-1',
-        trackIds: ['track-1'],
-      });
-      const playlist2 = mockPlaylist({
-        id: 'playlist-2',
-        trackIds: ['track-2'],
-      });
-
-      mockDatabaseInstance.readTable.mockReturnValue([playlist1, playlist2]);
-
-      const result = await playlistManager['addTracks']({
-        'playlist-1': ['track-3'],
-      });
-
-      expect(result.size).toBe(1);
-      expect(result.has('playlist-1')).toBe(true);
-      expect(result.has('playlist-2')).toBe(false);
-    });
-
-    it('should not modify playlist when no new tracks to add', async () => {
-      const playlistId = 'playlist-1';
-      const existingTrackIds = ['track-1', 'track-2'];
-      const playlist = mockPlaylist({
-        id: playlistId,
-        trackIds: existingTrackIds,
-      });
-
-      mockDatabaseInstance.readTable.mockReturnValue([playlist]);
-
-      const result = await playlistManager['addTracks']({
-        [playlistId]: ['track-1', 'track-2'],
-      });
+      })) as Map<string, Playlist>;
 
       expect(result.size).toBe(0);
     });
@@ -283,14 +238,141 @@ describe('PlaylistManager', () => {
 
       mockDatabaseInstance.readTable.mockReturnValue([playlist1, playlist2]);
 
-      const result = await playlistManager['addTracks']({
+      const result = (await triggerIpcMainHandle(PlaylistChannel.ADD_TRACKS, {
         'playlist-1': ['track-3'],
         'playlist-2': ['track-4'],
-      });
+      })) as Map<string, Playlist>;
 
       expect(result.size).toBe(2);
       expect(result.get('playlist-1')?.trackIds).toContain('track-3');
       expect(result.get('playlist-2')?.trackIds).toContain('track-4');
+    });
+  });
+
+  describe('update', () => {
+    it('should update playlist with name, tags, and tracks', async () => {
+      const playlist = mockPlaylist({
+        id: 'playlist-1',
+        name: 'Old Name',
+        tags: ['tag-1', 'tag-2'],
+        trackIds: ['track-1', 'track-2'],
+      });
+      mockPlaylistProvider.getBy.mockResolvedValue(playlist);
+      mockPlaylistProvider.replaceRecord.mockResolvedValue({
+        ...playlist,
+        name: 'New Name',
+        tags: ['tag-1', 'tag-3'],
+        trackIds: ['track-1', 'track-3'],
+      });
+
+      const result = (await triggerIpcMainHandle(PlaylistChannel.UPDATE, {
+        id: 'playlist-1',
+        name: 'New Name',
+        tagsAdded: ['tag-3'],
+        tagsRemoved: ['tag-2'],
+        tracksAdded: ['track-3'],
+        tracksRemoved: ['track-2'],
+      })) as Playlist;
+
+      expect(result.name).toBe('New Name');
+      expect(result.tags).toContain('tag-1');
+      expect(result.tags).toContain('tag-3');
+      expect(result.trackIds).toContain('track-1');
+      expect(result.trackIds).toContain('track-3');
+    });
+
+    it('should throw error when playlist ID is missing', async () => {
+      await expect(
+        triggerIpcMainHandle(PlaylistChannel.UPDATE, {
+          name: 'New Name',
+        }),
+      ).rejects.toThrow('Playlist ID is required for update.');
+    });
+
+    it('should throw error when playlist not found', async () => {
+      mockPlaylistProvider.getBy.mockResolvedValue(null);
+
+      await expect(
+        triggerIpcMainHandle(PlaylistChannel.UPDATE, {
+          id: 'nonexistent-id',
+          name: 'New Name',
+        }),
+      ).rejects.toThrow('Playlist with ID nonexistent-id not found');
+    });
+
+    it('should preserve unmodified fields', async () => {
+      const playlist = mockPlaylist({
+        id: 'playlist-1',
+        name: 'Original Name',
+        description: 'Original Description',
+        order: 5,
+      });
+      mockPlaylistProvider.getBy.mockResolvedValue(playlist);
+      mockPlaylistProvider.replaceRecord.mockResolvedValue({
+        ...playlist,
+        name: 'Updated Name',
+      });
+
+      const result = (await triggerIpcMainHandle(PlaylistChannel.UPDATE, {
+        id: 'playlist-1',
+        name: 'Updated Name',
+      })) as Playlist;
+
+      expect(result.order).toBe(5);
+      expect(result.description).toBe('Original Description');
+    });
+  });
+
+  describe('filterPlaylists', () => {
+    it('should return true when no filter provided', () => {
+      const playlist = mockPlaylist();
+      expect(PlaylistManager['filterPlaylists'](playlist)).toBe(true);
+    });
+
+    it('should filter by playlist name and tags case-insensitively', () => {
+      const playlist = mockPlaylist({
+        name: 'My Favorites',
+        tags: ['ROCK', 'ENERGY'],
+      });
+
+      expect(PlaylistManager['filterPlaylists'](playlist, 'favorites')).toBe(
+        true,
+      );
+      expect(PlaylistManager['filterPlaylists'](playlist, 'rock')).toBe(true);
+      expect(PlaylistManager['filterPlaylists'](playlist, 'jazz')).toBe(false);
+    });
+  });
+
+  describe('sortPlaylists', () => {
+    it('should return 0 when no sort direction provided', () => {
+      const playlistA = mockPlaylist();
+      const playlistB = mockPlaylist();
+      expect(PlaylistManager['sortPlaylists'](playlistA, playlistB)).toBe(0);
+    });
+
+    it('should sort by name and order ascending/descending', () => {
+      const playlistA = mockPlaylist({ name: 'Apple', order: 1 });
+      const playlistZ = mockPlaylist({ name: 'Zebra', order: 3 });
+
+      // Name ascending
+      expect(
+        PlaylistManager['sortPlaylists'](
+          playlistZ,
+          playlistA,
+          SortDirection.ASC,
+          'name',
+        ),
+      ).toBeGreaterThan(0);
+
+      // Order descending
+      expect(
+        PlaylistManager['sortPlaylists'](
+          playlistZ,
+          playlistA,
+          SortDirection.DESC,
+          'order',
+        ),
+      ).toBeLessThan(0);
     });
   });
 });

@@ -136,6 +136,25 @@ export class DatabaseProvider<T> {
       resolve(true);
     });
   }
+
+  replaceRecord(newRecord: T): Promise<T> {
+    return new Promise<T>(async (resolve) => {
+      const data = await this.getAll();
+      const recordId = newRecord[this.idColumn];
+      const existingIndex = data.findIndex(
+        (item: T) => recordId === item[this.idColumn],
+      );
+
+      if (existingIndex === -1) {
+        resolve(await this.create(newRecord));
+        return;
+      }
+
+      data[existingIndex] = newRecord;
+      await this.database.updateTable(this.table, data);
+      resolve(newRecord);
+    });
+  }
 }
 
 export type FilterFn<T> = (item: T, filter: string) => boolean;

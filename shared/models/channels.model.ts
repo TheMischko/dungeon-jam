@@ -26,13 +26,14 @@ export enum PlaylistChannel {
   GET_BY_ID = 'playlists/get',
   INSERT = 'playlists/insert',
   ADD_TRACKS = 'playlists/add-tracks',
+  UPDATE = 'playlists/update',
 }
 
 export enum TagChannel {
   GET_ALL = 'tags/get-all',
   GET_SUBSET = 'tags/get-subset',
   SUGGESTION = 'tags/suggestion',
-  INSERT = 'tags/insert'
+  INSERT = 'tags/insert',
 }
 
 export type AppChannel =

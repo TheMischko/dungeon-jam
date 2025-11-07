@@ -7,6 +7,7 @@ import {
   ButtonType,
   ButtonSize,
 } from '../../../../../../../general/models/button.model';
+import { ActionsMenuConfig } from '@general/components/display/actions-menu/actions-menu.component';
 
 @Component({
   selector: 'app-playlists-detail-page',
@@ -19,6 +20,9 @@ export class PlaylistsDetailPageComponent {
   readonly tracks = input.required<Track[]>();
   readonly playlistPlaying = input<boolean>(false);
   readonly playingTrackId = input<string | undefined>();
+  readonly songActionsMenuConfig = input<ActionsMenuConfig<Track, Playlist>[]>(
+    [],
+  );
 
   readonly playPlaylist = output();
   readonly playTrack = output<Track>();

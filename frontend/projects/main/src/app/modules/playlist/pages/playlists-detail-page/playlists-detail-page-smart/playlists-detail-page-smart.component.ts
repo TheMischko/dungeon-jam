@@ -16,6 +16,8 @@ import { Playlist } from '@shared/models/playlist.model';
 import { PlaylistsDetailPageComponent } from '../playlists-detail-page.component';
 import { PlaybackService } from '../../../../../services/playback.service';
 import { PlaybackState } from '../../../../../models/playback.model';
+import { ActionsMenuConfig } from '@general/components/display/actions-menu/actions-menu.component';
+import { actionsIconSet, iconSet } from '@general/icons/icons';
 
 @Component({
   selector: 'app-playlists-detail-page-smart',
@@ -63,6 +65,24 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
     sortBy: this.currentSortBy(),
     playlistId: this.playlistId(),
   }));
+  songActionsMenuConfig = computed<ActionsMenuConfig<Track, Playlist>[]>(() => {
+    return [
+      {
+        text: 'Play next',
+        icon: iconSet.PlayNextIcon,
+        onSelected: (track: Track) => {
+          this.playNext(track);
+        },
+      },
+      {
+        text: 'Remove from playlist',
+        icon: actionsIconSet.DeleteIcon,
+        onSelected: (track: Track) => {
+          this.removeTrackFromPlaylist(track);
+        },
+      },
+    ];
+  });
 
   ngOnInit() {
     this.playlistTracksStore.load(this.loadQuery);
@@ -92,5 +112,16 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
 
   async pausePlaying() {
     this.playbackService.pause();
+  }
+
+  private playNext(track: Track): void {
+    console.log(`Play next: ${track.name}`);
+  }
+
+  private removeTrackFromPlaylist(track: Track) {
+    this.playlistTracksStore.removeTrackFromPlaylist({
+      playlistId: this.playlistId(),
+      trackId: track.id,
+    });
   }
 }

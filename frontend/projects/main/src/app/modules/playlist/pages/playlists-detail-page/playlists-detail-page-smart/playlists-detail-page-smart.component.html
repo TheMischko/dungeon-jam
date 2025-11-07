@@ -3,6 +3,7 @@
   [tracks]="tracks()"
   [playingTrackId]="playbackState()?.currentTrack?.id"
   [playlistPlaying]="isPlaylistPlaying()"
+  [songActionsMenuConfig]="songActionsMenuConfig()"
   (playPlaylist)="playPlaylist()"
   (playTrack)="playTrack($event)"
   (pause)="pausePlaying()"

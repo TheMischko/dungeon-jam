@@ -3,33 +3,48 @@ import {
   Playlist,
   PlaylistAddTracksData,
   PlaylistInsertQuery,
+  PlaylistUpdateQuery,
 } from '@shared/models/playlist.model';
 import { ipcMain } from 'electron';
 import { PlaylistChannel } from '@shared/models/channels.model';
 import { QueryRequest } from '@shared/models/request.model';
 import { SortDirection } from '@shared/models/common.model';
 import { v4 as uuid } from 'uuid';
+import { DatabaseProvider } from '../database/database-provider';
+import { DatabaseProviderCreator } from '../database/database-provider-creator';
 
 export class PlaylistManager {
   private static _instance: PlaylistManager;
 
-  private constructor(private database: DatabaseWrapper) {}
+  private constructor(
+    private database: DatabaseWrapper,
+    private playlistProvider: DatabaseProvider<Playlist>,
+  ) {}
 
   public static async getInstance() {
     if (!PlaylistManager._instance) {
       const database = await DatabaseWrapper.getInstance();
-      PlaylistManager._instance = new PlaylistManager(database);
+      const provider = await DatabaseProviderCreator.create<Playlist>()
+        .setTable('playlists')
+        .setSort((a, b, sortBy, direction) =>
+          PlaylistManager.sortPlaylists(a, b, direction, sortBy),
+        )
+        .setFilter((item, filter) =>
+          PlaylistManager.filterPlaylists(item, filter),
+        )
+        .complete();
+      PlaylistManager._instance = new PlaylistManager(database, provider);
       PlaylistManager._instance.registerChannels();
     }
     return PlaylistManager._instance!;
   }
 
   private registerChannels(): void {
-    ipcMain.handle(PlaylistChannel.GET_ALL, (_, query?: QueryRequest) => {
-      return this.getAll(query);
+    ipcMain.handle(PlaylistChannel.GET_ALL, async (_, query?: QueryRequest) => {
+      return await this.playlistProvider.getAll(query);
     });
-    ipcMain.handle(PlaylistChannel.GET_BY_ID, (_, id: string) => {
-      return this.getById(id);
+    ipcMain.handle(PlaylistChannel.GET_BY_ID, async (_, id: string) => {
+      return await this.getById(id);
     });
     ipcMain.handle(
       PlaylistChannel.INSERT,
@@ -43,34 +58,25 @@ export class PlaylistManager {
         return await this.addTracks(data);
       },
     );
-  }
-
-  getById(playlistId: string): Playlist | null {
-    const data = this.getAll();
-    return data.find((playlist) => playlist.id === playlistId) ?? null;
-  }
-
-  getAll(query?: QueryRequest): Playlist[] {
-    const data = this.database.readTable<Playlist[]>('playlists') ?? [];
-    return data
-      .filter((playlist) => this.filterPlaylists(playlist, query?.filter))
-      .sort((a, b) =>
-        this.sortPlaylists(a, b, query?.sortDirection, query?.sortBy),
-      );
+    ipcMain.handle(
+      PlaylistChannel.UPDATE,
+      async (_, query: PlaylistUpdateQuery) => {
+        return await this.update(query);
+      },
+    );
   }
 
   async insert(query: PlaylistInsertQuery): Promise<Playlist> {
-    const playlists = this.database.readTable<Playlist[]>('playlists') ?? [];
+    const playlists = await this.playlistProvider.getAll();
     const newPlaylist = this.createNewPlaylist(query, playlists.length);
-    await this.database.updateTable('playlists', [...playlists, newPlaylist]);
-    return newPlaylist;
+    return await this.playlistProvider.create(newPlaylist);
   }
 
   public static __resetForTests(): void {
     PlaylistManager._instance = undefined as unknown as PlaylistManager;
   }
 
-  private filterPlaylists(playlist: Playlist, filter?: string): boolean {
+  private static filterPlaylists(playlist: Playlist, filter?: string): boolean {
     if (!filter) {
       return true;
     }
@@ -83,7 +89,7 @@ export class PlaylistManager {
     return playlist.tags.some((tag) => tag.toLowerCase().includes(filterLower));
   }
 
-  private sortPlaylists(
+  private static sortPlaylists(
     playlistA: Playlist,
     playlistB: Playlist,
     direction?: SortDirection,
@@ -131,7 +137,7 @@ export class PlaylistManager {
       description: data?.description,
       order,
       imageUrl: data?.imageUrl,
-      tags: data?.tags ?? [],
+      tags: data?.tags.map((t) => t.id) ?? [],
       dateCreated: date,
       dateUpdated: date,
       trackIds: [],
@@ -179,5 +185,49 @@ export class PlaylistManager {
     return new Map(
       modifiedPlaylists.map((playlist) => [playlist.id, playlist]),
     );
+  }
+
+  private async update(query: PlaylistUpdateQuery): Promise<Playlist> {
+    if (!query.id) {
+      throw new Error('Playlist ID is required for update.');
+    }
+    const playlist = await this.playlistProvider.getBy('id', query.id);
+    if (!playlist) {
+      throw new Error(`Playlist with ID ${query.id} not found`);
+    }
+    const playlistTags = [
+      ...(playlist?.tags ?? []),
+      ...(query?.tagsAdded ?? []),
+    ].filter((tag) => {
+      if (!query?.tagsRemoved) {
+        return true;
+      }
+      return !query.tagsRemoved.includes(tag);
+    });
+    const playlistTracks = [
+      ...(playlist?.trackIds ?? []),
+      ...(query?.tracksAdded ?? []),
+    ].filter((trackId) => {
+      if (!query?.tracksRemoved) {
+        return true;
+      }
+      return !query.tracksRemoved.includes(trackId);
+    });
+    const updatedPlaylist: Playlist = {
+      id: playlist.id,
+      name: query.name ?? playlist.name,
+      description: query.description ?? playlist.description,
+      imageUrl: query.imageUrl ?? playlist.imageUrl,
+      tags: playlistTags,
+      trackIds: playlistTracks,
+      order: playlist.order,
+      dateCreated: playlist.dateCreated,
+      dateUpdated: new Date(),
+    };
+    return await this.playlistProvider.replaceRecord(updatedPlaylist);
+  }
+
+  async getById(id: string) {
+    return this.playlistProvider.getBy('id', id);
   }
 }

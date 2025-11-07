@@ -24,6 +24,7 @@
   <app-songs-table
     [tracks]="tracks()"
     [playingTrackId]="playingTrackId()"
+    [actionsMenuConfig]="songActionsMenuConfig()"
     (playTrack)="playTrack.emit($event)"
     (pauseTrack)="pause.emit()"
     (search)="search.emit($event)"

@@ -1,4 +1,4 @@
-import { Tag, TagData } from '@shared/models/tag.model';
+import { TagData } from '@shared/models/tag.model';
 
 export interface Playlist {
   id: string;
@@ -16,7 +16,19 @@ export interface PlaylistInsertQuery {
   name: string;
   description?: string;
   imageUrl?: string;
-  tags: (Tag | TagData)[];
+  tags: TagData[];
+}
+
+export interface PlaylistUpdateQuery {
+  id: string;
+  name?: string;
+  description?: string | null;
+  imageUrl?: string | null;
+  order?: number;
+  tagsAdded?: string[];
+  tagsRemoved?: string[];
+  tracksAdded?: string[];
+  tracksRemoved?: string[];
 }
 
 /**

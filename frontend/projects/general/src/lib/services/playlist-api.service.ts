@@ -6,6 +6,7 @@ import {
   Playlist,
   PlaylistAddTracksData,
   PlaylistInsertQuery,
+  PlaylistUpdateQuery,
 } from '@shared/models/playlist.model';
 
 @Injectable({
@@ -64,5 +65,25 @@ export class PlaylistApiService {
         subject.error(error);
       });
     return subject.asObservable();
+  }
+
+  updatePlaylist(query: PlaylistUpdateQuery): Observable<Playlist> {
+    const subject = new Subject<Playlist>();
+    this.window.PLAYLIST_API.updatePlaylist(query)
+      .then((playlist) => {
+        subject.next(playlist);
+        subject.complete();
+      })
+      .catch((error) => {
+        subject.error(error);
+      });
+    return subject.asObservable();
+  }
+
+  removeTracks(playlistId: string, trackIds: string[]): Observable<Playlist> {
+    return this.updatePlaylist({
+      id: playlistId,
+      tracksRemoved: trackIds,
+    });
   }
 }

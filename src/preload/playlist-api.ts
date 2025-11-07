@@ -5,6 +5,7 @@ import {
   Playlist,
   PlaylistAddTracksData,
   PlaylistInsertQuery,
+  PlaylistUpdateQuery,
 } from '@shared/models/playlist.model';
 
 const getAllPlaylists = async (options: QueryRequest): Promise<Playlist[]> => {
@@ -25,9 +26,15 @@ const addTracksToPlaylists = async (
   return await ipcRenderer.invoke(PlaylistChannel.ADD_TRACKS, data);
 };
 
+const updatePlaylist = async (
+  query: PlaylistUpdateQuery,
+): Promise<Playlist> => {
+  return await ipcRenderer.invoke(PlaylistChannel.UPDATE, query);
+};
 export default {
   getAllPlaylists,
   getPlaylistById,
   insertPlaylist,
   addTracksToPlaylists,
+  updatePlaylist,
 };
