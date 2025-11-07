@@ -20,6 +20,15 @@ import {
   initialPlaybackState,
   PlaybackState,
 } from '../../../../models/playback.model';
+import { PlaylistStore } from '@general/stores/playlist.store';
+import {
+  ActionsMenuBaseConfig,
+  ActionsMenuConfig,
+  ActionsMenuDataConfig,
+} from '@general/components/display/actions-menu/actions-menu.component';
+import { actionsIconSet, iconSet } from '@general/icons/icons';
+import { Playlist } from '@shared/models/playlist.model';
+import { MenuCloseReason } from '@angular/material/menu';
 
 @Component({
   selector: 'app-library-landing-page',
@@ -32,6 +41,7 @@ export class LibraryLandingPageComponent implements OnInit {
   private readonly audioFilesService = inject(AudioFilesService);
   private readonly trackService = inject(TrackService);
   private readonly playbackService = inject(PlaybackService);
+  readonly playlistsStore = inject(PlaylistStore);
   private readonly locale = inject(LOCALE_ID);
 
   readonly playbackState = toSignal(this.playbackService.playback$, {
@@ -55,14 +65,66 @@ export class LibraryLandingPageComponent implements OnInit {
       );
     });
   });
+  readonly menuPickActions = computed(() => {
+    return this.playlistsStore
+      .entities()
+      .map<ActionsMenuDataConfig<Track, Playlist>>((playlist) => {
+        return {
+          text: playlist.name,
+          data: playlist,
+          keepOpen: false,
+          onSelected: (
+            track: Track,
+            config: ActionsMenuDataConfig<Track, Playlist>,
+          ) => {
+            this.playlistsStore.addNewTracks({
+              [config.data!.id]: [track!.id],
+            });
+            this.showPlaylists.set(false);
+          },
+        };
+      });
+  });
+  readonly songMenuActions = computed<ActionsMenuConfig<Track, Playlist>[]>(
+    () => {
+      if (this.showPlaylists()) {
+        return this.menuPickActions();
+      }
+      return this.defaultSongActions;
+    },
+  );
 
   readonly tracks = signal<Track[]>([]);
   readonly currentSearchValue = signal<string>('');
+  readonly showPlaylists = signal<boolean>(false);
+
+  readonly defaultSongActions: ActionsMenuBaseConfig<Track>[] = [
+    {
+      text: 'Play next',
+      icon: iconSet.PlayNextIcon,
+      onSelected: (track: Track) => this.playNext(track),
+    },
+    {
+      text: 'Add to playlist',
+      icon: actionsIconSet.AddIcon,
+      onSelected: () => this.addToPlaylist(),
+      keepOpen: true,
+    },
+    {
+      text: 'Delete',
+      icon: actionsIconSet.DeleteIcon,
+      onSelected: (track: Track) => this.deleteTrack(track),
+    },
+  ];
 
   ngOnInit() {
     this.trackService.getAllTracks().subscribe((tracks) => {
       this.tracks.set(tracks);
     });
+  }
+
+  addToPlaylist(): void {
+    this.showPlaylists.set(true);
   }
 
   openUploadDialog(audioTracks?: AudioTrack[]) {
@@ -104,5 +166,22 @@ export class LibraryLandingPageComponent implements OnInit {
 
   searchTracks(searchValue: string) {
     this.currentSearchValue.set(searchValue.toLocaleLowerCase(this.locale));
+  }
+
+  actionsClosed(reason: MenuCloseReason) {
+    if (reason !== 'click' || this.showPlaylists()) {
+      setTimeout(() => {
+        this.showPlaylists.set(false);
+      }, 250);
+    }
+  }
+
+  private playNext(track: Track) {
+    console.log(`Play next: ${track.name}`);
+    return undefined;
+  }
+
+  private deleteTrack(track: Track) {
+    console.log(`Remove song: ${track.name}`);
   }
 }

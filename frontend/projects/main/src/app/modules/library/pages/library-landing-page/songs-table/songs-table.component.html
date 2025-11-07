@@ -43,21 +43,23 @@
   </ng-container>
 
   <!-- Actions -->
+  @if (actionsMenuConfig()?.length ) {
   <ng-container matColumnDef="actions">
     <mat-header-cell mat-header-cell *matHeaderCellDef></mat-header-cell>
     <mat-cell *matCellDef="let row">
       <lib-icon-button [matMenuTriggerFor]="menu" [icon]="ActionsIcon" />
-      <mat-menu #menu="matMenu" (closed)="actionsClosed($event)">
-        <lib-actions-menu [item]="row" [config]="menuActions()" />
+      <mat-menu #menu="matMenu" (closed)="actionMenuClosed.emit($event)">
+        <lib-actions-menu [item]="row" [config]="actionsMenuConfig()" />
       </mat-menu>
     </mat-cell>
   </ng-container>
+  }
 
   <!-- Rows -->
 
-  <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+  <mat-header-row *matHeaderRowDef="displayedColumns()"></mat-header-row>
   <mat-row
-    *matRowDef="let row; columns: displayedColumns"
+    *matRowDef="let row; columns: displayedColumns()"
     [class.active-row]="isActiveRow(row)"
     [class.playing]="isTrackPlaying(row)"
     (mouseenter)="hoverStart(row)"

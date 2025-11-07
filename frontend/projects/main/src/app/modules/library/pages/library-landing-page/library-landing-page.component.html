@@ -11,9 +11,11 @@
   <app-songs-table
     [tracks]="displayTracks()"
     [playingTrackId]="playingTrackId()"
+    [actionsMenuConfig]="songMenuActions()"
     (playTrack)="playTrack($event)"
     (pauseTrack)="pauseTrack()"
     (search)="searchTracks($event)"
+    (actionMenuClosed)="actionsClosed($event)"
   ></app-songs-table>
   }
 </app-songs-drop-in-zone>
