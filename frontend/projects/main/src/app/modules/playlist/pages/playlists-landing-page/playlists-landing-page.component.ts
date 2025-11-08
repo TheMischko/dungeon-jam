@@ -54,7 +54,10 @@ export class PlaylistsLandingPageComponent {
           const requests = tagsToCreate.map((tag: Tag) =>
             this.tagApiService.insertTag(tag),
           );
-          return combineLatest(requests).pipe(
+          return this.tagApiService.clearOrphanedTags().pipe(
+            switchMap(() => {
+              return combineLatest(requests);
+            }),
             map((tags) => {
               return {
                 ...result,

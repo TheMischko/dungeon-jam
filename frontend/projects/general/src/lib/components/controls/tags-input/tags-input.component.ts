@@ -21,6 +21,7 @@ import {
   MatAutocompleteTrigger,
   MatOption,
 } from '@angular/material/autocomplete';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'lib-tags-input',
@@ -67,37 +68,19 @@ export class TagsInputComponent implements ControlValueAccessor {
       }
 
       this.tagApiService.getTagSuggestion(value).subscribe((tags) => {
-        this.suggestions.set(tags);
+        const value = untracked(() => this.value());
+        const notAlreadySelected = tags.filter(
+          (tag) => !value.includes(tag.title),
+        );
+        this.suggestions.set(notAlreadySelected);
       });
     });
 
-    effect(() => {
+    effect(async () => {
       const value = this.value();
       const tagMap = untracked(() => this.tagMap());
-      const tags = value.map((tagName) => {
-        const knownTag = tagMap[tagName] as Tag | TagData | undefined;
-        if (knownTag) {
-          return knownTag;
-        }
-        const suggestions = untracked(() => this.suggestions());
-        const suggestionTag = suggestions.find((tag) => tag.title === tagName);
-        if (suggestionTag) {
-          return suggestionTag;
-        }
-        return {
-          title: tagName,
-        } as Tag;
-      });
-      const newTagMap = tags.reduce(
-        (map, tag, _, __) => {
-          return {
-            ...map,
-            [tag.title]: tag,
-          };
-        },
-        {} as Record<string, TagData | Tag>,
-      );
-      this.tagMap.set(newTagMap);
+      const tags = await this.getTagsFromValue(value, tagMap);
+      this.updateTagMap(tags);
       this.changed.emit(tags);
     });
   }
@@ -159,6 +142,18 @@ export class TagsInputComponent implements ControlValueAccessor {
     this.inputValue.set('');
   }
 
+  removeTag(removedTag: Tag) {
+    const oldValue = this.value();
+    const filteredValue = oldValue.filter((tag) => tag !== removedTag.title);
+    this.value.set(filteredValue);
+  }
+
+  saveSuggestion(event: { source: { value: string } }) {
+    const value = event.source.value as string;
+    this.value.update((tags) => [...tags, value]);
+    this.inputValue.set('');
+  }
+
   private createAndSaveTag(value: string) {
     const trimmedText = value.replace(this.SEPARATORS, '').trim().toLowerCase();
     if (trimmedText.length === 0) {
@@ -183,15 +178,38 @@ export class TagsInputComponent implements ControlValueAccessor {
     this.value.set(newTags);
   }
 
-  removeTag(removedTag: Tag) {
-    const oldValue = this.value();
-    const filteredValue = oldValue.filter((tag) => tag !== removedTag.title);
-    this.value.set(filteredValue);
+  private async getTagsFromValue(
+    value: string[],
+    tagMap: Record<string, TagData | Tag>,
+  ): Promise<(Tag | TagData)[]> {
+    const tagPromises = value.map(async (tagName) => {
+      const knownTag = tagMap[tagName] as Tag | TagData | undefined;
+      if (knownTag) {
+        return knownTag;
+      }
+      const suggestions = untracked(() => this.suggestions());
+      const suggestionTag = suggestions.find((tag) => tag.title === tagName);
+      if (suggestionTag) {
+        return suggestionTag;
+      }
+      const newTagData = {
+        title: tagName,
+      } as Tag;
+      return await firstValueFrom(this.tagApiService.insertTag(newTagData));
+    });
+    return await Promise.all(tagPromises);
   }
 
-  saveSuggestion(event: { source: { value: string } }) {
-    const value = event.source.value as string;
-    this.value.update((tags) => [...tags, value]);
-    this.inputValue.set('');
+  private updateTagMap(tags: (Tag | TagData)[]): void {
+    const newTagMap = tags.reduce(
+      (map, tag, _, __) => {
+        return {
+          ...map,
+          [tag.title]: tag,
+        };
+      },
+      {} as Record<string, TagData | Tag>,
+    );
+    this.tagMap.set(newTagMap);
   }
 }

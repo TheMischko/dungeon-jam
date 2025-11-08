@@ -19,7 +19,15 @@ import {
 import { inject } from '@angular/core';
 import { PlaylistApiService } from '@general/services/playlist-api.service';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { catchError, EMPTY, finalize, pipe, switchMap, tap } from 'rxjs';
+import {
+  catchError,
+  debounceTime,
+  EMPTY,
+  finalize,
+  pipe,
+  switchMap,
+  tap,
+} from 'rxjs';
 import { QueryRequest } from '@shared/models/request.model';
 import { SortDirection } from '@shared/models/common.model';
 
@@ -45,13 +53,11 @@ export const PlaylistStore = signalStore(
   withMethods((store, playlistApiService = inject(PlaylistApiService)) => {
     const load = rxMethod<QueryRequest>(
       pipe(
+        tap((query) =>
+          patchState(store, { loading: true, lastLoadQuery: query }),
+        ),
+        debounceTime(500),
         switchMap((query) => {
-          if (areQueriesEqual(query, store.lastLoadQuery())) {
-            return EMPTY;
-          }
-
-          patchState(store, { loading: true, lastLoadQuery: query });
-
           return playlistApiService.getAllPlaylists(query).pipe(
             tap((playlists) => {
               patchState(store, setAllEntities(playlists));
@@ -124,11 +130,3 @@ export const PlaylistStore = signalStore(
     };
   }),
 );
-
-function areQueriesEqual(queryA: QueryRequest, queryB: QueryRequest): boolean {
-  return (
-    queryA.filter == queryB.filter &&
-    queryA.sortBy === queryB.sortBy &&
-    queryA.sortDirection === queryA.sortDirection
-  );
-}
