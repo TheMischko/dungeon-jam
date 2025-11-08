@@ -11,5 +11,7 @@ export type TagApiWindow = Window &
       ) => Promise<TagData[]>;
       insertTag: (data: Tag) => Promise<TagData>;
       getTagSuggestion: (titlePart: string) => Promise<TagData[]>;
+      deleteTag: (tagId: string) => Promise<void>;
+      clearOrphanedTags: () => Promise<number>;
     };
   };

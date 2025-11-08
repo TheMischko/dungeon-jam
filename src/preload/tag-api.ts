@@ -22,9 +22,19 @@ const getTagSuggestion = async (titlePart: string): Promise<TagData[]> => {
   return await ipcRenderer.invoke(TagChannel.SUGGESTION, titlePart);
 };
 
+const deleteTag = async (tagId: string): Promise<void> => {
+  return await ipcRenderer.invoke(TagChannel.DELETE_ONE, tagId);
+};
+
+const clearOrphanedTags = async (): Promise<number> => {
+  return await ipcRenderer.invoke(TagChannel.CLEAR_ORPHANS);
+};
+
 export default {
   getAllTags,
   getSubsetOfTags,
   insertTag,
   getTagSuggestion,
+  deleteTag,
+  clearOrphanedTags,
 };

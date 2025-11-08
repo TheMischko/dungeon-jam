@@ -6,6 +6,7 @@ export interface Track {
   url: string;
   author?: string;
   duration: number;
+  tags?: string[];
 }
 
 export interface AudioTrack {

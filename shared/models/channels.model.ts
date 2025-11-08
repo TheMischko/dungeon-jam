@@ -34,6 +34,8 @@ export enum TagChannel {
   GET_SUBSET = 'tags/get-subset',
   SUGGESTION = 'tags/suggestion',
   INSERT = 'tags/insert',
+  DELETE_ONE = 'tags/delete-one',
+  CLEAR_ORPHANS = 'tags/clear-orphans',
 }
 
 export type AppChannel =

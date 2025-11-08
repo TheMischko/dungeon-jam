@@ -64,4 +64,30 @@ export class TagApiService {
       });
     return subject.asObservable();
   }
+
+  deleteTag(tagId: string): Observable<void> {
+    const subject = new Subject<void>();
+    this.window.TAG_API.deleteTag(tagId)
+      .then(() => {
+        subject.next();
+        subject.complete();
+      })
+      .catch((err) => {
+        subject.error(err);
+      });
+    return subject.asObservable();
+  }
+
+  clearOrphanedTags(): Observable<number> {
+    const subject = new Subject<number>();
+    this.window.TAG_API.clearOrphanedTags()
+      .then((count) => {
+        subject.next(count);
+        subject.complete();
+      })
+      .catch((err) => {
+        subject.error(err);
+      });
+    return subject.asObservable();
+  }
 }
