@@ -3,5 +3,7 @@
     <h1>Select tracks</h1>
   </div>
 
-  <div class="content">Test</div>
+  <div class="content">
+    <app-table [dataSet]="tracks()" [config]="tableConfig()"></app-table>
+  </div>
 </div>

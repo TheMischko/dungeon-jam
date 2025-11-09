@@ -2,4 +2,12 @@
 
 :host {
   @include mix.base-dialog();
+  width: 80vw;
+  display: flex;
+  .wrapper {
+    width: 100%;
+  }
+  .content {
+    width: 100%;
+  }
 }

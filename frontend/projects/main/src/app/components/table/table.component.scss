@@ -1,0 +1,12 @@
+:host {
+  display: flex;
+  width: 100%;
+
+  .table-container {
+    width: 100%;
+  }
+
+  ::ng-deep .table {
+    background: none;
+  }
+}

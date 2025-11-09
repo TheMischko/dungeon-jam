@@ -1,0 +1,21 @@
+<div class="table-container">
+  <mat-table [dataSource]="dataSet()" class="table">
+    @for (colName of columnNames(); track colName){
+    <ng-container [matColumnDef]="colName">
+      <mat-header-cell *matHeaderCellDef>{{
+        config()[colName]?.title
+      }}</mat-header-cell>
+      <mat-cell *matCellDef="let row">
+        <app-table-cell
+          [item]="row"
+          [config]="config()[colName]"
+          [columnKey]="getColumnNameKeyOf(colName)"
+        ></app-table-cell>
+      </mat-cell>
+    </ng-container>
+    }
+
+    <mat-header-row *matHeaderRowDef="columnNames()"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: columnNames()"></mat-row>
+  </mat-table>
+</div>
