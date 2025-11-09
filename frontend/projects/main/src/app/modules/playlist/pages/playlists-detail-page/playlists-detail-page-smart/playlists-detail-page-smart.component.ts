@@ -18,6 +18,8 @@ import { PlaybackService } from '../../../../../services/playback.service';
 import { PlaybackState } from '../../../../../models/playback.model';
 import { ActionsMenuConfig } from '@general/components/display/actions-menu/actions-menu.component';
 import { actionsIconSet, iconSet } from '@general/icons/icons';
+import { DialogService } from '../../../../../services/dialog.service';
+import { SelectLibraryTracksModalComponent } from '../../../../library/modals/select-library-tracks-modal/select-library-tracks-modal.component';
 
 @Component({
   selector: 'app-playlists-detail-page-smart',
@@ -28,6 +30,7 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
   readonly playlistTracksStore = inject(PlaylistTracksStore);
   readonly playlistService = inject(PlaylistApiService);
   readonly playbackService = inject(PlaybackService);
+  readonly dialogService = inject(DialogService);
 
   readonly playlistId = input<string>('', { alias: 'id' });
 
@@ -95,6 +98,15 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
       tracks.slice(1),
       this.playlistId(),
     );
+  }
+
+  openAddTracksModal() {
+    const dialogRef = this.dialogService.open(
+      SelectLibraryTracksModalComponent,
+    );
+    dialogRef.afterClosed$.subscribe((result) => {
+      console.log('SelectLibrary closed', result);
+    });
   }
 
   async playTrack(track: Track) {

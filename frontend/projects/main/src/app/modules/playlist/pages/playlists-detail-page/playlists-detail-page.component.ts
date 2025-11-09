@@ -8,10 +8,18 @@ import {
   ButtonSize,
 } from '../../../../../../../general/models/button.model';
 import { ActionsMenuConfig } from '@general/components/display/actions-menu/actions-menu.component';
+import { actionsIconSet } from '@general/icons/icons';
+import { MatButton } from '@angular/material/button';
+import { LucideAngularModule } from 'lucide-angular';
 
 @Component({
   selector: 'app-playlists-detail-page',
-  imports: [SongsTableComponent, PlayPauseButtonComponent],
+  imports: [
+    SongsTableComponent,
+    PlayPauseButtonComponent,
+    MatButton,
+    LucideAngularModule,
+  ],
   templateUrl: './playlists-detail-page.component.html',
   styleUrl: './playlists-detail-page.component.scss',
 })
@@ -28,12 +36,14 @@ export class PlaylistsDetailPageComponent {
   readonly playTrack = output<Track>();
   readonly pause = output();
   readonly search = output<string>();
+  readonly openAddTracks = output<void>();
 
   readonly buttonType = ButtonType.Flat;
   readonly buttonSize: ButtonSize = 'large';
   readonly playButtonState = computed<'play' | 'pause'>(() => {
     return this.playlistPlaying() ? 'pause' : 'play';
   });
+  readonly addTracksIcon = actionsIconSet.AddIcon;
 
   playPauseClicked(state: 'play' | 'pause') {
     if (state === 'play') {

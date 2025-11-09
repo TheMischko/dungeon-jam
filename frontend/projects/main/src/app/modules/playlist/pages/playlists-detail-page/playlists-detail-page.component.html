@@ -20,6 +20,13 @@
   </div>
 </div>
 
+<div class="actions">
+  <button mat-flat-button (click)="openAddTracks.emit()">
+    <lucide-icon [img]="addTracksIcon"></lucide-icon>
+    <span>Add tracks from library</span>
+  </button>
+</div>
+
 <div class="content">
   <app-songs-table
     [tracks]="tracks()"
