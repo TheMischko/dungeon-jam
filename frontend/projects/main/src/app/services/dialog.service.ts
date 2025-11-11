@@ -27,8 +27,8 @@ export class DialogService {
 
     const currentRef = this.dialogRef.open<C, any, R>(content, config);
     return {
-      close() {
-        currentRef.close();
+      close(result?: R) {
+        currentRef.close(result);
       },
       afterClosed$: currentRef.afterClosed(),
       componentRef: currentRef.componentRef!,

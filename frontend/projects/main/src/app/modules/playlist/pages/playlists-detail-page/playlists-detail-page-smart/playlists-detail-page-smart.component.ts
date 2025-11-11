@@ -20,6 +20,7 @@ import { ActionsMenuConfig } from '@general/components/display/actions-menu/acti
 import { actionsIconSet, iconSet } from '@general/icons/icons';
 import { DialogService } from '../../../../../services/dialog.service';
 import { SelectLibraryTracksModalComponent } from '../../../../library/modals/select-library-tracks-modal/select-library-tracks-modal.component';
+import { SelectLibraryTracksSelection } from '../../../../library/modals/select-library-tracks-modal/select-library-tracks-modal.types';
 
 @Component({
   selector: 'app-playlists-detail-page-smart',
@@ -101,12 +102,24 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
   }
 
   openAddTracksModal() {
-    const dialogRef = this.dialogService.open(
+    const dialogRef = this.dialogService.open<
       SelectLibraryTracksModalComponent,
+      SelectLibraryTracksSelection
+    >(SelectLibraryTracksModalComponent);
+
+    dialogRef.afterClosed$.subscribe(
+      (result: SelectLibraryTracksSelection | undefined) => {
+        console.log(result);
+        if (result?.selectedTracks && result.selectedTracks.length > 0) {
+          this.addTracksToPlaylist(result.selectedTracks);
+        }
+      },
     );
-    dialogRef.afterClosed$.subscribe((result) => {
-      console.log('SelectLibrary closed', result);
-    });
+  }
+
+  private addTracksToPlaylist(tracks: Track[]): void {
+    console.log(`Adding ${tracks.length} tracks to playlist:`, tracks);
+    // TODO: Implement adding tracks to playlist
   }
 
   async playTrack(track: Track) {

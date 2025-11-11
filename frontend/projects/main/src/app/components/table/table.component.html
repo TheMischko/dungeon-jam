@@ -1,6 +1,22 @@
 <div class="table-container">
-  <mat-table [dataSource]="dataSet()" class="table">
-    @for (colName of columnNames(); track colName){
+  <mat-table [dataSource]="dataSet()" [trackBy]="trackBy" class="table">
+    @if (selection()) {
+    <ng-container [matColumnDef]="selectionColumn">
+      <mat-header-cell *matHeaderCellDef>
+        <mat-checkbox
+          [checked]="isAllChecked()"
+          [indeterminate]="isAllIndeterminate()"
+          (change)="selectAllAvailable($event)"
+        ></mat-checkbox>
+      </mat-header-cell>
+      <mat-cell *matCellDef="let row">
+        <mat-checkbox
+          [checked]="isSelected(row)"
+          (change)="itemSelected(row, $event)"
+        ></mat-checkbox>
+      </mat-cell>
+    </ng-container>
+    } @for (colName of configColumnNames(); track colName){
     <ng-container [matColumnDef]="colName">
       <mat-header-cell *matHeaderCellDef>{{
         config()[colName]?.title
@@ -13,8 +29,17 @@
         ></app-table-cell>
       </mat-cell>
     </ng-container>
+    } @if (hasActions()) {
+    <ng-container [matColumnDef]="actionsColumn">
+      <mat-header-cell *matHeaderCellDef></mat-header-cell>
+      <mat-cell *matCellDef="let row">
+        <lib-icon-button [matMenuTriggerFor]="menu" [icon]="ActionsIcon" />
+        <mat-menu #menu="matMenu" (closed)="emitMenuClosed(row, $event)">
+          <lib-actions-menu [item]="row" [config]="getActionsMenuConfig(row)" />
+        </mat-menu>
+      </mat-cell>
+    </ng-container>
     }
-
     <mat-header-row *matHeaderRowDef="columnNames()"></mat-header-row>
     <mat-row *matRowDef="let row; columns: columnNames()"></mat-row>
   </mat-table>

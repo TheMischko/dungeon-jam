@@ -4,6 +4,25 @@
   </div>
 
   <div class="content">
-    <app-table [dataSet]="tracks()" [config]="tableConfig()"></app-table>
+    <app-table
+      [dataSet]="tracks()"
+      [config]="tableConfig()"
+      [selection]="true"
+      [trackBy]="trackTrackByFn"
+      [uniquenessFn]="trackUniquenessFn"
+      [allSelectedState]="selectAllState()"
+      (selected)="selectionChanged($event)"
+    ></app-table>
+  </div>
+
+  <div class="footer">
+    <div class="footer-button">
+      <button mat-flat-button color="neutral" (click)="cancelClick()">
+        Cancel
+      </button>
+      <button mat-flat-button color="primary" (click)="saveSelection()">
+        Save
+      </button>
+    </div>
   </div>
 </div>
