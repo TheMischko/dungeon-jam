@@ -14,6 +14,7 @@ export interface AudioTrack {
   fullPath: string;
   author?: string;
   length: number;
+  tags?: string[];
 }
 
 export interface FileBase64 {

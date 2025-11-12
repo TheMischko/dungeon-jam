@@ -14,6 +14,8 @@ import {
   Validators,
 } from '@angular/forms';
 import { InputComponent } from '@general/components/controls/input/input.component';
+import { TagsInputComponent } from '@general/components/controls/tags-input/tags-input.component';
+import { TagData } from '@shared/models/tag.model';
 
 export type TracksUploadModalData = {
   title: string;
@@ -22,7 +24,13 @@ export type TracksUploadModalData = {
 
 @Component({
   selector: 'app-tracks-upload-modal',
-  imports: [MatDialogModule, MatButton, ReactiveFormsModule, InputComponent],
+  imports: [
+    MatDialogModule,
+    MatButton,
+    ReactiveFormsModule,
+    InputComponent,
+    TagsInputComponent,
+  ],
   templateUrl: './tracks-upload-modal.component.html',
   styleUrl: './tracks-upload-modal.component.scss',
   standalone: true,
@@ -47,12 +55,16 @@ export class TracksUploadModalComponent implements OnInit {
   readonly currentAuthorControl = computed(() => {
     return this.currentForm().controls.author;
   });
+  readonly currentTagsControl = computed(() => {
+    return this.currentForm().controls.tags;
+  });
 
   readonly forms = new FormArray<
     FormGroup<{
       path: FormControl<string | null>;
       title: FormControl<string | null>;
       author: FormControl<string | null>;
+      tags: FormControl<TagData[] | null>;
     }>
   >([]);
 
@@ -64,6 +76,7 @@ export class TracksUploadModalComponent implements OnInit {
           path: new FormControl({ value: track.fullPath, disabled: true }),
           title: new FormControl(track.title, [Validators.required]),
           author: new FormControl(track.author || null),
+          tags: new FormControl([] as TagData[]),
         }),
       );
     });
@@ -90,9 +103,11 @@ export class TracksUploadModalComponent implements OnInit {
           fullPath: this.tracks[index].fullPath,
           author: value.author || undefined,
           length: this.tracks[index].length,
+          tags: value.tags?.map((t) => t.id) || [],
         };
       });
-      this.dialog.close(result);
+      console.log(this.forms.getRawValue());
+      //this.dialog.close(result);
       return;
     }
 
