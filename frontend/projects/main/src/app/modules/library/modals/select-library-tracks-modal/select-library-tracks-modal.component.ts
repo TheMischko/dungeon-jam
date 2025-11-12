@@ -13,8 +13,9 @@ import { TrackService } from '../../../../services/track.service';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { TrackDurationPipe } from '@general/pipes/track-duration.pipe';
 import { MatButton } from '@angular/material/button';
-import { DialogRef } from '@angular/cdk/dialog';
 import { SelectLibraryTracksSelection } from './select-library-tracks-modal.types';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { map } from 'rxjs';
 
 @Component({
   selector: 'app-select-library-tracks-modal',
@@ -25,11 +26,25 @@ import { SelectLibraryTracksSelection } from './select-library-tracks-modal.type
 })
 export class SelectLibraryTracksModalComponent {
   readonly trackService = inject(TrackService);
-  readonly dialogRef = inject(DialogRef<SelectLibraryTracksSelection>);
+  readonly dialogRef =
+    inject<MatDialogRef<SelectLibraryTracksSelection>>(MatDialogRef);
+  readonly data = inject<SelectLibraryTracksModalData>(MAT_DIALOG_DATA);
 
-  readonly tracks = toSignal(this.trackService.getAllTracks(), {
-    initialValue: [],
-  });
+  readonly tracks = toSignal(
+    this.trackService.getAllTracks().pipe(
+      map((tracks) => {
+        if (!this.data?.excludedTrackIds?.length) {
+          return tracks;
+        }
+        return tracks.filter(
+          (track) => !this.data.excludedTrackIds.includes(track.id),
+        );
+      }),
+    ),
+    {
+      initialValue: [],
+    },
+  );
   private durationPipe = new TrackDurationPipe();
   readonly tableConfig = computed<TableColumnConfiguration<Track>>(() => {
     return {
@@ -67,13 +82,20 @@ export class SelectLibraryTracksModalComponent {
   };
 
   cancelClick() {
+    console.log(this.data);
     this.dialogRef.close(undefined);
   }
 
   saveSelection() {
-    console.log(this.selection());
     this.dialogRef.close({
       selectedTracks: this.selection(),
     });
   }
+}
+
+export interface SelectLibraryTracksModalConfig {
+  data: SelectLibraryTracksModalData;
+}
+interface SelectLibraryTracksModalData {
+  excludedTrackIds: string[];
 }
