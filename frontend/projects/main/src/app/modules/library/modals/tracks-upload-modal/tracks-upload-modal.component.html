@@ -10,7 +10,9 @@
       [formControl]="currentAuthorControl()"
       label="Author"
     ></lib-input>
-    <lib-tags-input [formControl]="currentTagsControl()"></lib-tags-input>
+    @let ctrl = currentTagsControl(); @if (ctrl) {
+    <lib-tags-input [formControl]="ctrl" label="Tags"></lib-tags-input>
+    }
   </form>
 
   <div class="footer">

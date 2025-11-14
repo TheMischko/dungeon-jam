@@ -44,19 +44,19 @@ export class TracksUploadModalComponent implements OnInit {
     () => this.currentStep() === this.tracks.length - 1,
   );
   readonly currentForm = computed(() => {
-    return this.forms.controls[this.currentStep()];
+    return this.forms.at(this.currentStep());
   });
-  readonly currentPathControl = computed(() => {
-    return this.currentForm().controls.path;
+  readonly currentPathControl = computed<FormControl<string | null>>(() => {
+    return this.currentForm().get('path') as FormControl<string | null>;
   });
-  readonly currentTitleControl = computed(() => {
-    return this.currentForm().controls.title;
+  readonly currentTitleControl = computed<FormControl<string | null>>(() => {
+    return this.currentForm().get('title') as FormControl<string | null>;
   });
-  readonly currentAuthorControl = computed(() => {
-    return this.currentForm().controls.author;
+  readonly currentAuthorControl = computed<FormControl<string | null>>(() => {
+    return this.currentForm().get('author') as FormControl<string | null>;
   });
-  readonly currentTagsControl = computed(() => {
-    return this.currentForm().controls.tags;
+  readonly currentTagsControl = computed<FormControl<TagData[] | null>>(() => {
+    return this.currentForm().get('tags') as FormControl<TagData[] | null>;
   });
 
   readonly forms = new FormArray<
@@ -103,11 +103,10 @@ export class TracksUploadModalComponent implements OnInit {
           fullPath: this.tracks[index].fullPath,
           author: value.author || undefined,
           length: this.tracks[index].length,
-          tags: value.tags?.map((t) => t.id) || [],
+          tags: value.tags?.map((t) => t.id)?.filter((v) => !!v) || [],
         };
       });
-      console.log(this.forms.getRawValue());
-      //this.dialog.close(result);
+      this.dialog.close(result);
       return;
     }
 

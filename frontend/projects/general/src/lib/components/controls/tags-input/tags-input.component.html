@@ -6,7 +6,7 @@
   <div class="tags-input">
     <div class="tags">
       <lib-tag-list
-        [tags]="tags()"
+        [tags]="value()"
         [editable]="true"
         (removed)="removeTag($event)"
       ></lib-tag-list>
@@ -15,9 +15,9 @@
       matInput
       class="tag-input"
       type="text"
-      [value]="inputValue()"
       [matAutocomplete]="suggestionBar"
-      (input)="createTag($event)"
+      [value]="inputValue()"
+      (input)="handleUserTyping($event)"
       (keydown)="handleKeyDown($event)"
       (focusout)="createTagFromRemaining($event)"
     />
@@ -27,8 +27,8 @@
 <mat-autocomplete #suggestionBar="matAutocomplete">
   @for (suggestion of suggestions(); track suggestion.id){
   <mat-option
-    [value]="suggestion.title"
-    (onSelectionChange)="saveSuggestion($event)"
+    [value]="null"
+    (onSelectionChange)="saveSuggestion($event, suggestion)"
     >{{ suggestion.title }}</mat-option
   >
   }

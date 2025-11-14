@@ -1,14 +1,13 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  computed,
-  effect,
   forwardRef,
   inject,
   model,
   output,
   signal,
   untracked,
+  viewChild,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MatFormField } from '@angular/material/form-field';
@@ -48,120 +47,149 @@ import { firstValueFrom } from 'rxjs';
 export class TagsInputComponent implements ControlValueAccessor {
   private readonly tagApiService = inject(TagApiService);
 
-  readonly value = model<string[]>([]);
+  readonly value = model<TagData[]>([]);
   readonly disabled = model<boolean>(false);
 
+  readonly suggestionBar = viewChild<MatAutocomplete>('suggestionBar');
+
   readonly touched = output<void>();
-  readonly changed = output<(Tag | TagData)[]>();
+  readonly changed = output<TagData[]>();
 
-  readonly SEPARATORS = new RegExp(/\,(?=\w)?/);
-  readonly inputValue = signal<string>('');
+  private onChange: (value: TagData[]) => void = () => {};
+  private onTouched: () => void = () => {};
+
+  readonly SEPARATORS = new RegExp(/,(?=\w)?/);
   readonly suggestions = signal<TagData[]>([]);
-  readonly tagMap = signal<Record<string, TagData | Tag>>({});
-  readonly tags = computed(() => Object.values(this.tagMap()));
+  readonly inputValue = signal<string>('');
 
-  constructor() {
-    effect(() => {
-      const value = this.inputValue();
-      if (value.length === 0) {
-        return;
-      }
-
-      this.tagApiService.getTagSuggestion(value).subscribe((tags) => {
-        const value = untracked(() => this.value());
-        const notAlreadySelected = tags.filter(
-          (tag) => !value.includes(tag.title),
-        );
-        this.suggestions.set(notAlreadySelected);
-      });
-    });
-
-    effect(async () => {
-      const value = this.value();
-      const tagMap = untracked(() => this.tagMap());
-      const tags = await this.getTagsFromValue(value, tagMap);
-      this.updateTagMap(tags);
-      this.changed.emit(tags);
-    });
-  }
-
-  writeValue(value: string[] | string): void {
-    if (typeof value === 'string' || !Array.isArray(value)) {
-      this.value.set([]);
-      return;
-    }
-    this.value.set(value);
+  writeValue(value: TagData[] | null): void {
+    this.value.set(value ?? []);
+    this.setInputValue('');
+    this.suggestions.set([]);
+    this.resetSuggestions();
   }
   registerOnChange(fn: (value: (Tag | TagData)[]) => void): void {
-    this.changed.subscribe(fn);
+    this.onChange = fn;
   }
   registerOnTouched(fn: any): void {
-    this.touched.subscribe(fn);
+    this.onTouched = fn;
   }
   setDisabledState(isDisabled: boolean): void {
     this.disabled.set(isDisabled);
   }
 
-  createTag(event: Event) {
+  /**
+   * Take current value, show suggestions, and if separator found, create tag
+   * @param event
+   */
+  async handleUserTyping(event: Event) {
     const target = event.target as HTMLInputElement;
     const value = target.value;
+
+    this.showSuggestions(value);
+
     const parts = value.split(this.SEPARATORS);
     if (parts.length <= 1) {
-      this.inputValue.set(value);
       return;
     }
-    this.createAndSaveTag(parts[0]);
-    this.inputValue.set(parts[1]);
+    await this.createAndSaveTag(parts[0].trim());
+    this.setInputValue('');
   }
 
-  handleKeyDown(event: KeyboardEvent) {
+  /**
+   * Handle key down events from the input
+   * @param event
+   */
+  async handleKeyDown(event: KeyboardEvent) {
     switch (event.key) {
       case 'Enter':
         event.preventDefault();
         event.stopPropagation();
-        this.createTagFromRemaining(event);
+        await this.createTagFromRemaining(event);
         break;
       case 'Backspace':
         this.editLastTag(event);
     }
   }
 
-  createTagFromRemaining(event: Event) {
+  /**
+   * Takes the current input value and creates a tag from it
+   * @param event
+   */
+  async createTagFromRemaining(event: Event) {
     const target = event.target as HTMLInputElement;
     const value = target.value;
 
     if (event.type === 'focusout') {
       return;
     }
-
     if (value.trim().length === 0) {
       return;
     }
 
-    this.createAndSaveTag(value);
-    this.inputValue.set('');
+    this.setInputValue('');
+    await this.createAndSaveTag(value);
   }
 
-  removeTag(removedTag: Tag) {
+  /**
+   * Remove a tag from the value
+   * @param removedTag
+   */
+  removeTag(removedTag: Tag | TagData) {
     const oldValue = this.value();
-    const filteredValue = oldValue.filter((tag) => tag !== removedTag.title);
+    const filteredValue = oldValue.filter((tag) => {
+      const removed = removedTag as TagData;
+      if (removed?.id) {
+        return tag.id !== removed.id;
+      }
+      return tag.title === removed.title;
+    });
     this.value.set(filteredValue);
+    this.emitValueChange();
   }
 
-  saveSuggestion(event: { source: { value: string } }) {
-    const value = event.source.value as string;
-    this.value.update((tags) => [...tags, value]);
-    this.inputValue.set('');
+  /**
+   * Save the selected suggestion to the value
+   * @param event
+   */
+  async saveSuggestion(_: unknown, suggestion: TagData) {
+    this.value.update((tags) => [...tags, suggestion]);
+    this.setInputValue('');
+    this.emitValueChange();
   }
 
-  private createAndSaveTag(value: string) {
+  /**
+   * Emit value change event with current value
+   * @private
+   */
+  private emitValueChange() {
+    const value = untracked(() => this.value());
+    this.changed.emit(value);
+    this.touched.emit();
+    this.onChange(value);
+    this.onTouched();
+  }
+
+  /**
+   * Trim the value, find or create the tag, and save it to the value
+   * @param value
+   * @private
+   */
+  private async createAndSaveTag(value: string) {
     const trimmedText = value.replace(this.SEPARATORS, '').trim().toLowerCase();
     if (trimmedText.length === 0) {
       return;
     }
-    this.value.set([...this.value(), trimmedText]);
+    const newTag = await this.getTagFromValue(trimmedText);
+    this.value.set([...this.value(), newTag]);
+    this.emitValueChange();
   }
 
+  /**
+   * Edit the last tag when backspace is pressed and input is empty
+   * @param event
+   * @private
+   */
   private editLastTag(event: Event) {
     const target = event.target as HTMLInputElement;
     const value = target.value;
@@ -173,43 +201,69 @@ export class TagsInputComponent implements ControlValueAccessor {
       return;
     }
     const newValue = tags[tags.length - 1];
-    this.inputValue.set(newValue);
+    this.setInputValue(newValue.title);
     const newTags = tags.slice(0, -1);
     this.value.set(newTags);
+    this.emitValueChange();
   }
 
-  private async getTagsFromValue(
-    value: string[],
-    tagMap: Record<string, TagData | Tag>,
-  ): Promise<(Tag | TagData)[]> {
-    const tagPromises = value.map(async (tagName) => {
-      const knownTag = tagMap[tagName] as Tag | TagData | undefined;
-      if (knownTag) {
-        return knownTag;
+  /**
+   * Set the value of text input
+   * @param value
+   * @private
+   */
+  private setInputValue(value: string) {
+    requestAnimationFrame(() => {
+      this.inputValue.set(value);
+      const inputEl = document.querySelector<HTMLInputElement>('.tag-input');
+      if (inputEl && inputEl.value !== value) {
+        inputEl.value = value;
       }
-      const suggestions = untracked(() => this.suggestions());
-      const suggestionTag = suggestions.find((tag) => tag.title === tagName);
-      if (suggestionTag) {
-        return suggestionTag;
-      }
-      const newTagData = {
-        title: tagName,
-      } as Tag;
-      return await firstValueFrom(this.tagApiService.insertTag(newTagData));
     });
-    return await Promise.all(tagPromises);
   }
 
-  private updateTagMap(tags: (Tag | TagData)[]): void {
-    const newTagMap = tags.reduce(
-      (map, tag, _, __) => {
-        return {
-          ...map,
-          [tag.title]: tag,
-        };
-      },
-      {} as Record<string, TagData | Tag>,
-    );
-    this.tagMap.set(newTagMap);
+  /**
+   * Reset suggestion selections
+   * @private
+   */
+  private resetSuggestions() {
+    requestAnimationFrame(() => {
+      const autocomplete = this.suggestionBar();
+      if (!autocomplete?.options) {
+        return;
+      }
+      autocomplete.options.forEach((options) => options.deselect());
+    });
+  }
+
+  /**
+   * Get tag data from value, creating a new tag if necessary
+   * @param value
+   * @private
+   */
+  private async getTagFromValue(value: string): Promise<TagData> {
+    const suggestions = untracked(() => this.suggestions());
+    const suggestionTag = suggestions.find((tag) => tag.title === value);
+    if (suggestionTag) {
+      return suggestionTag;
+    }
+    const newTagData = {
+      title: value,
+    } as Tag;
+    return await firstValueFrom(this.tagApiService.insertTag(newTagData));
+  }
+
+  private showSuggestions(value: string): void {
+    if (value.length === 0) {
+      return;
+    }
+
+    this.tagApiService.getTagSuggestion(value).subscribe((tags) => {
+      const value = untracked(() => this.value());
+      const notAlreadySelected = tags.filter(
+        (tag) => !value.some((v) => v.id === tag.id),
+      );
+      this.suggestions.set(notAlreadySelected);
+    });
   }
 }

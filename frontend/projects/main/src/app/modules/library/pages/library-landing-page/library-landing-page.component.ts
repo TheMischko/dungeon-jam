@@ -142,12 +142,11 @@ export class LibraryLandingPageComponent implements OnInit {
       if (!tracks) {
         return;
       }
-      console.log(tracks);
-      // this.audioFilesService.uploadAudioTracks(tracks).subscribe(() => {
-      //   this.trackService.getAllTracks().subscribe((tracks) => {
-      //     this.tracks.set(tracks);
-      //   });
-      // });
+      this.audioFilesService.uploadAudioTracks(tracks).subscribe(() => {
+        this.trackService.getAllTracks().subscribe((tracks) => {
+          this.tracks.set(tracks);
+        });
+      });
     });
   }
 
