@@ -1,4 +1,3 @@
-import { DatabaseWrapper } from '../database/database';
 import {
   AudioTrack,
   PlaylistTracksQuery,
@@ -6,20 +5,27 @@ import {
 } from '@shared/models/track.model';
 import { ipcMain } from 'electron';
 import { AudioFileChannel, TrackChannel } from '@shared/models/channels.model';
-import { v4 as uuid } from 'uuid';
 import { QueryRequest } from '@shared/models/request.model';
 import { SortDirection } from '@shared/models/common.model';
 import { PlaylistManager } from './playlist.manager';
+import { DatabaseProvider } from '../database/database-provider';
+import { DatabaseProviderCreator } from '../database/database-provider-creator';
+import { TagsManager } from './tags.manager';
+import { GetSomeMatch } from '../database/database-provider.model';
 
 export class TrackManager {
   private static _instance: TrackManager;
 
-  private constructor(private database: DatabaseWrapper) {}
+  private constructor(private tracksProvider: DatabaseProvider<Track>) {}
 
   public static async getInstance() {
     if (!TrackManager._instance) {
-      const database = await DatabaseWrapper.getInstance();
-      TrackManager._instance = new TrackManager(database);
+      const provider = await DatabaseProviderCreator.create<Track>()
+        .setTable('tracks')
+        .setSort(TrackManager.sortTracks)
+        .setFilter(TrackManager.filterTracks)
+        .complete();
+      TrackManager._instance = new TrackManager(provider);
       TrackManager._instance.registerChannels();
     }
     return TrackManager._instance!;
@@ -69,36 +75,34 @@ export class TrackManager {
     });
   }
 
-  getAll(query?: QueryRequest): Track[] {
-    const data = this.database.readTable<Track[]>('tracks') ?? [];
-    return data
-      .filter((track) => this.filterTracks(track, query?.filter))
-      .sort((a, b) =>
-        this.sortTracks(a, b, query?.sortDirection, query?.sortBy),
-      );
+  async getAll(query?: QueryRequest): Promise<Track[]> {
+    return await this.tracksProvider.getAll(query);
   }
 
-  get(id: string): Track | undefined {
-    return this.getAll()?.find((track) => track.id === id);
+  async get(id: string): Promise<Track | undefined> {
+    return (await this.tracksProvider.getBy('id', id)) ?? undefined;
   }
 
   async getByPlaylist(query: PlaylistTracksQuery): Promise<Track[]> {
     const playlist = await (
       await PlaylistManager.getInstance()
     ).getById(query.playlistId);
+
     if (!playlist) {
       return [];
     }
-    const allTracks = this.getAll();
-    return allTracks
-      .reduce((playlistTracks, track, _, __) => {
-        if (!playlist.trackIds.includes(track.id)) {
-          return playlistTracks;
-        }
-        return [...playlistTracks, track];
-      }, [] as Track[])
-      .filter((track) => this.filterTracks(track, query?.filter))
-      .sort((a, b) => this.sortTracks(a, b));
+    const allTracks = await this.getAll({
+      filter: query?.filter,
+      sortBy: query?.sortBy,
+      sortDirection: query?.sortDirection,
+    });
+
+    return allTracks.reduce((playlistTracks, track, _, __) => {
+      if (!playlist.trackIds.includes(track.id)) {
+        return playlistTracks;
+      }
+      return [...playlistTracks, track];
+    }, [] as Track[]);
   }
 
   async insert(
@@ -108,41 +112,54 @@ export class TrackManager {
     author?: string,
     tags?: string[],
   ): Promise<Track> {
-    const tracks = this.getAll();
-    const id = uuid();
-    const newTrack: Track = {
-      id,
+    const newTrack = {
       name,
       url,
       author,
       duration,
       tags,
     };
-    tracks.push(newTrack);
-    await this.database.updateTable('tracks', tracks);
-    return this.get(id)!;
+    return await this.tracksProvider.create(newTrack);
   }
 
   public static __resetForTests(): void {
     TrackManager._instance = undefined as unknown as TrackManager;
   }
 
-  private filterTracks(track: Track, filter?: string): boolean {
+  private static async filterTracks(
+    track: Track,
+    filter?: string,
+  ): Promise<boolean> {
     if (!filter) {
       return true;
     }
     const filterLower = filter.toLowerCase();
+    if (track.name && track.name.toLowerCase().includes(filterLower)) {
+      return true;
+    }
     if (track?.author && track.author.toLowerCase().includes(filterLower)) {
       return true;
     }
-    return track.name.toLowerCase().includes(filterLower);
+    if (track?.tags) {
+      const tags = await (
+        await TagsManager.getInstance()
+      ).getSubset('id', track.tags, {
+        match: GetSomeMatch.EXACT,
+      });
+      for (const tag of tags) {
+        if (tag.title.toLowerCase().includes(filterLower)) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
-  private sortTracks(
+  private static sortTracks(
     trackA: Track,
     trackB: Track,
-    direction?: SortDirection,
     sortBy?: string,
+    direction?: SortDirection,
   ) {
     if (!direction) {
       return 0;

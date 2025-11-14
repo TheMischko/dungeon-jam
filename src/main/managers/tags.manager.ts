@@ -9,7 +9,11 @@ import {
 import { Tag, TagData } from '@shared/models/tag.model';
 import { DatabaseProviderCreator } from '../database/database-provider-creator';
 import { SortDirection } from '@shared/models/common.model';
-import { GetSomeMatch } from '../database/database-provider.model';
+import {
+  DefaultGetSomeOptions,
+  GetSomeMatch,
+  GetSomeOptions,
+} from '../database/database-provider.model';
 import { DatabaseTable } from '../database/init-database';
 import { DatabaseWrapper } from '../database/database';
 
@@ -64,13 +68,15 @@ export class TagsManager {
    * Retrieves a subset of tags by column value
    * @param column - The column to filter by
    * @param values - The values to match
+   * @param options
    * @returns Tags matching the specified values
    */
-  public async getSubset(
+  public async getSubset<V>(
     column: keyof TagData,
-    values: [],
+    values: V[],
+    options: GetSomeOptions = DefaultGetSomeOptions,
   ): Promise<TagData[]> {
-    return await this.tagDatabase.getSome(column, values);
+    return await this.tagDatabase.getSome(column, values, options);
   }
 
   /**

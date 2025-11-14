@@ -31,22 +31,23 @@ export class DatabaseProvider<T> {
     this.sort = sort;
   }
 
-  getAll(query?: QueryOptions): Promise<T[]> {
-    return new Promise((resolve) => {
-      let data: T[] = [...(this.database.readTable<T[]>(this.table) ?? [])];
-      if (query?.filter) {
-        data = data.filter((item: T) =>
-          this.filter(item, query.filter!.toLowerCase()),
-        );
-      }
-      if (query?.sortBy && query?.sortDirection) {
-        data = data.sort((a, b) =>
-          this.sort(a, b, query.sortBy!, query.sortDirection!),
-        );
-      }
+  async getAll(query?: QueryOptions): Promise<T[]> {
+    let data: T[] = [...(this.database.readTable<T[]>(this.table) ?? [])];
 
-      resolve(data);
-    });
+    if (query?.filter) {
+      const filterResults = await Promise.all(
+        data.map((item: T) => this.filter(item, query.filter!.toLowerCase())),
+      );
+      data = data.filter((_, index) => filterResults[index]);
+    }
+
+    if (query?.sortBy && query?.sortDirection) {
+      data = data.sort((a, b) =>
+        this.sort(a, b, query.sortBy!, query.sortDirection!),
+      );
+    }
+
+    return data;
   }
 
   getBy<V>(column: keyof T, value: V): Promise<T | null> {
@@ -196,7 +197,10 @@ export class DatabaseProvider<T> {
   }
 }
 
-export type FilterFn<T> = (item: T, filter: string) => boolean;
+export type FilterFn<T> = (
+  item: T,
+  filter: string,
+) => boolean | Promise<boolean>;
 export type SortFn<T> = (
   itemA: T,
   itemB: T,

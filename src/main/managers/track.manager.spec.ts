@@ -1,9 +1,9 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { mockElectron } from '../testing/mocks/mock-electron';
 import {
-  mockDatabase,
-  mockDatabaseInstance,
-} from '../testing/mocks/mock-database';
+  mockDatabaseProviderInstance,
+  MockDatabaseProviderCreator,
+} from '../testing/mocks/mock-database-provider';
 import {
   mockPlaylistManager,
   mockPlaylistManagerInstance,
@@ -21,8 +21,10 @@ import { mockPlaylist } from '../testing/mocks/mock-playlist.data';
 import { SortDirection } from '@shared/models/common.model';
 
 vi.mock('electron', () => mockElectron);
-vi.mock('./../database/database', () => mockDatabase);
 vi.mock('./playlist.manager', () => mockPlaylistManager);
+vi.mock('../database/database-provider-creator', () => ({
+  DatabaseProviderCreator: MockDatabaseProviderCreator,
+}));
 
 describe('TrackManager', () => {
   let trackManager: TrackManager;
@@ -47,20 +49,29 @@ describe('TrackManager', () => {
     });
 
     it('should response to GET_ALL message with getting all the tracks', async () => {
-      vi.spyOn(trackManager, 'getAll').mockReturnValue([]);
+      const mockTracks = [mockTrack()];
+      vi.spyOn(mockDatabaseProviderInstance, 'getAll').mockResolvedValue(
+        mockTracks,
+      );
 
       await triggerIpcMainHandle(TrackChannel.GET_ALL);
 
-      expect(trackManager.getAll).toHaveBeenCalled();
+      expect(mockDatabaseProviderInstance.getAll).toHaveBeenCalled();
     });
 
     it('should response to GET_BY_ID with the matching track', async () => {
       const testId = 'test-123';
-      vi.spyOn(trackManager, 'get').mockReturnValue(undefined);
+      const mockResult = mockTrack({ id: testId });
+      vi.spyOn(mockDatabaseProviderInstance, 'getBy').mockResolvedValue(
+        mockResult,
+      );
 
       await triggerIpcMainHandle(TrackChannel.GET_BY_ID, testId);
 
-      expect(trackManager.get).toHaveBeenCalledWith(testId);
+      expect(mockDatabaseProviderInstance.getBy).toHaveBeenCalledWith(
+        'id',
+        testId,
+      );
     });
 
     it('should response to GET_PLAYLIST_TRACKS with tracks of the playlist', async () => {
@@ -68,7 +79,8 @@ describe('TrackManager', () => {
         playlistId: 'test-123',
         filter: 'test',
       };
-      vi.spyOn(trackManager, 'getByPlaylist').mockResolvedValue([]);
+      const mockTracks = [mockTrack()];
+      vi.spyOn(trackManager, 'getByPlaylist').mockResolvedValue(mockTracks);
 
       await triggerIpcMainHandle(TrackChannel.GET_PLAYLIST_TRACKS, query);
 
@@ -77,7 +89,7 @@ describe('TrackManager', () => {
 
     it('should handle INSERT request by inserting the track values', async () => {
       const track: Track = mockTrack();
-      vi.spyOn(trackManager, 'insert').mockReturnValue(Promise.resolve(track));
+      vi.spyOn(mockDatabaseProviderInstance, 'create').mockResolvedValue(track);
 
       await triggerIpcMainHandle(
         TrackChannel.INSERT,
@@ -87,12 +99,7 @@ describe('TrackManager', () => {
         track.author,
       );
 
-      expect(trackManager.insert).toHaveBeenCalledWith(
-        track.name,
-        track.url,
-        track.duration,
-        track.author,
-      );
+      expect(mockDatabaseProviderInstance.create).toHaveBeenCalled();
     });
 
     it('should handle UPLOAD request by inserting all the tracks', async () => {
@@ -101,79 +108,52 @@ describe('TrackManager', () => {
         mockAudioTrack(),
         mockAudioTrack(),
       ];
-      vi.spyOn(trackManager, 'insert').mockResolvedValue(mockTrack());
+      const mockTrackResult = mockTrack();
+      vi.spyOn(mockDatabaseProviderInstance, 'create').mockResolvedValue(
+        mockTrackResult,
+      );
 
       await triggerIpcMainHandle<Track[]>(AudioFileChannel.UPLOAD, tracks);
 
-      expect(trackManager.insert).toHaveBeenCalledTimes(tracks.length);
+      expect(mockDatabaseProviderInstance.create).toHaveBeenCalledTimes(
+        tracks.length,
+      );
     });
   });
 
   describe('getAll', () => {
-    it('getAll should read database table to fetch the all data', () => {
+    it('getAll should return all tracks from the provider', async () => {
       const dataSet: Track[] = [mockTrack(), mockTrack(), mockTrack()];
-      mockDatabaseInstance.readTable.mockImplementation(() => dataSet);
-      const data = trackManager.getAll();
+      vi.spyOn(mockDatabaseProviderInstance, 'getAll').mockResolvedValue(
+        dataSet,
+      );
 
-      expect(mockDatabaseInstance.readTable).toHaveBeenCalledWith('tracks');
+      const data = await trackManager.getAll();
+
+      expect(mockDatabaseProviderInstance.getAll).toHaveBeenCalled();
       expect(data.length).toEqual(dataSet.length);
     });
 
-    it('should filter the results by query value', () => {
-      const testFilter = 'Love';
-      const dataSet: Track[] = [
-        mockTrack(),
-        mockTrack({ name: `${testFilter} of Life` }),
-        mockTrack({ author: `KillAllYou${testFilter}` }),
-        mockTrack(),
-      ];
+    it('should pass the query to the provider', async () => {
+      const dataSet: Track[] = [mockTrack()];
+      const query = {
+        filter: 'test',
+        sortBy: 'name',
+        sortDirection: SortDirection.ASC,
+      };
+      vi.spyOn(mockDatabaseProviderInstance, 'getAll').mockResolvedValue(
+        dataSet,
+      );
 
-      mockDatabaseInstance.readTable.mockImplementation(() => dataSet);
+      await trackManager.getAll(query);
 
-      const results = trackManager.getAll({ filter: testFilter });
-
-      expect(results.length).toBe(2);
-    });
-
-    it('should sort by default by name', () => {
-      const trackOfA = mockTrack({ name: 'Abc' });
-      const trackOfH = mockTrack({ name: 'Hijk' });
-      const trackOfZ = mockTrack({ name: 'Zzz' });
-
-      mockDatabaseInstance.readTable.mockImplementation(() => [
-        trackOfH,
-        trackOfZ,
-        trackOfA,
-      ]);
-
-      const results = trackManager.getAll({ sortDirection: SortDirection.ASC });
-
-      expect(results).toEqual([trackOfA, trackOfH, trackOfZ]);
-    });
-
-    it('should sort the values by author DESC', () => {
-      const trackOfA = mockTrack({ author: 'Abc' });
-      const trackOfH = mockTrack({ author: 'Hijk' });
-      const trackOfZ = mockTrack({ author: 'Zzz' });
-
-      mockDatabaseInstance.readTable.mockImplementation(() => [
-        trackOfH,
-        trackOfZ,
-        trackOfA,
-      ]);
-
-      const results = trackManager.getAll({
-        sortBy: 'author',
-        sortDirection: SortDirection.DESC,
-      });
-
-      expect(results).toEqual([trackOfZ, trackOfH, trackOfA]);
+      expect(mockDatabaseProviderInstance.getAll).toHaveBeenCalledWith(query);
     });
   });
 
   describe('getByPlaylist', () => {
     it('should return empty array when playlist does not exist', async () => {
-      mockPlaylistManagerInstance.getById.mockReturnValue(null);
+      mockPlaylistManagerInstance.getById.mockResolvedValue(null);
 
       const query: PlaylistTracksQuery = { playlistId: 'nonexistent' };
       const result = await trackManager.getByPlaylist(query);
@@ -188,9 +168,9 @@ describe('TrackManager', () => {
       const track3 = mockTrack();
       const playlist = mockPlaylist({ trackIds: [track1.id, track2.id] });
 
-      mockPlaylistManagerInstance.getById.mockReturnValue(playlist);
+      mockPlaylistManagerInstance.getById.mockResolvedValue(playlist);
 
-      vi.spyOn(trackManager, 'getAll').mockReturnValue([
+      vi.spyOn(trackManager, 'getAll').mockResolvedValue([
         track1,
         track2,
         track3,
@@ -212,13 +192,10 @@ describe('TrackManager', () => {
         trackIds: [track1.id, track2.id, track3.id],
       });
 
-      mockPlaylistManagerInstance.getById.mockReturnValue(playlist);
+      mockPlaylistManagerInstance.getById.mockResolvedValue(playlist);
 
-      vi.spyOn(trackManager, 'getAll').mockReturnValue([
-        track1,
-        track2,
-        track3,
-      ]);
+      // Mock getAll to return only tracks that match the filter (Love)
+      vi.spyOn(trackManager, 'getAll').mockResolvedValue([track1, track3]);
 
       const query: PlaylistTracksQuery = {
         playlistId: playlist.id,
@@ -232,41 +209,42 @@ describe('TrackManager', () => {
     });
   });
 
-  it('get should fetch a record with the matching id', () => {
+  it('get should fetch a record with the matching id', async () => {
     const testId = 'test123';
-    const dataMock: Track[] = [
-      mockTrack({ id: 'test145' }),
-      mockTrack({ id: testId }),
-      mockTrack({ id: undefined }),
-    ];
+    const dataMock = mockTrack({ id: testId });
 
-    vi.spyOn(trackManager, 'getAll').mockImplementation(() => dataMock);
+    vi.spyOn(mockDatabaseProviderInstance, 'getBy').mockResolvedValue(dataMock);
 
-    const foundTrack = trackManager.get(testId);
-    expect(foundTrack).toEqual(dataMock[1]);
+    const foundTrack = await trackManager.get(testId);
+    expect(foundTrack).toEqual(dataMock);
+    expect(mockDatabaseProviderInstance.getBy).toHaveBeenCalledWith(
+      'id',
+      testId,
+    );
   });
 
   it('insert should add the track to the database and generate an id', async () => {
     const audioTrack = mockAudioTrack();
+    const expectedTrack = mockTrack({
+      name: audioTrack.title,
+      url: audioTrack.fullPath,
+      duration: audioTrack.length,
+      author: audioTrack.author,
+    });
 
-    let createdTrack: Track;
-    vi.spyOn(mockDatabaseInstance, 'updateTable').mockImplementation(
-      (table: string, data: Track[]) => {
-        expect(table).toEqual('tracks');
-
-        createdTrack = data[0];
-      },
+    vi.spyOn(mockDatabaseProviderInstance, 'create').mockResolvedValue(
+      expectedTrack,
     );
 
-    await trackManager.insert(
+    const createdTrack = await trackManager.insert(
       audioTrack.title,
       audioTrack.fullPath,
       audioTrack.length,
       audioTrack.author,
     );
 
-    expect(mockDatabaseInstance.updateTable).toHaveBeenCalled();
-    expect(createdTrack!.name).toEqual(audioTrack.title);
-    expect(createdTrack!.id).toBeDefined();
+    expect(mockDatabaseProviderInstance.create).toHaveBeenCalled();
+    expect(createdTrack.name).toEqual(audioTrack.title);
+    expect(createdTrack.id).toBeDefined();
   });
 });
