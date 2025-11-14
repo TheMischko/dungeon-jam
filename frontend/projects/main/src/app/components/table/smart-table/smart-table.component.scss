@@ -1,0 +1,22 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  .controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+
+    .search-bar {
+      width: 40%;
+    }
+  }
+
+  .table {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+}

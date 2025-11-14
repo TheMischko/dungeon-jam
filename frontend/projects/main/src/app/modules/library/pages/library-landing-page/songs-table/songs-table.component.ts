@@ -17,7 +17,6 @@ import { LucideAngularModule } from 'lucide-angular';
 import { actionsIconSet, iconSet } from '@general/icons/icons';
 import { MatIconButton } from '@angular/material/button';
 import { TrackDurationPipe } from '@general/pipes/track-duration.pipe';
-import { SearchBarComponent } from '@general/components/controls/search-bar/search-bar.component';
 import { IconButtonComponent } from '@general/components/buttons/icon-button/icon-button.component';
 import {
   MatMenu,
@@ -32,21 +31,25 @@ import { PlaylistStore } from '@general/stores/playlist.store';
 import { Playlist } from '@shared/models/playlist.model';
 import { SortDirection } from '@shared/models/common.model';
 import { TagListSmartComponent } from '@general/components/display/tag-list/tag-list-smart/tag-list-smart.component';
-import { TableColumnConfiguration } from '../../../../../models/table.model';
-import { TableComponent } from '../../../../../components/table/table.component';
+import {
+  TableColumnConfiguration,
+  TableTrackByFn,
+  TableUniquenessFn,
+} from '../../../../../models/table.model';
+import { SmartTableComponent } from '../../../../../components/table/smart-table/smart-table.component';
+import { QueryOptions } from '@shared/models/request.model';
 
 @Component({
   selector: 'app-songs-table',
   imports: [
     LucideAngularModule,
     MatIconButton,
-    SearchBarComponent,
     IconButtonComponent,
     MatMenuTrigger,
     MatMenu,
     ActionsMenuComponent,
     TagListSmartComponent,
-    TableComponent,
+    SmartTableComponent,
   ],
   templateUrl: './songs-table.component.html',
   styleUrl: './songs-table.component.scss',
@@ -58,11 +61,15 @@ export class SongsTableComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly tracks = input<Track[]>([]);
   readonly playingTrackId = input<string | null>();
   readonly actionsMenuConfig = input<ActionsMenuConfig<Track, Playlist>[]>([]);
+  readonly selection = input<boolean>(false);
+  readonly allSelectedState = input<'checked' | 'unchecked' | 'indeterminate'>(
+    'unchecked',
+  );
 
+  readonly queryChange = output<QueryOptions>();
   readonly playTrack = output<Track>();
   readonly pauseTrack = output();
-  readonly search = output<string>();
-  readonly actionMenuClosed = output<MenuCloseReason>();
+  readonly actionMenuClosed = output<MenuCloseReason | string>();
 
   readonly playColumnTemplate =
     viewChild.required<TemplateRef<{ $implicit: Track }>>('playColumn');
@@ -73,6 +80,10 @@ export class SongsTableComponent implements OnInit, AfterViewInit, OnDestroy {
 
   readonly durationPipe = new TrackDurationPipe();
   private resizeObserver!: ResizeObserver;
+  readonly trackByTrackId: TableTrackByFn<Track> = (_: number, item: Track) =>
+    item.id;
+  readonly uniqueTrackFn: TableUniquenessFn<Track> = (a: Track, b: Track) =>
+    a.id === b.id;
 
   readonly activeRow = signal<Track | null>(null);
   readonly componentWidth = signal<number>(0);
@@ -101,9 +112,11 @@ export class SongsTableComponent implements OnInit, AfterViewInit, OnDestroy {
     },
     name: {
       title: 'Title',
+      sortable: true,
     },
     author: {
       title: 'Author',
+      sortable: true,
     },
     duration: {
       title: 'Duration',

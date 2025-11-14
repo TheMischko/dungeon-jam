@@ -14,7 +14,7 @@
     [actionsMenuConfig]="songMenuActions()"
     (playTrack)="playTrack($event)"
     (pauseTrack)="pauseTrack()"
-    (search)="searchTracks($event)"
+    (queryChange)="currentQuery.set($event)"
     (actionMenuClosed)="actionsClosed($event)"
   ></app-songs-table>
   }

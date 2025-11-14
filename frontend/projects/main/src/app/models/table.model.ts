@@ -12,6 +12,8 @@ export interface BaseTableColumnConfiguration<TableEntity> {
   width?: string;
   customValueFn?: (item: TableEntity) => string;
   template?: () => TemplateRef<{ $implicit: TableEntity }>;
+  sortable?: boolean;
+  isDefaultSortColumn?: boolean;
 }
 
 export type TableActionsConfigFn<T> = (

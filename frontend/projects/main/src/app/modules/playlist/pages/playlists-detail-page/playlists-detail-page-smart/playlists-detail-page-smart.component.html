@@ -7,6 +7,6 @@
   (playPlaylist)="playPlaylist()"
   (playTrack)="playTrack($event)"
   (pause)="pausePlaying()"
-  (search)="currentFilter.set($event)"
+  (queryChange)="updateQuery($event)"
   (openAddTracks)="openAddTracksModal()"
 ></app-playlists-detail-page>

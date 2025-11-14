@@ -11,6 +11,7 @@ import { ActionsMenuConfig } from '@general/components/display/actions-menu/acti
 import { actionsIconSet } from '@general/icons/icons';
 import { MatButton } from '@angular/material/button';
 import { LucideAngularModule } from 'lucide-angular';
+import { QueryOptions } from '@shared/models/request.model';
 
 @Component({
   selector: 'app-playlists-detail-page',
@@ -35,7 +36,7 @@ export class PlaylistsDetailPageComponent {
   readonly playPlaylist = output();
   readonly playTrack = output<Track>();
   readonly pause = output();
-  readonly search = output<string>();
+  readonly queryChange = output<QueryOptions>();
   readonly openAddTracks = output<void>();
 
   readonly buttonType = ButtonType.Flat;

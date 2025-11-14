@@ -1,11 +1,4 @@
-import {
-  Component,
-  computed,
-  inject,
-  LOCALE_ID,
-  OnInit,
-  signal,
-} from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { TracksUploadModalComponent } from '../../modals/tracks-upload-modal/tracks-upload-modal.component';
 import { MatButton } from '@angular/material/button';
 import { DialogService } from '../../../../services/dialog.service';
@@ -29,6 +22,8 @@ import {
 import { actionsIconSet, iconSet } from '@general/icons/icons';
 import { Playlist } from '@shared/models/playlist.model';
 import { MenuCloseReason } from '@angular/material/menu';
+import { QueryOptions } from '@shared/models/request.model';
+import { SortDirection } from '@shared/models/common.model';
 
 @Component({
   selector: 'app-library-landing-page',
@@ -42,11 +37,11 @@ export class LibraryLandingPageComponent implements OnInit {
   private readonly trackService = inject(TrackService);
   private readonly playbackService = inject(PlaybackService);
   readonly playlistsStore = inject(PlaylistStore);
-  private readonly locale = inject(LOCALE_ID);
 
   readonly playbackState = toSignal(this.playbackService.playback$, {
     initialValue: initialPlaybackState,
   });
+
   readonly playingTrackId = computed(() => {
     const state: PlaybackState = this.playbackState();
     if (state.isPlaying && state.currentTrack) {
@@ -54,17 +49,11 @@ export class LibraryLandingPageComponent implements OnInit {
     }
     return null;
   });
-  readonly displayTracks = computed<Track[]>(() => {
-    const searchValue = this.currentSearchValue();
 
-    return this.tracks().filter((track) => {
-      return (
-        track?.author?.toLocaleLowerCase(this.locale).includes(searchValue) ||
-        track.name.toLocaleLowerCase(this.locale).includes(searchValue) ||
-        track.author?.toLocaleLowerCase(this.locale)?.includes(searchValue)
-      );
-    });
+  readonly displayTracks = computed<Track[]>(() => {
+    return this.tracks();
   });
+
   readonly menuPickActions = computed(() => {
     return this.playlistsStore
       .entities()
@@ -85,6 +74,7 @@ export class LibraryLandingPageComponent implements OnInit {
         };
       });
   });
+
   readonly songMenuActions = computed<ActionsMenuConfig<Track, Playlist>[]>(
     () => {
       if (this.showPlaylists()) {
@@ -95,7 +85,10 @@ export class LibraryLandingPageComponent implements OnInit {
   );
 
   readonly tracks = signal<Track[]>([]);
-  readonly currentSearchValue = signal<string>('');
+  readonly currentQuery = signal<QueryOptions>({
+    sortBy: 'name',
+    sortDirection: SortDirection.ASC,
+  });
   readonly showPlaylists = signal<boolean>(false);
 
   readonly defaultSongActions: ActionsMenuBaseConfig<Track>[] = [
@@ -164,11 +157,7 @@ export class LibraryLandingPageComponent implements OnInit {
     this.playbackService.pause();
   }
 
-  searchTracks(searchValue: string) {
-    this.currentSearchValue.set(searchValue.toLocaleLowerCase(this.locale));
-  }
-
-  actionsClosed(reason: MenuCloseReason) {
+  actionsClosed(reason: MenuCloseReason | string) {
     if (reason !== 'click' || this.showPlaylists()) {
       setTimeout(() => {
         this.showPlaylists.set(false);

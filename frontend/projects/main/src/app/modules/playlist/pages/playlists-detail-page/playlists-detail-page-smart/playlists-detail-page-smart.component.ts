@@ -26,6 +26,7 @@ import {
 import { SelectLibraryTracksSelection } from '../../../../library/modals/select-library-tracks-modal/select-library-tracks-modal.types';
 import { ToastService } from '../../../../../services/toast.service';
 import { ToastType } from '../../../../../models/toast.model';
+import { QueryOptions } from '@shared/models/request.model';
 
 @Component({
   selector: 'app-playlists-detail-page-smart',
@@ -182,5 +183,17 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
     return tracks.filter(
       (track) => track?.id && !currentTrackIds.has(track.id),
     );
+  }
+
+  updateQuery(queryOptions: QueryOptions) {
+    if (queryOptions.filter) {
+      this.currentFilter.set(queryOptions.filter);
+    }
+    if (queryOptions.sortBy) {
+      this.currentSortBy.set(queryOptions.sortBy);
+    }
+    if (queryOptions.sortDirection) {
+      this.currentSortDirection.set(queryOptions.sortDirection);
+    }
   }
 }

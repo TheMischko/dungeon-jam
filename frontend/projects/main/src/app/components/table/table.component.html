@@ -1,5 +1,14 @@
 <div class="table-container">
-  <mat-table [dataSource]="dataSet()" [trackBy]="trackBy" class="table">
+  <mat-table
+    [dataSource]="dataSet()"
+    [trackBy]="trackBy"
+    [matSortActive]="defaultSortBy()"
+    [matSortDirection]="matSortDirection()"
+    class="table"
+    matSort
+    (matSortChange)="emitSortChange($event)"
+  >
+    <!-- Selection Column -->
     @if (selection()) {
     <ng-container [matColumnDef]="selectionColumn">
       <mat-header-cell *matHeaderCellDef>
@@ -16,21 +25,27 @@
         ></mat-checkbox>
       </mat-cell>
     </ng-container>
-    } @for (colName of configColumnNames(); track colName){ @let columnConfig =
+    }
+
+    <!-- Data Columns -->
+    @for (colName of configColumnNames(); track colName){ @let columnConfig =
     config()?.[colName];
     <ng-container [matColumnDef]="colName">
       <mat-header-cell
         *matHeaderCellDef
+        [attr.mat-sort-header]="columnConfig?.sortable === true"
         [style.max-width]="columnConfig?.width"
         >{{ config()[colName]?.title }}</mat-header-cell
       >
       <mat-cell *matCellDef="let row" [style.max-width]="columnConfig?.width">
-        @if (columnConfig?.template) { @let template =
-        columnConfig!.template!();
+        @if (columnConfig?.template) {
+        <!-- Template Column -->
+        @let template = columnConfig!.template!();
         <ng-container
           *ngTemplateOutlet="template; context: { $implicit: row }"
         ></ng-container>
         } @else {
+        <!-- Standard Column -->
         <app-table-cell
           [item]="row"
           [config]="columnConfig"
@@ -39,7 +54,10 @@
         }
       </mat-cell>
     </ng-container>
-    } @if (hasActions()) {
+    }
+
+    <!-- Actions Column -->
+    @if (hasActions()) {
     <ng-container [matColumnDef]="actionsColumn">
       <mat-header-cell *matHeaderCellDef></mat-header-cell>
       <mat-cell *matCellDef="let row">
@@ -50,6 +68,8 @@
       </mat-cell>
     </ng-container>
     }
+
+    <!-- Row Declarations -->
     <mat-header-row *matHeaderRowDef="columnNames()"></mat-header-row>
     <mat-row
       *matRowDef="let row; columns: columnNames()"

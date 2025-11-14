@@ -3,6 +3,7 @@ import {
   Component,
   computed,
   input,
+  model,
   output,
   signal,
 } from '@angular/core';
@@ -38,6 +39,13 @@ import {
   MenuCloseReason,
 } from '@angular/material/menu';
 import { actionsIconSet } from '@general/icons/icons';
+import {
+  MatSort,
+  MatSortHeader,
+  Sort,
+  SortDirection as MatSortDirection,
+} from '@angular/material/sort';
+import { SortDirection } from '@shared/models/common.model';
 
 @Component({
   selector: 'app-table',
@@ -59,6 +67,8 @@ import { actionsIconSet } from '@general/icons/icons';
     MatMenu,
     MatMenuTrigger,
     NgTemplateOutlet,
+    MatSortHeader,
+    MatSort,
   ],
   templateUrl: './table.component.html',
   styleUrl: './table.component.scss',
@@ -74,11 +84,20 @@ export class TableComponent<T> {
   readonly actionsFn = input<TableActionsConfigFn<T>>();
   readonly trackBy = input<TableTrackByFn<T>>((index: number, _: T) => index);
   readonly uniquenessFn = input<TableUniquenessFn<T>>((_, __) => false);
+  readonly defaultSortBy = model<string>('');
+  readonly defaultSortDirection = model<SortDirection>(SortDirection.ASC);
+  readonly matSortDirection = computed<MatSortDirection>(() => {
+    return this.defaultSortDirection() === SortDirection.ASC ? 'asc' : 'desc';
+  });
 
   readonly selected = output<T[]>();
   readonly menuClosed = output<{ row: T; reason: string }>();
   readonly hoverStart = output<T>();
   readonly hoverEnd = output<T>();
+  readonly sortChange = output<{
+    sortBy: string;
+    sortDirection: SortDirection;
+  }>();
 
   readonly ActionsIcon = actionsIconSet.ActionsMenu;
   readonly selectionColumn = 'checkbox';
@@ -153,5 +172,13 @@ export class TableComponent<T> {
       this.selectedItems.set([]);
     }
     this.selected.emit(this.selectedItems());
+  }
+
+  emitSortChange(event: Sort) {
+    this.sortChange.emit({
+      sortBy: event.active,
+      sortDirection:
+        event.direction === 'desc' ? SortDirection.DESC : SortDirection.ASC,
+    });
   }
 }

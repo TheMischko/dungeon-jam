@@ -1,15 +1,16 @@
 <!-- Search bar -->
-<lib-search-bar
-  class="search-bar"
-  (search)="search.emit($event)"
-></lib-search-bar>
-
-<app-table
+<app-smart-table
   [config]="tableConfig"
   [dataSet]="tracks()"
+  [selection]="selection()"
+  [allSelectedState]="allSelectedState()"
+  [trackBy]="trackByTrackId"
+  [uniquenessFn]="uniqueTrackFn"
   (hoverStart)="hoverStart($event)"
   (hoverEnd)="hoverEnd($event)"
-></app-table>
+  (queryChange)="queryChange.emit($event)"
+  (menuClosed)="actionMenuClosed.emit($event.reason)"
+></app-smart-table>
 
 <ng-template #playColumn let-row="$implicit">
   @if (isActiveRow(row) && !isTrackPlaying(row)) {
