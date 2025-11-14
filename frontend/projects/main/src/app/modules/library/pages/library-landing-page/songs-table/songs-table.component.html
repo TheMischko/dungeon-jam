@@ -42,6 +42,16 @@
     }}</mat-cell>
   </ng-container>
 
+  <!-- Tags -->
+  <ng-container matColumnDef="tags">
+    <mat-header-cell mat-header-cell *matHeaderCellDef>Tags</mat-header-cell>
+    <mat-cell *matCellDef="let row">
+      @if (row.tags){
+      <lib-tag-list-smart [tagIds]="row.tags" />
+      }
+    </mat-cell>
+  </ng-container>
+
   <!-- Actions -->
   @if (actionsMenuConfig()?.length ) {
   <ng-container matColumnDef="actions">

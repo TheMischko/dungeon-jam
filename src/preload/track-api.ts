@@ -21,6 +21,7 @@ const createTrack = async (
   url: string,
   duration: number,
   author?: string,
+  tags?: string[],
 ): Promise<Track> => {
   return await ipcRenderer.invoke(
     TrackChannel.INSERT,
@@ -28,6 +29,7 @@ const createTrack = async (
     url,
     duration,
     author,
+    tags,
   );
 };
 

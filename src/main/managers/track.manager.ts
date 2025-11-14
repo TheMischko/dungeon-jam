@@ -49,8 +49,9 @@ export class TrackManager {
         url: string,
         duration: number,
         author?: string,
+        tags?: string[],
       ) => {
-        return await this.insert(name, url, duration, author);
+        return await this.insert(name, url, duration, author, tags);
       },
     );
 
@@ -61,6 +62,7 @@ export class TrackManager {
           track.fullPath,
           track.length,
           track.author,
+          track.tags,
         );
       });
       await Promise.all(promises);
@@ -104,15 +106,17 @@ export class TrackManager {
     url: string,
     duration: number,
     author?: string,
+    tags?: string[],
   ): Promise<Track> {
     const tracks = this.getAll();
     const id = uuid();
-    const newTrack = {
+    const newTrack: Track = {
       id,
       name,
       url,
       author,
       duration,
+      tags,
     };
     tracks.push(newTrack);
     await this.database.updateTable('tracks', tracks);
@@ -150,10 +154,9 @@ export class TrackManager {
     }
     const directionNum = direction === SortDirection.ASC ? 1 : -1;
 
-    return (
-      trackA[sortValue]!.toLowerCase().localeCompare(
-        trackB[sortValue]!.toLowerCase(),
-      ) * directionNum
-    );
+    const valA = trackA[sortValue] as string;
+    const valB = trackB[sortValue] as string;
+
+    return valA.toLowerCase().localeCompare(valB.toLowerCase()) * directionNum;
   }
 }

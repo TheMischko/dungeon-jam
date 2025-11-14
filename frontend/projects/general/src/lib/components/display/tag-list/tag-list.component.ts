@@ -1,5 +1,5 @@
 import { Component, input, output } from '@angular/core';
-import { Tag } from '@shared/models/tag.model';
+import { Tag, TagData } from '@shared/models/tag.model';
 import { TagPillComponent } from '@general/components/display/tag-pill/tag-pill.component';
 
 @Component({
@@ -9,12 +9,12 @@ import { TagPillComponent } from '@general/components/display/tag-pill/tag-pill.
   styleUrl: './tag-list.component.scss',
 })
 export class TagListComponent {
-  readonly tags = input<Tag[]>([]);
+  readonly tags = input<TagData[]>([]);
   readonly editable = input<boolean>(false);
 
-  readonly removed = output<Tag>();
+  readonly removed = output<TagData>();
 
-  tagRemoved(tag: Tag) {
-    this.removed.emit(tag);
+  tagRemoved(tag: Tag | TagData) {
+    this.removed.emit(tag as TagData);
   }
 }

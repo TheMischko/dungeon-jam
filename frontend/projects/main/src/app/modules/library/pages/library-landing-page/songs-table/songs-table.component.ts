@@ -38,6 +38,7 @@ import {
 import { PlaylistStore } from '@general/stores/playlist.store';
 import { Playlist } from '@shared/models/playlist.model';
 import { SortDirection } from '@shared/models/common.model';
+import { TagListSmartComponent } from '@general/components/display/tag-list/tag-list-smart/tag-list-smart.component';
 
 @Component({
   selector: 'app-songs-table',
@@ -60,6 +61,7 @@ import { SortDirection } from '@shared/models/common.model';
     MatMenuTrigger,
     MatMenu,
     ActionsMenuComponent,
+    TagListSmartComponent,
   ],
   templateUrl: './songs-table.component.html',
   styleUrl: './songs-table.component.scss',
@@ -79,7 +81,7 @@ export class SongsTableComponent implements OnInit {
   readonly activeRow = signal<Track | null>(null);
 
   readonly displayedColumns = computed<string[]>(() => {
-    const columns = ['play', 'title', 'author', 'duration'];
+    const columns = ['play', 'title', 'author', 'duration', 'tags'];
     if (this.actionsMenuConfig().length) {
       columns.push('actions');
     }

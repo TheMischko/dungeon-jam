@@ -1,5 +1,5 @@
 import { Component, computed, input, output } from '@angular/core';
-import { Tag } from '@shared/models/tag.model';
+import { Tag, TagData } from '@shared/models/tag.model';
 import { NgStyle } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import { actionsIconSet } from '@general/icons/icons';
@@ -11,10 +11,10 @@ import { actionsIconSet } from '@general/icons/icons';
   styleUrl: './tag-pill.component.scss',
 })
 export class TagPillComponent {
-  readonly tag = input.required<Tag>();
+  readonly tag = input.required<Tag | TagData>();
   readonly removable = input<boolean>(false);
 
-  readonly removed = output<Tag>();
+  readonly removed = output<Tag | TagData>();
 
   readonly removeIcon = actionsIconSet.CrossIcon;
 

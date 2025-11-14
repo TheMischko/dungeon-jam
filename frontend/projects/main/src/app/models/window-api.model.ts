@@ -24,6 +24,7 @@ export type AudioApiWindow = Window &
         url: string,
         duration: number,
         author?: string,
+        tags?: string[],
       ) => Promise<Track>;
     };
   } & {
