@@ -16,17 +16,27 @@
         ></mat-checkbox>
       </mat-cell>
     </ng-container>
-    } @for (colName of configColumnNames(); track colName){
+    } @for (colName of configColumnNames(); track colName){ @let columnConfig =
+    config()?.[colName];
     <ng-container [matColumnDef]="colName">
-      <mat-header-cell *matHeaderCellDef>{{
-        config()[colName]?.title
-      }}</mat-header-cell>
-      <mat-cell *matCellDef="let row">
+      <mat-header-cell
+        *matHeaderCellDef
+        [style.max-width]="columnConfig?.width"
+        >{{ config()[colName]?.title }}</mat-header-cell
+      >
+      <mat-cell *matCellDef="let row" [style.max-width]="columnConfig?.width">
+        @if (columnConfig?.template) { @let template =
+        columnConfig!.template!();
+        <ng-container
+          *ngTemplateOutlet="template; context: { $implicit: row }"
+        ></ng-container>
+        } @else {
         <app-table-cell
           [item]="row"
-          [config]="config()[colName]"
+          [config]="columnConfig"
           [columnKey]="getColumnNameKeyOf(colName)"
         ></app-table-cell>
+        }
       </mat-cell>
     </ng-container>
     } @if (hasActions()) {
@@ -41,6 +51,10 @@
     </ng-container>
     }
     <mat-header-row *matHeaderRowDef="columnNames()"></mat-header-row>
-    <mat-row *matRowDef="let row; columns: columnNames()"></mat-row>
+    <mat-row
+      *matRowDef="let row; columns: columnNames()"
+      (mouseenter)="hoverStart.emit(row)"
+      (mouseleave)="hoverEnd.emit(row)"
+    ></mat-row>
   </mat-table>
 </div>

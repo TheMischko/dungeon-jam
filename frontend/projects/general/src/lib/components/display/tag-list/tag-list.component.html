@@ -1,4 +1,4 @@
-@for (tag of tags(); track tag.title){
+@for (tag of shownTags(); track tag.title){
 <lib-tag-pill
   [tag]="tag"
   [removable]="editable()"

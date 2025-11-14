@@ -4,75 +4,38 @@
   (search)="search.emit($event)"
 ></lib-search-bar>
 
-<!-- Table -->
-<mat-table [dataSource]="tracks()" class="table">
-  <!-- PLAY -->
-  <ng-container matColumnDef="play">
-    <mat-header-cell *matHeaderCellDef></mat-header-cell>
-    <mat-cell mat-cell *matCellDef="let row">
-      @if (isActiveRow(row) && !isTrackPlaying(row)) {
-      <button mat-icon-button (click)="play(row)">
-        <lucide-icon class="icon-small" [img]="PlayIcon"></lucide-icon>
-      </button>
-      } @else if (isTrackPlaying(row)){
-      <button mat-icon-button (click)="pause()">
-        <lucide-icon class="icon-small" [img]="PauseIcon"></lucide-icon>
-      </button>
-      }
-    </mat-cell>
-  </ng-container>
+<app-table
+  [config]="tableConfig"
+  [dataSet]="tracks()"
+  (hoverStart)="hoverStart($event)"
+  (hoverEnd)="hoverEnd($event)"
+></app-table>
 
-  <!-- TITLE -->
-  <ng-container matColumnDef="title">
-    <mat-header-cell *matHeaderCellDef>Title</mat-header-cell>
-    <mat-cell mat-cell *matCellDef="let row">{{ row.name }}</mat-cell>
-  </ng-container>
-
-  <!-- Author -->
-  <ng-container matColumnDef="author">
-    <mat-header-cell mat-header-cell *matHeaderCellDef>Author</mat-header-cell>
-    <mat-cell *matCellDef="let row">{{ row.author }}</mat-cell>
-  </ng-container>
-
-  <!-- Duration -->
-  <ng-container matColumnDef="duration">
-    <mat-header-cell mat-header-cell *matHeaderCellDef>Length</mat-header-cell>
-    <mat-cell *matCellDef="let row">{{
-      row.duration | trackDuration
-    }}</mat-cell>
-  </ng-container>
-
-  <!-- Tags -->
-  <ng-container matColumnDef="tags">
-    <mat-header-cell mat-header-cell *matHeaderCellDef>Tags</mat-header-cell>
-    <mat-cell *matCellDef="let row">
-      @if (row.tags){
-      <lib-tag-list-smart [tagIds]="row.tags" />
-      }
-    </mat-cell>
-  </ng-container>
-
-  <!-- Actions -->
-  @if (actionsMenuConfig()?.length ) {
-  <ng-container matColumnDef="actions">
-    <mat-header-cell mat-header-cell *matHeaderCellDef></mat-header-cell>
-    <mat-cell *matCellDef="let row">
-      <lib-icon-button [matMenuTriggerFor]="menu" [icon]="ActionsIcon" />
-      <mat-menu #menu="matMenu" (closed)="actionMenuClosed.emit($event)">
-        <lib-actions-menu [item]="row" [config]="actionsMenuConfig()" />
-      </mat-menu>
-    </mat-cell>
-  </ng-container>
+<ng-template #playColumn let-row="$implicit">
+  @if (isActiveRow(row) && !isTrackPlaying(row)) {
+  <button mat-icon-button (click)="play(row)">
+    <lucide-icon class="icon-small" [img]="PlayIcon"></lucide-icon>
+  </button>
+  } @else if (isTrackPlaying(row)){
+  <button mat-icon-button (click)="pause()">
+    <lucide-icon class="icon-small" [img]="PauseIcon"></lucide-icon>
+  </button>
   }
+</ng-template>
 
-  <!-- Rows -->
+<ng-template #tagColumn let-row="$implicit">
+  @if (row.tags){
+  <lib-tag-list-smart
+    [tagIds]="row.tags"
+    [editable]="false"
+    [maxShownTags]="2"
+  />
+  }
+</ng-template>
 
-  <mat-header-row *matHeaderRowDef="displayedColumns()"></mat-header-row>
-  <mat-row
-    *matRowDef="let row; columns: displayedColumns()"
-    [class.active-row]="isActiveRow(row)"
-    [class.playing]="isTrackPlaying(row)"
-    (mouseenter)="hoverStart(row)"
-    (mouseleave)="hoverEnd(row)"
-  ></mat-row>
-</mat-table>
+<ng-template #actionsColumn let-row="$implicit">
+  <lib-icon-button [matMenuTriggerFor]="menu" [icon]="ActionsIcon" />
+  <mat-menu #menu="matMenu" (closed)="actionMenuClosed.emit($event)">
+    <lib-actions-menu [item]="row" [config]="actionsMenuConfig()" />
+  </mat-menu>
+</ng-template>

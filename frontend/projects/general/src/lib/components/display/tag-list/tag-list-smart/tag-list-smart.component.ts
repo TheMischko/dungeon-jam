@@ -23,6 +23,7 @@ export class TagListSmartComponent {
   readonly tags = input<TagData[]>([]);
   readonly tagIds = input<string[]>([]);
   readonly editable = input<boolean>(false);
+  readonly maxShownTags = input<number | null>(null);
 
   readonly removed = output<Tag>();
 

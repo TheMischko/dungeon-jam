@@ -6,19 +6,9 @@ import {
   OnInit,
   output,
   signal,
+  TemplateRef,
+  viewChild,
 } from '@angular/core';
-import {
-  MatCell,
-  MatCellDef,
-  MatColumnDef,
-  MatHeaderCell,
-  MatHeaderCellDef,
-  MatHeaderRow,
-  MatHeaderRowDef,
-  MatRow,
-  MatRowDef,
-  MatTable,
-} from '@angular/material/table';
 import { Track } from '@shared/models/track.model';
 import { LucideAngularModule } from 'lucide-angular';
 import { actionsIconSet, iconSet } from '@general/icons/icons';
@@ -39,35 +29,28 @@ import { PlaylistStore } from '@general/stores/playlist.store';
 import { Playlist } from '@shared/models/playlist.model';
 import { SortDirection } from '@shared/models/common.model';
 import { TagListSmartComponent } from '@general/components/display/tag-list/tag-list-smart/tag-list-smart.component';
+import { TableColumnConfiguration } from '../../../../../models/table.model';
+import { TableComponent } from '../../../../../components/table/table.component';
 
 @Component({
   selector: 'app-songs-table',
   imports: [
-    MatTable,
-    MatColumnDef,
-    MatHeaderCell,
-    MatHeaderCellDef,
-    MatCell,
-    MatCellDef,
-    MatHeaderRow,
-    MatHeaderRowDef,
-    MatRow,
-    MatRowDef,
     LucideAngularModule,
     MatIconButton,
-    TrackDurationPipe,
     SearchBarComponent,
     IconButtonComponent,
     MatMenuTrigger,
     MatMenu,
     ActionsMenuComponent,
     TagListSmartComponent,
+    TableComponent,
   ],
   templateUrl: './songs-table.component.html',
   styleUrl: './songs-table.component.scss',
 })
 export class SongsTableComponent implements OnInit {
   readonly playlistsStore = inject(PlaylistStore);
+  readonly durationPipe = new TrackDurationPipe();
 
   readonly tracks = input<Track[]>([]);
   readonly playingTrackId = input<string | null>();
@@ -78,7 +61,43 @@ export class SongsTableComponent implements OnInit {
   readonly search = output<string>();
   readonly actionMenuClosed = output<MenuCloseReason>();
 
+  readonly playColumnTemplate =
+    viewChild.required<TemplateRef<{ $implicit: Track }>>('playColumn');
+  readonly tagsColumnTemplate =
+    viewChild.required<TemplateRef<{ $implicit: Track }>>('tagColumn');
+  readonly actionsColumnTemplate =
+    viewChild.required<TemplateRef<{ $implicit: Track }>>('actionsColumn');
+
   readonly activeRow = signal<Track | null>(null);
+
+  readonly tableConfig: TableColumnConfiguration<Track> = {
+    play: {
+      title: '',
+      template: () => this.playColumnTemplate(),
+      width: '70px',
+    },
+    name: {
+      title: 'Title',
+    },
+    author: {
+      title: 'Author',
+    },
+    duration: {
+      title: 'Duration',
+      customValueFn: (track: Track) =>
+        this.durationPipe.transform(track.duration),
+      width: '90px',
+    },
+    tags: {
+      title: 'Tags',
+      template: () => this.tagsColumnTemplate(),
+    },
+    actions: {
+      title: '',
+      template: () => this.actionsColumnTemplate(),
+      width: '70px',
+    },
+  };
 
   readonly displayedColumns = computed<string[]>(() => {
     const columns = ['play', 'title', 'author', 'duration', 'tags'];

@@ -6,6 +6,7 @@ import {
   output,
   signal,
 } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import {
   TableActionsConfigFn,
   TableColumnConfiguration,
@@ -57,6 +58,7 @@ import { actionsIconSet } from '@general/icons/icons';
     IconButtonComponent,
     MatMenu,
     MatMenuTrigger,
+    NgTemplateOutlet,
   ],
   templateUrl: './table.component.html',
   styleUrl: './table.component.scss',
@@ -75,6 +77,8 @@ export class TableComponent<T> {
 
   readonly selected = output<T[]>();
   readonly menuClosed = output<{ row: T; reason: string }>();
+  readonly hoverStart = output<T>();
+  readonly hoverEnd = output<T>();
 
   readonly ActionsIcon = actionsIconSet.ActionsMenu;
   readonly selectionColumn = 'checkbox';

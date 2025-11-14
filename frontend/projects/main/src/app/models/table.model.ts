@@ -1,4 +1,5 @@
 import { ActionsMenuConfig } from '@general/components/display/actions-menu/actions-menu.component';
+import { TemplateRef } from '@angular/core';
 
 export type TableColumnConfiguration<TableEntity> = {
   [columnName in
@@ -8,7 +9,9 @@ export type TableColumnConfiguration<TableEntity> = {
 
 export interface BaseTableColumnConfiguration<TableEntity> {
   title: string;
+  width?: string;
   customValueFn?: (item: TableEntity) => string;
+  template?: () => TemplateRef<{ $implicit: TableEntity }>;
 }
 
 export type TableActionsConfigFn<T> = (
