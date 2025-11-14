@@ -4,4 +4,11 @@
   [removable]="editable()"
   (removed)="tagRemoved($event)"
 ></lib-tag-pill>
+} @if(leftoverTagCount()){
+<lib-tag-pill
+  matTooltipClass="tags-tooltip"
+  [matTooltip]="leftoverTagsTooltip()"
+  [tag]="leftoverTagCount()!"
+  (removed)="tagRemoved($event)"
+></lib-tag-pill>
 }

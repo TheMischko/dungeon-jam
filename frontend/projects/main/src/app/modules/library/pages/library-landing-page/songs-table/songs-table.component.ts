@@ -1,8 +1,11 @@
 import {
+  AfterViewInit,
   Component,
   computed,
+  ElementRef,
   inject,
   input,
+  OnDestroy,
   OnInit,
   output,
   signal,
@@ -48,9 +51,9 @@ import { TableComponent } from '../../../../../components/table/table.component'
   templateUrl: './songs-table.component.html',
   styleUrl: './songs-table.component.scss',
 })
-export class SongsTableComponent implements OnInit {
+export class SongsTableComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly playlistsStore = inject(PlaylistStore);
-  readonly durationPipe = new TrackDurationPipe();
+  readonly componentElement = inject(ElementRef<HTMLElement>);
 
   readonly tracks = input<Track[]>([]);
   readonly playingTrackId = input<string | null>();
@@ -68,7 +71,27 @@ export class SongsTableComponent implements OnInit {
   readonly actionsColumnTemplate =
     viewChild.required<TemplateRef<{ $implicit: Track }>>('actionsColumn');
 
+  readonly durationPipe = new TrackDurationPipe();
+  private resizeObserver!: ResizeObserver;
+
   readonly activeRow = signal<Track | null>(null);
+  readonly componentWidth = signal<number>(0);
+
+  readonly maxTagsToShow = computed(() => {
+    const width = this.componentWidth();
+    switch (true) {
+      case width > 1100:
+        return 4;
+      case width > 950:
+        return 3;
+      case width > 800:
+        return 2;
+      case width > 450:
+        return 1;
+      default:
+        return 0;
+    }
+  });
 
   readonly tableConfig: TableColumnConfiguration<Track> = {
     play: {
@@ -99,19 +122,22 @@ export class SongsTableComponent implements OnInit {
     },
   };
 
-  readonly displayedColumns = computed<string[]>(() => {
-    const columns = ['play', 'title', 'author', 'duration', 'tags'];
-    if (this.actionsMenuConfig().length) {
-      columns.push('actions');
-    }
-    return columns;
-  });
-
   ngOnInit() {
     this.playlistsStore.load({
       sortBy: 'title',
       sortDirection: SortDirection.ASC,
     });
+  }
+
+  ngAfterViewInit() {
+    this.resizeObserver = new ResizeObserver((_) => {
+      this.componentWidth.set(this.componentElement.nativeElement.clientWidth);
+    });
+    this.resizeObserver.observe(this.componentElement.nativeElement);
+  }
+
+  ngOnDestroy() {
+    this.resizeObserver.disconnect();
   }
 
   hoverStart(track: Track) {

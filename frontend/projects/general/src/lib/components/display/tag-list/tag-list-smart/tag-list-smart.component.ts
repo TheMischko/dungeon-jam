@@ -21,6 +21,7 @@ export class TagListSmartComponent {
   readonly tagStore = inject(TagsStore);
 
   readonly tags = input<TagData[]>([]);
+  readonly priorityTagNames = input<string[]>([]);
   readonly tagIds = input<string[]>([]);
   readonly editable = input<boolean>(false);
   readonly maxShownTags = input<number | null>(null);
@@ -33,10 +34,27 @@ export class TagListSmartComponent {
       ...this.tagIds()
         .map((id) => this.tagStore.getById(id))
         .filter((tag): tag is TagData => !!tag),
-    ];
+    ].sort((a, b) => {
+      return this.sortTagsByPriority(a, b);
+    });
   });
 
   tagRemoved(tag: TagData) {
     this.removed.emit(tag);
+  }
+  sortTagsByPriority(tagA: TagData, tagB: TagData): number {
+    if (!this.priorityTagNames()?.length) {
+      return 0;
+    }
+    const aPriority = this.priorityTagNames().indexOf(tagA.title);
+    const bPriority = this.priorityTagNames().indexOf(tagB.title);
+    if (aPriority !== -1 && bPriority !== -1) {
+      return aPriority - bPriority;
+    } else if (aPriority !== -1) {
+      return -1;
+    } else if (bPriority !== -1) {
+      return 1;
+    }
+    return 0;
   }
 }

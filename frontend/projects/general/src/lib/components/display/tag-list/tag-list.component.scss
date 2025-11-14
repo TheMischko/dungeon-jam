@@ -1,4 +1,4 @@
-:host{
+:host {
   width: 100%;
   height: 100%;
   display: flex;
@@ -6,4 +6,9 @@
   align-items: center;
   justify-content: flex-start;
   gap: 0.25rem;
+}
+
+::ng-deep .tags-tooltip {
+  word-spacing: 75px;
+  width: 75px;
 }
