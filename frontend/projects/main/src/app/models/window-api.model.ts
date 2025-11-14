@@ -5,6 +5,7 @@ import {
   StoredPlayback,
   Track,
 } from '@shared/models/track.model';
+import { QueryRequest } from '@shared/models/request.model';
 
 export type AudioApiWindow = Window &
   typeof globalThis & {
@@ -16,7 +17,7 @@ export type AudioApiWindow = Window &
     };
   } & {
     TRACK_API: {
-      getAllTracks: () => Promise<Track[]>;
+      getAllTracks: (query?: QueryRequest) => Promise<Track[]>;
       getTrackById: (id: string) => Promise<Track | null>;
       getTracksByPlaylist: (query: PlaylistTracksQuery) => Promise<Track[]>;
       createTrack: (

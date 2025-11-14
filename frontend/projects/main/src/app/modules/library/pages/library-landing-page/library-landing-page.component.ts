@@ -5,7 +5,6 @@ import { DialogService } from '../../../../services/dialog.service';
 import { SongsDropInZoneComponent } from './songs-drop-in-zone/songs-drop-in-zone.component';
 import { AudioTrack, Track } from '@shared/models/track.model';
 import { AudioFilesService } from '../../../../services/audio-files.service';
-import { TrackService } from '../../../../services/track.service';
 import { SongsTableComponent } from './songs-table/songs-table.component';
 import { PlaybackService } from '../../../../services/playback.service';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -24,6 +23,7 @@ import { Playlist } from '@shared/models/playlist.model';
 import { MenuCloseReason } from '@angular/material/menu';
 import { QueryOptions } from '@shared/models/request.model';
 import { SortDirection } from '@shared/models/common.model';
+import { TrackLibraryStore } from '../../../../stores/track-library.store';
 
 @Component({
   selector: 'app-library-landing-page',
@@ -34,9 +34,12 @@ import { SortDirection } from '@shared/models/common.model';
 export class LibraryLandingPageComponent implements OnInit {
   private readonly dialogService = inject(DialogService);
   private readonly audioFilesService = inject(AudioFilesService);
-  private readonly trackService = inject(TrackService);
+  private readonly trackStore = inject(TrackLibraryStore);
   private readonly playbackService = inject(PlaybackService);
   readonly playlistsStore = inject(PlaylistStore);
+
+  readonly tracks = this.trackStore.entities;
+  readonly tracksLoading = this.trackStore.loading;
 
   readonly playbackState = toSignal(this.playbackService.playback$, {
     initialValue: initialPlaybackState,
@@ -84,11 +87,11 @@ export class LibraryLandingPageComponent implements OnInit {
     },
   );
 
-  readonly tracks = signal<Track[]>([]);
   readonly currentQuery = signal<QueryOptions>({
     sortBy: 'name',
     sortDirection: SortDirection.ASC,
   });
+
   readonly showPlaylists = signal<boolean>(false);
 
   readonly defaultSongActions: ActionsMenuBaseConfig<Track>[] = [
@@ -111,9 +114,7 @@ export class LibraryLandingPageComponent implements OnInit {
   ];
 
   ngOnInit() {
-    this.trackService.getAllTracks().subscribe((tracks) => {
-      this.tracks.set(tracks);
-    });
+    this.trackStore.load(this.currentQuery);
   }
 
   addToPlaylist(): void {
@@ -136,9 +137,7 @@ export class LibraryLandingPageComponent implements OnInit {
         return;
       }
       this.audioFilesService.uploadAudioTracks(tracks).subscribe(() => {
-        this.trackService.getAllTracks().subscribe((tracks) => {
-          this.tracks.set(tracks);
-        });
+        this.trackStore.load(this.currentQuery);
       });
     });
   }
