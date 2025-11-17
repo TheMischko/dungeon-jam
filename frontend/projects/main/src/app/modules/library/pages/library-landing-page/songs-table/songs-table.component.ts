@@ -65,6 +65,7 @@ export class SongsTableComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly allSelectedState = input<'checked' | 'unchecked' | 'indeterminate'>(
     'unchecked',
   );
+  readonly loading = input<boolean>(false);
 
   readonly queryChange = output<QueryOptions>();
   readonly playTrack = output<Track>();
@@ -134,6 +135,10 @@ export class SongsTableComponent implements OnInit, AfterViewInit, OnDestroy {
       width: '70px',
     },
   };
+
+  readonly noDataText =
+    'Oops, there are no tracks yet. You need to upload some!';
+  readonly noSearchResultsText = 'No tracks match your search query.';
 
   ngOnInit() {
     this.playlistsStore.load({

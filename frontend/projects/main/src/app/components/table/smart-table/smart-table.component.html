@@ -5,7 +5,13 @@
     (search)="currentSearch.set($event)"
   ></lib-search-bar>
 </div>
-
+@if (loading()){
+<lib-loader size="large" class="loader"></lib-loader>
+} @else if (dataSet().length === 0 && currentSearch()){
+<div class="no-data">{{ noResultsText() }}</div>
+} @else if (dataSet().length === 0) {
+<div class="no-data">{{ noDataText() }}</div>
+} @else {
 <app-table
   class="table"
   [config]="config()"
@@ -22,3 +28,4 @@
   (hoverEnd)="hoverEnd.emit($event)"
   (sortChange)="setSort($event)"
 ></app-table>
+}

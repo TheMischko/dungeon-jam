@@ -9,3 +9,4 @@ Obviously the project is WIP, so there is just a list of small missing features 
 - [ ] Enable opening of modals after closing them. Currently, if you close a modal, you can open it again without leaving the page
 - [ ] Create custom scrollbar
 - [ ] Use `TableComponent` in `SongsTableComponent` 
+- [ ] Table and search box on Tracks landing page disappears if you set invalid search

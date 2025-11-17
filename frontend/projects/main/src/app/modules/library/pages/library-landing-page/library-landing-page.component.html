@@ -2,20 +2,14 @@
   <button mat-flat-button (click)="openUploadDialog()" [disabled]="true">
     Upload
   </button>
-  @if(tracks().length === 0){
-  <p>
-    There are no tracks yet. Upload them by dragging some audio files into this
-    page.
-  </p>
-  } @else {
   <app-songs-table
     [tracks]="displayTracks()"
     [playingTrackId]="playingTrackId()"
     [actionsMenuConfig]="songMenuActions()"
+    [loading]="tracksLoading()"
     (playTrack)="playTrack($event)"
     (pauseTrack)="pauseTrack()"
     (queryChange)="currentQuery.set($event)"
     (actionMenuClosed)="actionsClosed($event)"
   ></app-songs-table>
-  }
 </app-songs-drop-in-zone>

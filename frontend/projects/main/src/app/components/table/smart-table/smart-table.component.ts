@@ -17,10 +17,11 @@ import {
   TableUniquenessFn,
 } from '../../../models/table.model';
 import { TableComponent } from '../table.component';
+import { LoaderComponent } from '@general/components/display/loader/loader.component';
 
 @Component({
   selector: 'app-smart-table',
-  imports: [SearchBarComponent, TableComponent],
+  imports: [SearchBarComponent, TableComponent, LoaderComponent],
   templateUrl: './smart-table.component.html',
   styleUrl: './smart-table.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -35,6 +36,9 @@ export class SmartTableComponent<T> {
   readonly actionsFn = input<TableActionsConfigFn<T>>();
   readonly trackBy = input<TableTrackByFn<T>>((index: number, _: T) => index);
   readonly uniquenessFn = input<TableUniquenessFn<T>>((_, __) => false);
+  readonly loading = input<boolean>(false);
+  readonly noDataText = input<string>('No data available');
+  readonly noResultsText = input<string>('No results found');
 
   readonly selected = output<T[]>();
   readonly menuClosed = output<{ row: T; reason: string }>();
