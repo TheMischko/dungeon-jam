@@ -22,6 +22,11 @@ html {
       density: 0,
     )
   );
+
+  scrollbar-width: thin;
+  scrollbar-color: col.$primary transparent;
+  scrollbar-arrow-color: transparent;
+  -ms-scrollbar-track-color: transparent;
 }
 
 html,

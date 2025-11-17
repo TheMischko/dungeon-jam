@@ -1,6 +1,6 @@
 <!-- Search bar -->
 <app-smart-table
-  [config]="tableConfig"
+  [config]="tableConfig()"
   [dataSet]="tracks()"
   [selection]="selection()"
   [allSelectedState]="allSelectedState()"
@@ -13,6 +13,7 @@
   (hoverEnd)="hoverEnd($event)"
   (queryChange)="queryChange.emit($event)"
   (menuClosed)="actionMenuClosed.emit($event.reason)"
+  (selected)="updateSelection($event)"
 ></app-smart-table>
 
 <ng-template #playColumn let-row="$implicit">

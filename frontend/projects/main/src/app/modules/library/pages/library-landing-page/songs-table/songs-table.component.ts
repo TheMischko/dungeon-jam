@@ -66,11 +66,13 @@ export class SongsTableComponent implements OnInit, AfterViewInit, OnDestroy {
     'unchecked',
   );
   readonly loading = input<boolean>(false);
+  readonly showActionsColumn = input<boolean>(true);
 
   readonly queryChange = output<QueryOptions>();
   readonly playTrack = output<Track>();
   readonly pauseTrack = output();
   readonly actionMenuClosed = output<MenuCloseReason | string>();
+  readonly selectionChange = output<Track[]>();
 
   readonly playColumnTemplate =
     viewChild.required<TemplateRef<{ $implicit: Track }>>('playColumn');
@@ -105,12 +107,14 @@ export class SongsTableComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   });
 
-  readonly tableConfig: TableColumnConfiguration<Track> = {
-    play: {
-      title: '',
-      template: () => this.playColumnTemplate(),
-      width: '70px',
-    },
+  readonly tableConfig = computed<TableColumnConfiguration<Track>>(() => ({
+    ...(!this.selection() && {
+      play: {
+        title: '',
+        template: () => this.playColumnTemplate(),
+        width: '70px',
+      },
+    }),
     name: {
       title: 'Title',
       sortable: true,
@@ -129,12 +133,14 @@ export class SongsTableComponent implements OnInit, AfterViewInit, OnDestroy {
       title: 'Tags',
       template: () => this.tagsColumnTemplate(),
     },
-    actions: {
-      title: '',
-      template: () => this.actionsColumnTemplate(),
-      width: '70px',
-    },
-  };
+    ...(this.showActionsColumn() && {
+      actions: {
+        title: '',
+        template: () => this.actionsColumnTemplate(),
+        width: '70px',
+      },
+    }),
+  }));
 
   readonly noDataText =
     'Oops, there are no tracks yet. You need to upload some!';
@@ -190,4 +196,8 @@ export class SongsTableComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly PlayIcon = iconSet.PlayIcon;
   readonly PauseIcon = iconSet.PauseIcon;
   readonly ActionsIcon = actionsIconSet.ActionsMenu;
+
+  updateSelection(selectedTracks: Track[]) {
+    this.selectionChange.emit(selectedTracks);
+  }
 }

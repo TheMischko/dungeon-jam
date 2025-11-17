@@ -4,15 +4,16 @@
   </div>
 
   <div class="content">
-    <app-table
-      [dataSet]="tracks()"
-      [config]="tableConfig()"
+    <app-songs-table
+      class="table"
+      [tracks]="tracks()"
       [selection]="true"
-      [trackBy]="trackTrackByFn"
-      [uniquenessFn]="trackUniquenessFn"
       [allSelectedState]="selectAllState()"
-      (selected)="selectionChanged($event)"
-    ></app-table>
+      [loading]="tracksLoading()"
+      [showActionsColumn]="false"
+      (queryChange)="tracksQuery.set($event)"
+      (selectionChange)="selectionChanged($event)"
+    ></app-songs-table>
   </div>
 
   <div class="footer">

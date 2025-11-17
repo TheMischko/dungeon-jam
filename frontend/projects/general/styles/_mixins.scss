@@ -1,19 +1,32 @@
 @use 'colors' as col;
+@use 'typography' as typo;
 
 @mixin base-dialog() {
   color: col.$text-main;
   display: flex;
+  overflow-x: hidden;
+  max-height: 60vh;
 
   .wrapper {
+    max-height: inherit;
     width: 500px;
     display: flex;
     flex-direction: column;
+
+    .header {
+      @include typo.default-font;
+      h1 {
+        @include typo.h1;
+      }
+    }
 
     .content {
       flex: 1;
       display: flex;
       flex-direction: column;
-      margin-bottom: 3rem;
+      margin-bottom: 1.5rem;
+      overflow-x: hidden;
+      max-height: 70%;
     }
   }
 

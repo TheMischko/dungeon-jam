@@ -3,71 +3,48 @@ import {
   Component,
   computed,
   inject,
+  OnInit,
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { TableColumnConfiguration } from '../../../../models/table.model';
 import { Track } from '@shared/models/track.model';
-import { TableComponent } from '../../../../components/table/table.component';
 import { TrackService } from '../../../../services/track.service';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { TrackDurationPipe } from '@general/pipes/track-duration.pipe';
 import { MatButton } from '@angular/material/button';
 import { SelectLibraryTracksSelection } from './select-library-tracks-modal.types';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { map } from 'rxjs';
+import { SongsTableComponent } from '../../pages/library-landing-page/songs-table/songs-table.component';
+import { TrackLibraryStore } from '../../../../stores/track-library.store';
+import { QueryOptions } from '@shared/models/request.model';
 
 @Component({
   selector: 'app-select-library-tracks-modal',
-  imports: [FormsModule, TableComponent, MatButton],
+  imports: [FormsModule, MatButton, SongsTableComponent],
   templateUrl: './select-library-tracks-modal.component.html',
   styleUrl: './select-library-tracks-modal.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SelectLibraryTracksModalComponent {
+export class SelectLibraryTracksModalComponent implements OnInit {
+  readonly trackStore = inject(TrackLibraryStore);
   readonly trackService = inject(TrackService);
   readonly dialogRef =
     inject<MatDialogRef<SelectLibraryTracksSelection>>(MatDialogRef);
   readonly data = inject<SelectLibraryTracksModalData>(MAT_DIALOG_DATA);
 
-  readonly tracks = toSignal(
-    this.trackService.getAllTracks().pipe(
-      map((tracks) => {
-        if (!this.data?.excludedTrackIds?.length) {
-          return tracks;
-        }
-        return tracks.filter(
-          (track) => !this.data.excludedTrackIds.includes(track.id),
-        );
-      }),
-    ),
-    {
-      initialValue: [],
-    },
-  );
-  private durationPipe = new TrackDurationPipe();
-  readonly tableConfig = computed<TableColumnConfiguration<Track>>(() => {
-    return {
-      name: {
-        title: 'Track Name',
-      },
-      author: {
-        title: 'Author',
-      },
-      duration: {
-        title: 'Length',
-        customValueFn: (track: Track) => {
-          return this.durationPipe.transform(track.duration);
-        },
-      },
-    };
+  readonly tracks = computed(() => {
+    return this.trackStore.entities().filter((track) => {
+      return !this.data?.excludedTrackIds?.includes(track.id);
+    });
   });
+  readonly tracksLoading = this.trackStore.loading;
   readonly selection = signal<Track[]>([]);
   readonly selectAllState = signal<'checked' | 'unchecked' | 'indeterminate'>(
     'unchecked',
   );
-  readonly trackTrackByFn = (index: number, track: Track) => track.id;
-  readonly trackUniquenessFn = (a: Track, b: Track) => a.id === b.id;
+  readonly tracksQuery = signal<QueryOptions>({});
+
+  ngOnInit() {
+    this.trackStore.load(this.tracksQuery);
+  }
 
   selectionChanged = (selectedTracks: Track[]) => {
     if (selectedTracks.length === this.tracks().length) {
@@ -82,7 +59,7 @@ export class SelectLibraryTracksModalComponent {
   };
 
   cancelClick() {
-    console.log(this.data);
+    console.log(this.data, this.selection());
     this.dialogRef.close(undefined);
   }
 

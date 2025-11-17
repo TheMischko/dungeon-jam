@@ -20,10 +20,18 @@
 
 $font: 'Noto Sans', sans-serif;
 
-
-@mixin default-font(){
+@mixin default-font() {
   font-family: 'Noto Sans', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+}
+
+@mixin h1() {
+  @include default-font();
+  margin: 0.5rem 0;
+  font-size: 2rem;
+  font-weight: bold;
+  line-height: 1.2;
+  letter-spacing: 0.45px;
 }
