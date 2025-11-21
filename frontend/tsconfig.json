@@ -29,6 +29,9 @@
       ],
       "general": [
         "./dist/general"
+      ],
+      "styles/*": [
+        "./projects/general/styles/*"
       ]
     }
   },

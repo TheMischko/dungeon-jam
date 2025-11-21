@@ -1,8 +1,10 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   forwardRef,
   inject,
+  input,
   model,
   output,
   signal,
@@ -21,6 +23,7 @@ import {
   MatOption,
 } from '@angular/material/autocomplete';
 import { firstValueFrom } from 'rxjs';
+import { ValidationError } from '@angular/forms/signals';
 
 @Component({
   selector: 'lib-tags-input',
@@ -49,10 +52,13 @@ export class TagsInputComponent implements ControlValueAccessor {
 
   readonly value = model<TagData[]>([]);
   readonly disabled = model<boolean>(false);
+  readonly required = input<boolean>(false);
+  readonly errors = input<readonly ValidationError.WithField[]>([]);
+  readonly touched = model<boolean>(false);
 
   readonly suggestionBar = viewChild<MatAutocomplete>('suggestionBar');
 
-  readonly touched = output<void>();
+  readonly touchedChange = output<void>();
   readonly changed = output<TagData[]>();
 
   private onChange: (value: TagData[]) => void = () => {};
@@ -61,6 +67,9 @@ export class TagsInputComponent implements ControlValueAccessor {
   readonly SEPARATORS = new RegExp(/,(?=\w)?/);
   readonly suggestions = signal<TagData[]>([]);
   readonly inputValue = signal<string>('');
+  readonly hasErrors = computed<boolean>(() => {
+    return this.touched() && this.errors().length > 0;
+  });
 
   writeValue(value: TagData[] | null): void {
     this.value.set(value ?? []);
@@ -151,6 +160,7 @@ export class TagsInputComponent implements ControlValueAccessor {
   /**
    * Save the selected suggestion to the value
    * @param event
+   * @param suggestion
    */
   async saveSuggestion(_: unknown, suggestion: TagData) {
     this.value.update((tags) => [...tags, suggestion]);
@@ -165,9 +175,10 @@ export class TagsInputComponent implements ControlValueAccessor {
   private emitValueChange() {
     const value = untracked(() => this.value());
     this.changed.emit(value);
-    this.touched.emit();
+    this.touchedChange.emit();
     this.onChange(value);
     this.onTouched();
+    this.touched.set(true);
   }
 
   /**

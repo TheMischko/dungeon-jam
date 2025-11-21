@@ -1,0 +1,5 @@
+@use 'mixins' as mix;
+
+:host {
+  @include mix.base-form();
+}

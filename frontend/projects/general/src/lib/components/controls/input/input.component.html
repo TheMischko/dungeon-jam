@@ -1,4 +1,8 @@
-<mat-form-field appearance="outline" class="form-field">
+<mat-form-field
+  appearance="outline"
+  class="form-field"
+  [class.has-errors]="hasErrors()"
+>
   <mat-label>{{ label() }}</mat-label>
   @if (iconPrefix()){
   <span matPrefix>
@@ -13,7 +17,14 @@
     matInput
     [value]="value() ?? null"
     [disabled]="isDisabled()"
-    (blur)="touched.emit()"
+    [required]="required()"
+    (blur)="setTouched()"
     (input)="onInputChange($event)"
   />
 </mat-form-field>
+
+<div class="errors">
+  @if (hasErrors()) { @for (error of errors(); track error.kind){
+  <div class="error-message">{{ error.message }}</div>
+  } }
+</div>

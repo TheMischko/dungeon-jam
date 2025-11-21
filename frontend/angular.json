@@ -157,7 +157,10 @@
               "projects/sidebar/src/styles.scss",
               "projects/general/styles/global.scss"
             ],
-            "scripts": []
+            "scripts": [],
+            "stylePreprocessorOptions": {
+              "includePaths": ["projects/general/styles"]
+            }
           },
           "configurations": {
             "production": {
@@ -270,7 +273,10 @@
               "projects/topbar/src/styles.scss",
               "projects/general/styles/global.scss"
             ],
-            "scripts": []
+            "scripts": [],
+            "stylePreprocessorOptions": {
+              "includePaths": ["projects/general/styles"]
+            }
           },
           "configurations": {
             "production": {
@@ -380,7 +386,11 @@
             "polyfills": [
               "zone.js",
               "zone.js/testing"
-            ]
+            ],
+            "scripts": [],
+            "stylePreprocessorOptions": {
+              "includePaths": ["projects/general/styles"]
+            }
           }
         }
       }

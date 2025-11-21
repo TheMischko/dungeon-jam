@@ -1,6 +1,7 @@
 <mat-form-field
   appearance="outline"
   [floatLabel]="value().length > 0 ? 'always' : 'auto'"
+  [class.has-errors]="hasErrors()"
 >
   <mat-label>Tags</mat-label>
   <div class="tags-input">
@@ -23,6 +24,12 @@
     />
   </div>
 </mat-form-field>
+
+<div class="errors">
+  @if (hasErrors()) { @for (error of errors(); track error.kind){
+  <div class="error-message">{{ error.message }}</div>
+  } }
+</div>
 
 <mat-autocomplete #suggestionBar="matAutocomplete">
   @for (suggestion of suggestions(); track suggestion.id){
