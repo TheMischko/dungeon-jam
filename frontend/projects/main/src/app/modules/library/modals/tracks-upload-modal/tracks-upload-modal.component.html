@@ -3,17 +3,9 @@
     <h1>{{ title }}</h1>
   </div>
 
-  <form class="content" [formGroup]="currentForm()">
-    <lib-input [formControl]="currentPathControl()" label="File"></lib-input>
-    <lib-input [formControl]="currentTitleControl()" label="Title"></lib-input>
-    <lib-input
-      [formControl]="currentAuthorControl()"
-      label="Author"
-    ></lib-input>
-    @let ctrl = currentTagsControl(); @if (ctrl) {
-    <lib-tags-input [formControl]="ctrl" label="Tags"></lib-tags-input>
-    }
-  </form>
+  @if (currentForm()){
+  <app-track-form [form]="currentForm()"></app-track-form>
+  }
 
   <div class="footer">
     <div class="steps">

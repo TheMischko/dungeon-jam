@@ -11,11 +11,10 @@ interface TrackFormData {
 
 export const createTrackForm = (data?: Partial<TrackFormData>) => {
   const fields = signal<TrackFormData>({
-    path: '',
-    title: '',
-    author: '',
-    tags: [],
-    ...data,
+    path: data?.path ?? '',
+    title: data?.title ?? '',
+    author: data?.author ?? '',
+    tags: data?.tags ?? [],
   });
   return form(fields, (form) => {
     required(form.path, { message: 'Track file is required' });

@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import {
   MAT_DIALOG_DATA,
   MatDialogModule,
@@ -6,16 +6,10 @@ import {
 } from '@angular/material/dialog';
 import { AudioTrack } from '@shared/models/track.model';
 import { MatButton } from '@angular/material/button';
-import {
-  FormArray,
-  FormControl,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
-import { InputComponent } from '@general/components/controls/input/input.component';
-import { TagsInputComponent } from '@general/components/controls/tags-input/tags-input.component';
+import { ReactiveFormsModule } from '@angular/forms';
 import { TagData } from '@shared/models/tag.model';
+import { createTrackForm } from '../../../../forms/track-form/track-form.model';
+import { TrackFormComponent } from '../../../../forms/track-form/track-form.component';
 
 export type TracksUploadModalData = {
   title: string;
@@ -28,14 +22,13 @@ export type TracksUploadModalData = {
     MatDialogModule,
     MatButton,
     ReactiveFormsModule,
-    InputComponent,
-    TagsInputComponent,
+    TrackFormComponent,
   ],
   templateUrl: './tracks-upload-modal.component.html',
   styleUrl: './tracks-upload-modal.component.scss',
   standalone: true,
 })
-export class TracksUploadModalComponent implements OnInit {
+export class TracksUploadModalComponent {
   readonly data = inject<TracksUploadModalData>(MAT_DIALOG_DATA);
   readonly dialog = inject(MatDialogRef);
 
@@ -44,43 +37,17 @@ export class TracksUploadModalComponent implements OnInit {
     () => this.currentStep() === this.tracks.length - 1,
   );
   readonly currentForm = computed(() => {
-    return this.forms.at(this.currentStep());
-  });
-  readonly currentPathControl = computed<FormControl<string | null>>(() => {
-    return this.currentForm().get('path') as FormControl<string | null>;
-  });
-  readonly currentTitleControl = computed<FormControl<string | null>>(() => {
-    return this.currentForm().get('title') as FormControl<string | null>;
-  });
-  readonly currentAuthorControl = computed<FormControl<string | null>>(() => {
-    return this.currentForm().get('author') as FormControl<string | null>;
-  });
-  readonly currentTagsControl = computed<FormControl<TagData[] | null>>(() => {
-    return this.currentForm().get('tags') as FormControl<TagData[] | null>;
+    return this.forms[this.currentStep()];
   });
 
-  readonly forms = new FormArray<
-    FormGroup<{
-      path: FormControl<string | null>;
-      title: FormControl<string | null>;
-      author: FormControl<string | null>;
-      tags: FormControl<TagData[] | null>;
-    }>
-  >([]);
-
-  ngOnInit() {
-    this.tracks.forEach((track, index) => {
-      this.forms.insert(
-        index,
-        new FormGroup({
-          path: new FormControl({ value: track.fullPath, disabled: true }),
-          title: new FormControl(track.title, [Validators.required]),
-          author: new FormControl(track.author || null),
-          tags: new FormControl([] as TagData[]),
-        }),
-      );
+  readonly forms = this.tracks.map((track) => {
+    return createTrackForm({
+      path: track.fullPath,
+      title: track.title,
+      author: track.author,
+      tags: [] as TagData[],
     });
-  }
+  });
 
   get title(): string {
     return this.data.title;
@@ -95,9 +62,9 @@ export class TracksUploadModalComponent implements OnInit {
   }
 
   nextStep() {
-    if (this.currentStep() === this.tracks.length - 1 && this.forms.valid) {
-      const result: AudioTrack[] = this.forms.controls.map((group, index) => {
-        const value = group.value;
+    if (this.currentStep() === this.tracks.length - 1 && this.formsAreValid()) {
+      const result: AudioTrack[] = this.forms.map((group, index) => {
+        const value = group().value();
         return {
           title: value.title!,
           fullPath: this.tracks[index].fullPath,
@@ -118,5 +85,9 @@ export class TracksUploadModalComponent implements OnInit {
       return;
     }
     this.currentStep.set(this.currentStep() - 1);
+  }
+
+  private formsAreValid(): boolean {
+    return this.forms.every((form) => form().valid());
   }
 }
