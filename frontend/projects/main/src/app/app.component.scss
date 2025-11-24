@@ -1,21 +1,21 @@
-@use "typography" as typo;
+@use 'typography' as typo;
 
 h1 {
   @include typo.default-font();
 }
 
-:host{
+:host {
   height: 89vh;
   width: 97vw;
   overflow: hidden;
   display: flex;
   flex-direction: column;
 
-
-  .page-container{
+  .page-container {
     flex: 1 1 auto;
     display: flex;
     flex-direction: column;
     overflow-y: auto;
+    padding-bottom: 80px;
   }
 }
