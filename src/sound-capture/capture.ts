@@ -42,7 +42,11 @@ async function createCapture(){
       video: false
     });
 
-    const audioContext = new AudioContext();
+    const audioContext = new AudioContext({
+      latencyHint: "playback",
+      sampleRate: SAMPLE_RATE
+    });
+    console.log(`[CAPTURE] AudioContext created with sample rate: ${audioContext.sampleRate}`);
     const audioOutputNode = audioContext.createGain();
 
     await audioContext.audioWorklet.addModule("./PCMStream.worklet.js");
