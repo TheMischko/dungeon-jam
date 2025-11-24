@@ -475,6 +475,18 @@ dist/
 - Discord token must never be hardcoded; always load from .env
 - Database operations should be atomic; avoid partial writes
 
+### Documentation Output Guidelines
+
+**DO NOT generate explanation or documentation files** when implementing features or fixes. This includes:
+- ❌ Summary documents explaining what was done
+- ❌ Implementation guides or walkthroughs
+- ❌ Quick reference cards
+- ❌ Troubleshooting guides for new features
+- ❌ Verification checklists
+- ❌ Any `.md` files documenting your changes
+
+**ONLY create files if explicitly requested by the user.** Focus on code implementation only. Users will ask for documentation if they want it.
+
 ---
 
 ## Related Resources
