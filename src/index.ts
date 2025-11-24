@@ -13,6 +13,7 @@ import { RedirectManager } from './main/managers/redirect.manager';
 import { FilesManager } from './main/managers/files.manager';
 import { StoredPlaybackManager } from './main/managers/stored-playback.manager';
 import { TagsManager } from './main/managers/tags.manager';
+import { JitterBuffer } from './main/services/jitter-buffer';
 
 configDotenv();
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN || 'ERROR';
@@ -71,6 +72,13 @@ function setupWebsocketServer(
   console.log('Websocket server started on', websocketServer.address());
   ipcMain.handle('get-websocket', () => websocketServer.address());
 
+  // Create jitter buffer for handling network jitter
+  // This smooths out variable packet arrival times and prevents audio dropout
+  const jitterBuffer = new JitterBuffer(
+    1920, // Frame size: 960 samples * 2 bytes (16-bit) = 1920 bytes
+    200, // Target latency: 200ms buffer
+  );
+
   websocketServer.on('connection', async (socket: WebSocket) => {
     console.log('Got a new connection to a Websocket server');
     socket.on('message', async (data: RawData) => {
@@ -79,6 +87,8 @@ function setupWebsocketServer(
         : new Promise<void>((resolve) => resolve()));
     });
   });
+
+  return { websocketServer, jitterBuffer };
 }
 
 async function setupDiscord(token: string, stream: Readable): Promise<void> {
@@ -98,10 +108,33 @@ app.on('ready', async () => {
     rate: SAMPLE_RATE,
   });
 
-  setupWebsocketServer(async (data) => {
-    const buffer = Buffer.from(data as ArrayLike<number>);
-    encoder.write(buffer);
-  });
+  // Setup WebSocket server with jitter buffer for network stability
+  const { websocketServer, jitterBuffer } = setupWebsocketServer(
+    async (data) => {
+      const buffer = Buffer.from(data as ArrayLike<number>);
+
+      if (jitterBuffer.addFrame(buffer)) {
+        const frame = jitterBuffer.getFrame();
+        if (frame) {
+          encoder.write(frame);
+        } else {
+          console.warn(
+            '[AudioPipeline] Buffer underrun - writing silence frame',
+          );
+          encoder.write(Buffer.alloc(FRAME_SIZE));
+        }
+      }
+
+      // Log buffer health periodically
+      if (Math.random() < 0.001) {
+        const stats = jitterBuffer.getStats();
+        console.log(
+          `[JitterBuffer] Buffer: ${stats.currentBufferSize}/${stats.targetBufferSize} frames | Drop rate: ${stats.dropRate}`,
+        );
+      }
+    },
+  );
+
   const preload = path.join(__dirname, 'preload.js');
   const viewManager = await ViewManager.getInstance({
     width: 1280,

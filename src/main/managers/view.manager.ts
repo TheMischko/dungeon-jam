@@ -54,7 +54,7 @@ export class ViewManager {
         () => new SideBarTab(appWindow, config.defaultPreferences),
       );
 
-      frontendTab.tab.webContents.openDevTools({
+      captureTab.webContents.openDevTools({
         mode: 'detach',
       });
 
