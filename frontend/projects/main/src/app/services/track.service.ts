@@ -37,4 +37,30 @@ export class TrackService {
       });
     return subject.asObservable();
   }
+
+  updateTrack(track: Track): Observable<Track> {
+    const subject = new Subject<Track>();
+    this.window.TRACK_API.updateTrack(track)
+      .then((updatedTrack) => {
+        subject.next(updatedTrack);
+        subject.complete();
+      })
+      .catch((error) => {
+        subject.error(error);
+      });
+    return subject.asObservable();
+  }
+
+  deleteTrack(id: string): Observable<boolean> {
+    const subject = new Subject<boolean>();
+    this.window.TRACK_API.deleteTrack(id)
+      .then((success) => {
+        subject.next(success);
+        subject.complete();
+      })
+      .catch((error) => {
+        subject.error(error);
+      });
+    return subject.asObservable();
+  }
 }

@@ -10,6 +10,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { TagData } from '@shared/models/tag.model';
 import { createTrackForm } from '../../../../forms/track-form/track-form.model';
 import { TrackFormComponent } from '../../../../forms/track-form/track-form.component';
+import { disabled } from '@angular/forms/signals';
 
 export type TracksUploadModalData = {
   title: string;
@@ -41,12 +42,18 @@ export class TracksUploadModalComponent {
   });
 
   readonly forms = this.tracks.map((track) => {
-    return createTrackForm({
-      path: track.fullPath,
-      title: track.title,
-      author: track.author,
-      tags: [] as TagData[],
-    });
+    const form = createTrackForm(
+      {
+        path: track.fullPath,
+        title: track.title,
+        author: track.author,
+        tags: [] as TagData[],
+      },
+      (form) => {
+        disabled(form.path);
+      },
+    );
+    return form;
   });
 
   get title(): string {

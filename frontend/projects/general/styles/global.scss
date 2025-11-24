@@ -104,3 +104,23 @@ button.mdc-button.button-large {
   min-width: 56px;
   padding-top: 3px;
 }
+
+/**
+ * Flat buttons Color overrides
+ */
+button.mdc-button.mat-mdc-unelevated-button.mat-error,
+button.mdc-button.mat-mdc-unelevated-button.mat-danger {
+  background-color: col.$error;
+  color: col.$text-main;
+}
+button.mdc-button.mat-mdc-unelevated-button.mat-secondary,
+button.mdc-button.mat-mdc-unelevated-button.mat-neutral {
+  background-color: col.$text-main;
+  color: col.$text-secondary;
+}
+button.mdc-button {
+  lucide-icon svg {
+    display: inline-block;
+    margin-bottom: -3px;
+  }
+}

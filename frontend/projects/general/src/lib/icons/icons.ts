@@ -7,8 +7,10 @@ import {
   LoaderCircleIcon,
   Music2Icon,
   PauseIcon,
+  PencilIcon,
   PlayIcon,
   Repeat2Icon,
+  SaveIcon,
   SearchIcon,
   SkipBackIcon,
   SkipForwardIcon,
@@ -39,7 +41,9 @@ export const actionsIconSet = {
   DeleteIcon: Trash2Icon,
   AddIcon: SquarePlusIcon,
   ActionsMenu: EllipsisVerticalIcon,
+  EditIcon: PencilIcon,
   CrossIcon: XIcon,
+  SaveIcon: SaveIcon,
 };
 
 export const volumeIconSet = {

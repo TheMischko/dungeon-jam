@@ -7,7 +7,9 @@ import {
 } from '@ngrx/signals';
 import {
   entityConfig,
+  removeEntity,
   setAllEntities,
+  setEntity,
   withEntities,
 } from '@ngrx/signals/entities';
 import { Track } from '@shared/models/track.model';
@@ -63,8 +65,68 @@ export const TrackLibraryStore = signalStore(
         ),
       );
 
+      const updateTrack = rxMethod<Track>(
+        pipe(
+          tap(() => patchState(store, { loading: true })),
+          switchMap((track: Track) => {
+            return trackApiService.updateTrack(track).pipe(
+              catchError((err) => {
+                toastService.createToast(
+                  'Update error',
+                  err.message,
+                  ToastType.Error,
+                );
+                return of(null);
+              }),
+              tap(() => {
+                toastService.createToast(
+                  'Track updated',
+                  'The track was successfully updated.',
+                  ToastType.Success,
+                );
+                patchState(store, setEntity(track));
+              }),
+              finalize(() => {
+                patchState(store, { loading: false });
+              }),
+            );
+          }),
+        ),
+      );
+
+      const removeTrack = rxMethod<string>(
+        pipe(
+          tap(() => patchState(store, { loading: true })),
+          switchMap((trackId: string) => {
+            return trackApiService.deleteTrack(trackId).pipe(
+              catchError((err) => {
+                toastService.createToast(
+                  'Delete error',
+                  err.message,
+                  ToastType.Error,
+                );
+                return of(false);
+              }),
+              tap(() => {
+                toastService.createToast(
+                  'Track deleted',
+                  'The track was successfully deleted.',
+                  ToastType.Success,
+                );
+                patchState(store, removeEntity(trackId));
+              }),
+              finalize(() => {
+                patchState(store, { loading: false });
+              }),
+            );
+          }),
+        ),
+      );
+
       return {
         load,
+        updateTrack,
+        removeTrack,
       };
     },
   ),

@@ -24,6 +24,11 @@ import { MenuCloseReason } from '@angular/material/menu';
 import { QueryOptions } from '@shared/models/request.model';
 import { SortDirection } from '@shared/models/common.model';
 import { TrackLibraryStore } from '../../../../stores/track-library.store';
+import {
+  EditTrackModalComponent,
+  EditTrackResult,
+} from '../../modals/edit-track-modal/edit-track-modal.component';
+import { take } from 'rxjs';
 
 @Component({
   selector: 'app-library-landing-page',
@@ -107,6 +112,11 @@ export class LibraryLandingPageComponent implements OnInit {
       keepOpen: true,
     },
     {
+      text: 'Edit',
+      icon: actionsIconSet.EditIcon,
+      onSelected: (track: Track) => this.editTrack(track),
+    },
+    {
       text: 'Delete',
       icon: actionsIconSet.DeleteIcon,
       onSelected: (track: Track) => this.deleteTrack(track),
@@ -169,7 +179,34 @@ export class LibraryLandingPageComponent implements OnInit {
     return undefined;
   }
 
-  private deleteTrack(track: Track) {
-    console.log(`Remove song: ${track.name}`);
+  private deleteTrack(track: Track | undefined) {
+    if (!track) {
+      return;
+    }
+    this.trackStore.removeTrack(track.id);
+  }
+
+  private editTrack(track: Track) {
+    const dialog = this.dialogService.open<
+      EditTrackModalComponent,
+      EditTrackResult
+    >(EditTrackModalComponent, {
+      data: track,
+    });
+    dialog.afterClosed$.pipe(take(1)).subscribe((result) => {
+      switch (result?.type) {
+        case 'delete':
+          this.deleteTrack(this.tracks().find((t) => t.id === result.trackId)!);
+          break;
+        case 'update':
+          this.updateTrack(result.trackId, result.data);
+          break;
+      }
+    });
+  }
+
+  private updateTrack(_: string, data: Track) {
+    console.log('update', data);
+    this.trackStore.updateTrack(data);
   }
 }

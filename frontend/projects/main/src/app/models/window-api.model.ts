@@ -27,6 +27,8 @@ export type AudioApiWindow = Window &
         author?: string,
         tags?: string[],
       ) => Promise<Track>;
+      updateTrack: (track: Track) => Promise<Track>;
+      deleteTrack: (id: string) => Promise<boolean>;
     };
   } & {
     PLAYBACK_API: {

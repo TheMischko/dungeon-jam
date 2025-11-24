@@ -207,7 +207,7 @@ export class DiscordManager {
 
     // Initialize jitter buffer for stability
     // Frame size 1920 bytes = 960 samples * 2 bytes per 16-bit sample
-    this.jitterBuffer = new JitterBuffer(1920, 200, 48000); // 1920 bytes frame, 200ms target
+    this.jitterBuffer = new JitterBuffer(1920, 200); // 1920 bytes frame, 200ms target
 
     this.connection.subscribe(this.audioPlayer);
     this.audioResource = createAudioResource(stream, {

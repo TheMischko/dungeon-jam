@@ -73,6 +73,14 @@ export class TrackManager {
       });
       await Promise.all(promises);
     });
+
+    ipcMain.handle(TrackChannel.UPDATE, async (_, track: Track) => {
+      return await this.update(track);
+    });
+
+    ipcMain.handle(TrackChannel.DELETE, async (_, id: string) => {
+      return await this.deleteById(id);
+    });
   }
 
   async getAll(query?: QueryRequest): Promise<Track[]> {
@@ -175,5 +183,17 @@ export class TrackManager {
     const valB = trackB[sortValue] as string;
 
     return valA.toLowerCase().localeCompare(valB.toLowerCase()) * directionNum;
+  }
+
+  private async update(track: Track) {
+    console.log(`[TrackManager] Update track: ${track.id}`);
+    return await this.tracksProvider.update('id', track.id, track);
+  }
+
+  private async deleteById(id: string) {
+    console.log(`[TrackManager] Delete track: ${id}`);
+    const playlistsManager = await PlaylistManager.getInstance();
+    await playlistsManager.removeTracksFromPlaylists([id]);
+    return await this.tracksProvider.deleteOne('id', id);
   }
 }

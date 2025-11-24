@@ -34,9 +34,19 @@ const createTrack = async (
   );
 };
 
+const updateTrack = async (track: Track): Promise<Track> => {
+  return await ipcRenderer.invoke(TrackChannel.UPDATE, track);
+};
+
+const deleteTrack = async (id: string): Promise<boolean> => {
+  return await ipcRenderer.invoke(TrackChannel.DELETE, id);
+};
+
 export default {
   getAllTracks,
   getTrackById,
   createTrack,
   getTracksByPlaylist,
+  updateTrack,
+  deleteTrack,
 };

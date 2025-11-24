@@ -7,6 +7,8 @@ export enum TrackChannel {
   GET_ALL = 'tracks/get-all',
   GET_BY_ID = 'tracks/get-by-id',
   INSERT = 'tracks/add',
+  UPDATE = 'tracks/update',
+  DELETE = 'tracks/delete',
   GET_PLAYLIST_TRACKS = 'tracks/get-playlist-tracks',
 }
 

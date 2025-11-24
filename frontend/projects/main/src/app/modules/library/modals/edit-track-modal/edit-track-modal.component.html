@@ -1,0 +1,29 @@
+<div class="wrapper">
+  <div class="header">
+    <h1>Edit Track {{ trackForm().title().value() }}</h1>
+  </div>
+
+  <div class="content">
+    @if(loading() && !trackForm()) {
+    <lib-loader size="large" class="loader"></lib-loader>
+    } @else {
+    <app-track-form [form]="trackForm()!"></app-track-form>
+    }
+  </div>
+
+  <div class="footer">
+    <div class="buttons">
+      <button mat-flat-button color="error" (click)="deleteTrack()">
+        <lucide-icon [img]="deleteIcon" size="20" />
+        Delete
+      </button>
+      <button mat-flat-button color="primary" (click)="updateTrack()">
+        <lucide-icon [img]="saveIcon" size="20" />
+        Save
+      </button>
+      <button mat-flat-button color="secondary" (click)="cancel()">
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>

@@ -113,6 +113,7 @@ export class DatabaseProvider<T> {
       }
 
       data[existingIndex] = newValue;
+      console.log(data, data[existingIndex]);
       await this.database.updateTable(this.table, data);
       resolve(newValue);
     });

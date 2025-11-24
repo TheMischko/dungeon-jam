@@ -125,28 +125,7 @@ export class PlaylistManager {
     return 0;
   }
 
-  private createNewPlaylist(
-    data: PlaylistInsertQuery,
-    order: number,
-  ): Playlist {
-    const id = uuid();
-    const date = new Date();
-    return {
-      id,
-      name: data.name,
-      description: data?.description,
-      order,
-      imageUrl: data?.imageUrl,
-      tags: data?.tags.map((t) => t.id) ?? [],
-      dateCreated: date,
-      dateUpdated: date,
-      trackIds: [],
-    };
-  }
-
-  private async addTracks(
-    data: PlaylistAddTracksData,
-  ): Promise<Map<string, Playlist>> {
+  async addTracks(data: PlaylistAddTracksData): Promise<Map<string, Playlist>> {
     const playlists = this.database.readTable<Playlist[]>('playlists');
     if (!playlists) {
       return new Map();
@@ -187,7 +166,7 @@ export class PlaylistManager {
     );
   }
 
-  private async update(query: PlaylistUpdateQuery): Promise<Playlist> {
+  async update(query: PlaylistUpdateQuery): Promise<Playlist> {
     if (!query.id) {
       throw new Error('Playlist ID is required for update.');
     }
@@ -229,5 +208,43 @@ export class PlaylistManager {
 
   async getById(id: string) {
     return this.playlistProvider.getBy('id', id);
+  }
+
+  async removeTracksFromPlaylists(trackIds: string[]): Promise<number> {
+    const playlists = await this.playlistProvider.getAll();
+    let affectedCount = 0;
+    for (const playlist of playlists) {
+      const tracks = [...playlist.trackIds].filter(
+        (trackId) => !trackIds.includes(trackId),
+      );
+      if (tracks.length !== playlist.trackIds.length) {
+        await this.playlistProvider.replaceRecord({
+          ...playlist,
+          trackIds: tracks,
+          dateUpdated: new Date(),
+        });
+        affectedCount++;
+      }
+    }
+    return affectedCount;
+  }
+
+  private createNewPlaylist(
+    data: PlaylistInsertQuery,
+    order: number,
+  ): Playlist {
+    const id = uuid();
+    const date = new Date();
+    return {
+      id,
+      name: data.name,
+      description: data?.description,
+      order,
+      imageUrl: data?.imageUrl,
+      tags: data?.tags.map((t) => t.id) ?? [],
+      dateCreated: date,
+      dateUpdated: date,
+      trackIds: [],
+    };
   }
 }
