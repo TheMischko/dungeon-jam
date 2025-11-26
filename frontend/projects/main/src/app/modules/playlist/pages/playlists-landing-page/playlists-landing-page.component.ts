@@ -4,9 +4,8 @@ import { MatButton } from '@angular/material/button';
 import { DialogService } from '../../../../services/dialog.service';
 import { CreatePlaylistModalComponent } from '../../modals/create-playlist-modal/create-playlist-modal.component';
 import { PlaylistInsertQuery } from '@shared/models/playlist.model';
-import { DialogRef } from '../../../../models/dialog.model';
 import { PlaylistStore } from '@general/stores/playlist.store';
-import { combineLatest, map, of, switchMap, take } from 'rxjs';
+import { combineLatest, map, of, switchMap } from 'rxjs';
 import { Tag, TagData } from '@shared/models/tag.model';
 import { TagApiService } from '@general/services/tag-api.service';
 
@@ -21,22 +20,14 @@ export class PlaylistsLandingPageComponent {
   readonly playlistStore = inject(PlaylistStore);
   readonly tagApiService = inject(TagApiService);
 
-  private dialogRef:
-    | DialogRef<CreatePlaylistModalComponent, PlaylistInsertQuery>
-    | undefined;
-
   openCreateDialog() {
-    if (this.dialogRef) {
-      return;
-    }
-
-    this.dialogRef = this.dialogService.open<
+    const dialogRef = this.dialogService.open<
       CreatePlaylistModalComponent,
       PlaylistInsertQuery
     >(CreatePlaylistModalComponent);
-    this.dialogRef.afterClosed$
+
+    dialogRef.afterClosed$
       .pipe(
-        take(1),
         switchMap((result) => {
           if (!result) {
             return of(result);

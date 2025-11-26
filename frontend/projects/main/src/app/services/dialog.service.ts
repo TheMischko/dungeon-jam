@@ -3,6 +3,7 @@ import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { ComponentType } from '@angular/cdk/portal';
 import { DialogRef } from '../models/dialog.model';
 import { NoopScrollStrategy } from '@angular/cdk/overlay';
+import {take} from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -30,7 +31,7 @@ export class DialogService {
       close(result?: R) {
         currentRef.close(result);
       },
-      afterClosed$: currentRef.afterClosed(),
+      afterClosed$: currentRef.afterClosed().pipe(take(1)),
       componentRef: currentRef.componentRef!,
     };
   }
