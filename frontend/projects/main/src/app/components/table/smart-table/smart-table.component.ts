@@ -21,6 +21,9 @@ import { LoaderComponent } from '@general/components/display/loader/loader.compo
 import { FilterSettingsComponent } from '../../filters/filter-settings/filter-settings.component';
 import { TagsFilterComponent } from '../../filters/tags-filter/tags-filter.component';
 import { PlaylistFilterComponent } from '../../filters/playlist-filter/playlist-filter.component';
+import { FilterMatchingOption } from '../../../../../../general/models/filter.model';
+import { Playlist } from '@shared/models/playlist.model';
+import { TagData } from '@shared/models/tag.model';
 
 @Component({
   selector: 'app-smart-table',
@@ -56,6 +59,8 @@ export class SmartTableComponent<T> {
   readonly hoverStart = output<T>();
   readonly hoverEnd = output<T>();
   readonly queryChange = output<QueryOptions>();
+  readonly filterChange = output<{ collection: string; filters: unknown[] }>();
+  readonly filterMatchingChange = output<FilterMatchingOption>();
 
   readonly currentSearch = signal<string>('');
   readonly currentSortBy = signal<string | undefined>(undefined);
@@ -92,5 +97,19 @@ export class SmartTableComponent<T> {
   setSort(event: { sortBy: string; sortDirection: SortDirection }) {
     this.currentSortBy.set(event.sortBy);
     this.currentSortDirection.set(event.sortDirection);
+  }
+
+  protected emitPlaylistFilters(playlists: Playlist[]) {
+    this.filterChange.emit({
+      collection: 'playlists',
+      filters: playlists.map((p) => p.id),
+    });
+  }
+
+  protected emitTagFilters(tags: TagData[]) {
+    this.filterChange.emit({
+      collection: 'tags',
+      filters: tags.map((t) => t.id),
+    });
   }
 }

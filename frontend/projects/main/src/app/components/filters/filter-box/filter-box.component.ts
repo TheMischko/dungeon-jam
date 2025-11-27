@@ -6,7 +6,11 @@ import {
   output,
 } from '@angular/core';
 import { MatFormField, MatLabel } from '@angular/material/input';
-import { MatOption, MatSelect } from '@angular/material/select';
+import {
+  MatOption,
+  MatSelect,
+  MatSelectChange,
+} from '@angular/material/select';
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 
 @Component({
@@ -33,4 +37,8 @@ export class FilterBoxComponent<T> {
   );
 
   readonly selectionChange = output<T[]>();
+
+  protected emitSelection(event: MatSelectChange<T[]>) {
+    this.selectionChange.emit(event.value);
+  }
 }

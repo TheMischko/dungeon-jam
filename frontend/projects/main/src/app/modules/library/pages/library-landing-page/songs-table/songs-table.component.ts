@@ -38,7 +38,10 @@ import {
 } from '../../../../../models/table.model';
 import { SmartTableComponent } from '../../../../../components/table/smart-table/smart-table.component';
 import { QueryOptions } from '@shared/models/request.model';
-import { FilterSettingsComponent } from '../../../../../components/filters/filter-settings/filter-settings.component';
+import {
+  FilterMatchingOption,
+  SongsTableFilters,
+} from '../../../../../../../../general/models/filter.model';
 
 @Component({
   selector: 'app-songs-table',
@@ -51,7 +54,6 @@ import { FilterSettingsComponent } from '../../../../../components/filters/filte
     ActionsMenuComponent,
     TagListSmartComponent,
     SmartTableComponent,
-    FilterSettingsComponent,
   ],
   templateUrl: './songs-table.component.html',
   styleUrl: './songs-table.component.scss',
@@ -75,6 +77,7 @@ export class SongsTableComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly pauseTrack = output();
   readonly actionMenuClosed = output<MenuCloseReason | string>();
   readonly selectionChange = output<Track[]>();
+  readonly filterChange = output<SongsTableFilters>();
 
   readonly playColumnTemplate =
     viewChild.required<TemplateRef<{ $implicit: Track }>>('playColumn');
@@ -92,6 +95,11 @@ export class SongsTableComponent implements OnInit, AfterViewInit, OnDestroy {
 
   readonly activeRow = signal<Track | null>(null);
   readonly componentWidth = signal<number>(0);
+  readonly filters = signal<SongsTableFilters>({
+    matching: 'any',
+    tagIds: [],
+    playlistIds: [],
+  });
 
   readonly maxTagsToShow = computed(() => {
     const width = this.componentWidth();
@@ -201,5 +209,33 @@ export class SongsTableComponent implements OnInit, AfterViewInit, OnDestroy {
 
   updateSelection(selectedTracks: Track[]) {
     this.selectionChange.emit(selectedTracks);
+  }
+
+  protected setFilterMatching(matchingOption: FilterMatchingOption) {
+    this.filters.update((filters) => ({
+      ...filters,
+      matching: matchingOption,
+    }));
+    this.filterChange.emit(this.filters());
+  }
+
+  protected setFilters(update: { collection: string; filters: unknown[] }) {
+    if (update.collection === 'playlists') {
+      this.filters.update((oldValue) => ({
+        ...oldValue,
+        playlistIds: update.filters as string[],
+      }));
+      this.filterChange.emit(this.filters());
+      return;
+    }
+
+    if (update.collection === 'tags') {
+      this.filters.update((oldValue) => ({
+        ...oldValue,
+        tagIds: update.filters as string[],
+      }));
+      this.filterChange.emit(this.filters());
+      return;
+    }
   }
 }

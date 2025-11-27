@@ -1,9 +1,9 @@
 <div class="controls">
   @if(filterEnabled()){
-  <app-filter-settings />
+  <app-filter-settings (matchingChange)="filterMatchingChange.emit($event)" />
   <div class="filters">
-    <app-tags-filter />
-    <app-playlist-filter />
+    <app-tags-filter (selectionChange)="emitTagFilters($event)" />
+    <app-playlist-filter (selectionChange)="emitPlaylistFilters($event)" />
   </div>
   } @else {
   <div></div>

@@ -11,6 +11,10 @@
     --mat-form-field-container-vertical-padding: 10px;
     --mat-form-field-container-height: 40px;
   }
+
+  ::ng-deep .mdc-notched-outline {
+    top: unset;
+  }
 }
 
 .search-bar {
