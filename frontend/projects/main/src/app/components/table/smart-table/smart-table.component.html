@@ -1,5 +1,13 @@
 <div class="controls">
-  <div>Filters</div>
+  @if(filterEnabled()){
+  <app-filter-settings />
+  <div class="filters">
+    <app-tags-filter />
+    <app-playlist-filter />
+  </div>
+  } @else {
+  <div></div>
+  }
   <lib-search-bar
     class="search-bar"
     (search)="currentSearch.set($event)"

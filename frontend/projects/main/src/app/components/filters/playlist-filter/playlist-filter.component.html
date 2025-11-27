@@ -1,0 +1,8 @@
+<app-filter-box
+  [options]="playlists()"
+  [optionDisplayField]="displayField"
+  [trackBy]="trackById"
+  (selectionChange)="emitSelection($event)"
+  placeholder="Playlist filters"
+  label="Playlists"
+></app-filter-box>

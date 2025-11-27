@@ -1,12 +1,36 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  input,
+  model,
+  output,
+} from '@angular/core';
+import { MatFormField, MatLabel } from '@angular/material/input';
+import { MatOption, MatSelect } from '@angular/material/select';
+import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 
 @Component({
   selector: 'app-filter-box',
-  imports: [],
+  imports: [MatFormField, MatSelect, MatOption, MatLabel],
+  providers: [
+    {
+      provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,
+      useValue: { appearance: 'outline' },
+    },
+  ],
   templateUrl: './filter-box.component.html',
   styleUrl: './filter-box.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class FilterBoxComponent {
+export class FilterBoxComponent<T> {
+  readonly options = input.required<T[]>();
+  readonly optionDisplayField = input.required<keyof T>();
+  readonly label = input.required<string>();
+  readonly placeholder = input<string>('Select options');
+  readonly selection = model<T[]>([]);
+  readonly trackBy = input<(index: number, item: T) => unknown>(
+    (_, item) => item,
+  );
 
+  readonly selectionChange = output<T[]>();
 }

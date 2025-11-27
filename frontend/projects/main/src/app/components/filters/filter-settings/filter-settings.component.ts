@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, output } from '@angular/core';
 import { IconButtonComponent } from '@general/components/buttons/icon-button/icon-button.component';
 import { actionsIconSet } from '@general/icons/icons';
 import {
@@ -15,19 +15,23 @@ import { MatMenu, MatMenuTrigger } from '@angular/material/menu';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FilterSettingsComponent {
+  readonly matchingChange = output<FilterMatchingOption>();
+
   readonly filtersIcon = actionsIconSet.FilterIcon;
   filterOptions: ActionsMenuBaseConfig<null>[] = [
     {
       text: 'Any',
-      onSelected() {
-        console.log('or');
+      onSelected: () => {
+        this.matchingChange.emit('any');
       },
     },
     {
       text: 'All',
-      onSelected() {
-        console.log('all');
+      onSelected: () => {
+        this.matchingChange.emit('all');
       },
     },
   ];
 }
+
+export type FilterMatchingOption = 'any' | 'all';

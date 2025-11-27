@@ -1,4 +1,3 @@
-<app-filter-settings></app-filter-settings>
 <app-smart-table
   [config]="tableConfig()"
   [dataSet]="tracks()"
@@ -9,6 +8,7 @@
   [noDataText]="noDataText"
   [noResultsText]="noSearchResultsText"
   [loading]="loading()"
+  [filterEnabled]="true"
   (hoverStart)="hoverStart($event)"
   (hoverEnd)="hoverEnd($event)"
   (queryChange)="queryChange.emit($event)"

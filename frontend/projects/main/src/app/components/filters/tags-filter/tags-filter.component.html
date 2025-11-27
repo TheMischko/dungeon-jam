@@ -1,0 +1,8 @@
+<app-filter-box
+  [options]="tags()"
+  [optionDisplayField]="displayField"
+  [trackBy]="trackById"
+  (selectionChange)="emitSelection($event)"
+  placeholder="Tag filters"
+  label="Tags"
+></app-filter-box>

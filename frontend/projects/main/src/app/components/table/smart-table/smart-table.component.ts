@@ -18,10 +18,20 @@ import {
 } from '../../../models/table.model';
 import { TableComponent } from '../table.component';
 import { LoaderComponent } from '@general/components/display/loader/loader.component';
+import { FilterSettingsComponent } from '../../filters/filter-settings/filter-settings.component';
+import { TagsFilterComponent } from '../../filters/tags-filter/tags-filter.component';
+import { PlaylistFilterComponent } from '../../filters/playlist-filter/playlist-filter.component';
 
 @Component({
   selector: 'app-smart-table',
-  imports: [SearchBarComponent, TableComponent, LoaderComponent],
+  imports: [
+    SearchBarComponent,
+    TableComponent,
+    LoaderComponent,
+    FilterSettingsComponent,
+    TagsFilterComponent,
+    PlaylistFilterComponent,
+  ],
   templateUrl: './smart-table.component.html',
   styleUrl: './smart-table.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -39,6 +49,7 @@ export class SmartTableComponent<T> {
   readonly loading = input<boolean>(false);
   readonly noDataText = input<string>('No data available');
   readonly noResultsText = input<string>('No results found');
+  readonly filterEnabled = input<boolean>(false);
 
   readonly selected = output<T[]>();
   readonly menuClosed = output<{ row: T; reason: string }>();
