@@ -1,3 +1,5 @@
+@use './../../../../../styles/colors' as col;
+
 :host ::ng-deep button .mat-mdc-menu-item-text {
   display: flex;
   align-items: center;
@@ -6,4 +8,10 @@
   lucide-icon {
     margin-top: 4px;
   }
+}
+
+.menu-title {
+  color: col.$text-main;
+  padding: 0 8px;
+  font-size: 16px;
 }

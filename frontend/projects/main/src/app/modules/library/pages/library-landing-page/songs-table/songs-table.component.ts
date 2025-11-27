@@ -38,6 +38,7 @@ import {
 } from '../../../../../models/table.model';
 import { SmartTableComponent } from '../../../../../components/table/smart-table/smart-table.component';
 import { QueryOptions } from '@shared/models/request.model';
+import { FilterSettingsComponent } from '../../../../../components/filters/filter-settings/filter-settings.component';
 
 @Component({
   selector: 'app-songs-table',
@@ -50,6 +51,7 @@ import { QueryOptions } from '@shared/models/request.model';
     ActionsMenuComponent,
     TagListSmartComponent,
     SmartTableComponent,
+    FilterSettingsComponent,
   ],
   templateUrl: './songs-table.component.html',
   styleUrl: './songs-table.component.scss',

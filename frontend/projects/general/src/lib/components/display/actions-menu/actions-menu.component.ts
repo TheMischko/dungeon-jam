@@ -12,6 +12,7 @@ import { MatMenuItem } from '@angular/material/menu';
 export class ActionsMenuComponent<T> {
   readonly item = input.required<T>();
   readonly config = input.required<ActionsMenuBaseConfig<T>[]>();
+  readonly title = input<string>();
 
   actionClicked(item: T, config: ActionsMenuBaseConfig<T>, event: Event): void {
     if (!config.onSelected || typeof config.onSelected !== 'function') {

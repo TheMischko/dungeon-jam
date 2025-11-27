@@ -2,6 +2,7 @@ import {
   EllipsisVerticalIcon,
   Grid2x2Icon,
   Grid3x3Icon,
+  ListFilterIcon,
   ListMusicIcon,
   ListStartIcon,
   LoaderCircleIcon,
@@ -44,6 +45,7 @@ export const actionsIconSet = {
   EditIcon: PencilIcon,
   CrossIcon: XIcon,
   SaveIcon: SaveIcon,
+  FilterIcon: ListFilterIcon,
 };
 
 export const volumeIconSet = {
