@@ -12,11 +12,15 @@ import { DatabaseProvider } from '../database/database-provider';
 import { DatabaseProviderCreator } from '../database/database-provider-creator';
 import { TagsManager } from './tags.manager';
 import { GetSomeMatch } from '../database/database-provider.model';
+import { FilesManager } from './files.manager';
 
 export class TrackManager {
   private static _instance: TrackManager;
 
-  private constructor(private tracksProvider: DatabaseProvider<Track>) {}
+  private constructor(
+    private tracksProvider: DatabaseProvider<Track>,
+    private filesManager: FilesManager,
+  ) {}
 
   public static async getInstance() {
     if (!TrackManager._instance) {
@@ -25,7 +29,8 @@ export class TrackManager {
         .setSort(TrackManager.sortTracks)
         .setFilter(TrackManager.filterTracks)
         .complete();
-      TrackManager._instance = new TrackManager(provider);
+      const filesManager = await FilesManager.getInstance();
+      TrackManager._instance = new TrackManager(provider, filesManager);
       TrackManager._instance.registerChannels();
     }
     return TrackManager._instance!;
@@ -127,7 +132,13 @@ export class TrackManager {
       duration,
       tags,
     };
-    return await this.tracksProvider.create(newTrack);
+    const newRecord = await this.tracksProvider.create(newTrack);
+    try {
+      await this.filesManager.updateTrackFile(newRecord);
+    } catch (e) {
+      console.error('[TrackManager] Failed to update track file metadata', e);
+    }
+    return newRecord;
   }
 
   public static __resetForTests(): void {
@@ -187,7 +198,17 @@ export class TrackManager {
 
   private async update(track: Track) {
     console.log(`[TrackManager] Update track: ${track.id}`);
-    return await this.tracksProvider.update('id', track.id, track);
+    const updatedRecord = await this.tracksProvider.update(
+      'id',
+      track.id,
+      track,
+    );
+    try {
+      await this.filesManager.updateTrackFile(updatedRecord);
+    } catch (e) {
+      console.error('[TrackManager] Failed to update track file metadata', e);
+    }
+    return updatedRecord;
   }
 
   private async deleteById(id: string) {

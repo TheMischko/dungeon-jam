@@ -16,6 +16,7 @@ export class MockDatabaseProviderCreator {
   private table: string = '';
   private sort: any = null;
   private filter: any = null;
+  private idColumn: string = 'id';
 
   static create<T>(): MockDatabaseProviderCreator {
     return new MockDatabaseProviderCreator();
@@ -23,6 +24,11 @@ export class MockDatabaseProviderCreator {
 
   setTable(table: string) {
     this.table = table;
+    return this;
+  }
+
+  setIdColumn(idColumn: string) {
+    this.idColumn = idColumn;
     return this;
   }
 

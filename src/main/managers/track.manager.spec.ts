@@ -8,6 +8,11 @@ import {
   mockPlaylistManager,
   mockPlaylistManagerInstance,
 } from '../testing/mocks/mock-playlist-manager';
+import {
+  mockFilesManager,
+  mockFilesManagerInstance,
+} from '../testing/mocks/mock-files-manager';
+import { mockTagsManager } from '../testing/mocks/mock-tags-manager';
 import { setupTestEnvironment, triggerIpcMainHandle } from '../testing/setup';
 import { AudioFileChannel, TrackChannel } from '@shared/models/channels.model';
 import { TrackManager } from './track.manager';
@@ -22,6 +27,8 @@ import { SortDirection } from '@shared/models/common.model';
 
 vi.mock('electron', () => mockElectron);
 vi.mock('./playlist.manager', () => mockPlaylistManager);
+vi.mock('./files.manager', () => mockFilesManager);
+vi.mock('./tags.manager', () => mockTagsManager);
 vi.mock('../database/database-provider-creator', () => ({
   DatabaseProviderCreator: MockDatabaseProviderCreator,
 }));
@@ -246,5 +253,63 @@ describe('TrackManager', () => {
     expect(mockDatabaseProviderInstance.create).toHaveBeenCalled();
     expect(createdTrack.name).toEqual(audioTrack.title);
     expect(createdTrack.id).toBeDefined();
+  });
+
+  describe('update', () => {
+    it('should update track in the database', async () => {
+      const track = mockTrack({
+        name: 'Updated Track',
+        author: 'Updated Author',
+      });
+
+      vi.spyOn(mockDatabaseProviderInstance, 'update').mockResolvedValue(track);
+      mockFilesManagerInstance.updateTrackFile.mockResolvedValue(undefined);
+
+      const result = await trackManager['update'](track);
+
+      expect(mockDatabaseProviderInstance.update).toHaveBeenCalledWith(
+        'id',
+        track.id,
+        track,
+      );
+      expect(result).toEqual(track);
+    });
+
+    it('should update track file metadata after updating the track', async () => {
+      const track = mockTrack({
+        name: 'Updated Track',
+        author: 'Updated Author',
+      });
+
+      vi.spyOn(mockDatabaseProviderInstance, 'update').mockResolvedValue(track);
+      mockFilesManagerInstance.updateTrackFile.mockResolvedValue(undefined);
+
+      await trackManager['update'](track);
+
+      expect(mockFilesManagerInstance.updateTrackFile).toHaveBeenCalledWith(
+        track,
+      );
+    });
+
+    it('should handle metadata update errors gracefully during update', async () => {
+      const track = mockTrack();
+      vi.spyOn(mockDatabaseProviderInstance, 'update').mockResolvedValue(track);
+      const consoleSpy = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
+      const updateError = new Error('Metadata update failed');
+      mockFilesManagerInstance.updateTrackFile.mockRejectedValue(updateError);
+
+      const result = await trackManager['update'](track);
+
+      expect(mockFilesManagerInstance.updateTrackFile).toHaveBeenCalled();
+      expect(consoleSpy).toHaveBeenCalledWith(
+        '[TrackManager] Failed to update track file metadata',
+        updateError,
+      );
+      expect(result).toEqual(track);
+
+      consoleSpy.mockRestore();
+    });
   });
 });
