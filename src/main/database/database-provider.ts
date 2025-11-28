@@ -202,6 +202,7 @@ export type FilterFn<T> = (
   item: T,
   filter: string,
 ) => boolean | Promise<boolean>;
+
 export type SortFn<T> = (
   itemA: T,
   itemB: T,

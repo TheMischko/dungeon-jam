@@ -12,6 +12,7 @@ import { SortDirection } from '@shared/models/common.model';
 import { v4 as uuid } from 'uuid';
 import { DatabaseProvider } from '../database/database-provider';
 import { DatabaseProviderCreator } from '../database/database-provider-creator';
+import { GetSomeMatch } from '../database/database-provider.model';
 
 export class PlaylistManager {
   private static _instance: PlaylistManager;
@@ -227,6 +228,32 @@ export class PlaylistManager {
       }
     }
     return affectedCount;
+  }
+
+  async isTrackInPlaylists(
+    trackId: string,
+    playlistIds: string[],
+  ): Promise<boolean> {
+    if (playlistIds.length <= 1) {
+      return this.isTrackInPlaylist(trackId, playlistIds[0]);
+    }
+
+    const playlists = await this.playlistProvider.getSome('id', playlistIds, {
+      match: GetSomeMatch.EXACT,
+    });
+
+    return playlists.some((playlist) => playlist.trackIds.includes(trackId));
+  }
+
+  async isTrackInPlaylist(
+    trackId: string,
+    playlistId: string,
+  ): Promise<boolean> {
+    const playlist = await this.getById(playlistId);
+    if (!playlist) {
+      return false;
+    }
+    return playlist.trackIds.includes(trackId);
   }
 
   private createNewPlaylist(

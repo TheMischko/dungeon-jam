@@ -28,6 +28,8 @@ describe('PlaylistManager', () => {
     mockPlaylistProvider = {
       getAll: vi.fn().mockResolvedValue([]),
       getBy: vi.fn().mockResolvedValue(null),
+      getById: vi.fn().mockResolvedValue(null),
+      getSome: vi.fn().mockResolvedValue([]),
       create: vi
         .fn()
         .mockImplementation((data) =>
@@ -373,6 +375,101 @@ describe('PlaylistManager', () => {
           'order',
         ),
       ).toBeLessThan(0);
+    });
+  });
+
+  describe('isTrackInPlaylist', () => {
+    it('should return true if the track is in the playlist', async () => {
+      const trackId = 'track-123';
+      const playlist = mockPlaylist({
+        trackIds: [trackId],
+      });
+      mockPlaylistProvider.getBy.mockResolvedValue(playlist);
+
+      const result = await playlistManager.isTrackInPlaylist(
+        trackId,
+        playlist.id,
+      );
+
+      expect(result).toBe(true);
+    });
+
+    it('should return false if the track is not in the playlist', async () => {
+      const trackId = 'track-123';
+      const playlist = mockPlaylist({
+        trackIds: ['track-1234'],
+      });
+      mockPlaylistProvider.getBy.mockResolvedValue(playlist);
+
+      const result = await playlistManager.isTrackInPlaylist(
+        trackId,
+        playlist.id,
+      );
+
+      expect(result).toBe(false);
+    });
+  });
+
+  describe('isTrackInPlaylists', () => {
+    it('should use isTrackInPlaylist for single playlist ID', async () => {
+      const trackId = 'track-123';
+      const playlist = mockPlaylist({
+        trackIds: ['track-1234'],
+      });
+      vi.spyOn(playlistManager, 'isTrackInPlaylist').mockResolvedValue(true);
+
+      const result = await playlistManager.isTrackInPlaylists(trackId, [
+        playlist.id,
+      ]);
+
+      expect(playlistManager.isTrackInPlaylist).toHaveBeenCalled();
+      expect(result).toBe(true);
+    });
+
+    it('should return true if track is found in one of the playlists', async () => {
+      const trackId = 'track-123';
+      const playlists: Playlist[] = [
+        mockPlaylist(),
+        mockPlaylist({
+          trackIds: ['rack-123', 'track-1234'],
+        }),
+        mockPlaylist({
+          trackIds: [trackId],
+        }),
+        mockPlaylist(),
+      ];
+
+      mockPlaylistProvider.getSome.mockResolvedValue(playlists);
+      const result = await playlistManager.isTrackInPlaylists(
+        trackId,
+        playlists.map((p) => p.id),
+      );
+
+      expect(result).toBe(true);
+    });
+
+    it('should return false if track is not found in any playlists', async () => {
+      const trackId = 'track-123';
+      const playlists: Playlist[] = [
+        mockPlaylist({
+          trackIds: ['rack-125', 'track-1254'],
+        }),
+        mockPlaylist({
+          trackIds: ['rack-123', 'track-1234'],
+        }),
+        mockPlaylist({
+          trackIds: ['rack-125', 'track-1254'],
+        }),
+        mockPlaylist(),
+      ];
+
+      mockPlaylistProvider.getSome.mockResolvedValue(playlists);
+      const result = await playlistManager.isTrackInPlaylists(
+        trackId,
+        playlists.map((p) => p.id),
+      );
+
+      expect(result).toBe(false);
     });
   });
 });
