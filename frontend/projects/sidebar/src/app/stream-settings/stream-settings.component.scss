@@ -19,3 +19,7 @@
     background: col.$background-hover;
   }
 }
+
+::ng-deep svg.lucide-discord{
+  stroke-width: 1px !important;
+}

@@ -15,7 +15,7 @@ import {LucideAngularModule, MonitorSpeakerIcon} from 'lucide-angular';
 export class StreamSettingsComponent {
 
   readonly currentIcon = computed<any>(() => {
-    return this.localPlaybackIcon;
+    return this.discordPlaybackIcon;
   })
 
   readonly localPlaybackIcon = MonitorSpeakerIcon;
