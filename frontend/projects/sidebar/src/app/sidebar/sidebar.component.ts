@@ -7,11 +7,13 @@ import {PlaylistStore} from '@general/stores/playlist.store';
 import {SortDirection} from '@shared/models/common.model';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {filter} from 'rxjs';
+import {StreamSettingsComponent} from '../stream-settings/stream-settings.component';
 
 @Component({
   selector: 'app-sidebar',
   imports: [
-    SidebarItemComponent
+    SidebarItemComponent,
+    StreamSettingsComponent
   ],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.scss'
@@ -47,6 +49,7 @@ export class SidebarComponent implements OnInit{
       }
     ]
   });
+
 
   ngOnInit() {
     setTimeout(() => {

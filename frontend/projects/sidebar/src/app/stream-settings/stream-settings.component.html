@@ -1,0 +1,18 @@
+<div class="content">
+  <div class="icon">
+    @if(isStringIcon(currentIcon())){
+      <lucide-icon
+        [name]="currentIcon()">
+      </lucide-icon>
+    } @else {
+      <lucide-icon
+        [img]="currentIcon()">
+      </lucide-icon>
+    }
+  </div>
+  <div class="content-info">
+    <div class="stream-title">Zaplivaná knajpa</div>
+    <div class="stream-description">Channel: <span>Velký stůl</span></div>
+  </div>
+</div>
+<span></span>

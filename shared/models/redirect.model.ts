@@ -1,5 +1,6 @@
 export enum RedirectPath {
   HOME = 'home',
   LIBRARY = 'library',
-  PLAYLISTS = 'playlists'
+  PLAYLISTS = 'playlists',
+  SETTINGS = 'settings'
 }
