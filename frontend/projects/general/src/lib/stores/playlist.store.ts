@@ -64,6 +64,7 @@ export const PlaylistStore = signalStore(
             }),
             catchError((err) => {
               console.error(err);
+              setTimeout(() => load(query), 500);
               return EMPTY;
             }),
             finalize(() => {

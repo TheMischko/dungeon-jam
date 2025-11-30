@@ -23,6 +23,7 @@ export class RedirectService {
   }
 
   private handleRedirect(path: RedirectPath): void {
+    console.log('redirecting to', path);
     this.redirectSubject.next(path);
     // Reset to null after a short delay to allow effects to complete
     setTimeout(() => this.redirectSubject.next(null), 100);

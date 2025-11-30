@@ -1,4 +1,6 @@
 import {
+  ChevronDownIcon,
+  ChevronUpIcon,
   EllipsisVerticalIcon,
   Grid2x2Icon,
   Grid3x3Icon,
@@ -46,6 +48,8 @@ export const actionsIconSet = {
   CrossIcon: XIcon,
   SaveIcon: SaveIcon,
   FilterIcon: ListFilterIcon,
+  CollapsedArrowIcon: ChevronDownIcon,
+  ExpandedArrowIcon: ChevronUpIcon
 };
 
 export const volumeIconSet = {

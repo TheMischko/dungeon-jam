@@ -19,7 +19,7 @@ export class RedirectManager{
 
     ipcMain.on(GeneralChannels.REDIRECT, (e, path: RedirectPath) => {
       console.log(`[REDIRECT]: ${path}`);
-      viewManager.broadcast(GeneralChannels.REDIRECT, e.processId, path);
+      viewManager.broadcast(GeneralChannels.REDIRECT, null, path);
     });
     console.log('RedirectManager listeners are registered.')
   }

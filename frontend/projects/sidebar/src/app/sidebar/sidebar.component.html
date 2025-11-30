@@ -1,6 +1,6 @@
 <div class="sidebar-list">
   @for(item of items(); track item){
-    <app-sidebar-item [item]="item" (clicked)="triggerRedirect($event)"
+    <app-sidebar-item [item]="item" [children]="item?.children" (clicked)="triggerRedirect($event)"
     ></app-sidebar-item>
   }
 </div>
