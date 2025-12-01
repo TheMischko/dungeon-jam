@@ -1,10 +1,11 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { LucideAngularModule, LucideIconData } from 'lucide-angular';
 import { MatMenuItem } from '@angular/material/menu';
+import {NgClass} from '@angular/common';
 
 @Component({
   selector: 'lib-actions-menu',
-  imports: [LucideAngularModule, MatMenuItem],
+  imports: [LucideAngularModule, MatMenuItem, NgClass],
   templateUrl: './actions-menu.component.html',
   styleUrl: './actions-menu.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -30,6 +31,7 @@ export type ActionsMenuBaseConfig<T> = {
   icon?: LucideIconData;
   onSelected?: (item: T, config: ActionsMenuBaseConfig<T>) => void;
   keepOpen?: boolean;
+  cssClasses?: string[];
 };
 export type ActionsMenuDataConfig<T, V> = ActionsMenuBaseConfig<T> & {
   data?: V;

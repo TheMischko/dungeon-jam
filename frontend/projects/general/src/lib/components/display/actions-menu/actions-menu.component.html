@@ -1,7 +1,7 @@
 @if (title()){
 <h3 class="menu-title">{{ title() }}</h3>
 } @for (config of config(); track config.text){
-<button mat-menu-item (click)="actionClicked(item(), config, $event)">
+<button mat-menu-item (click)="actionClicked(item(), config, $event)" [ngClass]="config?.cssClasses">
   @if (config.icon){
   <lucide-icon [img]="config.icon"></lucide-icon>
   }
