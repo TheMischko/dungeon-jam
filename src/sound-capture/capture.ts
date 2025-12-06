@@ -22,6 +22,15 @@ const FRAME_DURATION_SECONDS = FRAME_DURATION / 1000;
 const FRAME_SIZE =
   (SAMPLE_RATE * FRAME_DURATION_SECONDS * NUM_CHANNELS) / BYTES_PER_SAMPLE;
 
+interface CaptureWindowAPI {
+  setupAudioCapture: (callback: (constraints: any) => void) => void;
+  getWebSocketAddress: () => Promise<any>;
+  onCaptureSettingsChanged: (callback: (settings: { isMuted: boolean }) => void) => void;
+}
+
+// @ts-ignore
+declare const window: Window & { API: CaptureWindowAPI };
+
 async function createCapture(){
   try {
     const constraints: { chromeMediaSource: string, chromeMediaSourceId: string } = await new Promise(
@@ -93,7 +102,13 @@ async function createCapture(){
 function createLocalLoopback(audioContext: AudioContext, audioOutputNode: GainNode) {
   console.log('Creating local loopback.');
   const mediaDestination = audioContext.createMediaStreamDestination();
-  audioOutputNode.connect(mediaDestination);
+
+  // Create a gain node to control loopback volume separately from capture
+  const loopbackGain = audioContext.createGain();
+  loopbackGain.gain.value = 1; // Default to full volume
+
+  audioOutputNode.connect(loopbackGain);
+  loopbackGain.connect(mediaDestination);
 
   const audioOutputElement = document.createElement("audio");
   document.body.appendChild(audioOutputElement);
@@ -103,7 +118,10 @@ function createLocalLoopback(audioContext: AudioContext, audioOutputNode: GainNo
     console.log('Audio loopback active.');
   }
 
-  return audioOutputElement;
+  return {
+    audioElement: audioOutputElement,
+    loopbackGain
+  };
 }
 
 async function connectToWebSocketServer(): Promise<WebSocket> {
@@ -124,8 +142,27 @@ async function createDiscordStream(): Promise<void> {
 
 }
 
+let loopbackGain: GainNode | null = null;
+
 createCapture()
   .then((capture) => {
+    if (!capture) return;
+
+    // Auto-enable loopback on startup
+    const loopback = createLocalLoopback(capture.audioContext, capture.audioOutputNode);
+    loopbackGain = loopback.loopbackGain;
+
+    // Listen for capture settings changes from frontend
+    window.API.onCaptureSettingsChanged((settings) => {
+      if (loopbackGain) {
+        // Set loopback gain: 0 if muted (disable output), 1 if unmuted (full output)
+        // Volume is controlled by the application being captured
+        loopbackGain.gain.value = settings.isMuted ? 0 : 1;
+        console.log(`[LOOPBACK] Settings updated: muted=${settings.isMuted}, gain=${loopbackGain.gain.value}`);
+      }
+    });
+
+    // Keep legacy button for manual testing
     document.getElementById('start-loopback')?.addEventListener("click", () => {
       if(!capture) return;
       createLocalLoopback(capture.audioContext, capture.audioOutputNode);

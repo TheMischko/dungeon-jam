@@ -21,6 +21,7 @@ export enum AudioFileChannel {
 export enum PlaybackChannel {
   LOAD = 'playback/load',
   UPDATE = 'playback/update',
+  CAPTURE_SETTINGS = 'playback/capture-settings',
 }
 
 export enum PlaylistChannel {
@@ -40,10 +41,15 @@ export enum TagChannel {
   CLEAR_ORPHANS = 'tags/clear-orphans',
 }
 
+export enum CaptureChannel {
+  SETTINGS = 'capture/settings',
+}
+
 export type AppChannel =
   | GeneralChannels
   | TrackChannel
   | AudioFileChannel
   | PlaybackChannel
   | PlaylistChannel
-  | TagChannel;
+  | TagChannel
+  | CaptureChannel;

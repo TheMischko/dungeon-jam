@@ -13,6 +13,7 @@ import { RedirectManager } from './main/managers/redirect.manager';
 import { FilesManager } from './main/managers/files.manager';
 import { StoredPlaybackManager } from './main/managers/stored-playback.manager';
 import { TagsManager } from './main/managers/tags.manager';
+import { PlaybackDestinationManager } from './main/managers/playback-destination.manager';
 import { JitterBuffer } from './main/services/jitter-buffer';
 
 configDotenv();
@@ -162,5 +163,6 @@ app.on('ready', async () => {
   await RedirectManager.getInstance();
   await FilesManager.getInstance();
   await TagsManager.getInstance();
+  await PlaybackDestinationManager.getInstance();
   //TO-DO: Postpone loading UI until all managers are loaded.
 });
