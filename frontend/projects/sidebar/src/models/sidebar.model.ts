@@ -1,8 +1,8 @@
-import {RedirectPath} from '@shared/models/redirect.model';
+import { RedirectRequest } from '@shared/models/redirect.model';
 
-export interface SidebarItem{
-  title: string,
-  redirectPath: RedirectPath,
-  active?: boolean,
-  children?: SidebarItem[]
+export interface SidebarItem {
+  title: string;
+  redirectRequest: RedirectRequest;
+  active?: boolean;
+  children?: SidebarItem[];
 }

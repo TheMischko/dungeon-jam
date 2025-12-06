@@ -1,19 +1,21 @@
 import { contextBridge, ipcRenderer } from 'electron';
 import { GeneralChannels } from '@shared/models/channels.model';
 import TrackApi from './preload/track-api';
-import { RedirectPath } from '@shared/models/redirect.model';
+import { RedirectRequest } from '@shared/models/redirect.model';
 import AudioFileApi from './preload/audio-file-api';
 import PlaybackApi from './preload/playback-api';
 import PlaylistApi from './preload/playlist-api';
 import TagApi from './preload/tag-api';
 
 const generalApi = {
-  triggerRedirect(path: RedirectPath) {
-    ipcRenderer.send(GeneralChannels.REDIRECT, path);
+  triggerRedirect(request: RedirectRequest) {
+    ipcRenderer.send(GeneralChannels.REDIRECT, request);
   },
-  registerRedirect(callback: (path: RedirectPath) => void | Promise<void>) {
-    ipcRenderer.on(GeneralChannels.REDIRECT, (_, path) => {
-      callback(path);
+  registerRedirect(
+    callback: (request: RedirectRequest) => void | Promise<void>,
+  ) {
+    ipcRenderer.on(GeneralChannels.REDIRECT, (_, request) => {
+      callback(request);
     });
   },
 };

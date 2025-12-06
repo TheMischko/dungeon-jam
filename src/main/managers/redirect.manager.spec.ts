@@ -60,12 +60,13 @@ describe('RedirectManager', () => {
     const handler = redirectCall[1];
     expect(typeof handler).toBe('function');
 
-    handler(mockIpcMainEvent({ processId: 123 }), 'test-path');
+    const redirectRequest = { path: 'test-path', params: { id: '123' } };
+    handler(mockIpcMainEvent({ processId: 123 }), redirectRequest);
 
     expect(mockViewManagerInstance.broadcast).toHaveBeenCalledWith(
       GeneralChannels.REDIRECT,
       expect.any(Number),
-      expect.any(String),
+      redirectRequest,
     );
   });
 });

@@ -1,30 +1,36 @@
 import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
-import { RedirectPath } from '@shared/models/redirect.model';
+import { RedirectRequest } from '@shared/models/redirect.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class RedirectService {
-  private redirectSubject = new Subject<RedirectPath | null>();
+  private redirectSubject = new Subject<RedirectRequest | null>();
 
   constructor() {
     (window as unknown as GeneralApiWindow).GENERAL_API.registerRedirect(
-      (path: RedirectPath) => this.handleRedirect(path),
+      (request: RedirectRequest) => this.handleRedirect(request),
     );
   }
 
-  get redirect$(): Observable<RedirectPath | null> {
+  get redirect$(): Observable<RedirectRequest | null> {
     return this.redirectSubject.asObservable();
   }
 
-  triggerRedirect(path: RedirectPath): void {
-    (window as unknown as GeneralApiWindow).GENERAL_API.triggerRedirect(path);
+  triggerRedirect(request: RedirectRequest): void {
+    (window as unknown as GeneralApiWindow).GENERAL_API.triggerRedirect(
+      request,
+    );
   }
 
-  private handleRedirect(path: RedirectPath): void {
-    console.log('redirecting to', path);
-    this.redirectSubject.next(path);
+  private handleRedirect(request: RedirectRequest): void {
+    console.log(
+      'redirecting to',
+      request.path,
+      request?.params ? new URLSearchParams(request.params).toString() : '',
+    );
+    this.redirectSubject.next(request);
     // Reset to null after a short delay to allow effects to complete
     setTimeout(() => this.redirectSubject.next(null), 100);
   }
@@ -33,8 +39,8 @@ export class RedirectService {
 type GeneralApiWindow = {
   GENERAL_API: {
     registerRedirect: (
-      callback: (path: RedirectPath) => void | Promise<void>,
+      callback: (request: RedirectRequest) => void | Promise<void>,
     ) => void;
-    triggerRedirect: (path: RedirectPath) => void;
+    triggerRedirect: (request: RedirectRequest) => void;
   };
 };

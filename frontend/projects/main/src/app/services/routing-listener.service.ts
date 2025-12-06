@@ -31,7 +31,7 @@ export class RoutingListenerService {
         return;
       }
 
-      switch (redirect) {
+      switch (redirect.path) {
         case RedirectPath.HOME:
           await this.router.navigate([
             routesStrings.home,
@@ -39,10 +39,19 @@ export class RoutingListenerService {
           ]);
           break;
         case RedirectPath.PLAYLISTS:
-          await this.router.navigate([
-            routesStrings.playlists,
-            playlistRouteStrings.playlists,
-          ]);
+          const playlistId = redirect.params?.['playlistId'];
+          if (playlistId) {
+            await this.router.navigate([
+              routesStrings.playlists,
+              playlistRouteStrings.detail,
+              playlistId,
+            ]);
+          } else {
+            await this.router.navigate([
+              routesStrings.playlists,
+              playlistRouteStrings.playlists,
+            ]);
+          }
           break;
         case RedirectPath.LIBRARY:
           await this.router.navigate([
@@ -51,7 +60,7 @@ export class RoutingListenerService {
           ]);
           break;
         default:
-          console.error(`Unknow redirect to: ${redirect}`);
+          console.error(`Unknow redirect to: ${redirect.path}`);
           break;
       }
     });
