@@ -25,7 +25,7 @@ const FRAME_SIZE =
 interface CaptureWindowAPI {
   setupAudioCapture: (callback: (constraints: any) => void) => void;
   getWebSocketAddress: () => Promise<any>;
-  onCaptureSettingsChanged: (callback: (settings: { isMuted: boolean }) => void) => void;
+  onCaptureSettingsChanged: (callback: (settings: { isLocalMuted: boolean }) => void) => void;
 }
 
 // @ts-ignore
@@ -155,10 +155,10 @@ createCapture()
     // Listen for capture settings changes from frontend
     window.API.onCaptureSettingsChanged((settings) => {
       if (loopbackGain) {
-        // Set loopback gain: 0 if muted (disable output), 1 if unmuted (full output)
+        // Set loopback gain: 0 if locally muted (disable output), 1 if unmuted (full output)
         // Volume is controlled by the application being captured
-        loopbackGain.gain.value = settings.isMuted ? 0 : 1;
-        console.log(`[LOOPBACK] Settings updated: muted=${settings.isMuted}, gain=${loopbackGain.gain.value}`);
+        loopbackGain.gain.value = settings.isLocalMuted ? 0 : 1;
+        console.log(`[LOOPBACK] Settings updated: localMuted=${settings.isLocalMuted}, gain=${loopbackGain.gain.value}`);
       }
     });
 

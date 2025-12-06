@@ -93,7 +93,7 @@ function setupWebsocketServer(
 }
 
 async function setupDiscord(token: string, stream: Readable): Promise<void> {
-  const discordManager = new DiscordManager();
+  const discordManager = DiscordManager.getInstance();
   discordManager.createAudioPlayer();
   await discordManager.connect(token);
   const guilds = await discordManager.getGuildChannels();

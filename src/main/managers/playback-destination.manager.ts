@@ -3,17 +3,23 @@ import { ipcMain } from 'electron';
 import { CaptureChannel } from '@shared/models/channels.model';
 import { PlaybackChannel } from '@shared/models/channels.model';
 import { CaptureSettings } from '@shared/models/capture.model';
+import { DiscordManager } from './discord.manager';
 
 export class PlaybackDestinationManager {
   private static instance: PlaybackDestinationManager;
 
-  private constructor(private viewManager: ViewManager) {}
+  private constructor(
+    private viewManager: ViewManager,
+    private discordManager: DiscordManager,
+  ) {}
 
   public static async getInstance(): Promise<PlaybackDestinationManager> {
     if (!PlaybackDestinationManager.instance) {
       const viewManager = await ViewManager.getInstance();
+      const discordManager = DiscordManager.getInstance();
       PlaybackDestinationManager.instance = new PlaybackDestinationManager(
         viewManager,
+        discordManager,
       );
       await PlaybackDestinationManager.instance.registerChannels();
     }
@@ -38,7 +44,14 @@ export class PlaybackDestinationManager {
         CaptureChannel.SETTINGS,
         settings,
       );
-      console.log(`[PlaybackDestination] Updated: muted=${settings.isMuted}`);
+      if (settings.isLocalMuted) {
+        this.discordManager.resumeStreaming();
+      } else {
+        this.discordManager.stopStreaming();
+      }
+      console.log(
+        `[PlaybackDestination] Updated: localMuted=${settings.isLocalMuted}`,
+      );
     } catch (e) {
       console.error('[PlaybackDestination] Failed to update:', e);
     }

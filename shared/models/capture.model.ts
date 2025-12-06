@@ -1,3 +1,3 @@
 export interface CaptureSettings {
-  isMuted: boolean;
+  isLocalMuted: boolean;
 }

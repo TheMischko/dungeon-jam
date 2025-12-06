@@ -11,9 +11,9 @@ const updateState = (newState: StoredPlayback): void => {
   ipcRenderer.send(PlaybackChannel.UPDATE, newState);
 };
 
-const updateCaptureSettings = (isMuted: boolean): void => {
+const updateCaptureSettings = (isLocalMuted: boolean): void => {
   const settings: CaptureSettings = {
-    isMuted,
+    isLocalMuted,
   };
   ipcRenderer.send(PlaybackChannel.CAPTURE_SETTINGS, settings);
 };

@@ -16,7 +16,7 @@ import {
   VoiceChannel,
 } from 'discord.js';
 import { ChannelData, GuildWithChannels } from '@shared/models/discord.model';
-import { Readable } from 'node:stream';
+import { Readable, Writable } from 'node:stream';
 import ffmpegPath from 'ffmpeg-static';
 import { JitterBuffer } from '../services/jitter-buffer';
 import {
@@ -25,6 +25,8 @@ import {
 } from '../services/network-health-monitor';
 
 export class DiscordManager {
+  private static instance: DiscordManager;
+
   private audioPlayer?: AudioPlayer;
   private client?: Client;
   private audioResource?: AudioResource;
@@ -36,6 +38,22 @@ export class DiscordManager {
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 5;
   private reconnectDelayMs = 3000;
+  private isStreamEnabled = true;
+  private pauseDrain: Writable;
+
+  private constructor() {
+    this.pauseDrain = new Writable();
+    this.pauseDrain._write = (_, __, callback) => {
+      callback();
+    };
+  }
+
+  public static getInstance(): DiscordManager {
+    if (!DiscordManager.instance) {
+      DiscordManager.instance = new DiscordManager();
+    }
+    return DiscordManager.instance;
+  }
 
   createAudioPlayer(): void {
     if (this.audioPlayer) {
@@ -271,6 +289,28 @@ export class DiscordManager {
       packetLoss: quality.packetLossPercent,
       bufferHealth: `${bufferStats.currentBufferSize}/${bufferStats.targetBufferSize} frames`,
     };
+  }
+
+  stopStreaming(): void {
+    if (this.isStreamEnabled && this.audioPlayer) {
+      if (this.audioResource?.playStream) {
+        this.audioResource.playStream.pipe(this.pauseDrain);
+      }
+
+      this.isStreamEnabled = !this.audioPlayer.pause(true);
+      console.log('[DiscordManager] Streaming stopped');
+    }
+  }
+
+  resumeStreaming(): void {
+    if (!this.isStreamEnabled && this.audioPlayer) {
+      if (this.audioResource?.playStream) {
+        this.audioResource.playStream.unpipe(this.pauseDrain);
+      }
+      this.audioPlayer.unpause();
+      console.log('[DiscordManager] Streaming resumed');
+    }
+    this.isStreamEnabled = true;
   }
 
   private resolveOnceClientIsReady(resolve: () => void) {

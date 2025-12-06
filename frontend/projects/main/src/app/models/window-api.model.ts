@@ -34,6 +34,6 @@ export type AudioApiWindow = Window &
     PLAYBACK_API: {
       loadState: () => Promise<StoredPlayback>;
       updateState: (newState: StoredPlayback) => void;
-      updateCaptureSettings: (isMuted: boolean) => void;
+      updateCaptureSettings: (isLocalMuted: boolean) => void;
     };
   };
