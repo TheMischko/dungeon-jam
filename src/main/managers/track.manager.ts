@@ -141,6 +141,13 @@ export class TrackManager {
     return newRecord;
   }
 
+  async deleteById(id: string) {
+    console.log(`[TrackManager] Delete track: ${id}`);
+    const playlistsManager = await PlaylistManager.getInstance();
+    await playlistsManager.removeTracksFromPlaylists([id]);
+    return await this.tracksProvider.deleteOne('id', id);
+  }
+
   public static __resetForTests(): void {
     TrackManager._instance = undefined as unknown as TrackManager;
   }
@@ -209,12 +216,5 @@ export class TrackManager {
       console.error('[TrackManager] Failed to update track file metadata', e);
     }
     return updatedRecord;
-  }
-
-  private async deleteById(id: string) {
-    console.log(`[TrackManager] Delete track: ${id}`);
-    const playlistsManager = await PlaylistManager.getInstance();
-    await playlistsManager.removeTracksFromPlaylists([id]);
-    return await this.tracksProvider.deleteOne('id', id);
   }
 }
