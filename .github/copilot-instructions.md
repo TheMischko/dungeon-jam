@@ -436,10 +436,88 @@ dist/
 
 ## Guidelines for AI Code Generation
 
+### Manager Initialization Flow
+
+The application uses a centralized `StartupManager` to initialize all managers in dependency order during app startup:
+
+**Files Involved:**
+- `src/main/managers/startup.manager.ts` - Orchestrates manager initialization
+- `src/main/configs/managers.config.ts` - Defines initialization order and dependencies
+- `src/main/configs/audio.config.ts` - Audio pipeline configuration
+
+**When Adding a New Manager:**
+
+1. **Create the Manager Class**
+   ```typescript
+   // src/main/managers/your-feature.manager.ts
+   export class YourFeatureManager {
+     private static instance: YourFeatureManager;
+     
+     private constructor(/* dependencies */) {}
+     
+     public static async getInstance(): Promise<YourFeatureManager> {
+       if (!YourFeatureManager.instance) {
+         // Initialize dependencies first
+         const depManager = await DependencyManager.getInstance();
+         YourFeatureManager.instance = new YourFeatureManager(depManager);
+         YourFeatureManager.instance.registerChannels();
+       }
+       return YourFeatureManager.instance;
+     }
+     
+     private registerChannels(): void {
+       // Register IPC handlers
+     }
+   }
+   ```
+
+2. **Register in `src/main/configs/managers.config.ts`**
+   - Add import for your new manager
+   - Add initialization entry in the appropriate phase:
+     - **Phase 1**: Core infrastructure (no dependencies) - e.g., StoredPlayback, View
+     - **Phase 2**: Data managers (database only) - e.g., Tags, Files
+     - **Phase 3**: Cross-dependent managers - e.g., Track (depends on Files & Tags)
+     - **Phase 4**: Feature managers (depend on data) - e.g., Playlist, Redirect
+     - **Phase 5**: Advanced managers (depend on multiple) - e.g., Discord, PlaybackDestination
+
+   ```typescript
+   // In getManagersInitConfig() function
+   {
+     name: 'YourFeature',
+     initFunction: async () => {
+       await YourFeatureManager.getInstance();
+     },
+   },
+   ```
+
+3. **Define IPC Channel** (if exposing to frontend)
+   ```typescript
+   // In src/shared/models/channels.model.ts
+   export enum YourFeatureChannel {
+     DO_SOMETHING = 'YOUR_FEATURE:DO_SOMETHING',
+   }
+   ```
+
+4. **Export Public API** (if needed by frontend)
+   ```typescript
+   // src/preload/your-feature-api.ts
+   export const YOUR_FEATURE_API = {
+     doSomething: () => ipcRenderer.invoke(YourFeatureChannel.DO_SOMETHING),
+   };
+   ```
+
+**Key Principles:**
+- Managers are singletons initialized on app startup via `StartupManager`
+- All manager IPC handlers are registered during `getInstance()` 
+- Dependencies must be explicitly listed in the config (phase ordering)
+- Async/await pattern ensures proper initialization sequencing
+- Frontend can safely call APIs after all managers initialize
+
 ### When Adding New Features
 
 1. **Feature Spans Frontend & Backend?**
    - Create new manager in `src/main/managers/feature.manager.ts`
+   - Register in `src/main/configs/managers.config.ts` (see Manager Initialization Flow above)
    - Export public API in new `src/preload/feature-api.ts`
    - Create Angular service in `frontend/projects/general/services/` that calls the API
    - Use the service in components via dependency injection
@@ -451,7 +529,8 @@ dist/
 
 3. **Audio/Discord-Related Changes**
    - Modify `DiscordManager` for bot behavior
-   - Modify `src/index.ts` for audio pipeline changes
+   - Modify `StartupManager.initializeResources()` for audio pipeline changes
+   - Update `src/main/configs/audio.config.ts` for audio spec changes
    - Ensure audio specs (48kHz, 16-bit, stereo) are maintained
 
 4. **Database Schema Changes**

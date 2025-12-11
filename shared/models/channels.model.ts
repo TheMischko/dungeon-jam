@@ -1,6 +1,7 @@
 export enum GeneralChannels {
   GET_OS = 'GET_OS',
   REDIRECT = 'redirect',
+  APP_READY = 'app/ready',
 }
 
 export enum TrackChannel {
