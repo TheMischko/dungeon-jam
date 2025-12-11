@@ -19,6 +19,11 @@ const generalApi = {
       callback(request);
     });
   },
+  onApplicationReady(callback: () => void | Promise<void>) {
+    ipcRenderer.on(GeneralChannels.APP_READY, () => {
+      callback();
+    });
+  },
 };
 
 declare global {

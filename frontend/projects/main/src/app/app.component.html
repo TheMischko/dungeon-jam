@@ -1,3 +1,6 @@
+@if(!applicationReady()){
+<lib-loader class="app-loader" size="large"></lib-loader>
+} @else {
 <button mat-flat-button (click)="togglePlay()">
   {{ playing ? 'pause' : 'play' }}
 </button>
@@ -7,3 +10,4 @@
 </div>
 
 <app-player-smart></app-player-smart>
+}

@@ -1,6 +1,8 @@
 import { app } from 'electron';
 import { configDotenv } from 'dotenv';
 import { StartupManager } from './main/managers/startup.manager';
+import { ViewManager } from './main/managers/view.manager';
+import { GeneralChannels } from '@shared/models/channels.model';
 
 configDotenv();
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN || 'ERROR';
@@ -16,5 +18,15 @@ app.on('ready', async () => {
     console.error('[App] Failed to initialize all managers. Exiting.');
     app.quit();
     return;
+  } else {
+    await sendAppReadySignal();
   }
 });
+
+async function sendAppReadySignal() {
+  const viewManager = await ViewManager.getInstance();
+  viewManager.broadcast(GeneralChannels.APP_READY);
+  setInterval(() => {
+    viewManager.broadcast(GeneralChannels.APP_READY);
+  }, 500);
+}

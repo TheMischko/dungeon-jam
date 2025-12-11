@@ -5,15 +5,33 @@ import { RouterOutlet } from '@angular/router';
 import { RoutingListenerService } from './services/routing-listener.service';
 import { MatDialogModule } from '@angular/material/dialog';
 import { PlayerSmartComponent } from './player/player-smart/player-smart.component';
+import { ApplicationStateService } from '@general/services/application-state.service';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { LoaderComponent } from '@general/components/display/loader/loader.component';
+import { tap } from 'rxjs';
+import { addAppInitClass } from '@general/utils/add-app-init-class';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
-  imports: [MatButton, RouterOutlet, MatDialogModule, PlayerSmartComponent],
+  imports: [
+    MatButton,
+    RouterOutlet,
+    MatDialogModule,
+    PlayerSmartComponent,
+    LoaderComponent,
+  ],
 })
 export class AppComponent {
   private readonly routingListenerService = inject(RoutingListenerService);
+  private readonly applicationStateService = inject(ApplicationStateService);
+
+  readonly applicationReady = toSignal(
+    this.applicationStateService.applicationReady$.pipe(
+      tap((ready) => addAppInitClass(ready)),
+    ),
+  );
 
   title = 'main';
 
