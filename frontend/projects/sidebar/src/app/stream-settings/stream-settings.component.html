@@ -1,28 +1,28 @@
 <div [matMenuTriggerFor]="streamingMenu" class="content">
   <div class="icon">
     @if(isStringIcon(currentIcon())){
-      <lucide-icon
-        [name]="currentIcon()" [size]="32">
-      </lucide-icon>
+    <lucide-icon [name]="currentIcon()" [size]="32"> </lucide-icon>
     } @else {
-      <lucide-icon
-        [img]="currentIcon()">
-      </lucide-icon>
+    <lucide-icon [img]="currentIcon()"> </lucide-icon>
     }
   </div>
   <div class="content-info">
     <div class="stream-title">
       @if (isDiscordPlayback()) {
-        {{ availableDiscordServers()[0] }}
+      {{ '' }}
       } @else {
-        {{ localStreamText }}
+      {{ localStreamText }}
       }
     </div>
     @if (isDiscordPlayback()){
-      <div class="stream-description">Channel: <span>{{availableDiscordChannels()[0]}}</span></div>
+    <div class="stream-description">Channel: <span></span></div>
     }
   </div>
 </div>
 <mat-menu #streamingMenu="matMenu">
-  <lib-actions-menu [config]="actionMenuConfig()" [item]="null" class="settings-menu"/>
+  <lib-actions-menu
+    [config]="actionMenuConfig()"
+    [item]="null"
+    class="settings-menu"
+  />
 </mat-menu>

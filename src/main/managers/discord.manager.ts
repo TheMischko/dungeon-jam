@@ -23,6 +23,8 @@ import {
   NetworkHealthMonitor,
   NetworkQuality,
 } from '../services/network-health-monitor';
+import { ipcMain } from 'electron';
+import { DiscordChannel } from '@shared/models/channels.model';
 
 export class DiscordManager {
   private static instance: DiscordManager;
@@ -51,8 +53,15 @@ export class DiscordManager {
   public static getInstance(): DiscordManager {
     if (!DiscordManager.instance) {
       DiscordManager.instance = new DiscordManager();
+      DiscordManager.instance.registerChannels();
     }
     return DiscordManager.instance;
+  }
+
+  private registerChannels(): void {
+    ipcMain.handle(DiscordChannel.GET_CHANNELS, async (_) => {
+      return await this.getAvailableChannels();
+    });
   }
 
   createAudioPlayer(): void {
@@ -181,90 +190,6 @@ export class DiscordManager {
     }
   }
 
-  private attemptReconnect(channelId: string, stream: Readable): void {
-    if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-      console.error(
-        `[DiscordManager] Max reconnection attempts (${this.maxReconnectAttempts}) reached`,
-      );
-      return;
-    }
-
-    this.reconnectAttempts++;
-    console.log(
-      `[DiscordManager] Attempting reconnect (${this.reconnectAttempts}/${this.maxReconnectAttempts}) in ${this.reconnectDelayMs}ms`,
-    );
-
-    setTimeout(() => {
-      this.joinChannel(channelId, stream).catch(console.error);
-    }, this.reconnectDelayMs);
-  }
-
-  private async handleConnectionFailure(token: string): Promise<void> {
-    if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-      console.error(
-        '[DiscordManager] Max reconnection attempts reached, giving up',
-      );
-      return;
-    }
-
-    this.reconnectAttempts++;
-    const delayMs =
-      this.reconnectDelayMs * Math.pow(2, this.reconnectAttempts - 1); // Exponential backoff
-    console.log(
-      `[DiscordManager] Retrying connection in ${delayMs}ms (attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts})`,
-    );
-
-    await new Promise((resolve) => setTimeout(resolve, delayMs));
-    await this.connect(token);
-  }
-
-  startStreaming(stream: Readable) {
-    if (!this.audioPlayer || !this.connection) {
-      throw new Error('Cannot start stream without successful initial setup');
-    }
-
-    // Initialize jitter buffer for stability
-    // Frame size 1920 bytes = 960 samples * 2 bytes per 16-bit sample
-    this.jitterBuffer = new JitterBuffer(1920, 200); // 1920 bytes frame, 200ms target
-
-    this.connection.subscribe(this.audioPlayer);
-    this.audioResource = createAudioResource(stream, {
-      inputType: StreamType.Opus,
-      inlineVolume: true,
-      silencePaddingFrames: 5,
-      metadata: {
-        ffmpegPath,
-      },
-    });
-    this.audioResource.volume?.setVolume(1);
-    this.audioPlayer.play(this.audioResource);
-
-    if (this.jitterBuffer) {
-      console.log(
-        `[DiscordManager] Jitter buffer initialized: target ${
-          this.jitterBuffer.getStats().targetBufferSize
-        } frames`,
-      );
-    }
-
-    console.log(
-      '[DiscordManager] Started streaming with stability features enabled',
-    );
-  }
-
-  private updateAudioResourceBitrate(): void {
-    if (!this.audioResource) {
-      console.warn('[DiscordManager] Cannot update bitrate: no audio resource');
-      return;
-    }
-
-    // Note: Bitrate update depends on stream type and encoder configuration
-    // This is typically handled by the encoder on the frontend or requires recreating the resource
-    console.log(
-      `[DiscordManager] Bitrate configuration updated to ${this.currentBitrate} kbps`,
-    );
-  }
-
   /**
    * Get current network health information
    */
@@ -311,6 +236,115 @@ export class DiscordManager {
       console.log('[DiscordManager] Streaming resumed');
     }
     this.isStreamEnabled = true;
+  }
+
+  startStreaming(stream: Readable) {
+    if (!this.audioPlayer || !this.connection) {
+      throw new Error('Cannot start stream without successful initial setup');
+    }
+
+    // Initialize jitter buffer for stability
+    // Frame size 1920 bytes = 960 samples * 2 bytes per 16-bit sample
+    this.jitterBuffer = new JitterBuffer(1920, 200); // 1920 bytes frame, 200ms target
+
+    this.connection.subscribe(this.audioPlayer);
+    this.audioResource = createAudioResource(stream, {
+      inputType: StreamType.Opus,
+      inlineVolume: true,
+      silencePaddingFrames: 5,
+      metadata: {
+        ffmpegPath,
+      },
+    });
+    this.audioResource.volume?.setVolume(1);
+    this.audioPlayer.play(this.audioResource);
+
+    if (this.jitterBuffer) {
+      console.log(
+        `[DiscordManager] Jitter buffer initialized: target ${
+          this.jitterBuffer.getStats().targetBufferSize
+        } frames`,
+      );
+    }
+
+    console.log(
+      '[DiscordManager] Started streaming with stability features enabled',
+    );
+  }
+
+  async getAvailableChannels() {
+    const guilds = await this.client?.guilds.fetch();
+    const collection: GuildWithChannels[] = [];
+    for (const guild of guilds?.values() || []) {
+      const fetchedGuild = await guild.fetch();
+      const guildChannels = await fetchedGuild.channels.fetch();
+      const channels: ChannelData[] = [];
+      for (const channel of guildChannels.values()) {
+        if (channel?.isVoiceBased()) {
+          channels.push({
+            id: channel.id,
+            name: channel.name,
+          });
+        }
+      }
+      collection.push({
+        guildId: fetchedGuild.id,
+        guildName: fetchedGuild.name,
+        guildIconURL: fetchedGuild.iconURL() || undefined,
+        channels,
+      });
+    }
+    return collection;
+  }
+
+  private attemptReconnect(channelId: string, stream: Readable): void {
+    if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+      console.error(
+        `[DiscordManager] Max reconnection attempts (${this.maxReconnectAttempts}) reached`,
+      );
+      return;
+    }
+
+    this.reconnectAttempts++;
+    console.log(
+      `[DiscordManager] Attempting reconnect (${this.reconnectAttempts}/${this.maxReconnectAttempts}) in ${this.reconnectDelayMs}ms`,
+    );
+
+    setTimeout(() => {
+      this.joinChannel(channelId, stream).catch(console.error);
+    }, this.reconnectDelayMs);
+  }
+
+  private async handleConnectionFailure(token: string): Promise<void> {
+    if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+      console.error(
+        '[DiscordManager] Max reconnection attempts reached, giving up',
+      );
+      return;
+    }
+
+    this.reconnectAttempts++;
+    const delayMs =
+      this.reconnectDelayMs * Math.pow(2, this.reconnectAttempts - 1); // Exponential backoff
+    console.log(
+      `[DiscordManager] Retrying connection in ${delayMs}ms (attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts})`,
+    );
+
+    await new Promise((resolve) => setTimeout(resolve, delayMs));
+    await this.connect(token);
+  }
+
+  private updateAudioResourceBitrate(): void {
+    if (!this.audioResource) {
+      console.warn('[DiscordManager] Cannot update bitrate: no audio resource');
+      return;
+    }
+
+    // Note: Bitrate update depends on stream type and encoder configuration
+    // This is typically handled by the encoder on the frontend or requires recreating the resource
+    console.log(
+      `[DiscordManager] Bitrate configuration updated to ${this.currentBitrate} kbps`,
+    );
   }
 
   private resolveOnceClientIsReady(resolve: () => void) {

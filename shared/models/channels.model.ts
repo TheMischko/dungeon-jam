@@ -45,6 +45,10 @@ export enum CaptureChannel {
   SETTINGS = 'capture/settings',
 }
 
+export enum DiscordChannel {
+  GET_CHANNELS = 'discord/get-channels',
+}
+
 export type AppChannel =
   | GeneralChannels
   | TrackChannel

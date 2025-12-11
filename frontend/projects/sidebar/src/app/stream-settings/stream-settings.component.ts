@@ -3,6 +3,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  inject,
   signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -16,6 +17,9 @@ import {
   ActionsMenuBaseConfig,
   ActionsMenuComponent,
 } from '@general/components/display/actions-menu/actions-menu.component';
+import { DiscordService } from '@general/services/discord.service';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { ChannelData, GuildWithChannels } from '@shared/models/discord.model';
 
 type PlaybackApiWindow = Window & {
   PLAYBACK_API: {
@@ -38,12 +42,17 @@ type PlaybackApiWindow = Window & {
 })
 export class StreamSettingsComponent implements AfterViewInit {
   private readonly window = window as unknown as PlaybackApiWindow;
-  readonly currentStreamDestination = signal<'local' | 'discord'>('local');
-  readonly availableDiscordChannels = signal<string[]>(['Velký stůl']);
-  readonly availableDiscordServers = signal<string[]>(['Zaplivaná knajpa']);
+  readonly discordService = inject(DiscordService);
+  readonly currentStreamDestination = signal<'local' | DiscordPlaybackInfo>(
+    'local',
+  );
+  readonly availableDiscordServers = toSignal(
+    this.discordService.getChannels(),
+    { initialValue: [] },
+  );
 
   readonly currentIcon = computed<any>(() => {
-    if (this.currentStreamDestination() === 'discord') {
+    if (this.isDiscordPlayback()) {
       return this.discordPlaybackIcon;
     }
     return this.localPlaybackIcon;
@@ -54,6 +63,18 @@ export class StreamSettingsComponent implements AfterViewInit {
   readonly localPlaybackIcon = MonitorSpeakerIcon;
   readonly discordPlaybackIcon = 'discord';
 
+  readonly serversFlattened = computed<ActionsMenuBaseConfig<null>[]>(() => {
+    const servers = this.availableDiscordServers();
+    return servers.reduce((channels, server, _, __) => {
+      return [
+        ...channels,
+        ...server.channels.map((channel) =>
+          this.mapServerChannelToActionConfig(server, channel),
+        ),
+      ];
+    }, [] as ActionsMenuBaseConfig<null>[]);
+  });
+
   readonly actionMenuConfig = computed<ActionsMenuBaseConfig<null>[]>(() => {
     return [
       {
@@ -61,17 +82,12 @@ export class StreamSettingsComponent implements AfterViewInit {
         icon: this.localPlaybackIcon,
         onSelected: () => this.switchToLocalPlayback(),
       },
-      {
-        text: 'Discord playback',
-        icon: this.discordPlaybackIcon as unknown as LucideIconData,
-        cssClasses: ['discord-icon'],
-        onSelected: () => this.switchToDiscordPlayback(),
-      },
+      ...this.serversFlattened(),
     ];
   });
 
   readonly isDiscordPlayback = computed<boolean>(() => {
-    return this.currentStreamDestination() === 'discord';
+    return this.currentStreamDestination() !== 'local';
   });
 
   ngAfterViewInit() {
@@ -91,10 +107,36 @@ export class StreamSettingsComponent implements AfterViewInit {
     this.window.PLAYBACK_API.updateCaptureSettings(false);
   }
 
-  switchToDiscordPlayback(): void {
-    this.currentStreamDestination.set('discord');
+  switchToDiscordPlayback(discordInfo: DiscordPlaybackInfo): void {
+    this.currentStreamDestination.set(discordInfo);
     // When switching to Discord playback, mute the capture (isLocalMuted = true)
     // This prevents audio from playing through speakers
     this.window.PLAYBACK_API.updateCaptureSettings(true);
   }
+
+  private mapServerChannelToActionConfig(
+    guild: GuildWithChannels,
+    channel: ChannelData,
+  ): ActionsMenuBaseConfig<null> {
+    return {
+      text: `${guild.guildName} - ${channel.name}`,
+      icon: this.discordPlaybackIcon as unknown as LucideIconData,
+      cssClasses: ['discord-icon'],
+      onSelected: () => {
+        this.switchToDiscordPlayback({
+          guildId: guild.guildId,
+          guildName: guild.guildName,
+          channelId: channel.id,
+          channelName: channel.name,
+        });
+      },
+    };
+  }
 }
+
+type DiscordPlaybackInfo = {
+  guildId: string;
+  guildName: string;
+  channelId: string;
+  channelName: string;
+};
