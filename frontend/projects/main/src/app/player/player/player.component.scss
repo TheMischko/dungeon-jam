@@ -3,11 +3,12 @@
 :host {
   z-index: 10;
   position: absolute;
-  bottom: 12%;
+  bottom: 1%;
   left: 50%;
   transform: translateX(-50%);
-  min-height: 50px;
-  width: 95vw;
+  height: 80px;
+  width: 90%;
+  border-radius: 8px;
 
   padding: 0.5rem 1rem;
 
@@ -32,7 +33,7 @@
     white-space: nowrap;
   }
 
-  .volume{
+  .volume {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -45,6 +46,7 @@
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
+    margin-bottom: -8px;
 
     .buttons {
       display: flex;
