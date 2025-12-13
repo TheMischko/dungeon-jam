@@ -1,10 +1,4 @@
-import {
-  BrowserWindow,
-  Rectangle,
-  WebContentsView,
-  WebPreferences,
-  WillResizeDetails,
-} from 'electron';
+import { BrowserWindow, WebContentsView, WebPreferences } from 'electron';
 import path from 'node:path';
 import { FrontendTab } from './tabs/frontend.tab';
 import { TopBarTab } from './tabs/top-bar.tab';
@@ -54,7 +48,7 @@ export class ViewManager {
         () => new SideBarTab(appWindow, config.defaultPreferences),
       );
 
-      sideBarTab.tab.webContents.openDevTools({
+      frontendTab.tab.webContents.openDevTools({
         mode: 'detach',
       });
 
@@ -76,14 +70,13 @@ export class ViewManager {
     height: number,
     defaultPreferences: Partial<WebPreferences>,
   ): BrowserWindow {
-    const appWindow = new BrowserWindow({
+    return new BrowserWindow({
       width: width,
       height: height,
       webPreferences: {
         ...defaultPreferences,
       },
     });
-    return appWindow;
   }
 
   private static async createAndLoadTab<T extends BaseTab>(
@@ -135,13 +128,24 @@ export class ViewManager {
   }
 
   private initializeEventListeners(): void {
-    this.appWindow.on(
+    const resizeEvents: string[] = [
       'will-resize',
-      (event, newBounds: Rectangle, _: WillResizeDetails) => {
-        this.tabs.forEach((tab) => {
-          tab.resize(newBounds);
-        });
-      },
-    );
+      'enter-full-screen',
+      'leave-full-screen',
+      'maximize',
+      'unmaximize',
+      'enter-html-full-screen',
+      'leave-html-full-screen',
+    ];
+    resizeEvents.forEach((event) => {
+      this.appWindow.on(event as any, () => this.updateTabSizes());
+    });
+  }
+
+  private updateTabSizes(): void {
+    const appBounds = this.appWindow.getContentBounds();
+    this.tabs.forEach((tab) => {
+      tab.resize(appBounds);
+    });
   }
 }

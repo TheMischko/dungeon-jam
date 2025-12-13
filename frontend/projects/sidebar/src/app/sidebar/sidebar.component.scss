@@ -1,11 +1,12 @@
-:host{
+:host {
   display: flex;
   flex-direction: column;
   align-items: stretch;
   justify-content: space-between;
-  height: 90vh;
+  height: 100%;
+  padding-bottom: 5px;
 }
-.sidebar-list{
+.sidebar-list {
   display: flex;
   flex-direction: column;
   align-items: stretch;

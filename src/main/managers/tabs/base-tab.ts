@@ -22,7 +22,7 @@ export class BaseTab {
     });
 
     parent.contentView.addChildView(this.tab);
-    this.resize(parent.getBounds());
+    this.resize(parent.getContentBounds());
   }
 
   mute(muted: boolean = true): void {
