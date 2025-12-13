@@ -48,6 +48,9 @@ export enum CaptureChannel {
 
 export enum DiscordChannel {
   GET_CHANNELS = 'discord/get-channels',
+  JOIN_CHANNEL = 'discord/join-channel',
+  DISCONNECT = 'discord/disconnect',
+  STATE_UPDATE = 'discord/state-update',
 }
 
 export type AppChannel =
@@ -57,4 +60,5 @@ export type AppChannel =
   | PlaybackChannel
   | PlaylistChannel
   | TagChannel
-  | CaptureChannel;
+  | CaptureChannel
+  | DiscordChannel;

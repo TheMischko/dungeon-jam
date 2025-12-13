@@ -145,14 +145,14 @@ export class NetworkHealthMonitor {
       const quality = this.getQuality();
       const recommendation = this.getbitrateRecommendation();
 
-      console.log(
-        `[NetworkMonitor] Quality: ${quality.quality} | Latency: ${quality.latencyMs}ms | Jitter: ${quality.jitterMs}ms | Loss: ${quality.packetLossPercent}%`,
-      );
+      // console.log(
+      //   `[NetworkMonitor] Quality: ${quality.quality} | Latency: ${quality.latencyMs}ms | Jitter: ${quality.jitterMs}ms | Loss: ${quality.packetLossPercent}%`,
+      // );
 
       if (recommendation.bitrate !== this.currentBitrate) {
-        console.log(
-          `[NetworkMonitor] Bitrate change recommended: ${this.currentBitrate} → ${recommendation.bitrate} kbps`,
-        );
+        // console.log(
+        //   `[NetworkMonitor] Bitrate change recommended: ${this.currentBitrate} → ${recommendation.bitrate} kbps`,
+        // );
         this.currentBitrate = recommendation.bitrate;
         this.onBitrateRecommendation?.(recommendation);
       }

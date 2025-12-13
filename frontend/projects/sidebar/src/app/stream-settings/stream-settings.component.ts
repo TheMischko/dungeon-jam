@@ -4,7 +4,6 @@ import {
   Component,
   computed,
   inject,
-  signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -19,7 +18,11 @@ import {
 } from '@general/components/display/actions-menu/actions-menu.component';
 import { DiscordService } from '@general/services/discord.service';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { ChannelData, GuildWithChannels } from '@shared/models/discord.model';
+import {
+  ChannelData,
+  DiscordStateType,
+  GuildWithChannels,
+} from '@shared/models/discord.model';
 
 type PlaybackApiWindow = Window & {
   PLAYBACK_API: {
@@ -43,14 +46,28 @@ type PlaybackApiWindow = Window & {
 export class StreamSettingsComponent implements AfterViewInit {
   private readonly window = window as unknown as PlaybackApiWindow;
   readonly discordService = inject(DiscordService);
-  readonly currentStreamDestination = signal<'local' | DiscordPlaybackInfo>(
-    'local',
+  readonly currentStreamDestination = computed<'local' | DiscordPlaybackInfo>(
+    () => {
+      const discordState = this.discordState();
+      if (discordState.type === DiscordStateType.CONNECTED) {
+        return {
+          guildId: discordState.guildId,
+          guildName: discordState.guildName,
+          channelId: discordState.channelId,
+          channelName: discordState.channelName,
+        };
+      }
+      return 'local';
+    },
   );
   readonly availableDiscordServers = toSignal(
     this.discordService.getChannels(),
     { initialValue: [] },
   );
 
+  readonly discordState = toSignal(this.discordService.discordState$, {
+    initialValue: { type: DiscordStateType.NONE },
+  });
   readonly currentIcon = computed<any>(() => {
     if (this.isDiscordPlayback()) {
       return this.discordPlaybackIcon;
@@ -101,14 +118,16 @@ export class StreamSettingsComponent implements AfterViewInit {
   }
 
   switchToLocalPlayback(): void {
-    this.currentStreamDestination.set('local');
+    this.discordService.disconnect().subscribe();
     // When switching to local playback, unmute the capture (isLocalMuted = false)
     // This allows audio to be heard through speakers
     this.window.PLAYBACK_API.updateCaptureSettings(false);
   }
 
   switchToDiscordPlayback(discordInfo: DiscordPlaybackInfo): void {
-    this.currentStreamDestination.set(discordInfo);
+    this.discordService
+      .joinChannel(discordInfo.guildId, discordInfo.channelId)
+      .subscribe();
     // When switching to Discord playback, mute the capture (isLocalMuted = true)
     // This prevents audio from playing through speakers
     this.window.PLAYBACK_API.updateCaptureSettings(true);

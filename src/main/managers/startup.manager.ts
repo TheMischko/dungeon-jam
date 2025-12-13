@@ -2,8 +2,6 @@ import { BrowserWindow, ipcMain, WebContentsView } from 'electron';
 import { getManagersInitConfig } from '../configs';
 import { ViewManager } from './view.manager';
 import { RawData, WebSocket, WebSocketServer } from 'ws';
-import { JitterBuffer } from '../services/jitter-buffer';
-import { Readable } from 'node:stream';
 import { DiscordManager } from './discord.manager';
 import { opus } from 'prism-media';
 import Encoder = opus.Encoder;
@@ -61,33 +59,20 @@ export class StartupManager {
         frameSize: audioConfig.frameSize,
         rate: audioConfig.sampleRate,
       });
+      encoder.on('error', (err) => {
+        console.error(`[Audio Encoder] Error: ${err.message}\n`, err);
+      });
+      encoder.on('close', () => console.log('[Audio Encoder] Encoder closed'));
+      encoder.on('end', () => console.log('[Audio Encoder] Encoder ended'));
+      encoder.on('drain', () => console.log('[Audio Encoder] Drain event'));
+
+      const discordManager = await setupDiscord(this.discordToken);
 
       // Setup WebSocket server with jitter buffer for network stability
-      const { websocketServer, jitterBuffer } = setupWebsocketServer(
-        async (data) => {
-          const buffer = Buffer.from(data as ArrayLike<number>);
-
-          if (jitterBuffer.addFrame(buffer)) {
-            const frame = jitterBuffer.getFrame();
-            if (frame) {
-              encoder.write(frame);
-            } else {
-              console.warn(
-                '[AudioPipeline] Buffer underrun - writing silence frame',
-              );
-              encoder.write(Buffer.alloc(FRAME_SIZE));
-            }
-          }
-
-          // Log buffer health periodically
-          if (Math.random() < 0.001) {
-            const stats = jitterBuffer.getStats();
-            console.log(
-              `[JitterBuffer] Buffer: ${stats.currentBufferSize}/${stats.targetBufferSize} frames | Drop rate: ${stats.dropRate}`,
-            );
-          }
-        },
-      );
+      setupWebsocketServer(async (data) => {
+        const buffer = Buffer.from(data as ArrayLike<number>);
+        await discordManager.handleVoiceData(buffer);
+      });
 
       const viewManager = await ViewManager.getInstance();
 
@@ -96,8 +81,6 @@ export class StartupManager {
         viewManager.captureTab,
         viewManager.frontendTab.tab,
       );
-
-      await setupDiscord(this.discordToken, encoder);
       return true;
     } catch (e) {
       console.error(`[Init] Resource initialization failed:`, e);
@@ -147,13 +130,6 @@ function setupWebsocketServer(
   console.log('Websocket server started on', websocketServer.address());
   ipcMain.handle('get-websocket', () => websocketServer.address());
 
-  // Create jitter buffer for handling network jitter
-  // This smooths out variable packet arrival times and prevents audio dropout
-  const jitterBuffer = new JitterBuffer(
-    1920, // Frame size: 960 samples * 2 bytes (16-bit) = 1920 bytes
-    200, // Target latency: 200ms buffer
-  );
-
   websocketServer.on('connection', async (socket: WebSocket) => {
     console.log('Got a new connection to a Websocket server');
     socket.on('message', async (data: RawData) => {
@@ -163,13 +139,11 @@ function setupWebsocketServer(
     });
   });
 
-  return { websocketServer, jitterBuffer };
+  return { websocketServer };
 }
 
-async function setupDiscord(token: string, stream: Readable): Promise<void> {
+async function setupDiscord(token: string): Promise<DiscordManager> {
   const discordManager = DiscordManager.getInstance();
-  discordManager.createAudioPlayer();
   await discordManager.connect(token);
-  const guilds = await discordManager.getGuildChannels();
-  await discordManager.joinChannel(guilds[0].channels[0].id, stream);
+  return discordManager;
 }
