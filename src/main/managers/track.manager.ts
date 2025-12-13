@@ -13,9 +13,11 @@ import { DatabaseProviderCreator } from '../database/database-provider-creator';
 import { TagsManager } from './tags.manager';
 import { GetSomeMatch } from '../database/database-provider.model';
 import { FilesManager } from './files.manager';
+import { Logger } from '../utils/logger';
 
 export class TrackManager {
   private static _instance: TrackManager;
+  private logger = new Logger('TrackManager', 'green');
 
   private constructor(
     private tracksProvider: DatabaseProvider<Track>,
@@ -137,12 +139,15 @@ export class TrackManager {
       await this.filesManager.updateTrackFile(newRecord);
     } catch (e) {
       console.error('[TrackManager] Failed to update track file metadata', e);
+      this.logger.logErrorMessage('Failed to update track file metadata', {
+        error: e,
+      });
     }
     return newRecord;
   }
 
   async deleteById(id: string) {
-    console.log(`[TrackManager] Delete track: ${id}`);
+    this.logger.log('Delete track', { trackId: id });
     const playlistsManager = await PlaylistManager.getInstance();
     await playlistsManager.removeTracksFromPlaylists([id]);
     return await this.tracksProvider.deleteOne('id', id);
@@ -204,7 +209,7 @@ export class TrackManager {
   }
 
   private async update(track: Track) {
-    console.log(`[TrackManager] Update track: ${track.id}`);
+    this.logger.log('Update track', { trackId: track.id });
     const updatedRecord = await this.tracksProvider.update(
       'id',
       track.id,
@@ -213,7 +218,9 @@ export class TrackManager {
     try {
       await this.filesManager.updateTrackFile(updatedRecord);
     } catch (e) {
-      console.error('[TrackManager] Failed to update track file metadata', e);
+      this.logger.logErrorMessage('Failed to update track file metadata', {
+        error: e,
+      });
     }
     return updatedRecord;
   }

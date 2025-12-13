@@ -6,11 +6,13 @@ import { DiscordManager } from './discord.manager';
 import { opus } from 'prism-media';
 import Encoder = opus.Encoder;
 import { getAudioConfig } from '../configs';
+import { Logger } from '../utils/logger';
 
 export class StartupManager {
   private static instance: StartupManager;
 
   private initialized: boolean = false;
+  private logger = new Logger('StartupManager', 'green');
 
   private constructor(
     private buildPath: string,
@@ -29,7 +31,7 @@ export class StartupManager {
 
   public async initializeAllManagers(): Promise<boolean> {
     if (this.initialized) {
-      console.log('[Init] Managers already initialized.');
+      this.logger.log('Managers already initialized');
       return true;
     }
 
@@ -41,13 +43,15 @@ export class StartupManager {
         config.initFunction,
       );
       if (!result) {
-        console.error(`[Init] Failed to initialize manager: ${config.name}`);
+        this.logger.logErrorMessage('Failed to initialize manager', {
+          manager: config.name,
+        });
         return false;
       }
     }
 
     this.initialized = true;
-    console.log('[Init] All managers initialized successfully.');
+    this.logger.log('All managers initialized successfully');
     return true;
   }
 
@@ -60,11 +64,11 @@ export class StartupManager {
         rate: audioConfig.sampleRate,
       });
       encoder.on('error', (err) => {
-        console.error(`[Audio Encoder] Error: ${err.message}\n`, err);
+        this.logger.logErrorMessage('Audio Encoder error', { error: err });
       });
-      encoder.on('close', () => console.log('[Audio Encoder] Encoder closed'));
-      encoder.on('end', () => console.log('[Audio Encoder] Encoder ended'));
-      encoder.on('drain', () => console.log('[Audio Encoder] Drain event'));
+      encoder.on('close', () => this.logger.log('Audio Encoder closed'));
+      encoder.on('end', () => this.logger.log('Audio Encoder ended'));
+      encoder.on('drain', () => this.logger.log('Audio Encoder drain event'));
 
       const discordManager = await setupDiscord(this.discordToken);
 
@@ -72,7 +76,7 @@ export class StartupManager {
       setupWebsocketServer(async (data) => {
         const buffer = Buffer.from(data as ArrayLike<number>);
         await discordManager.handleVoiceData(buffer);
-      });
+      }, this.logger);
 
       const viewManager = await ViewManager.getInstance();
 
@@ -80,10 +84,13 @@ export class StartupManager {
         viewManager.appWindow,
         viewManager.captureTab,
         viewManager.frontendTab.tab,
+        this.logger,
       );
       return true;
     } catch (e) {
-      console.error(`[Init] Resource initialization failed:`, e);
+      this.logger.logErrorMessage('Resource initialization failed', {
+        error: e,
+      });
       return false;
     }
   }
@@ -93,12 +100,14 @@ export class StartupManager {
     initFunction: () => Promise<void>,
   ): Promise<boolean> {
     try {
-      console.log(`[Init] Creating ${name}...`);
+      this.logger.log(`Creating ${name}...`);
       await initFunction();
-      console.log(`[Init] ${name} initialized successfully.`);
+      this.logger.log(`${name} initialized successfully`);
       return true;
     } catch (e) {
-      console.error(`[Init] ${name} initialization failed:`, e);
+      this.logger.logErrorMessage(`${name} initialization failed`, {
+        error: e,
+      });
       return false;
     }
   }
@@ -108,6 +117,7 @@ async function setupAudioCapture(
   window: BrowserWindow,
   captureTab: WebContentsView,
   youtubeTab: WebContentsView,
+  logger: Logger,
 ) {
   try {
     const sourceId = youtubeTab.webContents.getMediaSourceId(
@@ -119,19 +129,21 @@ async function setupAudioCapture(
       chromeMediaSourceId: sourceId,
     } as MediaTrackConstraints);
   } catch (e) {
-    console.error('Audio capture failed:', e);
+    logger.logErrorMessage('Audio capture failed', { error: e });
   }
 }
 
 function setupWebsocketServer(
   messageCallback?: (msg: RawData) => Promise<void>,
+  logger?: Logger,
 ) {
   const websocketServer = new WebSocketServer({ port: 17253 });
-  console.log('Websocket server started on', websocketServer.address());
+  const address = websocketServer.address();
+  logger?.log('Websocket server started', { address });
   ipcMain.handle('get-websocket', () => websocketServer.address());
 
   websocketServer.on('connection', async (socket: WebSocket) => {
-    console.log('Got a new connection to a Websocket server');
+    logger?.log('Got a new connection to a Websocket server');
     socket.on('message', async (data: RawData) => {
       await (messageCallback
         ? messageCallback(data)

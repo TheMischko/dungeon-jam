@@ -7,9 +7,11 @@ import { AudioTrack, FileBase64, Track } from '@shared/models/track.model';
 import { lookup } from 'mime-types';
 import { TrackMetaData } from '../utils/track-meta-data';
 import { TagsManager } from './tags.manager';
+import { Logger } from '../utils/logger';
 
 export class FilesManager {
   private static _instance: FilesManager;
+  private logger = new Logger('FilesManager', 'magenta');
 
   constructor(private tagsManager: TagsManager) {}
 
@@ -61,7 +63,10 @@ export class FilesManager {
           });
         })
         .catch((e: Error) => {
-          console.error(e);
+          this.logger.logErrorMessage('Failed to read metadata', {
+            filePath: path,
+            error: e,
+          });
           resolve({
             fullPath: path,
             title: '',

@@ -4,9 +4,11 @@ import { CaptureChannel } from '@shared/models/channels.model';
 import { PlaybackChannel } from '@shared/models/channels.model';
 import { CaptureSettings } from '@shared/models/capture.model';
 import { DiscordManager } from './discord.manager';
+import { Logger } from '../utils/logger';
 
 export class PlaybackDestinationManager {
   private static instance: PlaybackDestinationManager;
+  private logger = new Logger('PlaybackDestination', 'blue');
 
   private constructor(
     private viewManager: ViewManager,
@@ -31,11 +33,11 @@ export class PlaybackDestinationManager {
       PlaybackChannel.CAPTURE_SETTINGS,
       (_, settings: CaptureSettings) => {
         this.updateCaptureSettings(settings).catch((e) =>
-          console.error('[PlaybackDestination] Error handling update:', e),
+          this.logger.logErrorMessage('Error handling update', { error: e }),
         );
       },
     );
-    console.log('PlaybackDestinationManager listeners are registered.');
+    this.logger.log('Listeners registered');
   }
 
   public async updateCaptureSettings(settings: CaptureSettings): Promise<void> {
@@ -49,11 +51,13 @@ export class PlaybackDestinationManager {
       } else {
         this.discordManager.stopStreaming();
       }
-      console.log(
-        `[PlaybackDestination] Updated: localMuted=${settings.isLocalMuted}`,
-      );
+      this.logger.log('Capture settings updated', {
+        localMuted: settings.isLocalMuted,
+      });
     } catch (e) {
-      console.error('[PlaybackDestination] Failed to update:', e);
+      this.logger.logErrorMessage('Failed to update capture settings', {
+        error: e,
+      });
     }
   }
 }

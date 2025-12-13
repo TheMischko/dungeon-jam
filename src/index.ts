@@ -1,13 +1,15 @@
-import { app } from 'electron';
+import { app, ipcMain } from 'electron';
 import { configDotenv } from 'dotenv';
 import { StartupManager } from './main/managers/startup.manager';
 import { ViewManager } from './main/managers/view.manager';
-import { GeneralChannels } from '@shared/models/channels.model';
+import { AppChannel, GeneralChannels } from '@shared/models/channels.model';
+import { Logger } from './main/utils/logger';
 
 configDotenv();
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN || 'ERROR';
 const ENV = process.env.ENV || 'production';
 console.log('DISCORD_TOKEN', DISCORD_TOKEN);
+const appLogger = new Logger('APP', 'cyanBright');
 
 app.on('ready', async () => {
   const startup = StartupManager.getInstance(__dirname, DISCORD_TOKEN);
@@ -15,7 +17,7 @@ app.on('ready', async () => {
   const resourcesInitSuccess = await startup.initializeResources();
   const initSuccess = managersInitSuccess && resourcesInitSuccess;
   if (!initSuccess) {
-    console.error('[App] Failed to initialize all managers. Exiting.');
+    appLogger.logErrorMessage('Failed to initialize all managers. Exiting.');
     app.quit();
     return;
   } else {
