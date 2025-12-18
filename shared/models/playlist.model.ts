@@ -10,6 +10,7 @@ export interface Playlist {
   order: number;
   dateCreated: Date;
   dateUpdated: Date;
+  childrenIds?: string[];
 }
 
 export interface PlaylistInsertQuery {
