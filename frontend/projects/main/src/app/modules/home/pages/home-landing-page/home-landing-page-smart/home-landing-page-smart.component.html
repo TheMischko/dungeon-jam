@@ -1,0 +1,7 @@
+<app-home-landing-page
+  [tracks]="tracks()"
+  [playingTrackId]="currentlyPlayingTrackId()"
+  [tracksLoading]="tracksLoading()"
+  (playTrack)="playTrack($event)"
+  (pauseTrack)="pausePlaying()"
+></app-home-landing-page>
