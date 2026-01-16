@@ -11,6 +11,7 @@ export const playlistsMock: Playlist[] = [
     dateCreated: new Date(),
     dateUpdated: new Date(),
     order: 0,
+    childrenIds: []
   },
   {
     id: '234',
@@ -22,6 +23,7 @@ export const playlistsMock: Playlist[] = [
     dateCreated: new Date(),
     dateUpdated: new Date(),
     order: 1,
+    childrenIds: []
   },
   {
     id: '345',
@@ -33,6 +35,7 @@ export const playlistsMock: Playlist[] = [
     dateCreated: new Date(),
     dateUpdated: new Date(),
     order: 2,
+    childrenIds: []
   },
   {
     id: '456',
@@ -44,5 +47,6 @@ export const playlistsMock: Playlist[] = [
     dateCreated: new Date(),
     dateUpdated: new Date(),
     order: 3,
+    childrenIds: []
   },
 ];
