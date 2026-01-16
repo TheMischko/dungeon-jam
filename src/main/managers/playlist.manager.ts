@@ -70,60 +70,11 @@ export class PlaylistManager {
   async insert(query: PlaylistInsertQuery): Promise<Playlist> {
     const playlists = await this.playlistProvider.getAll();
     const newPlaylist = this.createNewPlaylist(query, playlists.length);
-    return await this.playlistProvider.create(newPlaylist);
-  }
+    const createdPlaylist = await this.playlistProvider.create(newPlaylist);
 
-  public static __resetForTests(): void {
-    PlaylistManager._instance = undefined as unknown as PlaylistManager;
-  }
+    await this.setParentOwnership(query.parentPlaylistId ?? undefined, createdPlaylist.id);
 
-  private static filterPlaylists(playlist: Playlist, filter?: string): boolean {
-    if (!filter) {
-      return true;
-    }
-    const filterLower = filter.toLowerCase();
-    // Check if filter matches playlist name
-    if (playlist.name.toLowerCase().includes(filterLower)) {
-      return true;
-    }
-    // Check if filter matches any tag
-    return playlist.tags.some((tag) => tag.toLowerCase().includes(filterLower));
-  }
-
-  private static sortPlaylists(
-    playlistA: Playlist,
-    playlistB: Playlist,
-    direction?: SortDirection,
-    sortBy?: string,
-  ) {
-    if (!direction) {
-      return 0;
-    }
-    type PlaylistKey = Extract<
-      keyof Omit<Playlist, 'trackIds' | 'dateCreated' | 'dateUpdated'>,
-      string
-    >;
-    let sortValue: PlaylistKey = 'name';
-    if (sortBy && ['name', 'order'].includes(sortBy)) {
-      sortValue = sortBy as PlaylistKey;
-    }
-    const directionNum = direction === SortDirection.ASC ? 1 : -1;
-
-    // Handle string and number sorting
-    const valueA = playlistA[sortValue];
-    const valueB = playlistB[sortValue];
-
-    if (typeof valueA === 'string' && typeof valueB === 'string') {
-      return (
-        valueA.toLowerCase().localeCompare(valueB.toLowerCase()) * directionNum
-      );
-    }
-
-    if (typeof valueA === 'number' && typeof valueB === 'number') {
-      return (valueA - valueB) * directionNum;
-    }
-
-    return 0;
+    return createdPlaylist;
   }
 
   async addTracks(data: PlaylistAddTracksData): Promise<Map<string, Playlist>> {
@@ -204,7 +155,40 @@ export class PlaylistManager {
       dateCreated: playlist.dateCreated,
       dateUpdated: new Date(),
     };
-    return await this.playlistProvider.replaceRecord(updatedPlaylist);
+    await this.playlistProvider.replaceRecord(updatedPlaylist);
+    await this.setParentOwnership(query.parentPlaylistId ?? undefined, updatedPlaylist.id);
+
+    const finalizedPlaylist = await this.getById(playlist.id);
+    if(!finalizedPlaylist) {
+      throw new Error('Failed to retrieve updated playlist.');
+    }
+    return finalizedPlaylist;
+  }
+
+  async getAll(query?: QueryRequest | undefined) {
+    const playlists = await this.playlistProvider.getAll(query);
+    const playlistMap = await this.getPlaylistMap(playlists);
+
+    playlists.forEach((playlist) => {
+      playlist.childrenIds?.forEach((childId) => {
+        const child = playlistMap.get(childId);
+        if (!child) {
+          return;
+        }
+        playlistMap.set(childId, {
+          ...child,
+          ownershipId: playlist.id
+        });
+      });
+    });
+
+    const order = Object.fromEntries(playlists.map((p, i) => [p.id, i] as const));
+
+    const correctIndex = (p: Playlist) => order[p.id] ?? Number.MAX_SAFE_INTEGER;
+
+    return Array.from(playlistMap.values()).sort((a, b) => {
+      return correctIndex(a) - correctIndex(b);
+    })
   }
 
   async getById(id: string) {
@@ -272,6 +256,102 @@ export class PlaylistManager {
       dateCreated: date,
       dateUpdated: date,
       trackIds: [],
+      ownershipId: data.parentPlaylistId
     };
+  }
+
+  private async getPlaylistMap(playlists?: Playlist[]): Promise<Map<string, Playlist>> {
+    const items = playlists ?? (await this.playlistProvider.getAll());
+    if(!items) {
+      return new Map();
+    }
+    const records = items.map(playlist => [playlist.id, playlist] as const);
+    return new Map(records);
+  }
+
+  private async setParentOwnership(parentId: string | undefined, childId: string): Promise<void> {
+    if(!parentId) {
+      return;
+    }
+    const parentPlaylist = await this.getById(parentId);
+    if (!parentPlaylist) {
+      return;
+    }
+
+    const childPlaylist = await this.getById(childId);
+    if (!childPlaylist) {
+      return;
+    }
+
+    if (childPlaylist.ownershipId !== parentPlaylist.id) {
+      const updatedChild: Playlist = {
+        ...childPlaylist,
+        ownershipId: parentPlaylist.id
+      };
+      await this.playlistProvider.replaceRecord(updatedChild);
+    }
+
+    if (parentPlaylist.childrenIds?.includes(childId)) {
+      return;
+    }
+
+    const updatedParent: Playlist = {
+      ...parentPlaylist,
+      childrenIds: [...(parentPlaylist.childrenIds ?? []), childId]
+    };
+    await this.playlistProvider.replaceRecord(updatedParent);
+  }
+
+  public static __resetForTests(): void {
+    PlaylistManager._instance = undefined as unknown as PlaylistManager;
+  }
+
+  private static sortPlaylists(
+    playlistA: Playlist,
+    playlistB: Playlist,
+    direction?: SortDirection,
+    sortBy?: string,
+  ) {
+    if (!direction) {
+      return 0;
+    }
+    type PlaylistKey = Extract<
+      keyof Omit<Playlist, 'trackIds' | 'dateCreated' | 'dateUpdated'>,
+      string
+    >;
+    let sortValue: PlaylistKey = 'name';
+    if (sortBy && ['name', 'order'].includes(sortBy)) {
+      sortValue = sortBy as PlaylistKey;
+    }
+    const directionNum = direction === SortDirection.ASC ? 1 : -1;
+
+    // Handle string and number sorting
+    const valueA = playlistA[sortValue];
+    const valueB = playlistB[sortValue];
+
+    if (typeof valueA === 'string' && typeof valueB === 'string') {
+      return (
+        valueA.toLowerCase().localeCompare(valueB.toLowerCase()) * directionNum
+      );
+    }
+
+    if (typeof valueA === 'number' && typeof valueB === 'number') {
+      return (valueA - valueB) * directionNum;
+    }
+
+    return 0;
+  }
+
+  private static filterPlaylists(playlist: Playlist, filter?: string): boolean {
+    if (!filter) {
+      return true;
+    }
+    const filterLower = filter.toLowerCase();
+    // Check if filter matches playlist name
+    if (playlist.name.toLowerCase().includes(filterLower)) {
+      return true;
+    }
+    // Check if filter matches any tag
+    return playlist.tags.some((tag) => tag.toLowerCase().includes(filterLower));
   }
 }

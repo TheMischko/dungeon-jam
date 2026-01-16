@@ -8,6 +8,7 @@ import { RangeSliderComponent } from '@general/components/controls/range-slider/
 import { iconSet } from '@general/icons/icons';
 import { PlaylistViewData } from '../../../../../../../../general/models/playlist.model';
 import { LoaderComponent } from '@general/components/display/loader/loader.component';
+import { Playlist } from '@shared/models/playlist.model';
 
 @Component({
   selector: 'app-playlist-grid',
@@ -21,7 +22,7 @@ import { LoaderComponent } from '@general/components/display/loader/loader.compo
   styleUrl: './playlist-grid.component.scss',
 })
 export class PlaylistGridComponent {
-  readonly dataSet = input.required<PlaylistViewData[]>();
+  readonly dataSet = input.required<(PlaylistViewData & { parentPlaylist: Playlist | null})[]>();
   readonly sizeConfig = input.required<GridItemSizeConfig>();
   readonly playingPlaylistId = input<string | null>();
   readonly loading = input<boolean>(false);

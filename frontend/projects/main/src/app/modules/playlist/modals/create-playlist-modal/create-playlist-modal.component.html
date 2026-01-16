@@ -3,12 +3,7 @@
     <h1>Create new playlist</h1>
   </div>
 
-  <form class="content" [formGroup]="form">
-    <lib-input formControlName="name" label="Playlist name"></lib-input>
-    <lib-input formControlName="description" label="Description"></lib-input>
-    <lib-tags-input formControlName="tags"></lib-tags-input>
-    <lib-input formControlName="imageUrl" label="Image URL"></lib-input>
-  </form>
+  <app-playlist-form [form]="form"></app-playlist-form>
 
   <div class="footer">
     <div class="buttons">

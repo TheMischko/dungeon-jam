@@ -11,6 +11,7 @@ export interface Playlist {
   dateCreated: Date;
   dateUpdated: Date;
   childrenIds?: string[];
+  ownershipId?: string;
 }
 
 export interface PlaylistInsertQuery {
@@ -18,6 +19,7 @@ export interface PlaylistInsertQuery {
   description?: string;
   imageUrl?: string;
   tags: TagData[];
+  parentPlaylistId?: string;
 }
 
 export interface PlaylistUpdateQuery {
@@ -30,6 +32,7 @@ export interface PlaylistUpdateQuery {
   tagsRemoved?: string[];
   tracksAdded?: string[];
   tracksRemoved?: string[];
+  parentPlaylistId?: string;
 }
 
 /**

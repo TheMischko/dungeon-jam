@@ -3,6 +3,7 @@ import { NgStyle } from '@angular/common';
 import { iconSet, volumeIconSet } from '@general/icons/icons';
 import { LucideAngularModule, LucideIconData } from 'lucide-angular';
 import { PlaylistViewData } from '../../../../../../../../../general/models/playlist.model';
+import { Playlist } from '@shared/models/playlist.model';
 
 @Component({
   selector: 'app-playlist-grid-item',
@@ -11,7 +12,7 @@ import { PlaylistViewData } from '../../../../../../../../../general/models/play
   styleUrl: './playlist-grid-item.component.scss',
 })
 export class PlaylistGridItemComponent {
-  readonly playlist = input.required<PlaylistViewData>();
+  readonly playlist = input.required<PlaylistViewData & { parentPlaylist: Playlist | null }>();
   readonly sizeConfig = input.required<GridItemSizeConfig>();
   readonly isPlaying = input<boolean>(false);
 

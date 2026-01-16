@@ -42,13 +42,13 @@ export class PlaylistGridSmartComponent implements OnInit {
   readonly sortDirection = signal<SortDirection>(SortDirection.ASC);
   readonly sortBy = signal<Extract<keyof Playlist, string>>('order');
 
-  readonly dataSet = computed<PlaylistViewData[]>(() => {
+  readonly dataSet = computed<(PlaylistViewData & { parentPlaylist: Playlist | null })[]>(() => {
     const loading = this.loading();
     if (loading) {
       return [];
     }
     const tags = untracked(() => this.tagsStore.entityMap());
-    return this.playlistStore.entities().map((playlist) => {
+    return this.playlistStore.playlistsWithParents().map((playlist) => {
       const playlistTags = playlist.tags.map((t) => tags[t]).filter((t) => !!t);
       return {
         ...playlist,

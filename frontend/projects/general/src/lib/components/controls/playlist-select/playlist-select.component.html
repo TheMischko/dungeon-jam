@@ -1,0 +1,10 @@
+<mat-form-field>
+  <mat-label>{{ label() }}</mat-label>
+  <mat-select [value]="value()" (selectionChange)="setValueFromSelect($event)">
+    @if (!loading()) {
+      @for (playlist of playlists(); track playlist.id) {
+        <mat-option [value]="playlist">{{ playlist.name }}</mat-option>
+      }
+    }
+  </mat-select>
+</mat-form-field>

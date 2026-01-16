@@ -1,7 +1,7 @@
 import {
   patchState,
   signalStore,
-  type,
+  type, withComputed,
   withMethods,
   withState,
 } from '@ngrx/signals';
@@ -16,7 +16,7 @@ import {
   PlaylistAddTracksData,
   PlaylistInsertQuery,
 } from '@shared/models/playlist.model';
-import { inject } from '@angular/core';
+import { computed, inject } from '@angular/core';
 import { PlaylistApiService } from '@general/services/playlist-api.service';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import {
@@ -50,6 +50,26 @@ export const PlaylistStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
   withEntities(playlistConfig),
+  withComputed((store) => {
+    const playlistsWithParents = computed<(Playlist & { parentPlaylist: Playlist | null})[]>(() => {
+      const playlists = store.entities();
+      const playlistMap = new Map(playlists.map((p) => [p.id, p]));
+
+      return playlists.map((playlist) => {
+        const parentPlaylist = playlist.ownershipId
+          ? playlistMap.get(playlist.ownershipId) || null
+          : null;
+        return {
+          ...playlist,
+          parentPlaylist,
+        };
+      });
+    });
+
+    return {
+      playlistsWithParents
+    }
+  }),
   withMethods((store, playlistApiService = inject(PlaylistApiService)) => {
     const load = rxMethod<QueryRequest>(
       pipe(
