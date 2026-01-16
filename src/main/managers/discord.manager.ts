@@ -1,18 +1,17 @@
 import {
   AudioPlayer,
   AudioResource,
-  createAudioResource,
+  createAudioResource, DiscordGatewayAdapterCreator,
   joinVoiceChannel,
   NoSubscriberBehavior,
   StreamType,
   VoiceConnection,
   VoiceConnectionStatus,
 } from '@discordjs/voice';
-import { Client, GatewayIntentBits, VoiceChannel } from 'discord.js';
+import { Client, Intents, VoiceChannel } from 'discord.js';
 import {
   ChannelData,
   DiscordState,
-  DiscordStateConnected,
   DiscordStateType,
   GuildWithChannels,
   JoinChannelRequest,
@@ -148,7 +147,7 @@ export class DiscordManager {
 
     this.isConnecting = true;
     this.client = new Client({
-      intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates],
+      intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_VOICE_STATES],
     });
 
     // Initialize network monitoring
@@ -326,7 +325,7 @@ export class DiscordManager {
       this.connection = joinVoiceChannel({
         channelId: channelId,
         guildId: guildId,
-        adapterCreator: channel.guild.voiceAdapterCreator,
+        adapterCreator: channel.guild.voiceAdapterCreator as unknown as DiscordGatewayAdapterCreator,
       });
 
       this.appendConnectionEventHandlers(guildId, channelId);
@@ -487,7 +486,7 @@ export class DiscordManager {
       const guildChannels = await fetchedGuild.channels.fetch();
       const channels: ChannelData[] = [];
       for (const channel of guildChannels.values()) {
-        if (channel?.isVoiceBased()) {
+        if (channel?.type === 'GUILD_VOICE' || channel?.type === 'GUILD_STAGE_VOICE') {
           channels.push({
             id: channel.id,
             name: channel.name,
