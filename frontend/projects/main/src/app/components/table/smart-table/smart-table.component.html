@@ -1,39 +1,43 @@
-<div class="controls">
-  @if(filterEnabled()){
-  <app-filter-settings (matchingChange)="filterMatchingChange.emit($event)" />
-  <div class="filters">
-    <app-tags-filter (selectionChange)="emitTagFilters($event)" />
-    <app-playlist-filter (selectionChange)="emitPlaylistFilters($event)" />
+@if (showControls()) {
+  <div class="controls">
+    @if (filterEnabled()) {
+      <app-filter-settings
+        (matchingChange)="filterMatchingChange.emit($event)"
+      />
+      <div class="filters">
+        <app-tags-filter (selectionChange)="emitTagFilters($event)" />
+        <app-playlist-filter (selectionChange)="emitPlaylistFilters($event)" />
+      </div>
+    } @else {
+      <div></div>
+    }
+    <lib-search-bar
+      class="search-bar"
+      (search)="currentSearch.set($event)"
+    ></lib-search-bar>
   </div>
-  } @else {
-  <div></div>
-  }
-  <lib-search-bar
-    class="search-bar"
-    (search)="currentSearch.set($event)"
-  ></lib-search-bar>
-</div>
-@if (loading()){
-<lib-loader size="large" class="loader"></lib-loader>
-} @else if (dataSet().length === 0 && currentSearch()){
-<div class="no-data">{{ noResultsText() }}</div>
+}
+@if (loading()) {
+  <lib-loader size="large" class="loader"></lib-loader>
+} @else if (dataSet().length === 0 && currentSearch()) {
+  <div class="no-data">{{ noResultsText() }}</div>
 } @else if (dataSet().length === 0) {
-<div class="no-data">{{ noDataText() }}</div>
+  <div class="no-data">{{ noDataText() }}</div>
 } @else {
-<app-table
-  class="table"
-  [config]="config()"
-  [dataSet]="dataSet()"
-  [selection]="selection()"
-  [allSelectedState]="allSelectedState()"
-  [actionsFn]="actionsFn()"
-  [trackBy]="trackBy()"
-  [uniquenessFn]="uniquenessFn()"
-  [defaultSortBy]="currentSortBy() ?? ''"
-  [defaultSortDirection]="currentSortDirection()"
-  (selected)="selected.emit($event)"
-  (hoverStart)="hoverStart.emit($event)"
-  (hoverEnd)="hoverEnd.emit($event)"
-  (sortChange)="setSort($event)"
-></app-table>
+  <app-table
+    class="table"
+    [config]="config()"
+    [dataSet]="dataSet()"
+    [selection]="selection()"
+    [allSelectedState]="allSelectedState()"
+    [actionsFn]="actionsFn()"
+    [trackBy]="trackBy()"
+    [uniquenessFn]="uniquenessFn()"
+    [defaultSortBy]="currentSortBy() ?? ''"
+    [defaultSortDirection]="currentSortDirection()"
+    (selected)="selected.emit($event)"
+    (hoverStart)="hoverStart.emit($event)"
+    (hoverEnd)="hoverEnd.emit($event)"
+    (sortChange)="setSort($event)"
+  ></app-table>
 }

@@ -2,6 +2,7 @@ import {
   Component,
   computed,
   inject,
+  input,
   OnInit,
   signal,
   untracked,
@@ -33,6 +34,8 @@ export class PlaylistGridSmartComponent implements OnInit {
   readonly playbackService = inject(PlaybackService);
   readonly trackService = inject(TrackService);
   readonly router = inject(Router);
+
+  readonly showControls = input<boolean>(true);
 
   readonly sizeSliderValue = signal<number>(0.75);
   readonly searchFilter = signal<string>('');

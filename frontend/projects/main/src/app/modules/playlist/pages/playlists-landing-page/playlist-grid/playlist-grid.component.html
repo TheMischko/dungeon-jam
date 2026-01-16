@@ -1,4 +1,5 @@
 <div class="wrapper">
+  @if(showControls()){
   <div class="controls">
     <div class="filters">Filters</div>
     <div class="search">
@@ -16,6 +17,7 @@
       />
     </div>
   </div>
+  }
 
   <div class="grid-content">
     @if (loading()) {

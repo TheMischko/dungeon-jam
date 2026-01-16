@@ -53,6 +53,7 @@ export class SmartTableComponent<T> {
   readonly noDataText = input<string>('No data available');
   readonly noResultsText = input<string>('No results found');
   readonly filterEnabled = input<boolean>(false);
+  readonly showControls = input<boolean>(true);
 
   readonly selected = output<T[]>();
   readonly menuClosed = output<{ row: T; reason: string }>();

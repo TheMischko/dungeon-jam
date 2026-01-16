@@ -25,6 +25,7 @@ export class PlaylistGridComponent {
   readonly sizeConfig = input.required<GridItemSizeConfig>();
   readonly playingPlaylistId = input<string | null>();
   readonly loading = input<boolean>(false);
+  readonly showControls = input<boolean>(true);
 
   readonly sizeChange = output<number>();
   readonly playPlaylist = output<string>();

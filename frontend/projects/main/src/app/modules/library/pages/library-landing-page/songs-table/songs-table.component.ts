@@ -71,6 +71,7 @@ export class SongsTableComponent implements OnInit, AfterViewInit, OnDestroy {
   );
   readonly loading = input<boolean>(false);
   readonly showActionsColumn = input<boolean>(true);
+  readonly showControls = input<boolean>(true);
 
   readonly queryChange = output<QueryOptions>();
   readonly playTrack = output<Track>();

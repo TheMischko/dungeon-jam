@@ -1,15 +1,15 @@
-import {Route} from '@angular/router';
-import {homeRouteStrings} from './home-route-strings';
-import {HomeLandingPageComponent} from './pages/home-landing-page/home-landing-page.component';
+import { Route } from '@angular/router';
+import { homeRouteStrings } from './home-route-strings';
+import { HomeLandingPageSmartComponent } from './pages/home-landing-page/home-landing-page-smart/home-landing-page-smart.component';
 
 export const homeRoutes: Route[] = [
   {
     path: '',
     redirectTo: homeRouteStrings.home,
-    pathMatch: 'full'
+    pathMatch: 'full',
   },
   {
     path: homeRouteStrings.home,
-    component: HomeLandingPageComponent
-  }
-]
+    component: HomeLandingPageSmartComponent,
+  },
+];
