@@ -214,6 +214,58 @@ describe('TrackManager', () => {
       expect(result).toContainEqual(track1);
       expect(result).toContainEqual(track3);
     });
+
+    it('should resolve all the tracks from playlist and its children', async () => {
+      const track1 = mockTrack({ name: 'Happy Song' });
+      const track2 = mockTrack({ name: 'Sad Song' });
+      const track3 = mockTrack({ name: 'Dance Song' });
+      const track4 = mockTrack({ name: 'Chill Song' });
+      const track5 = mockTrack({ name: 'Rock Song' });
+
+      const child1 = mockPlaylist({
+        trackIds: [track1.id, track3.id]
+      });
+      const child2 = mockPlaylist({
+        trackIds: [track4.id]
+      });
+      const child3 = mockPlaylist({
+        trackIds: [track5.id]
+      });
+
+      const playlistId = 'root';
+      const playlist = mockPlaylist({
+        id: playlistId,
+        trackIds: [track1.id, track2.id],
+        childrenIds: [child1.id, child2.id]
+      });
+
+      vi.spyOn(trackManager, 'getAll').mockResolvedValue([
+        track1,
+        track2,
+        track3,
+        track4,
+        track5
+      ]);
+      // Mock playlist manager to return prepared playlists
+      mockPlaylistManagerInstance.getById.mockResolvedValue(playlist);
+      mockPlaylistManagerInstance.getAll.mockResolvedValue([
+        playlist,
+        child1,
+        child2,
+        child3
+      ]);
+
+      const tracks = await trackManager.getByPlaylist({
+        playlistId,
+        includeChildren: true
+      });
+
+      expect(tracks).toHaveLength(4);
+      expect(tracks).toContainEqual(track1);
+      expect(tracks).toContainEqual(track2);
+      expect(tracks).toContainEqual(track3);
+      expect(tracks).toContainEqual(track4);
+    });
   });
 
   it('get should fetch a record with the matching id', async () => {

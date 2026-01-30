@@ -10,4 +10,5 @@ export const mockPlaylistManager = {
 
 export const mockPlaylistManagerInstance = {
   getById: vi.fn(),
+  getAll: vi.fn()
 };

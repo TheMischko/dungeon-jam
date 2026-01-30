@@ -14,6 +14,7 @@ import { TagsManager } from './tags.manager';
 import { GetSomeMatch } from '../database/database-provider.model';
 import { FilesManager } from './files.manager';
 import { Logger } from '../utils/logger';
+import { Playlist } from '@shared/models/playlist.model';
 
 export class TrackManager {
   private static _instance: TrackManager;
@@ -112,12 +113,11 @@ export class TrackManager {
       sortDirection: query?.sortDirection,
     });
 
-    return allTracks.reduce((playlistTracks, track, _, __) => {
-      if (!playlist.trackIds.includes(track.id)) {
-        return playlistTracks;
-      }
-      return [...playlistTracks, track];
-    }, [] as Track[]);
+    if(query.includeChildren){
+      return this.getPlaylistTracksWithChildren(playlist, allTracks);
+    }
+
+    return this.getPlaylistTracks(playlist, allTracks);
   }
 
   async insert(
@@ -218,10 +218,34 @@ export class TrackManager {
     try {
       await this.filesManager.updateTrackFile(updatedRecord);
     } catch (e) {
+      console.error('[TrackManager] Failed to update track file metadata', e);
       this.logger.logErrorMessage('Failed to update track file metadata', {
         error: e,
       });
     }
     return updatedRecord;
+  }
+
+  private getPlaylistTracks(playlist: Playlist, allTracks: Track[]): Track[] {
+    return allTracks.reduce((playlistTracks, track, _, __) => {
+      if (!playlist.trackIds.includes(track.id)) {
+        return playlistTracks;
+      }
+      return [...playlistTracks, track];
+    }, [] as Track[]);
+  }
+
+  private async getPlaylistTracksWithChildren(playlist: Playlist, allTracks: Track[]) {
+    const playlistManager = await PlaylistManager.getInstance();
+    if(!playlist.childrenIds || playlist.childrenIds.length === 0){
+      return this.getPlaylistTracks(playlist, allTracks);
+    }
+    const playlists = await playlistManager.getAll();
+    const childrenPlaylists = playlists.filter(p => playlist.childrenIds!.includes(p.id));
+    const relatedTrackIds = [playlist, ...childrenPlaylists].reduce((tracks, playlist, _, __) => {
+      return [...tracks, ...playlist.trackIds];
+    }, [] as string[]);
+    const trackIdsUniqueSet = new Set(relatedTrackIds);
+    return allTracks.filter(track => trackIdsUniqueSet.has(track.id));
   }
 }
