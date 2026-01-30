@@ -69,12 +69,14 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
   readonly currentFilter = signal<string>('');
   readonly currentSortBy = signal<string>('name');
   readonly currentSortDirection = signal<SortDirection>(SortDirection.ASC);
+  readonly currentIncludeChildren = signal<boolean>(false);
 
   readonly loadQuery = computed<PlaylistTracksQuery>(() => ({
     filter: this.currentFilter(),
     sortDirection: this.currentSortDirection(),
     sortBy: this.currentSortBy(),
     playlistId: this.playlistId(),
+    includeChildren: this.currentIncludeChildren(),
   }));
   songActionsMenuConfig = computed<ActionsMenuConfig<Track, Playlist>[]>(() => {
     return [
@@ -185,7 +187,7 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
     );
   }
 
-  updateQuery(queryOptions: QueryOptions) {
+  protected updateQuery(queryOptions: QueryOptions) {
     if (queryOptions.filter) {
       this.currentFilter.set(queryOptions.filter);
     }
@@ -195,5 +197,9 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
     if (queryOptions.sortDirection) {
       this.currentSortDirection.set(queryOptions.sortDirection);
     }
+  }
+
+  protected updateIncludeChildren(include: boolean) {
+    this.currentIncludeChildren.set(include);
   }
 }

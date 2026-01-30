@@ -12,6 +12,7 @@ import { actionsIconSet } from '@general/icons/icons';
 import { MatButton } from '@angular/material/button';
 import { LucideAngularModule } from 'lucide-angular';
 import { QueryOptions } from '@shared/models/request.model';
+import { SwitchComponent } from '@general/components/controls/switch/switch.component';
 
 @Component({
   selector: 'app-playlists-detail-page',
@@ -20,6 +21,7 @@ import { QueryOptions } from '@shared/models/request.model';
     PlayPauseButtonComponent,
     MatButton,
     LucideAngularModule,
+    SwitchComponent,
   ],
   templateUrl: './playlists-detail-page.component.html',
   styleUrl: './playlists-detail-page.component.scss',
@@ -38,6 +40,7 @@ export class PlaylistsDetailPageComponent {
   readonly pause = output();
   readonly queryChange = output<QueryOptions>();
   readonly openAddTracks = output<void>();
+  readonly includeChildren = output<boolean>();
 
   readonly buttonType = ButtonType.Flat;
   readonly buttonSize: ButtonSize = 'large';
@@ -51,5 +54,9 @@ export class PlaylistsDetailPageComponent {
       return this.playPlaylist.emit();
     }
     this.pause.emit();
+  }
+
+  protected toggleIncludeChildren(include: boolean) {
+    this.includeChildren.emit(include);
   }
 }
