@@ -1,4 +1,5 @@
 import { TagData } from '@shared/models/tag.model';
+import { QueryRequest } from '@shared/models/request.model';
 
 export interface Playlist {
   id: string;
@@ -33,6 +34,11 @@ export interface PlaylistUpdateQuery {
   tracksAdded?: string[];
   tracksRemoved?: string[];
   parentPlaylistId?: string;
+}
+
+export interface PlaylistFetchQuery extends QueryRequest{
+  groupByParent?: boolean;
+  hideChildren?: boolean;
 }
 
 /**

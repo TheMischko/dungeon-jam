@@ -1,7 +1,7 @@
 import { DatabaseWrapper } from '../database/database';
 import {
   Playlist,
-  PlaylistAddTracksData,
+  PlaylistAddTracksData, PlaylistFetchQuery,
   PlaylistInsertQuery,
   PlaylistUpdateQuery,
 } from '@shared/models/playlist.model';
@@ -13,6 +13,7 @@ import { v4 as uuid } from 'uuid';
 import { DatabaseProvider } from '../database/database-provider';
 import { DatabaseProviderCreator } from '../database/database-provider-creator';
 import { GetSomeMatch } from '../database/database-provider.model';
+import { PlaylistHelper } from '../utils/playlist-helper';
 
 export class PlaylistManager {
   private static _instance: PlaylistManager;
@@ -165,30 +166,14 @@ export class PlaylistManager {
     return finalizedPlaylist;
   }
 
-  async getAll(query?: QueryRequest | undefined) {
+  async getAll(query?: PlaylistFetchQuery | undefined) {
     const playlists = await this.playlistProvider.getAll(query);
-    const playlistMap = await this.getPlaylistMap(playlists);
 
-    playlists.forEach((playlist) => {
-      playlist.childrenIds?.forEach((childId) => {
-        const child = playlistMap.get(childId);
-        if (!child) {
-          return;
-        }
-        playlistMap.set(childId, {
-          ...child,
-          ownershipId: playlist.id
-        });
-      });
-    });
+    if(query?.hideChildren) {
+      return PlaylistHelper.getPlaylistsWithoutChildren(playlists);
+    }
 
-    const order = Object.fromEntries(playlists.map((p, i) => [p.id, i] as const));
-
-    const correctIndex = (p: Playlist) => order[p.id] ?? Number.MAX_SAFE_INTEGER;
-
-    return Array.from(playlistMap.values()).sort((a, b) => {
-      return correctIndex(a) - correctIndex(b);
-    })
+    return PlaylistHelper.getPlaylistsWithOwnership(playlists);
   }
 
   async getById(id: string) {
@@ -258,15 +243,6 @@ export class PlaylistManager {
       trackIds: [],
       ownershipId: data.parentPlaylistId
     };
-  }
-
-  private async getPlaylistMap(playlists?: Playlist[]): Promise<Map<string, Playlist>> {
-    const items = playlists ?? (await this.playlistProvider.getAll());
-    if(!items) {
-      return new Map();
-    }
-    const records = items.map(playlist => [playlist.id, playlist] as const);
-    return new Map(records);
   }
 
   private async setParentOwnership(parentId: string | undefined, childId: string): Promise<void> {
