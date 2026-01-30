@@ -160,12 +160,15 @@ describe('PlaylistManager', () => {
         name: 'Old Name',
         tags: ['tag-1'],
       });
-      mockPlaylistProvider.getBy.mockResolvedValue(playlist);
-      mockPlaylistProvider.replaceRecord.mockResolvedValue({
+      const updatedPlaylist = {
         ...playlist,
         name: 'New Name',
         tags: ['tag-1', 'tag-2'],
-      });
+      };
+      mockPlaylistProvider.getBy
+        .mockResolvedValueOnce(playlist)
+        .mockResolvedValueOnce(updatedPlaylist);
+      mockPlaylistProvider.replaceRecord.mockResolvedValue(updatedPlaylist);
 
       const result = (await triggerIpcMainHandle(PlaylistChannel.UPDATE, {
         id: 'playlist-1',
@@ -259,13 +262,16 @@ describe('PlaylistManager', () => {
         tags: ['tag-1', 'tag-2'],
         trackIds: ['track-1', 'track-2'],
       });
-      mockPlaylistProvider.getBy.mockResolvedValue(playlist);
-      mockPlaylistProvider.replaceRecord.mockResolvedValue({
+      const updatedPlaylist = {
         ...playlist,
         name: 'New Name',
         tags: ['tag-1', 'tag-3'],
         trackIds: ['track-1', 'track-3'],
-      });
+      };
+      mockPlaylistProvider.getBy
+        .mockResolvedValueOnce(playlist)
+        .mockResolvedValueOnce(updatedPlaylist);
+      mockPlaylistProvider.replaceRecord.mockResolvedValue(updatedPlaylist);
 
       const result = (await triggerIpcMainHandle(PlaylistChannel.UPDATE, {
         id: 'playlist-1',

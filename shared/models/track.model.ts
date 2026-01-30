@@ -28,4 +28,5 @@ export interface StoredPlayback {
 
 export interface PlaylistTracksQuery extends QueryRequest {
   playlistId: string;
+  includeChildren?: boolean;
 }

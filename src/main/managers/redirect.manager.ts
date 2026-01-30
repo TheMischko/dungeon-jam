@@ -21,7 +21,7 @@ export class RedirectManager {
 
     ipcMain.on(GeneralChannels.REDIRECT, (e, request: RedirectRequest) => {
       this.logger.log('Redirect request received', { request });
-      viewManager.broadcast(GeneralChannels.REDIRECT, null, request);
+      viewManager.broadcast(GeneralChannels.REDIRECT, e.processId, request);
     });
     this.logger.log('Listeners registered');
   }
