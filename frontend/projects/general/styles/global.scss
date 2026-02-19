@@ -126,3 +126,15 @@ button.mdc-button {
     margin-bottom: -3px;
   }
 }
+ a {
+   @include typo.default-font();
+    color: col.$text-main;
+
+   &:active, &:focus{
+      color: col.$text-main;
+   }
+
+   &:hover {
+     color: col.$primary;
+   }
+ }

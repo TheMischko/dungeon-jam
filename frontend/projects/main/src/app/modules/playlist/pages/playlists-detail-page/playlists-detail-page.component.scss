@@ -9,7 +9,29 @@
   flex-direction: column;
   align-items: flex-start;
   justify-content: space-between;
-  .header-content {
+
+  .header-content{
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .header-parent-playlist{
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: flex-start;
+    justify-content: flex-end;
+    margin: 8px;
+    & > * {
+      background: rgba(0,0,0,0.35);
+      padding: 4px;
+    }
+  }
+
+
+  .header-info {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -17,8 +39,13 @@
     padding: 0.25rem 1rem;
     min-height: 200px;
 
+    & > * {
+      background: rgba(0,0,0,0.35);
+      padding: 4px;
+    }
+
     h1 {
-      margin: 0.5rem 0;
+      margin: 0.25rem 0;
     }
     h2 {
       margin: 0;

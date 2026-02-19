@@ -10,8 +10,8 @@ import { SortDirection } from '@shared/models/common.model';
 import { PlaylistTracksQuery, Track } from '@shared/models/track.model';
 import { PlaylistTracksStore } from '../../../../../stores/playlist-tracks.store';
 import { PlaylistApiService } from '@general/services/playlist-api.service';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { map, switchMap } from 'rxjs';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { map } from 'rxjs';
 import { Playlist } from '@shared/models/playlist.model';
 import { PlaylistsDetailPageComponent } from '../playlists-detail-page.component';
 import { PlaybackService } from '../../../../../services/playback.service';
@@ -27,6 +27,7 @@ import { SelectLibraryTracksSelection } from '../../../../library/modals/select-
 import { ToastService } from '../../../../../services/toast.service';
 import { ToastType } from '../../../../../models/toast.model';
 import { QueryOptions } from '@shared/models/request.model';
+import { PlaylistStore } from '@general/stores/playlist.store';
 
 @Component({
   selector: 'app-playlists-detail-page-smart',
@@ -39,19 +40,34 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
   readonly playbackService = inject(PlaybackService);
   readonly dialogService = inject(DialogService);
   readonly toastService = inject(ToastService);
+  readonly playlistStore = inject(PlaylistStore);
 
   readonly playlistId = input<string>('', { alias: 'id' });
 
   readonly tracks = this.playlistTracksStore.entities;
-  readonly playlistId$ = toObservable(this.playlistId);
-  readonly playlist = toSignal<Playlist | null>(
-    this.playlistId$.pipe(
-      switchMap((playlistId) => {
-        return this.playlistService.getById(playlistId);
-      }),
-    ),
-    { initialValue: null },
-  );
+
+  readonly playlist = computed(() => {
+    const playlistId = this.playlistId();
+    if (!playlistId) {
+      return null;
+    }
+    return this.playlistStore.entityMap()[playlistId] ?? null;
+  });
+
+  readonly parentPlaylist = computed(() => {
+    const playlistId = this.playlistId();
+    return this.playlistStore.getParent(playlistId);
+  });
+
+  readonly childPlaylists = computed(() => {
+    const childIds = this.playlist()?.childrenIds;
+    if(!childIds) {
+      return [];
+    }
+    const playlistMap = this.playlistStore.entityMap();
+    return childIds.map((id) => playlistMap[id]).filter((p: Playlist) => !!p);
+  });
+
   readonly playbackState = toSignal<PlaybackState | null>(
     this.playbackService.playback$.pipe(
       map((state) => {
@@ -99,6 +115,7 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
 
   ngOnInit() {
     this.playlistTracksStore.load(this.loadQuery);
+    this.playlistStore.load({});
   }
 
   async playPlaylist() {
@@ -141,6 +158,7 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
       .subscribe({
         next: () => {
           this.playlistTracksStore.load(this.loadQuery);
+          this.playlistStore.load({});
         },
         error: (err) => {
           this.toastService.createToast(

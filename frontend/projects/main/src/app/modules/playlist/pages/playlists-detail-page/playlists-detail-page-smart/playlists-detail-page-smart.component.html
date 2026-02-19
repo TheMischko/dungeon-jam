@@ -1,6 +1,8 @@
 <app-playlists-detail-page
   [playlist]="playlist()"
   [tracks]="tracks()"
+  [parentPlaylist]="parentPlaylist()"
+  [childrenPlaylists]="childPlaylists()"
   [playingTrackId]="playbackState()?.currentTrack?.id"
   [playlistPlaying]="isPlaylistPlaying()"
   [songActionsMenuConfig]="songActionsMenuConfig()"

@@ -13,6 +13,7 @@ import { MatButton } from '@angular/material/button';
 import { LucideAngularModule } from 'lucide-angular';
 import { QueryOptions } from '@shared/models/request.model';
 import { SwitchComponent } from '@general/components/controls/switch/switch.component';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-playlists-detail-page',
@@ -22,6 +23,7 @@ import { SwitchComponent } from '@general/components/controls/switch/switch.comp
     MatButton,
     LucideAngularModule,
     SwitchComponent,
+    RouterLink,
   ],
   templateUrl: './playlists-detail-page.component.html',
   styleUrl: './playlists-detail-page.component.scss',
@@ -34,6 +36,8 @@ export class PlaylistsDetailPageComponent {
   readonly songActionsMenuConfig = input<ActionsMenuConfig<Track, Playlist>[]>(
     [],
   );
+  readonly parentPlaylist = input<Playlist | null>(null);
+  readonly childrenPlaylists = input<Playlist[]>([]);
 
   readonly playPlaylist = output();
   readonly playTrack = output<Track>();
@@ -41,6 +45,14 @@ export class PlaylistsDetailPageComponent {
   readonly queryChange = output<QueryOptions>();
   readonly openAddTracks = output<void>();
   readonly includeChildren = output<boolean>();
+
+  readonly parentDetailRoute = computed(() => {
+    const parent = this.parentPlaylist();
+    if (!parent) {
+      return null;
+    }
+    return ['../', parent.id];
+  })
 
   readonly buttonType = ButtonType.Flat;
   readonly buttonSize: ButtonSize = 'large';
