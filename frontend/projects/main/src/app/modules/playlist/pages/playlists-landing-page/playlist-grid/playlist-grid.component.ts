@@ -6,9 +6,8 @@ import {
 import { SearchBarComponent } from '@general/components/controls/search-bar/search-bar.component';
 import { RangeSliderComponent } from '@general/components/controls/range-slider/range-slider.component';
 import { iconSet } from '@general/icons/icons';
-import { PlaylistViewData } from '../../../../../../../../general/models/playlist.model';
+import { PlaylistWithTagData } from '../../../../../../../../general/models/playlist.model';
 import { LoaderComponent } from '@general/components/display/loader/loader.component';
-import { Playlist } from '@shared/models/playlist.model';
 
 @Component({
   selector: 'app-playlist-grid',
@@ -22,7 +21,7 @@ import { Playlist } from '@shared/models/playlist.model';
   styleUrl: './playlist-grid.component.scss',
 })
 export class PlaylistGridComponent {
-  readonly dataSet = input.required<(PlaylistViewData & { parentPlaylist: Playlist | null})[]>();
+  readonly dataSet = input.required<PlaylistWithTagData[]>();
   readonly sizeConfig = input.required<GridItemSizeConfig>();
   readonly playingPlaylistId = input<string | null>();
   readonly loading = input<boolean>(false);
@@ -41,7 +40,7 @@ export class PlaylistGridComponent {
     return this.playingPlaylistId() === playlistId;
   }
 
-  trackPlaylist(playlist: PlaylistViewData): string {
+  trackPlaylist(playlist: PlaylistWithTagData): string {
     return playlist.id;
   }
 

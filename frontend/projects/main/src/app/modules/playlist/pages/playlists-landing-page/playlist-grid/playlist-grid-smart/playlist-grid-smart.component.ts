@@ -20,7 +20,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { map, take } from 'rxjs';
 import { TrackService } from '../../../../../../services/track.service';
 import { TagsStore } from '@general/stores/tags.store';
-import { PlaylistViewData } from '../../../../../../../../../general/models/playlist.model';
+import { PlaylistWithTagData } from '../../../../../../../../../general/models/playlist.model';
 
 @Component({
   selector: 'app-playlist-grid-smart',
@@ -42,13 +42,13 @@ export class PlaylistGridSmartComponent implements OnInit {
   readonly sortDirection = signal<SortDirection>(SortDirection.ASC);
   readonly sortBy = signal<Extract<keyof Playlist, string>>('order');
 
-  readonly dataSet = computed<(PlaylistViewData & { parentPlaylist: Playlist | null })[]>(() => {
+  readonly dataSet = computed<PlaylistWithTagData[]>(() => {
     const loading = this.loading();
     if (loading) {
       return [];
     }
     const tags = untracked(() => this.tagsStore.entityMap());
-    return this.playlistStore.playlistsWithParents().map((playlist) => {
+    return this.playlistStore.entities().map((playlist) => {
       const playlistTags = playlist.tags.map((t) => tags[t]).filter((t) => !!t);
       return {
         ...playlist,

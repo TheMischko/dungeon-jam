@@ -13,9 +13,9 @@
         }}</span>
       </div>
     }
-    @if (playlist().parentPlaylist) {
+    @if (parentPlaylist()) {
       <div class="parent-overlay small-overlay">
-        {{ playlist().parentPlaylist!.name }}
+        {{ parentPlaylist()!.name }}
       </div>
     }
     @if (isHovering()) {

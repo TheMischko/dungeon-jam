@@ -1,9 +1,9 @@
-import { Component, computed, input, output, signal } from '@angular/core';
+import { Component, computed, inject, input, output, signal } from '@angular/core';
 import { NgStyle } from '@angular/common';
 import { iconSet, volumeIconSet } from '@general/icons/icons';
 import { LucideAngularModule, LucideIconData } from 'lucide-angular';
-import { PlaylistViewData } from '../../../../../../../../../general/models/playlist.model';
-import { Playlist } from '@shared/models/playlist.model';
+import { PlaylistWithTagData } from '../../../../../../../../../general/models/playlist.model';
+import { PlaylistStore } from '@general/stores/playlist.store';
 
 @Component({
   selector: 'app-playlist-grid-item',
@@ -12,7 +12,8 @@ import { Playlist } from '@shared/models/playlist.model';
   styleUrl: './playlist-grid-item.component.scss',
 })
 export class PlaylistGridItemComponent {
-  readonly playlist = input.required<PlaylistViewData & { parentPlaylist: Playlist | null }>();
+  private readonly playlistStore = inject(PlaylistStore);
+  readonly playlist = input.required<PlaylistWithTagData>();
   readonly sizeConfig = input.required<GridItemSizeConfig>();
   readonly isPlaying = input<boolean>(false);
 
@@ -21,6 +22,9 @@ export class PlaylistGridItemComponent {
   readonly pausePlaylist = output<string>();
 
   readonly isHovering = signal(false);
+  readonly parentPlaylist = computed(() => {
+    return this.playlistStore.getParent(this.playlist().id);
+  })
 
   readonly DEFAULT_IMAGE = '/assets/playlist.img';
   readonly playIcon = iconSet.PlayIcon;
