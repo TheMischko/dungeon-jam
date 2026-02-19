@@ -1,4 +1,4 @@
-import { Component, computed, input, output } from '@angular/core';
+import { Component, computed, input, output, TemplateRef, viewChild } from '@angular/core';
 import { Playlist } from '@shared/models/playlist.model';
 import { Track } from '@shared/models/track.model';
 import { SongsTableComponent } from '../../../library/pages/library-landing-page/songs-table/songs-table.component';
@@ -14,6 +14,9 @@ import { LucideAngularModule } from 'lucide-angular';
 import { QueryOptions } from '@shared/models/request.model';
 import { SwitchComponent } from '@general/components/controls/switch/switch.component';
 import { RouterLink } from '@angular/router';
+import {
+  CollapsibleSectionComponent
+} from '@general/components/display/collapsible-section/collapsible-section.component';
 
 @Component({
   selector: 'app-playlists-detail-page',
@@ -24,6 +27,7 @@ import { RouterLink } from '@angular/router';
     LucideAngularModule,
     SwitchComponent,
     RouterLink,
+    CollapsibleSectionComponent,
   ],
   templateUrl: './playlists-detail-page.component.html',
   styleUrl: './playlists-detail-page.component.scss',
@@ -52,7 +56,21 @@ export class PlaylistsDetailPageComponent {
       return null;
     }
     return ['../', parent.id];
-  })
+  });
+
+  readonly childrenSectionConfig = computed(() => {
+    if(!this.childrenPlaylists() || this.childrenPlaylists().length === 0) {
+      return [] as {value: Playlist[], title: string, template: TemplateRef<{ $implicit: Playlist[]}>}[];
+    }
+    return [{
+      value: this.childrenPlaylists(),
+      title: 'Child Playlists',
+      template: this.childrenSectionTemplate(),
+    }]
+  });
+
+
+  readonly childrenSectionTemplate = viewChild.required<TemplateRef<{$implicit: Playlist[]}>>('childrenTemplate')
 
   readonly buttonType = ButtonType.Flat;
   readonly buttonSize: ButtonSize = 'large';

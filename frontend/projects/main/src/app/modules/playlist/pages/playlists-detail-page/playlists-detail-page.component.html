@@ -29,6 +29,14 @@
   </div>
 </div>
 
+<div class="sections">
+  <lib-collapsible-section
+    [data]="childrenSectionConfig()"
+  ></lib-collapsible-section>
+</div>
+
+<h3 class="tracks-header">Tracks</h3>
+
 <div class="actions">
   <button mat-flat-button (click)="openAddTracks.emit()">
     <lucide-icon [img]="addTracksIcon"></lucide-icon>
@@ -50,3 +58,9 @@
     (queryChange)="queryChange.emit($event)"
   ></app-songs-table>
 </div>
+
+<ng-template #childrenTemplate>
+  @for (child of childrenPlaylists(); track child.id) {
+    <a [routerLink]="['../', child.id]">{{ child.name }}</a>
+  }
+</ng-template>

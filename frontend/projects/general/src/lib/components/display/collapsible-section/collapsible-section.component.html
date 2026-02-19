@@ -1,0 +1,35 @@
+@if (data().length > 0) {
+  <cdk-accordion class="collapsible-section-wrapper">
+    @for (item of data(); track trackBy()($index, item.value)) {
+      @let expanded = isExpanded(item.value, $index);
+      <cdk-accordion-item
+        #accordionItem="cdkAccordionItem"
+        class="collapsible-section-item"
+        [expanded]="expanded"
+      >
+        <div
+          class="collapsible-section-header"
+          (click)="toggleExpanded(item.value, $index)"
+        >
+          <h3>{{ item.title }}</h3>
+          <lucide-icon [img]="getExpandedIcon(expanded)" />
+        </div>
+
+        @if (expanded) {
+          <div
+            class="collapsible-section-item-body"
+            role="region"
+            [style.display]="expanded ? '' : 'none'"
+            [attr.id]="'accordion-body-' + $index"
+            [attr.aria-labelledby]="'accordion-header-' + $index"
+          >
+            <ng-template
+              [ngTemplateOutlet]="item.template"
+              [ngTemplateOutletContext]="{ $implicit: item.value }"
+            />
+          </div>
+        }
+      </cdk-accordion-item>
+    }
+  </cdk-accordion>
+}
