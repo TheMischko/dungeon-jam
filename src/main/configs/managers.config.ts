@@ -8,6 +8,7 @@ import { RedirectManager } from '../managers/redirect.manager';
 import { DiscordManager } from '../managers/discord.manager';
 import { PlaybackDestinationManager } from '../managers/playback-destination.manager';
 import { getDefaultViewConfig } from './view.config';
+import { DiscordTokenManager } from '../managers/discord-token.manager';
 
 /**
  * Manager initialization configuration
@@ -59,6 +60,12 @@ export function getManagersInitConfig(
       initFunction: async () => {
         await RedirectManager.getInstance();
       },
+    },
+    {
+      name: 'DiscordToken',
+      initFunction: async () => {
+        await DiscordTokenManager.getInstance();
+      }
     },
     {
       name: 'Discord',

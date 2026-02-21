@@ -7,6 +7,7 @@ import PlaybackApi from './preload/playback-api';
 import PlaylistApi from './preload/playlist-api';
 import TagApi from './preload/tag-api';
 import DiscordApi from './preload/discord-api';
+import DiscordTokenApi from './preload/discord-token-api';
 
 const generalApi = {
   triggerRedirect(request: RedirectRequest) {
@@ -35,6 +36,7 @@ declare global {
     PLAYLIST_API: typeof PlaylistApi;
     TAG_API: typeof TagApi;
     DISCORD_API: typeof DiscordApi;
+    DISCORD_TOKEN_API: typeof DiscordTokenApi;
   }
 }
 
@@ -45,3 +47,4 @@ contextBridge.exposeInMainWorld('PLAYBACK_API', PlaybackApi);
 contextBridge.exposeInMainWorld('PLAYLIST_API', PlaylistApi);
 contextBridge.exposeInMainWorld('TAG_API', TagApi);
 contextBridge.exposeInMainWorld('DISCORD_API', DiscordApi);
+contextBridge.exposeInMainWorld('DISCORD_TOKEN_API', DiscordTokenApi);

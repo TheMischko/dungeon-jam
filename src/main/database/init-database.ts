@@ -2,6 +2,7 @@ import { StoredPlayback, Track } from '@shared/models/track.model';
 import { Playlist } from '@shared/models/playlist.model';
 import { playlistsMock } from './playlists.mock';
 import { TagData } from '@shared/models/tag.model';
+import { DiscordTokenData } from '@shared/models/discord.model';
 
 export function initDatabase() {
   return {
@@ -9,6 +10,7 @@ export function initDatabase() {
     playlists: initPlaylists(),
     playback: initPlayback(),
     tags: initTags(),
+    discordTokens: initDiscordTokens(),
   };
 }
 export type DatabaseSchema = ReturnType<typeof initDatabase>;
@@ -47,4 +49,8 @@ function initTags(): TagData[] {
       title: 'indoor',
     },
   ];
+}
+
+function initDiscordTokens(): DiscordTokenData[] {
+  return [];
 }

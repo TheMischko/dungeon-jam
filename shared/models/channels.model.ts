@@ -53,6 +53,13 @@ export enum DiscordChannel {
   STATE_UPDATE = 'discord/state-update',
 }
 
+export enum DiscordTokenChannel {
+  CREATE = 'discord-tokens/create',
+  GET_ALL = 'discord-tokens/get-all',
+  UPDATE = 'discord-tokens/update',
+  DELETE = 'discord-tokens/delete',
+}
+
 export type AppChannel =
   | GeneralChannels
   | TrackChannel
@@ -61,4 +68,5 @@ export type AppChannel =
   | PlaylistChannel
   | TagChannel
   | CaptureChannel
-  | DiscordChannel;
+  | DiscordChannel
+  | DiscordTokenChannel;

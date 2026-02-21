@@ -33,3 +33,8 @@ export enum DiscordStateType {
   NONE = 'NONE',
   CONNECTED = 'CONNECTED',
 }
+
+export type DiscordTokenData = {
+  apiKey: string;
+  name: string;
+}
