@@ -1,0 +1,13 @@
+<lib-collapsible-section [data]="sections()" />
+
+<ng-template #tokensTemp>
+  @if (tokensLoading()) {
+    Loading...
+  } @else {
+    <ul>
+      @for (token of tokens(); track token.apiKey) {
+        <li>Name: {{ token.name }}, Value: {{ token.apiKey }}</li>
+      }
+    </ul>
+  }
+</ng-template>

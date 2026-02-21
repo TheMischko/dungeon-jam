@@ -1,0 +1,8 @@
+<app-general-settings-page
+  [tokens]="tokens()"
+  [tokensLoading]="tokensLoading()"
+  (createToken)="createToken($event)"
+  (updateToken)="updateToken($event)"
+  (deleteToken)="deleteToken($event)"
+  (connectViaToken)="connectViaToken($event)"
+/>

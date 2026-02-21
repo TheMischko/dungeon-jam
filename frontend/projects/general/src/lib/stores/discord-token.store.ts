@@ -2,7 +2,7 @@ import { patchState, signalStore, type, withHooks, withMethods, withState } from
 import { entityConfig, removeEntity, setAllEntities, setEntity, withEntities } from '@ngrx/signals/entities';
 import { DiscordTokenData } from '@shared/models/discord.model';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { catchError, EMPTY, finalize, pipe, switchMap, tap } from 'rxjs';
+import { catchError, EMPTY, finalize, map, of, pipe, switchMap, tap } from 'rxjs';
 import { inject } from '@angular/core';
 import { DiscordTokenApiService } from '@general/services/discord-token-api.service';
 
@@ -66,11 +66,23 @@ export const DiscordTokenStore = signalStore(
       })
     ));
 
-    const updateToken = rxMethod<DiscordTokenData>(pipe(
+    const updateToken = rxMethod<{ token: string, newData: DiscordTokenData }>(pipe(
       switchMap((data) => {
-        return tokenService.updateToken(data).pipe(
+        if(!store.entityMap()[data.token]){
+          return of(data);
+        }
+
+        return tokenService.deleteToken(data.token).pipe(
+          tap(() => {
+            patchState(store, removeEntity(data.token))
+          }),
+          map(() => data)
+        )
+      }),
+      switchMap((data) => {
+        return tokenService.updateToken(data.newData).pipe(
           tap((updatedData) => {
-            patchState(store, removeEntity(data.apiKey), setEntity(updatedData, tokenEntity));
+            patchState(store, setEntity(updatedData, tokenEntity));
           })
         )
       })

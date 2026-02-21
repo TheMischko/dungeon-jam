@@ -51,6 +51,11 @@ export class SidebarComponent implements OnInit {
           },
         })),
       },
+      {
+        title: 'Settings',
+        redirectRequest: { path: RedirectPath.SETTINGS },
+        active: activePath === RedirectPath.SETTINGS,
+      }
     ];
   });
 

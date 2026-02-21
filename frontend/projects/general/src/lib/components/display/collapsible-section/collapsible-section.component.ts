@@ -1,8 +1,9 @@
-import { ChangeDetectionStrategy, Component, effect, input, signal, TemplateRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, input, signal } from '@angular/core';
 import { CdkAccordionModule } from '@angular/cdk/accordion';
 import { NgTemplateOutlet } from '@angular/common';
 import { actionsIconSet } from '@general/icons/icons';
 import { LucideAngularModule } from 'lucide-angular';
+import { CollapsibleSectionConfig } from '../../../../../models/collapsible-section-component.model';
 
 @Component({
   selector: 'lib-collapsible-section',
@@ -16,7 +17,7 @@ import { LucideAngularModule } from 'lucide-angular';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CollapsibleSectionComponent<T> {
-  readonly data = input.required<{value: T, template: TemplateRef<{ $implicit: T }>, title: string}[]>();
+  readonly data = input.required<CollapsibleSectionConfig<T>[]>();
   readonly trackBy = input<(index: number, item: T) => string>((index, _) => index.toString());
 
   readonly expandedMap = signal<Record<string, boolean>>({});
@@ -26,12 +27,12 @@ export class CollapsibleSectionComponent<T> {
 
   constructor() {
     effect(() => {
-      const data = this.data();
+      const data: CollapsibleSectionConfig<T>[] = this.data();
       if (!data || data.length === 0) {
         return;
       }
       const items = data
-        .map(i => i.value)
+        .map(item => item.value)
         .reduce((map, item, index, __) => {
           return {
             ...map,

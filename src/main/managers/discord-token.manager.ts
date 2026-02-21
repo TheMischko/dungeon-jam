@@ -3,9 +3,11 @@ import { DiscordTokenData } from '@shared/models/discord.model';
 import { DiscordTokenChannel } from '@shared/models/channels.model';
 import { DatabaseProvider } from '../database/database-provider';
 import { DatabaseProviderCreator } from '../database/database-provider-creator';
+import { Logger } from '../utils/logger';
 
 export class DiscordTokenManager {
   private static instance: DiscordTokenManager;
+  private logger = new Logger('DiscordTokenManager', 'yellow');
   private constructor(private db: DatabaseProvider<DiscordTokenData>) {}
 
   public static async getInstance(): Promise<DiscordTokenManager> {
@@ -54,7 +56,9 @@ export class DiscordTokenManager {
     });
 
     ipcMain.handle(DiscordTokenChannel.GET_ALL, async () => {
-      return await this.getTokens();
+      const resp = await this.getTokens();
+      this.logger.log(`Request for tokens resulted in ${resp.length} records`);
+      return resp
     });
 
     ipcMain.handle(DiscordTokenChannel.DELETE, async (_, apiKey: string) => {

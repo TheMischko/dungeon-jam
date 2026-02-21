@@ -21,5 +21,9 @@ export const routes: Routes = [
     path: routesStrings.library,
     loadChildren: () =>
       import('./modules/library/library-routes').then((module) => module.libraryRoutes)
+  },
+  {
+    path: routesStrings.settings,
+    loadChildren: () => import('./modules/settings/settings-routes').then((module) => module.settingsRoutes)
   }
 ];

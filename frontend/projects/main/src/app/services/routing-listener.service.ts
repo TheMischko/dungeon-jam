@@ -7,6 +7,7 @@ import { playlistRouteStrings } from '../modules/playlist/playlist-route-strings
 import { routesStrings } from '../routes-strings';
 import { libraryRouteStrings } from '../modules/library/library-route-strings';
 import { homeRouteStrings } from '../modules/home/home-route-strings';
+import { settingsRouteStrings } from '../modules/settings/settings-route-strings';
 
 @Injectable({
   providedIn: 'root',
@@ -32,12 +33,14 @@ export class RoutingListenerService {
       }
 
       switch (redirect.path) {
+        // Home
         case RedirectPath.HOME:
           await this.router.navigate([
             routesStrings.home,
             homeRouteStrings.home,
           ]);
           break;
+        // Playlists
         case RedirectPath.PLAYLISTS:
           const playlistId = redirect.params?.['playlistId'];
           if (playlistId) {
@@ -53,10 +56,18 @@ export class RoutingListenerService {
             ]);
           }
           break;
+        // Library
         case RedirectPath.LIBRARY:
           await this.router.navigate([
             routesStrings.library,
             libraryRouteStrings.library,
+          ]);
+          break;
+        // Settings
+        case RedirectPath.SETTINGS:
+          await this.router.navigate([
+            routesStrings.settings,
+            settingsRouteStrings.general
           ]);
           break;
         default:

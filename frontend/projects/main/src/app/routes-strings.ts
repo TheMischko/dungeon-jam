@@ -1,5 +1,6 @@
 export const routesStrings = {
   home: 'home',
   library: 'library',
-  playlists: 'playlists'
+  playlists: 'playlists',
+  settings: 'settings'
 }
