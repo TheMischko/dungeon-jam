@@ -19,6 +19,7 @@ import { Playlist } from '@shared/models/playlist.model';
 export class TrackManager {
   private static _instance: TrackManager;
   private logger = new Logger('TrackManager', 'green');
+  private readonly MAX_CHILDREN_DEPTH = 5;
 
   private constructor(
     private tracksProvider: DatabaseProvider<Track>,
@@ -240,12 +241,35 @@ export class TrackManager {
     if(!playlist.childrenIds || playlist.childrenIds.length === 0){
       return this.getPlaylistTracks(playlist, allTracks);
     }
-    const playlists = await playlistManager.getAll();
-    const childrenPlaylists = playlists.filter(p => playlist.childrenIds!.includes(p.id));
-    const relatedTrackIds = [playlist, ...childrenPlaylists].reduce((tracks, playlist, _, __) => {
-      return [...tracks, ...playlist.trackIds];
-    }, [] as string[]);
+    const allPlaylists = await playlistManager.getAll();
+
+
+    const relatedTracks = this.getTracksFromChildren(playlist, allTracks, allPlaylists);
+    const relatedTrackIds = relatedTracks.map(track => track.id);
     const trackIdsUniqueSet = new Set(relatedTrackIds);
     return allTracks.filter(track => trackIdsUniqueSet.has(track.id));
+  }
+
+  getTracksFromChildren(playlist: Playlist, allTracks: Track[], allPlaylists: Playlist[], currentIteration: number = 0): Track[] {
+    if(currentIteration > this.MAX_CHILDREN_DEPTH){
+      return [];
+    }
+    if(!playlist?.childrenIds?.length){
+      return this.getPlaylistTracks(playlist, allTracks);
+    }
+
+    const childrenPlaylists = allPlaylists.filter(p => playlist.childrenIds!.includes(p.id));
+
+    const tracks = childrenPlaylists.reduce((tracks, childPlaylist, _, __) => {
+      const childTracks = this.getPlaylistTracks(childPlaylist, allTracks);
+      childTracks.forEach((track) => tracks.add(track));
+      const childChildrenTracks = this.getTracksFromChildren(childPlaylist, allTracks, allPlaylists, currentIteration + 1);
+      childChildrenTracks.forEach((track) => tracks.add(track));
+      return tracks;
+    }, new Set<Track>())
+
+    this.getPlaylistTracks(playlist, allTracks).forEach((item) => tracks.add(item));
+
+    return Array.from(tracks.values());
   }
 }

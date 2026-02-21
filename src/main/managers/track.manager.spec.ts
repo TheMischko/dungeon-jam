@@ -266,6 +266,43 @@ describe('TrackManager', () => {
       expect(tracks).toContainEqual(track3);
       expect(tracks).toContainEqual(track4);
     });
+
+    it('should include parent playlist tracks when children are requested', async () => {
+      const sharedTrack = mockTrack({ id: 'shared-track', name: 'Shared Hit' });
+      const parentOnlyTrack = mockTrack({ id: 'parent-only', name: 'Parent Ballad' });
+      const childOnlyTrack = mockTrack({ id: 'child-only', name: 'Child Anthem' });
+
+      const childPlaylist = mockPlaylist({
+        id: 'child-playlist',
+        trackIds: [sharedTrack.id, childOnlyTrack.id],
+      });
+      const parentPlaylist = mockPlaylist({
+        id: 'parent-playlist',
+        trackIds: [sharedTrack.id, parentOnlyTrack.id],
+        childrenIds: [childPlaylist.id],
+      });
+
+      vi.spyOn(trackManager, 'getAll').mockResolvedValue([
+        sharedTrack,
+        parentOnlyTrack,
+        childOnlyTrack,
+      ]);
+      mockPlaylistManagerInstance.getById.mockResolvedValue(parentPlaylist);
+      mockPlaylistManagerInstance.getAll.mockResolvedValue([
+        parentPlaylist,
+        childPlaylist,
+      ]);
+
+      const result = await trackManager.getByPlaylist({
+        playlistId: parentPlaylist.id,
+        includeChildren: true,
+      });
+
+      expect(result).toEqual(
+        expect.arrayContaining([sharedTrack, parentOnlyTrack, childOnlyTrack]),
+      );
+      expect(result.filter((track) => track.id === sharedTrack.id)).toHaveLength(1);
+    });
   });
 
   it('get should fetch a record with the matching id', async () => {
