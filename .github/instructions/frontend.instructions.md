@@ -25,6 +25,11 @@ You WILL note style preprocessor options include shared style paths: `stylePrepr
 ## 2. Coding Standards & Conventions
 
 You WILL adhere to the following conventions derived from workspace configuration and existing code:
+- Use strict typing and interfaces for all data contracts.
+- Prefer signal state management over observable streams in components; services should convert window APIs to Observables, and stores should consume those Observables to manage state.
+- Avoid anonymous function in bodies of other functions. Create a private method if the component or service needs such functionality.
+- Use Smart-Dummy architecture, when creating complex components. The Smart components handles the business logic and provides data for the Dummy components, which servers as the View layer and renders the data correctly and passes events.
+- Move any new color or typography styles to the `general` project and use them across the apps. Those files are in `frontend/projects/general/styles` folder and the individual `*.scss` files.
 - Components: standalone, OnPush change detection, SCSS styles.
 - Import aliases: shared models use `@shared/...`; general library services/components use `@general/...`.
 - Strict TypeScript: create and use interfaces for data exchanged over IPC.
@@ -94,14 +99,8 @@ You WILL use SCSS across projects with shared global styles:
 - Application `styles.scss` includes shared styles: `projects/general/styles/global.scss`.
 - Assets are pulled from each project’s `public/` plus `projects/general/assets` per `angular.json` build options.
 
-## 8. Testing
 
-You WILL use Karma with Jasmine for unit tests in the Angular workspace:
-- Each project defines `test` builder configuration in `angular.json` referencing `zone.js` and `zone.js/testing`.
-- Library tests live under `projects/general/src/lib/**/*.spec.ts` (e.g., `redirect.service.spec.ts`, `playlist-api.service.spec.ts`).
-- Write tests for services and stores with RxJS and signals; mock `window.*` APIs by overriding the typed window interfaces.
-
-## 9. Implementation Guidelines
+## 8. Implementation Guidelines
 
 You WILL follow these concrete rules when adding features:
 - Shared logic goes into `projects/general` as services, stores, components, or utilities. Do not duplicate across apps.
@@ -112,31 +111,22 @@ You WILL follow these concrete rules when adding features:
 - Handle errors with `catchError`, log via `console.error`, and avoid throwing from services; surface errors as Observable `error` emissions.
 - Debounce or throttle high-frequency requests (`debounceTime` as seen in `playlist.store.ts`).
 
-## 10. Known Interfaces & Models
+## 9. Known Interfaces & Models
 
 You WILL rely on these known patterns and files:
 - Preload APIs: `window.PLAYLIST_API`, `window.TAG_API` (see backend preload under `src/preload/*.ts`).
 - Models from `shared/models/`: `playlist.model.ts`, `tag.model.ts`, `request.model.ts`, `common.model.ts`.
 - Sort conventions: `SortDirection` from `@shared/models/common.model`.
 
-## 11. Build & Serve
-
-You WILL build and serve each project using Angular CLI scripts (usually invoked by top-level npm scripts):
-- Main app: serves at port 4200.
-- Sidebar app: serves at port 4201.
-- Topbar app: serves at port 4202.
-- General library: built via ng-packagr. Applications consume built library or source during dev.
-
-You WILL ensure that any shared styles or assets are referenced via `angular.json` and `stylePreprocessorOptions`.
-
-## 12. Do & Don’t Summary
+## 10. Do & Don’t Summary
 
 You WILL:
-- Route all Electron interactions through typed services in `general`.
-- Use signal stores for state and side effects.
+- Route all Electron interactions through typed services either in current Angular project or in `general`.
+- Use signal stores for state management and side effects.
 - Keep components lean and OnPush.
 - Use SCSS and shared styles.
 - Leverage shared models and maintain strict typing.
+- Use Angular Material components and patterns for UI consistency.
 
 You WILL NOT:
 - Call Electron APIs directly in components.
@@ -144,7 +134,7 @@ You WILL NOT:
 - Perform heavy logic in components.
 - Introduce untyped IPC or any `any` types for data contracts.
 
-## 13. Electron Managers → Preload APIs → Angular Services Pipeline
+## 11. Electron Managers → Preload APIs → Angular Services Pipeline
 
 You WILL understand and apply this backend-to-frontend pipeline when adding or modifying functionality:
 
@@ -164,47 +154,9 @@ You WILL understand and apply this backend-to-frontend pipeline when adding or m
   - Role: Wrap `window.*` APIs into RxJS Observables. Provide typed methods consumed by signal stores and components.
   - Pattern: Cast `window` to a typed `*ApiWindow` interface, call `window.*` methods, and bridge Promises to Observables via `Subject`.
 
-### Step-by-Step: Adding a New Endpoint/Channel
-
-You WILL follow these exact steps to add a new backend-to-frontend capability:
-
-1. Define/Locate IPC Channel or Manager Method
-   - Add a new method in the appropriate Manager under `src/main/managers/`. Ensure it encapsulates business logic and returns typed data.
-   - If communication requires an IPC channel (event-style), add a constant to `shared/models/channels.model.ts` and use `ipcMain.handle` or `ipcMain.on` accordingly in the main process or a service layer.
-
-2. Create/Update Preload API File
-   - Under `src/preload/`, create a new `feature-api.ts` (or update an existing one) that calls your Manager via `ipcRenderer.invoke`/`send` or direct method import if structured that way.
-   - Export a typed API object with methods that mirror the Manager capabilities.
-   - Use shared models from `shared/models/*` for parameters and return types.
-
-3. Wire the Preload in `src/preload.ts`
-   - Import your new API module into `src/preload.ts`.
-   - Extend the global `Window` interface to include your new API (e.g., `FEATURE_API: typeof FeatureApi`).
-   - Call `contextBridge.exposeInMainWorld('FEATURE_API', FeatureApi)` to make it available to the frontend.
-
-4. Create Frontend Service Wrapper
-   - In `frontend/projects/general/src/lib/services/`, add `feature-api.service.ts`.
-   - Define a `FeatureApiWindow` interface in `frontend/projects/general/src/models/api/` (if the models folder exists) or consistently where other `*ApiWindow` interfaces live.
-   - Bridge each `window.FEATURE_API.method()` call to an Observable via `Subject` (or `from(window.FEATURE_API.method())` with proper error handling).
-
-5. Integrate with Signal Store (Optional but Recommended)
-   - In `frontend/projects/general/src/lib/stores/`, add a signal store (e.g., `feature.store.ts`).
-   - Use `withEntities` for collections or `withState` for simple state.
-   - Wire async flows via `rxMethod` calling your new service methods.
-
-6. Consume in Components
-   - Inject the store in standalone components and bind to signals for reactive rendering.
-   - Avoid calling services directly from components for side effects; prefer store methods.
-
-7. Test & Validate
-   - Add unit tests for the service and store using Karma/Jasmine.
-   - Mock `window.FEATURE_API` in tests to simulate backend responses.
-   - Run the app and verify the data flow end-to-end.
-
 ### Notes & Rules
 
 - Do not expose raw `ipcRenderer` to the window. Always wrap calls in typed API functions within preload files.
 - Keep preload APIs minimal and domain-focused. One file per domain keeps concerns clear.
 - Always update the global `Window` type in `src/preload.ts` to include any new API, otherwise TypeScript consumers in Angular will have type errors.
 - Use `GeneralChannels` and other shared channel enums for consistency; do not hardcode strings in multiple places.
-- Ensure managers use the `DatabaseWrapper` singleton where persistence is required.
