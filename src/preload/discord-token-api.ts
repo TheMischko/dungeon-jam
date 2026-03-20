@@ -2,7 +2,7 @@ import { ipcRenderer } from 'electron';
 import { DiscordTokenChannel } from '@shared/models/channels.model';
 import { DiscordTokenData, DiscordTokenUpdateData } from '@shared/models/discord.model';
 
-const createToken = async (data: DiscordTokenData): Promise<DiscordTokenData> => {
+const createToken = async (data: DiscordTokenUpdateData): Promise<DiscordTokenData> => {
   return await ipcRenderer.invoke(DiscordTokenChannel.CREATE, data);
 };
 

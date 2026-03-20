@@ -7,6 +7,7 @@ import { CollapsibleSectionConfig } from '../../../../../../../general/models/co
 import { IconButtonComponent } from '@general/components/buttons/icon-button/icon-button.component';
 import { actionsIconSet } from '@general/icons/icons';
 import { SlicePipe } from '@angular/common';
+import { MatButton } from '@angular/material/button';
 
 @Component({
   selector: 'app-general-settings-page',
@@ -14,6 +15,7 @@ import { SlicePipe } from '@angular/common';
     CollapsibleSectionComponent,
     IconButtonComponent,
     SlicePipe,
+    MatButton,
   ],
   templateUrl: './general-settings-page.component.html',
   styleUrl: './general-settings-page.component.scss',
@@ -26,12 +28,14 @@ export class GeneralSettingsPageComponent {
 
   readonly editToken = output<DiscordTokenData>();
   readonly deleteToken = output<string>();
+  readonly createToken = output<void>();
 
   readonly tokenSectionTemp = viewChild.required<TemplateRef<{$implicit: DiscordTokenData[]}>>('tokensTemp');
 
   readonly icons = {
     Edit: actionsIconSet.EditIcon,
     Delete: actionsIconSet.DeleteIcon,
+    Create: actionsIconSet.AddIcon
   };
 
   readonly iconColors = {
@@ -46,6 +50,10 @@ export class GeneralSettingsPageComponent {
       template: this.tokenSectionTemp()
     }
   ]));
+
+  onCreateToken(): void {
+    this.createToken.emit();
+  }
 
   onEditToken(token: DiscordTokenData): void {
     this.editToken.emit(token);

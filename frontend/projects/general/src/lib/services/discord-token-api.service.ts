@@ -9,7 +9,7 @@ import { DiscordTokenApiWindow } from '../../../models/api/discord-token-api.mod
 export class DiscordTokenApiService {
   private readonly window = <DiscordTokenApiWindow>window;
 
-  createToken(data: DiscordTokenData): Observable<DiscordTokenData> {
+  createToken(data: DiscordTokenUpdateData): Observable<DiscordTokenData> {
     const subject = new Subject<DiscordTokenData>();
     this.window.DISCORD_TOKEN_API.createToken(data)
       .then((token) => {

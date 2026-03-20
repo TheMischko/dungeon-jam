@@ -57,7 +57,7 @@ export class DiscordTokenManager {
   }
 
   private registerIpcHandlers(): void {
-    ipcMain.handle(DiscordTokenChannel.CREATE, async (_, data: DiscordTokenData) => {
+    ipcMain.handle(DiscordTokenChannel.CREATE, async (_, data: DiscordTokenUpdateData) => {
       return await this.saveToken(data);
     });
 

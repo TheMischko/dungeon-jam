@@ -46,7 +46,7 @@ export const DiscordTokenStore = signalStore(
       })
     ));
 
-    const createToken = rxMethod<DiscordTokenData>(pipe(
+    const createToken = rxMethod<DiscordTokenUpdateData>(pipe(
       switchMap((data) => {
         return tokenService.createToken(data).pipe(
           tap((createdData) => {

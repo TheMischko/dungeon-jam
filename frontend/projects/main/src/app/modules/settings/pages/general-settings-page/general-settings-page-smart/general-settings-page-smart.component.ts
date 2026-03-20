@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { DiscordTokenStore } from '@general/stores/discord-token.store';
 import { DiscordTokenData, DiscordTokenUpdateData } from '@shared/models/discord.model';
 import { GeneralSettingsPageComponent } from '../general-settings-page.component';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { EditDiscordTokenModalComponent } from '../../../modals/edit-discord-token-modal/edit-discord-token-modal.component';
 
 @Component({
@@ -21,10 +21,7 @@ export class GeneralSettingsPageSmartComponent {
   readonly tokensLoading = this.discordTokenStore.loading;
 
   editToken(token: DiscordTokenData): void {
-    const dialogRef = this.dialog.open(EditDiscordTokenModalComponent, {
-      width: '600px',
-      data: token,
-    });
+    const dialogRef = this.createDiscordTokenDialog(token);
 
     dialogRef.afterClosed().subscribe((result: DiscordTokenUpdateData | null) => {
       if (result) {
@@ -33,7 +30,24 @@ export class GeneralSettingsPageSmartComponent {
     });
   }
 
+  createToken(): void {
+    const dialogRef = this.createDiscordTokenDialog();
+
+    dialogRef.afterClosed().subscribe((result: DiscordTokenUpdateData | null) => {
+      if (result) {
+        this.discordTokenStore.createToken(result);
+      }
+    });
+  }
+
   deleteToken(id: string): void {
     this.discordTokenStore.removeToken(id);
+  }
+
+  private createDiscordTokenDialog(data?: DiscordTokenUpdateData): MatDialogRef<EditDiscordTokenModalComponent> {
+    return this.dialog.open(EditDiscordTokenModalComponent, {
+      width: '600px',
+      data: data ?? null,
+    });
   }
 }

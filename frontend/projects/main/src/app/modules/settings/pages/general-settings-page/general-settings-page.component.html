@@ -1,6 +1,7 @@
 <lib-collapsible-section [data]="sections()" />
 
 <ng-template #tokensTemp>
+  <button mat-flat-button (click)="onCreateToken()">Create token</button>
   @if (tokensLoading()) {
     <div class="loading">Loading tokens...</div>
   } @else {
@@ -14,7 +15,7 @@
           <div class="token-item">
             <div class="token-info">
               <div class="token-name">{{ token.name }}</div>
-              <div class="token-key">{{ token.apiKey | slice:0:20 }}...</div>
+              <div class="token-key">{{ token.apiKey | slice: 0 : 20 }}...</div>
             </div>
             <div class="token-actions">
               <lib-icon-button
