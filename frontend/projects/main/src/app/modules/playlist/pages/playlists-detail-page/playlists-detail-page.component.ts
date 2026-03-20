@@ -17,6 +17,7 @@ import { RouterLink } from '@angular/router';
 import {
   CollapsibleSectionComponent
 } from '@general/components/display/collapsible-section/collapsible-section.component';
+import { ChildPlaylistBoxComponent } from './child-playlist-box/child-playlist-box.component';
 
 @Component({
   selector: 'app-playlists-detail-page',
@@ -28,6 +29,7 @@ import {
     SwitchComponent,
     RouterLink,
     CollapsibleSectionComponent,
+    ChildPlaylistBoxComponent,
   ],
   templateUrl: './playlists-detail-page.component.html',
   styleUrl: './playlists-detail-page.component.scss',

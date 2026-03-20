@@ -61,6 +61,8 @@
 
 <ng-template #childrenTemplate>
   @for (child of childrenPlaylists(); track child.id) {
-    <a [routerLink]="['../', child.id]">{{ child.name }}</a>
+    <a [routerLink]="['../', child.id]">
+      <app-child-playlist-box [playlist]="child" />
+    </a>
   }
 </ng-template>

@@ -1,0 +1,6 @@
+<div class="wrapper" (click)="clicked.emit(playlist())">
+  @if (playlist()?.imageUrl; as image) {
+    <img [src]="image" [alt]="playlist()?.name" class="playlist-image" />
+  }
+  <div class="playlist-title">{{ playlist()?.name }}</div>
+</div>
