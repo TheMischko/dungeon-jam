@@ -171,6 +171,10 @@ src/
 
 ## Core Architectural Patterns
 
+_Note:_
+The operation of creating a new entity data and the communication is described in following instruction file: [Data Flow Instructions](./dataflow.instructions.md)
+
+
 ### 1. IPC (Inter-Process Communication) Layer
 
 **Communication Flow:**
@@ -337,6 +341,9 @@ npm run build:electron    # Build Electron backend once
 - Structure: `component.ts` (smart), `component.component.ts` (presentational), `component.service.ts`
 - All IPC calls through injected services (see `RoutingListenerService` pattern)
 
+
+**All TypeScript**
+- Using `any` type is forbidden in all contexts. Always define proper interfaces and types through models.
 ---
 
 ## Key Managers (Backend Business Logic)
@@ -346,12 +353,6 @@ npm run build:electron    # Build Electron backend once
 - Persists to database
 - Notifies frontend on library changes
 - Location: `src/main/managers/track.manager.ts`
-
-### FilesManager
-- Discovers audio files from disk
-- Extracts metadata via `music-metadata` library
-- Handles file I/O operations
-- Location: `src/main/managers/files.manager.ts`
 
 ### DiscordManager
 - Initializes Discord.js bot
@@ -365,12 +366,6 @@ npm run build:electron    # Build Electron backend once
 - Manages `WebContentsView` instances for each Angular project
 - Handles window lifecycle
 - Location: `src/main/managers/view.manager.ts`
-
-### RedirectManager
-- Routes IPC navigation events between views
-- Enables sidebar → main navigation, etc.
-- Uses `GeneralChannels.REDIRECT` IPC channel
-- Location: `src/main/managers/redirect.manager.ts`
 
 ### StoredPlaybackManager
 - Persists playback state (volume, position, etc.)
@@ -438,7 +433,7 @@ dist/
 
 ### Manager Initialization Flow
 
-The application uses a centralized `StartupManager` to initialize all managers in dependency order during app startup:
+The Electron application uses a centralized `StartupManager` to initialize all managers in dependency order during app startup:
 
 **Files Involved:**
 - `src/main/managers/startup.manager.ts` - Orchestrates manager initialization
@@ -551,8 +546,9 @@ The application uses a centralized `StartupManager` to initialize all managers i
 ⚠️ **Critical Rules:**
 - Never call Electron APIs directly from Angular frontend—use IPC
 - Audio worklet (`PCMStream.worklet.js`) must remain in sync with main process Opus encoding specs
-- Discord token must never be hardcoded; always load from .env
-- Database operations should be atomic; avoid partial writes
+- Discord or ny other API token must never be hardcoded.
+- Database operations should be atomic; avoid partial writes; use DatabaseProvider.
+- Focus on maintainability, modularity, readability alligned with the up-to-date best practices in TypeScript, Angular and Electron development. (Prioritize signals over observables f.e.)
 
 ### Documentation Output Guidelines
 

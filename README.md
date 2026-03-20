@@ -1,5 +1,9 @@
-# Simple Electron + Discord.js sound capturing app
-This app is a demo project to test if one browser tab can record a sound from the second browser tab and stream that captured audio to the Discord bot.
+# DungeonJam - Local audio Discord streaming app
+**Dungeon Jam** is a desktop music player application built with **Electron** and **Angular** (v19) that enables users to:
+- Organize and play local music files with full library management
+- Stream audio to Discord voice channels via a Discord bot integration
+- Capture audio from the application and forward it to connected Discord servers
+- Navigate through a tabbed interface supporting future extensibility (e.g., YouTube tabs)
 
 ### Setup
 1. Make sure NodeJS is installed on your system.
@@ -9,9 +13,10 @@ This app is a demo project to test if one browser tab can record a sound from th
 DISCORD_TOKEN="..."
 ```
 4. Make sure your Discord bot is part of exactly one Discord server, which has at least one joinable voice channel.
-5. Start the app by `npm run start`
-6. Once loaded, check if your Discord bot has logged in and joined the first available voice channel on the server.
-7. Play anything on the left tab. (You should be able to hear that in Discord)
+5. Start the frontend development server by `npm run start:frontend`
+6. Once the Angular frontend is running, run the main app by `npm run start`
+7. Once loaded, check if your Discord bot has logged in and joined the first available voice channel on the server.
+8. Play anything on the left tab. (You should be able to hear that in Discord)
 
 
 Disclaimer:
