@@ -1,9 +1,10 @@
 import { Component, inject } from '@angular/core';
-import { MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatButton } from '@angular/material/button';
-import { PlaylistInsertQuery } from '@shared/models/playlist.model';
+import { Playlist, PlaylistInsertQuery } from '@shared/models/playlist.model';
 import { PlaylistFormComponent } from '../../../../forms/playlist-form/playlist-form.component';
-import { createPlaylistForm } from '../../../../forms/playlist-form/playlist-form.model';
+import { createPlaylistForm, PlaylistForm } from '../../../../forms/playlist-form/playlist-form.model';
+import { disabled } from '@angular/forms/signals';
 
 @Component({
   selector: 'app-create-playlist-modal',
@@ -13,14 +14,18 @@ import { createPlaylistForm } from '../../../../forms/playlist-form/playlist-for
 })
 export class CreatePlaylistModalComponent {
   readonly dialog = inject(MatDialogRef<void, PlaylistInsertQuery>);
+  readonly dialogData = inject<CreatePlaylistModalData>(MAT_DIALOG_DATA);
 
-  readonly form = createPlaylistForm()
+  readonly form: PlaylistForm = createPlaylistForm(
+    { parentPlaylist: this.dialogData?.parentPlaylist ?? null },
+    this.dialogData?.parentPlaylist ? (form) => { disabled(form.parentPlaylist); } : undefined,
+  );
 
   cancel(): void {
     this.dialog.close(null);
   }
 
-  save() {
+  save(): void {
     if (this.form().valid()) {
       const formValue = this.form().value();
       const tags = formValue.tags ?? [];
@@ -30,7 +35,11 @@ export class CreatePlaylistModalComponent {
         imageUrl: formValue.imageUrl,
         tags,
         parentPlaylistId: formValue.parentPlaylist?.id ?? undefined
-      });
+      } as PlaylistInsertQuery);
     }
   }
+}
+
+export type CreatePlaylistModalData = {
+  parentPlaylist?: Playlist | null;
 }

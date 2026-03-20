@@ -60,9 +60,18 @@
 </div>
 
 <ng-template #childrenTemplate>
-  @for (child of childrenPlaylists(); track child.id) {
-    <a [routerLink]="['../', child.id]">
-      <app-child-playlist-box [playlist]="child" />
-    </a>
-  }
+  <div class="child-playlists-section">
+    @if (playlist(); as playlist) {
+      <app-child-playlist-actions-smart [parent]="playlist" />
+    }
+    <div class="playlists">
+      @for (child of childrenPlaylists(); track child.id) {
+        @if (child) {
+          <a [routerLink]="['../', child.id]">
+            <app-child-playlist-box [playlist]="child" />
+          </a>
+        }
+      }
+    </div>
+  </div>
 </ng-template>

@@ -100,3 +100,16 @@
 .tracks-header{
   padding: 16px;
 }
+
+.child-playlists-section{
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  .playlists{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+}

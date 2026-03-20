@@ -18,6 +18,9 @@ import {
   CollapsibleSectionComponent
 } from '@general/components/display/collapsible-section/collapsible-section.component';
 import { ChildPlaylistBoxComponent } from './child-playlist-box/child-playlist-box.component';
+import {
+  ChildPlaylistActionsSmartComponent
+} from './child-playlist-actions/child-playlist-actions-smart/child-playlist-actions-smart.component';
 
 @Component({
   selector: 'app-playlists-detail-page',
@@ -30,6 +33,7 @@ import { ChildPlaylistBoxComponent } from './child-playlist-box/child-playlist-b
     RouterLink,
     CollapsibleSectionComponent,
     ChildPlaylistBoxComponent,
+    ChildPlaylistActionsSmartComponent,
   ],
   templateUrl: './playlists-detail-page.component.html',
   styleUrl: './playlists-detail-page.component.scss',

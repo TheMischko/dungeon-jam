@@ -31,3 +31,5 @@ export const createPlaylistForm = (
     }
   });
 }
+
+export type PlaylistForm = ReturnType<typeof createPlaylistForm>;
