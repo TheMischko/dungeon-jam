@@ -2,12 +2,37 @@
 
 <ng-template #tokensTemp>
   @if (tokensLoading()) {
-    Loading...
+    <div class="loading">Loading tokens...</div>
   } @else {
-    <ul>
-      @for (token of tokens(); track token.apiKey) {
-        <li>Name: {{ token.name }}, Value: {{ token.apiKey }}</li>
-      }
-    </ul>
+    @if (tokens()?.length === 0) {
+      <div class="empty-state">
+        No Discord tokens configured. Add one to get started.
+      </div>
+    } @else {
+      <div class="tokens-list">
+        @for (token of tokens(); track token.id) {
+          <div class="token-item">
+            <div class="token-info">
+              <div class="token-name">{{ token.name }}</div>
+              <div class="token-key">{{ token.apiKey | slice:0:20 }}...</div>
+            </div>
+            <div class="token-actions">
+              <lib-icon-button
+                [icon]="icons.Edit"
+                size="small"
+                [color]="iconColors.edit"
+                (clicked)="onEditToken(token)"
+              />
+              <lib-icon-button
+                [icon]="icons.Delete"
+                size="small"
+                [color]="iconColors.delete"
+                (clicked)="onDeleteToken(token.id)"
+              />
+            </div>
+          </div>
+        }
+      </div>
+    }
   }
 </ng-template>

@@ -35,6 +35,12 @@ export enum DiscordStateType {
 }
 
 export type DiscordTokenData = {
+  id: string;
+  apiKey: string;
+  name: string;
+}
+
+export type DiscordTokenUpdateData = {
   apiKey: string;
   name: string;
 }

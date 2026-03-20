@@ -85,6 +85,7 @@ You WILL follow this end-to-end flow for frontend operations:
 - Service bridges Promise to Observable, emitting values or errors via `Subject`.
 - Store consumes the Observable, taps into results to patch state and entities, and handles errors gracefully.
 - Components subscribe to signals (not Observables directly) and render derived state.
+  - Components are standalone. (`standalone: true`)
 
 You WILL keep components lean: they render signals, and delegate all async work to stores and services.
 

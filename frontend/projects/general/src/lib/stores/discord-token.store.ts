@@ -1,8 +1,8 @@
 import { patchState, signalStore, type, withHooks, withMethods, withState } from '@ngrx/signals';
 import { entityConfig, removeEntity, setAllEntities, setEntity, withEntities } from '@ngrx/signals/entities';
-import { DiscordTokenData } from '@shared/models/discord.model';
+import { DiscordTokenData, DiscordTokenUpdateData } from '@shared/models/discord.model';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { catchError, EMPTY, finalize, map, of, pipe, switchMap, tap } from 'rxjs';
+import { catchError, EMPTY, finalize, pipe, switchMap, tap } from 'rxjs';
 import { inject } from '@angular/core';
 import { DiscordTokenApiService } from '@general/services/discord-token-api.service';
 
@@ -18,7 +18,7 @@ const initialState: DiscordTokenStoreState = {
 
 const tokenEntity = entityConfig({
   entity: type<DiscordTokenData>(),
-  selectId: token => token.apiKey
+  selectId: token => token.id
 })
 
 export const DiscordTokenStore = signalStore(
@@ -57,34 +57,26 @@ export const DiscordTokenStore = signalStore(
     ));
 
     const removeToken = rxMethod<string>(pipe(
-      switchMap((apiKey) => {
-        return tokenService.deleteToken(apiKey).pipe(
+      switchMap((id) => {
+        return tokenService.deleteToken(id).pipe(
           tap(() => {
-            patchState(store, removeEntity(apiKey))
+            patchState(store, removeEntity(id))
           })
         )
       })
     ));
 
-    const updateToken = rxMethod<{ token: string, newData: DiscordTokenData }>(pipe(
+    const updateToken = rxMethod<{ id: string, newData: DiscordTokenUpdateData }>(pipe(
       switchMap((data) => {
-        if(!store.entityMap()[data.token]){
-          return of(data);
-        }
-
-        return tokenService.deleteToken(data.token).pipe(
-          tap(() => {
-            patchState(store, removeEntity(data.token))
-          }),
-          map(() => data)
-        )
-      }),
-      switchMap((data) => {
-        return tokenService.updateToken(data.newData).pipe(
+        return tokenService.updateToken(data.id, data.newData).pipe(
           tap((updatedData) => {
             patchState(store, setEntity(updatedData, tokenEntity));
+          }),
+          catchError((err) => {
+            console.error('[DiscordTokenStore] Failed to update token', err);
+            return EMPTY;
           })
-        )
+        );
       })
     ));
 

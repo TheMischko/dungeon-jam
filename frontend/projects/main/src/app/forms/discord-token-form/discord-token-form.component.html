@@ -1,0 +1,13 @@
+@if (form()) {
+  <lib-input
+    class="text-input"
+    label="Token Name"
+    [field]="form()!.name"
+  ></lib-input>
+  <lib-input
+    class="text-input"
+    label="Discord API Key"
+    [field]="form()!.apiKey"
+  ></lib-input>
+}
+

@@ -108,12 +108,12 @@ export class DatabaseProvider<T> {
       );
 
       if (existingIndex === -1) {
-        resolve(await this.create(newValue));
+        // Pass the ID from newValue so create() never generates a UUID
+        resolve(await this.create(newValue, String(newValue[this.idColumn])));
         return;
       }
 
       data[existingIndex] = newValue;
-      console.log(data, data[existingIndex]);
       await this.database.updateTable(this.table, data);
       resolve(newValue);
     });

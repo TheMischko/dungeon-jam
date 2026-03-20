@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
-import { DiscordTokenData } from '@shared/models/discord.model';
+import { DiscordTokenData, DiscordTokenUpdateData } from '@shared/models/discord.model';
 import { DiscordTokenApiWindow } from '../../../models/api/discord-token-api.model';
 
 @Injectable({
@@ -35,9 +35,9 @@ export class DiscordTokenApiService {
     return subject.asObservable();
   }
 
-  updateToken(data: DiscordTokenData): Observable<DiscordTokenData> {
+  updateToken(id: string, newData: DiscordTokenUpdateData): Observable<DiscordTokenData> {
     const subject = new Subject<DiscordTokenData>();
-    this.window.DISCORD_TOKEN_API.updateToken(data)
+    this.window.DISCORD_TOKEN_API.updateToken(id, newData)
       .then((token) => {
         subject.next(token);
         subject.complete();
@@ -48,9 +48,9 @@ export class DiscordTokenApiService {
     return subject.asObservable();
   }
 
-  deleteToken(apiKey: string): Observable<boolean> {
+  deleteToken(id: string): Observable<boolean> {
     const subject = new Subject<boolean>();
-    this.window.DISCORD_TOKEN_API.deleteToken(apiKey)
+    this.window.DISCORD_TOKEN_API.deleteToken(id)
       .then((result) => {
         subject.next(result);
         subject.complete();
