@@ -1,1 +1,13 @@
-<app-table [config]="tableConfig()" [dataSet]="tags()" [trackBy]="trackByFn" />
+<app-smart-table
+  [config]="tableConfig()"
+  [dataSet]="tags()"
+  [trackBy]="trackByFn"
+  [loading]="loading()"
+/>
+
+<ng-template #actionsColumn let-row="$implicit">
+  <lib-icon-button [matMenuTriggerFor]="menu" [icon]="ActionsIcon" />
+  <mat-menu #menu="matMenu">
+    <lib-actions-menu [item]="row" [config]="actionsMenuConfig()" />
+  </mat-menu>
+</ng-template>
