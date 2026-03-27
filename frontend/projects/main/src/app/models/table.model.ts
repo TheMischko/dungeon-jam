@@ -13,6 +13,7 @@ export interface BaseTableColumnConfiguration<TableEntity> {
   customValueFn?: (item: TableEntity) => string;
   template?: () => TemplateRef<{ $implicit: TableEntity }>;
   sortable?: boolean;
+  canCollapse?: boolean;
   isDefaultSortColumn?: boolean;
 }
 

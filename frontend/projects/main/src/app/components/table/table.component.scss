@@ -28,5 +28,11 @@
     .selection-cell {
       max-width: 65px;
     }
+    mat-header-cell.clickable{
+      cursor: pointer;
+      &:hover {
+        background: rgba(0,0,0,0.1);
+      }
+    }
   }
 }

@@ -7,7 +7,7 @@ import {
   output,
   signal,
 } from '@angular/core';
-import { NgTemplateOutlet } from '@angular/common';
+import { NgClass, NgTemplateOutlet } from '@angular/common';
 import {
   TableActionsConfigFn,
   TableColumnConfiguration,
@@ -69,6 +69,7 @@ import { SortDirection } from '@shared/models/common.model';
     NgTemplateOutlet,
     MatSortHeader,
     MatSort,
+    NgClass,
   ],
   templateUrl: './table.component.html',
   styleUrl: './table.component.scss',
@@ -84,6 +85,8 @@ export class TableComponent<T> {
   readonly actionsFn = input<TableActionsConfigFn<T>>();
   readonly trackBy = input<TableTrackByFn<T>>((index: number, _: T) => index);
   readonly uniquenessFn = input<TableUniquenessFn<T>>((_, __) => false);
+  readonly headerCellMenu = input<MatMenu | null>(null);
+  readonly visibleColumns = input<string[] | null>(null);
   readonly defaultSortBy = model<string>('');
   readonly defaultSortDirection = model<SortDirection>(SortDirection.ASC);
   readonly matSortDirection = computed<MatSortDirection>(() => {
@@ -104,7 +107,7 @@ export class TableComponent<T> {
   readonly actionsColumn = 'actions';
 
   readonly configColumnNames = computed<string[]>(() => {
-    return Object.keys(this.config());
+    return this.visibleColumns() ?? Object.keys(this.config());
   });
 
   readonly columnNames = computed<string[]>(() => {
@@ -180,5 +183,17 @@ export class TableComponent<T> {
       sortDirection:
         event.direction === 'desc' ? SortDirection.DESC : SortDirection.ASC,
     });
+  }
+
+  protected onHeaderCellClicked(event: MouseEvent, colName: string, trigger: MatMenuTrigger) {
+    if(!this.headerCellMenu()){
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    trigger.menuData = { columnName: colName };
+    trigger.openMenu();
   }
 }

@@ -133,16 +133,19 @@ export class SongsTableComponent implements OnInit, AfterViewInit, OnDestroy {
     author: {
       title: 'Author',
       sortable: true,
+      canCollapse: true,
     },
     duration: {
       title: 'Duration',
       customValueFn: (track: Track) =>
         this.durationPipe.transform(track.duration),
       width: '90px',
+      canCollapse: true,
     },
     tags: {
       title: 'Tags',
       template: () => this.tagsColumnTemplate(),
+      canCollapse: true,
     },
     ...(this.showActionsColumn() && {
       actions: {

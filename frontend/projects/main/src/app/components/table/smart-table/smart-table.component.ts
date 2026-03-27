@@ -24,6 +24,9 @@ import { PlaylistFilterComponent } from '../../filters/playlist-filter/playlist-
 import { FilterMatchingOption } from '../../../../../../general/models/filter.model';
 import { Playlist } from '@shared/models/playlist.model';
 import { TagData } from '@shared/models/tag.model';
+import { MatMenu } from '@angular/material/menu';
+import { ColumnStateManager } from './column-state.manager';
+import { MatCheckbox } from '@angular/material/checkbox';
 
 @Component({
   selector: 'app-smart-table',
@@ -34,12 +37,15 @@ import { TagData } from '@shared/models/tag.model';
     FilterSettingsComponent,
     TagsFilterComponent,
     PlaylistFilterComponent,
+    MatMenu,
+    MatCheckbox,
   ],
   templateUrl: './smart-table.component.html',
   styleUrl: './smart-table.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SmartTableComponent<T> {
+  private readonly columnStateManager = new ColumnStateManager<T>();
   readonly config = input.required<TableColumnConfiguration<T>>();
   readonly dataSet = input<T[]>([]);
   readonly selection = input<boolean>(false);
@@ -76,6 +82,10 @@ export class SmartTableComponent<T> {
     return query;
   });
 
+  readonly collapsibleColumns = this.columnStateManager.collapsibleColumns;
+  readonly collapsibleColumnNames = computed<string[]>(() => Object.keys(this.collapsibleColumns()));
+  readonly enabledColumns = this.columnStateManager.enabledColumns;
+
   constructor() {
     effect(() => {
       this.queryChange.emit(this.currentQuery());
@@ -92,6 +102,11 @@ export class SmartTableComponent<T> {
       }
       const columnIndex = configValues.indexOf(defaultSortColumn);
       this.currentSortBy.set(Object.keys(config)[columnIndex]);
+    });
+
+    effect(() => {
+      const config = this.config();
+      this.columnStateManager.config.set(config);
     });
   }
 
@@ -112,5 +127,15 @@ export class SmartTableComponent<T> {
       collection: 'tags',
       filters: tags.map((t) => t.id),
     });
+  }
+
+  protected isColumnEnabled(columnName: string): boolean {
+    return this.enabledColumns().includes(columnName);
+  }
+
+  protected toggleColumn(colName: string, event: MouseEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.columnStateManager.toggleColumn(colName);
   }
 }

@@ -35,9 +35,23 @@
     [uniquenessFn]="uniquenessFn()"
     [defaultSortBy]="currentSortBy() ?? ''"
     [defaultSortDirection]="currentSortDirection()"
+    [headerCellMenu]="columnsMenu"
+    [visibleColumns]="enabledColumns()"
     (selected)="selected.emit($event)"
     (hoverStart)="hoverStart.emit($event)"
     (hoverEnd)="hoverEnd.emit($event)"
     (sortChange)="setSort($event)"
   ></app-table>
 }
+
+<mat-menu #columnsMenu="matMenu" class="columns-menu">
+  @for (colName of collapsibleColumnNames(); track colName) {
+    @let col = collapsibleColumns()[colName]!;
+    <mat-checkbox
+      [checked]="isColumnEnabled(colName)"
+      (click)="toggleColumn(colName, $event)"
+    >
+      {{ col.title }}
+    </mat-checkbox>
+  }
+</mat-menu>
