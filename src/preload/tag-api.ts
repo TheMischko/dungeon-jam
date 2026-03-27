@@ -30,6 +30,10 @@ const clearOrphanedTags = async (): Promise<number> => {
   return await ipcRenderer.invoke(TagChannel.CLEAR_ORPHANS);
 };
 
+const getTagsTrackCount = async (): Promise<Record<string, number>> => {
+  return await ipcRenderer.invoke(TagChannel.GET_TRACKS_COUNT);
+};
+
 export default {
   getAllTags,
   getSubsetOfTags,
@@ -37,4 +41,5 @@ export default {
   getTagSuggestion,
   deleteTag,
   clearOrphanedTags,
+  getTagsTrackCount,
 };

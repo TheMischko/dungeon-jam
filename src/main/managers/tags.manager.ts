@@ -16,6 +16,7 @@ import {
 } from '../database/database-provider.model';
 import { DatabaseTable } from '../database/init-database';
 import { DatabaseWrapper } from '../database/database';
+import { Track } from '@shared/models/track.model';
 
 export class TagsManager {
   private static _instance: TagsManager;
@@ -53,6 +54,9 @@ export class TagsManager {
     ipcMain.handle(TagChannel.CLEAR_ORPHANS, async () => {
       return await this.clearOrphanedTags();
     });
+    ipcMain.handle(TagChannel.GET_TRACKS_COUNT, async () => {
+      return await this.getTrackCounts();
+    })
   }
 
   /**
@@ -164,6 +168,19 @@ export class TagsManager {
   ) => {
     return item.title.includes(filter) || item.id.includes(filter);
   };
+
+  private async getTrackCounts() {
+    const database = await DatabaseWrapper.getInstance();
+    const tracks = database.readTable<Track[]>('tracks') ?? [];
+    const tagCounts: Record<string, number> = {};
+    tracks.forEach((track) => {
+      const tags = track.tags ?? [];
+      tags.forEach((tagId) => {
+        tagCounts[tagId] = (tagCounts[tagId] ?? 0) + 1;
+      });
+    });
+    return tagCounts;
+  }
 }
 
 const tagUsedInTableColumnMap = {

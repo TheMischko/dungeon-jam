@@ -13,5 +13,6 @@ export type TagApiWindow = Window &
       getTagSuggestion: (titlePart: string) => Promise<TagData[]>;
       deleteTag: (tagId: string) => Promise<void>;
       clearOrphanedTags: () => Promise<number>;
+      getTagsTrackCount: () => Promise<Record<string, number>>;
     };
   };

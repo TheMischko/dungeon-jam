@@ -90,4 +90,17 @@ export class TagApiService {
       });
     return subject.asObservable();
   }
+
+  getTagsTrackCount(): Observable<Record<string, number>> {
+    const subject = new Subject<Record<string, number>>();
+    this.window.TAG_API.getTagsTrackCount()
+      .then((counts) => {
+        subject.next(counts);
+        subject.complete();
+      })
+      .catch((err) => {
+        subject.error(err);
+      });
+    return subject.asObservable();
+  }
 }
