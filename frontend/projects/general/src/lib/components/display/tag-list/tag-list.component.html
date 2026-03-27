@@ -1,14 +1,16 @@
-@for (tag of shownTags(); track tag.title){
-<lib-tag-pill
-  [tag]="tag"
-  [removable]="editable()"
-  (removed)="tagRemoved($event)"
-></lib-tag-pill>
-} @if(leftoverTagCount()){
-<lib-tag-pill
-  matTooltipClass="tags-tooltip"
-  [matTooltip]="leftoverTagsTooltip()"
-  [tag]="leftoverTagCount()!"
-  (removed)="tagRemoved($event)"
-></lib-tag-pill>
+@for (tag of shownTags(); track tag.title) {
+  <lib-tag-pill
+    [tag]="tag"
+    [removable]="editable()"
+    [highlighted]="matchesPriority(tag)"
+    (removed)="tagRemoved($event)"
+  ></lib-tag-pill>
+}
+@if (leftoverTagCount()) {
+  <lib-tag-pill
+    matTooltipClass="tags-tooltip"
+    [matTooltip]="leftoverTagsTooltip()"
+    [tag]="leftoverTagCount()!"
+    (removed)="tagRemoved($event)"
+  ></lib-tag-pill>
 }

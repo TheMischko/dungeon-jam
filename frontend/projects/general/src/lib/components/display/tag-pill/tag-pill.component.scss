@@ -10,6 +10,11 @@
   background: col.$primary;
   color: col.$text-main;
 
+  &.highlighted{
+    background: col.$primary-light;
+    color: col.$primary-dark-dark;
+  }
+
   .remove-button {
     border: none;
     background: none;

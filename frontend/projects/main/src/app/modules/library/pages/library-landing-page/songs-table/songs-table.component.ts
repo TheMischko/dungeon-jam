@@ -1,11 +1,8 @@
 import {
-  AfterViewInit,
   Component,
   computed,
-  ElementRef,
   inject,
   input,
-  OnDestroy,
   OnInit,
   output,
   signal,
@@ -58,9 +55,8 @@ import {
   templateUrl: './songs-table.component.html',
   styleUrl: './songs-table.component.scss',
 })
-export class SongsTableComponent implements OnInit, AfterViewInit, OnDestroy {
+export class SongsTableComponent implements OnInit {
   readonly playlistsStore = inject(PlaylistStore);
-  readonly componentElement = inject(ElementRef<HTMLElement>);
 
   readonly tracks = input<Track[]>([]);
   readonly playingTrackId = input<string | null>();
@@ -88,35 +84,18 @@ export class SongsTableComponent implements OnInit, AfterViewInit, OnDestroy {
     viewChild.required<TemplateRef<{ $implicit: Track }>>('actionsColumn');
 
   readonly durationPipe = new TrackDurationPipe();
-  private resizeObserver!: ResizeObserver;
   readonly trackByTrackId: TableTrackByFn<Track> = (_: number, item: Track) =>
     item.id;
   readonly uniqueTrackFn: TableUniquenessFn<Track> = (a: Track, b: Track) =>
     a.id === b.id;
 
   readonly activeRow = signal<Track | null>(null);
-  readonly componentWidth = signal<number>(0);
   readonly filters = signal<SongsTableFilters>({
     matching: 'any',
     tagIds: [],
     playlistIds: [],
   });
-
-  readonly maxTagsToShow = computed(() => {
-    const width = this.componentWidth();
-    switch (true) {
-      case width > 1100:
-        return 4;
-      case width > 950:
-        return 3;
-      case width > 800:
-        return 2;
-      case width > 450:
-        return 1;
-      default:
-        return 0;
-    }
-  });
+  readonly currentSearchValue = signal<string>('');
 
   readonly tableConfig = computed<TableColumnConfiguration<Track>>(() => ({
     ...(!this.selection() && {
@@ -165,17 +144,6 @@ export class SongsTableComponent implements OnInit, AfterViewInit, OnDestroy {
       sortBy: 'title',
       sortDirection: SortDirection.ASC,
     });
-  }
-
-  ngAfterViewInit() {
-    this.resizeObserver = new ResizeObserver((_) => {
-      this.componentWidth.set(this.componentElement.nativeElement.clientWidth);
-    });
-    this.resizeObserver.observe(this.componentElement.nativeElement);
-  }
-
-  ngOnDestroy() {
-    this.resizeObserver.disconnect();
   }
 
   hoverStart(track: Track) {
@@ -241,5 +209,10 @@ export class SongsTableComponent implements OnInit, AfterViewInit, OnDestroy {
       this.filterChange.emit(this.filters());
       return;
     }
+  }
+
+  protected updateQuery(query: QueryOptions) {
+    this.currentSearchValue.set(query?.filter?.trim() ?? '');
+    this.queryChange.emit(query);
   }
 }

@@ -13,6 +13,7 @@ export class TagListComponent {
   readonly tags = input<TagData[]>([]);
   readonly editable = input<boolean>(false);
   readonly maxShownTags = input<number | null>(null);
+  readonly priorityValue = input<string | null>(null);
 
   readonly shownTags = computed<TagData[]>(() => {
     if (this.maxShownTags() !== null) {
@@ -55,4 +56,12 @@ export class TagListComponent {
     const leftoverTags = this.tags().slice(this.maxShownTags()!);
     return leftoverTags.map((tag) => tag.title).join(' ');
   });
+
+  protected matchesPriority(tag: TagData): boolean {
+    const priorityValue = this.priorityValue();
+    if (!priorityValue) {
+      return false;
+    }
+    return tag.title.includes(priorityValue);
+  }
 }

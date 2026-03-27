@@ -12,7 +12,7 @@
   [showControls]="showControls()"
   (hoverStart)="hoverStart($event)"
   (hoverEnd)="hoverEnd($event)"
-  (queryChange)="queryChange.emit($event)"
+  (queryChange)="updateQuery($event)"
   (menuClosed)="actionMenuClosed.emit($event.reason)"
   (selected)="updateSelection($event)"
   (filterChange)="setFilters($event)"
@@ -21,23 +21,23 @@
 
 <ng-template #playColumn let-row="$implicit">
   @if (isActiveRow(row) && !isTrackPlaying(row)) {
-  <button mat-icon-button (click)="play(row)">
-    <lucide-icon class="icon-small" [img]="PlayIcon"></lucide-icon>
-  </button>
-  } @else if (isTrackPlaying(row)){
-  <button mat-icon-button (click)="pause()">
-    <lucide-icon class="icon-small" [img]="PauseIcon"></lucide-icon>
-  </button>
+    <button mat-icon-button (click)="play(row)">
+      <lucide-icon class="icon-small" [img]="PlayIcon"></lucide-icon>
+    </button>
+  } @else if (isTrackPlaying(row)) {
+    <button mat-icon-button (click)="pause()">
+      <lucide-icon class="icon-small" [img]="PauseIcon"></lucide-icon>
+    </button>
   }
 </ng-template>
 
 <ng-template #tagColumn let-row="$implicit">
-  @if (row.tags){
-  <lib-tag-list-smart
-    [tagIds]="row.tags"
-    [editable]="false"
-    [maxShownTags]="maxTagsToShow()"
-  />
+  @if (row.tags) {
+    <lib-tag-list-smart
+      [tagIds]="row.tags"
+      [editable]="false"
+      [priorityValue]="currentSearchValue()"
+    />
   }
 </ng-template>
 
