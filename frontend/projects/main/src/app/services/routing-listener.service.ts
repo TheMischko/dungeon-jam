@@ -63,6 +63,10 @@ export class RoutingListenerService {
             libraryRouteStrings.library,
           ]);
           break;
+        // Tags
+        case RedirectPath.TAGS:
+          await this.router.navigate([routesStrings.tags]);
+          break;
         // Settings
         case RedirectPath.SETTINGS:
           await this.router.navigate([

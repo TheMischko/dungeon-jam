@@ -23,6 +23,11 @@ export const routes: Routes = [
       import('./modules/library/library-routes').then((module) => module.libraryRoutes)
   },
   {
+    path: routesStrings.tags,
+    loadChildren: () =>
+      import('./modules/tags/tags-routes').then((module) => module.tagsRoutes)
+  },
+  {
     path: routesStrings.settings,
     loadChildren: () => import('./modules/settings/settings-routes').then((module) => module.settingsRoutes)
   }

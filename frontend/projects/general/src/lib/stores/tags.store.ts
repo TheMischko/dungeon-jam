@@ -42,6 +42,9 @@ export const TagsStore = signalStore(
         tap(() => {
           patchState(store, { loading: true });
         }),
+        switchMap(()=> {
+          return tagApiService.clearOrphanedTags();
+        }),
         switchMap(() => {
           return tagApiService
             .getAllTags({
