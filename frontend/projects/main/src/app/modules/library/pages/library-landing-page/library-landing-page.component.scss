@@ -1,0 +1,13 @@
+.upload-info{
+  border: 1px solid white;
+  padding: 1rem 0.5rem;
+  margin: 0.5rem 0.25rem;
+
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  h3, p{
+    margin: 0;
+  }
+}

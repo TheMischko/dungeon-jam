@@ -48,7 +48,6 @@ export class TagListSmartComponent implements AfterViewInit, OnDestroy{
     this.resizeObserver = new ResizeObserver((entries) => {
       if(entries[0]){
         const width = entries[0].contentRect.width;
-        console.log(width);
         this.updateMaxShownTags(width);
       }
     });

@@ -1,4 +1,4 @@
-import { Directive, HostBinding, inject, input, output } from '@angular/core';
+import { Directive, HostBinding, HostListener, inject, input, output } from '@angular/core';
 import { AudioFilesService } from '../services/audio-files.service';
 import { AudioTrack } from '@shared/models/track.model';
 
@@ -6,17 +6,44 @@ import { AudioTrack } from '@shared/models/track.model';
   selector: '[appDnd]',
 })
 export class DndDirective {
-  accept = input<string>('.*');
+  readonly audioFilesService = inject(AudioFilesService);
 
-  filesDropped = output<AudioTrack[]>();
+  readonly accept = input<string>('.*');
 
-  audioFilesService = inject(AudioFilesService);
-
-  @HostBinding('class.file-over') fileOver: boolean = false;
+  readonly filesDropped = output<AudioTrack[]>();
 
   constructor() {
     this.audioFilesService.registerDrop((paths) => {
       this.filesDropped.emit(paths);
     });
+  }
+
+  @HostBinding('class.file-over')
+  fileOver: boolean = false;
+
+  @HostListener('dragenter', ['$event'])
+  onDragEnter(evt: DragEvent) {
+    evt.preventDefault();
+    evt.stopPropagation();
+    this.fileOver = true;
+  }
+
+  @HostListener('dragover', ['$event'])
+  onDragOver(evt: DragEvent) {
+    evt.preventDefault();
+    evt.stopPropagation();
+    this.fileOver = true;
+  }
+
+  @HostListener('dragleave', ['$event'])
+  public onDragLeave(evt: DragEvent) {
+    evt.preventDefault();
+    evt.stopPropagation();
+    this.fileOver = false;
+  }
+
+  @HostListener('drop', ['$event'])
+  public onDrop(_: DragEvent) {
+    this.fileOver = false;
   }
 }

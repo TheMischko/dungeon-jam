@@ -1,7 +1,9 @@
+<h1>Library</h1>
 <app-songs-drop-in-zone (dropped)="openUploadDialog($event)">
-  <button mat-flat-button (click)="openUploadDialog()" [disabled]="true">
-    Upload
-  </button>
+  <div class="upload-info">
+    <h3>Adding new tracks</h3>
+    <p>To add new tracks just drop the audio files onto the Library table.</p>
+  </div>
   <app-songs-table
     [tracks]="displayTracks()"
     [playingTrackId]="playingTrackId()"
