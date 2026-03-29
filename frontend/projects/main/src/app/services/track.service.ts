@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AudioApiWindow } from '../models/window-api.model';
 import { PlaylistTracksQuery, Track } from '@shared/models/track.model';
-import { Observable, Subject } from 'rxjs';
+import { map, Observable, Subject } from 'rxjs';
 import { QueryRequest } from '@shared/models/request.model';
 
 @Injectable({
@@ -62,5 +62,18 @@ export class TrackService {
         subject.error(error);
       });
     return subject.asObservable();
+  }
+
+  findDuplicates(paths: string[]): Observable<{ path: string, track: Track | null}[]> {
+    return this.getAllTracks().pipe(
+      map((tracks) => {
+        const trackMap = new Map<string, Track>();
+        tracks.forEach(track => trackMap.set(track.url, track));
+        return paths.map(path => ({
+          path,
+          track: trackMap.get(path) || null
+        }));
+      })
+    )
   }
 }

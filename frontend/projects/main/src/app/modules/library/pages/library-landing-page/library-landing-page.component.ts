@@ -1,10 +1,6 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import { TracksUploadModalComponent } from '../../modals/tracks-upload-modal/tracks-upload-modal.component';
-import { MatButton } from '@angular/material/button';
-import { DialogService } from '../../../../services/dialog.service';
 import { SongsDropInZoneComponent } from './songs-drop-in-zone/songs-drop-in-zone.component';
 import { AudioTrack, Track } from '@shared/models/track.model';
-import { AudioFilesService } from '../../../../services/audio-files.service';
 import { SongsTableComponent } from './songs-table/songs-table.component';
 import { PlaybackService } from '../../../../services/playback.service';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -30,18 +26,20 @@ import {
 } from '../../modals/edit-track-modal/edit-track-modal.component';
 import { take } from 'rxjs';
 import { SongsTableFilters } from '../../../../../../../general/models/filter.model';
+import { NewTrackDropInService } from '../../services/new-track-drop-in.service';
+import { DialogService } from '../../../../services/dialog.service';
 
 @Component({
   selector: 'app-library-landing-page',
-  imports: [MatButton, SongsDropInZoneComponent, SongsTableComponent],
+  imports: [SongsDropInZoneComponent, SongsTableComponent],
   templateUrl: './library-landing-page.component.html',
   styleUrl: './library-landing-page.component.scss',
 })
 export class LibraryLandingPageComponent implements OnInit {
   private readonly dialogService = inject(DialogService);
-  private readonly audioFilesService = inject(AudioFilesService);
   private readonly trackStore = inject(TrackLibraryStore);
   private readonly playbackService = inject(PlaybackService);
+  private readonly newTrackDropInService = inject(NewTrackDropInService);
   readonly playlistsStore = inject(PlaylistStore);
 
   readonly tracks = this.trackStore.entities;
@@ -133,23 +131,8 @@ export class LibraryLandingPageComponent implements OnInit {
   }
 
   openUploadDialog(audioTracks?: AudioTrack[]) {
-    const dialog = this.dialogService.open<
-      TracksUploadModalComponent,
-      AudioTrack[] | null
-    >(TracksUploadModalComponent, {
-      data: {
-        title: 'Upload',
-        tracks: audioTracks,
-      },
-    });
-
-    dialog.afterClosed$.subscribe((tracks) => {
-      if (!tracks) {
-        return;
-      }
-      this.audioFilesService.uploadAudioTracks(tracks).subscribe(() => {
-        this.trackStore.load(this.currentQuery);
-      });
+    this.newTrackDropInService.startUploadSequence(audioTracks).subscribe(() => {
+      this.trackStore.load(this.currentQuery);
     });
   }
 
