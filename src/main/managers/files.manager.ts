@@ -2,7 +2,6 @@ import { ipcMain } from 'electron';
 import { AudioFileChannel } from '@shared/models/channels.model';
 import * as fs from 'node:fs';
 import { IAudioMetadata, parseFile } from 'music-metadata';
-import path from 'node:path';
 import { AudioTrack, FileBase64, Track } from '@shared/models/track.model';
 import { lookup } from 'mime-types';
 import { TrackMetaData } from '../utils/track-meta-data';
@@ -77,11 +76,11 @@ export class FilesManager {
     });
   }
 
-  private getTrackTitle(filePath: string, metadata: IAudioMetadata): string {
+  private getTrackTitle(_: string, metadata: IAudioMetadata): string {
     if (metadata.common.title) {
       return metadata.common.title;
     }
-    return path.basename(filePath, path.extname(filePath));
+    return '';
   }
 
   private async loadFileBase64(filePath: string): Promise<FileBase64> {

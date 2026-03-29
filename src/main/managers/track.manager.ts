@@ -15,6 +15,7 @@ import { GetSomeMatch } from '../database/database-provider.model';
 import { FilesManager } from './files.manager';
 import { Logger } from '../utils/logger';
 import { Playlist } from '@shared/models/playlist.model';
+import { resolveAudioTrack } from '../utils/resolve-audio-track';
 
 export class TrackManager {
   private static _instance: TrackManager;
@@ -71,16 +72,18 @@ export class TrackManager {
     );
 
     ipcMain.handle(AudioFileChannel.UPLOAD, async (_, tracks: AudioTrack[]) => {
-      const promises = tracks.map((track: AudioTrack) => {
-        return this.insert(
-          track.title,
-          track.fullPath,
-          track.length,
-          track.author,
-          track.tags,
+      for (const track of tracks) {
+        const resolved = resolveAudioTrack(track);
+        this.logger.log('Uploading track', { name: resolved.name, url: resolved.url, author: resolved.author, duration: resolved.duration });
+
+        await this.insert(
+          resolved.name,
+          resolved.url,
+          resolved.duration,
+          resolved.author,
+          resolved.tags,
         );
-      });
-      await Promise.all(promises);
+      }
     });
 
     ipcMain.handle(TrackChannel.UPDATE, async (_, track: Track) => {
@@ -136,6 +139,7 @@ export class TrackManager {
       tags,
     };
     const newRecord = await this.tracksProvider.create(newTrack);
+    this.logger.log('Insert track', { trackId: newRecord.id, name, url, author, duration });
     try {
       await this.filesManager.updateTrackFile(newRecord);
     } catch (e) {
@@ -219,7 +223,6 @@ export class TrackManager {
     try {
       await this.filesManager.updateTrackFile(updatedRecord);
     } catch (e) {
-      console.error('[TrackManager] Failed to update track file metadata', e);
       this.logger.logErrorMessage('Failed to update track file metadata', {
         error: e,
       });

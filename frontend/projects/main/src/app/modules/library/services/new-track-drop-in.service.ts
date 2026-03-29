@@ -8,8 +8,15 @@ import {
   DuplicateTracksModalData,
   DuplicateTracksModalResult,
 } from '../modals/duplicate-tracks-modal/duplicate-tracks-modal.component';
+import {
+  BulkUploadConfirmationModalComponent,
+  BulkUploadConfirmationModalData,
+  BulkUploadConfirmationModalResult,
+} from '../modals/bulk-upload-confirmation-modal/bulk-upload-confirmation-modal.component';
 import { TracksUploadModalComponent } from '../modals/tracks-upload-modal/tracks-upload-modal.component';
 import { AudioFilesService } from '../../../services/audio-files.service';
+
+const BULK_UPLOAD_THRESHOLD = 10;
 
 @Injectable({
   providedIn: 'root',
@@ -38,6 +45,9 @@ export class NewTrackDropInService {
       switchMap((tracksToUpload) => {
         if (!tracksToUpload?.length) {
           return EMPTY;
+        }
+        if (tracksToUpload.length >= BULK_UPLOAD_THRESHOLD) {
+          return this.openBulkConfirmationDialog(tracksToUpload);
         }
         return this.openUploadDialog(tracksToUpload);
       }),
@@ -85,6 +95,29 @@ export class NewTrackDropInService {
           return audioTracks.filter((t) => !this.duplicateMap.has(t.fullPath));
         }
         return undefined;
+      }),
+    );
+  }
+
+  /**
+   * Opens a confirmation dialog when the number of tracks being uploaded meets or exceeds the bulk threshold.
+   * Allows the user to choose between reviewing files manually or autoresolving metadata.
+   * Currently only the manual review path continues to the upload dialog.
+   */
+  private openBulkConfirmationDialog(audioTracks: AudioTrack[]): Observable<void> {
+    const dialogRef = this.dialogService.open<
+      BulkUploadConfirmationModalComponent,
+      BulkUploadConfirmationModalResult
+    >(BulkUploadConfirmationModalComponent, {
+      data: { count: audioTracks.length } satisfies BulkUploadConfirmationModalData,
+    });
+
+    return dialogRef.afterClosed$.pipe(
+      switchMap((result) => {
+        if (result === 'manual') {
+          return this.openUploadDialog(audioTracks);
+        }
+        return this.audioFilesService.uploadAudioTracks(audioTracks);
       }),
     );
   }
