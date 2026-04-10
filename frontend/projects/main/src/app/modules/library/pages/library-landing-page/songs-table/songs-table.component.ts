@@ -1,9 +1,7 @@
 import {
   Component,
   computed,
-  inject,
   input,
-  OnInit,
   output,
   signal,
   TemplateRef,
@@ -24,9 +22,7 @@ import {
   ActionsMenuComponent,
   ActionsMenuConfig,
 } from '@general/components/display/actions-menu/actions-menu.component';
-import { PlaylistStore } from '@general/stores/playlist.store';
 import { Playlist } from '@shared/models/playlist.model';
-import { SortDirection } from '@shared/models/common.model';
 import { TagListSmartComponent } from '@general/components/display/tag-list/tag-list-smart/tag-list-smart.component';
 import {
   TableColumnConfiguration,
@@ -55,9 +51,7 @@ import {
   templateUrl: './songs-table.component.html',
   styleUrl: './songs-table.component.scss',
 })
-export class SongsTableComponent implements OnInit {
-  readonly playlistsStore = inject(PlaylistStore);
-
+export class SongsTableComponent {
   readonly tracks = input<Track[]>([]);
   readonly playingTrackId = input<string | null>();
   readonly actionsMenuConfig = input<ActionsMenuConfig<Track, Playlist>[]>([]);
@@ -140,12 +134,6 @@ export class SongsTableComponent implements OnInit {
     'Oops, there are no tracks yet. You need to upload some!';
   readonly noSearchResultsText = 'No tracks match your search query.';
 
-  ngOnInit() {
-    this.playlistsStore.load({
-      sortBy: 'title',
-      sortDirection: SortDirection.ASC,
-    });
-  }
 
   hoverStart(track: Track) {
     this.activeRow.set(track);

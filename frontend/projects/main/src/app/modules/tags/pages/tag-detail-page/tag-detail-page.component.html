@@ -1,6 +1,5 @@
 <div class="tag-detail-page">
   <div class="title-header">
-    <h1>{{ pageTitle() }}</h1>
     <button
       class="tag-color"
       [ngStyle]="tagColorStyle()"
@@ -13,10 +12,35 @@
       [value]="tag()?.color"
       (change)="emitNewColor()"
     />
+    <h1>Tag -&nbsp;</h1>
+    @if (!titleEditMode()) {
+      <h1 class="tag-title">
+        {{ pageTitle() }}
+        <lib-icon-button
+          [icon]="editIcon"
+          class="edit-title-button"
+          (clicked)="startTitleEdit()"
+        />
+      </h1>
+    } @else {
+      <input
+        #titleInput
+        type="text"
+        class="title-input"
+        [value]="pageTitle()"
+        (blur)="updateTitle()"
+        (keydown.enter)="updateTitle()"
+      />
+      <lib-icon-button [icon]="confirmIcon" (clicked)="updateTitle()" />
+      <lib-icon-button [icon]="cancelIcon" (clicked)="stopEditMode()" />
+    }
   </div>
   <app-songs-table
     [tracks]="tracks()"
     [loading]="loading()"
     [showFilters]="false"
+    [playingTrackId]="playingTrackId()"
+    (playTrack)="playTrack.emit($event)"
+    (pauseTrack)="pauseTrack.emit()"
   ></app-songs-table>
 </div>

@@ -1,5 +1,5 @@
 import { effect, inject, Injectable, OnDestroy } from '@angular/core';
-import { BehaviorSubject, Observable, Subscription } from 'rxjs';
+import { BehaviorSubject, map, Observable, Subscription } from 'rxjs';
 import {
   initialPlaybackState,
   PlaybackState,
@@ -22,6 +22,7 @@ export class PlaybackService implements OnDestroy {
     initialPlaybackState,
   );
   readonly playback$: Observable<PlaybackState> = this.state.asObservable();
+  readonly currentTrackId$ = this.playback$.pipe(map((state) => state.currentTrack?.id ?? null));
 
   readonly playerPosition = toSignal(this.audioPlayerService.position$, {
     initialValue: 0,
