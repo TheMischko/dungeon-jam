@@ -36,7 +36,7 @@ export class TagsTableComponent {
   readonly tags = input<TagRow[]>([]);
   readonly loading = input<boolean>(false);
 
-  readonly showTracks = output<TagRow>();
+  readonly showDetail = output<TagRow>();
   readonly editTag = output<TagRow>();
   readonly deleteTag = output<TagRow>();
 
@@ -47,9 +47,9 @@ export class TagsTableComponent {
 
   readonly actionsMenuConfig = computed<ActionsMenuConfig<TagRow, unknown>[]>(() => [
     {
-      text: 'Show tracks',
+      text: 'Show detail',
       icon: iconSet.TracksIcon,
-      onSelected: (tag) => this.showTracks.emit(tag),
+      onSelected: (tag) => this.showDetail.emit(tag),
     },
     {
       text: 'Edit',

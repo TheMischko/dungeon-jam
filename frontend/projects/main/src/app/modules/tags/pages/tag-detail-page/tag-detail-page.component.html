@@ -1,0 +1,8 @@
+<div class="tag-detail-page">
+  <h1>{{ pageTitle() }}</h1>
+  <ul>
+    @for (track of tracks(); track track.id) {
+      <li>{{ track.name }}</li>
+    }
+  </ul>
+</div>

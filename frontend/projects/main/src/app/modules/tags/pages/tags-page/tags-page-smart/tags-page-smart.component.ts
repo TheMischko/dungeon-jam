@@ -10,6 +10,8 @@ import { TagsStore } from '@general/stores/tags.store';
 import { TagApiService } from '@general/services/tag-api.service';
 import { TagRow } from '../../../models/tag-row.model';
 import { TagsPageComponent } from '../tags-page.component';
+import { Router } from '@angular/router';
+import { tagRouteStrings } from '../../../tag-route-strings';
 
 @Component({
   selector: 'app-tags-page-smart',
@@ -20,6 +22,7 @@ import { TagsPageComponent } from '../tags-page.component';
 export class TagsPageSmartComponent implements OnInit {
   private readonly tagsStore = inject(TagsStore);
   private readonly tagApiService = inject(TagApiService);
+  private readonly router = inject(Router);
 
   private readonly trackCounts = signal<Record<string, number>>({});
 
@@ -37,5 +40,9 @@ export class TagsPageSmartComponent implements OnInit {
     this.tagApiService.getTagsTrackCount().subscribe((counts) => {
       this.trackCounts.set(counts);
     });
+  }
+
+  protected async showTagDetail(tagData: TagRow) {
+    await this.router.navigate([tagRouteStrings.detail, tagData.id], { relativeTo: this.router.routerState.root.firstChild });
   }
 }

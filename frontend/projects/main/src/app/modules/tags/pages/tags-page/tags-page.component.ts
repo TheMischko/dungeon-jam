@@ -1,7 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  input,
+  input, output,
 } from '@angular/core';
 import { TagRow } from '../../models/tag-row.model';
 import { TagsTableComponent } from './tags-table/tags-table.component';
@@ -17,4 +17,6 @@ import { TagsTableComponent } from './tags-table/tags-table.component';
 export class TagsPageComponent {
   readonly tags = input<TagRow[]>([]);
   readonly loading = input<boolean>(false);
+
+  readonly showTagDetail = output<TagRow>();
 }

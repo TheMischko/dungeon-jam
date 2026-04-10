@@ -1,4 +1,8 @@
 <div class="tags-page">
   <h1>Tags</h1>
-  <app-tags-table [tags]="tags()" [loading]="loading()" />
+  <app-tags-table
+    [tags]="tags()"
+    [loading]="loading()"
+    (showDetail)="showTagDetail.emit($event)"
+  />
 </div>

@@ -539,7 +539,8 @@ The Electron application uses a centralized `StartupManager` to initialize all m
 - **Naming**: camelCase for variables/functions, PascalCase for classes/interfaces
 - **IPC Safety**: Never expose internal implementation; always define clear API boundaries
 - **Error Handling**: Catch errors in managers, log via console, return to frontend gracefully
-- **Comments**: Add JSDoc comments for public manager methods and complex audio logic
+- **Comments**: Add simple JSDoc comments for comples methods and complex audio logic
+- **End of file policy**: Files should end with only one empty line after the last code
 
 ### Architecture Constraints
 

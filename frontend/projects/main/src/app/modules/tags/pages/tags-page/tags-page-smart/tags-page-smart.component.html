@@ -1,1 +1,5 @@
-<app-tags-page [tags]="tags()" [loading]="loading()" />
+<app-tags-page
+  [tags]="tags()"
+  [loading]="loading()"
+  (showTagDetail)="showTagDetail($event)"
+/>
