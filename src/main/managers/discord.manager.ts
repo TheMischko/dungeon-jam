@@ -8,7 +8,7 @@ import {
   VoiceConnection,
   VoiceConnectionStatus,
 } from '@discordjs/voice';
-import { Client, Intents, VoiceChannel } from 'discord.js';
+import { Client, VoiceChannel, IntentsBitField, ChannelType } from 'discord.js';
 import {
   ChannelData,
   DiscordState,
@@ -146,8 +146,10 @@ export class DiscordManager {
     }
 
     this.isConnecting = true;
+    const intents = new IntentsBitField();
+    intents.add(IntentsBitField.Flags.Guilds, IntentsBitField.Flags.GuildVoiceStates)
     this.client = new Client({
-      intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_VOICE_STATES],
+      intents,
     });
 
     // Initialize network monitoring
@@ -486,7 +488,7 @@ export class DiscordManager {
       const guildChannels = await fetchedGuild.channels.fetch();
       const channels: ChannelData[] = [];
       for (const channel of guildChannels.values()) {
-        if (channel?.type === 'GUILD_VOICE' || channel?.type === 'GUILD_STAGE_VOICE') {
+        if (channel?.type === ChannelType.GuildVoice || channel?.type === ChannelType.GuildStageVoice) {
           channels.push({
             id: channel.id,
             name: channel.name,
