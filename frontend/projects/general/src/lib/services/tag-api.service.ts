@@ -103,4 +103,17 @@ export class TagApiService {
       });
     return subject.asObservable();
   }
+
+  updateTag(tag: TagData): Observable<TagData> {
+    const subject = new Subject<TagData>();
+    this.window.TAG_API.updateTag(tag)
+      .then((updated) => {
+        subject.next(updated);
+        subject.complete();
+      })
+      .catch((err) => {
+        subject.error(err);
+      });
+    return subject.asObservable();
+  }
 }

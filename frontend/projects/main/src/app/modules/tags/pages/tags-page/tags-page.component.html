@@ -3,6 +3,7 @@
   <app-tags-table
     [tags]="tags()"
     [loading]="loading()"
+    (queryChange)="queryChange.emit($event)"
     (showDetail)="showTagDetail.emit($event)"
   />
 </div>

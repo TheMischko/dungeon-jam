@@ -17,6 +17,8 @@ import {
 import { IconButtonComponent } from '@general/components/buttons/icon-button/icon-button.component';
 import { MatMenu, MatMenuTrigger } from '@angular/material/menu';
 import { actionsIconSet, iconSet } from '@general/icons/icons';
+import { TagPillComponent } from '@general/components/display/tag-pill/tag-pill.component';
+import { QueryOptions } from '@shared/models/request.model';
 
 @Component({
   selector: 'app-tags-table',
@@ -26,6 +28,7 @@ import { actionsIconSet, iconSet } from '@general/icons/icons';
     IconButtonComponent,
     MatMenuTrigger,
     MatMenu,
+    TagPillComponent,
   ],
   templateUrl: './tags-table.component.html',
   styleUrl: './tags-table.component.scss',
@@ -36,10 +39,13 @@ export class TagsTableComponent {
   readonly tags = input<TagRow[]>([]);
   readonly loading = input<boolean>(false);
 
+  readonly queryChange = output<QueryOptions>();
   readonly showDetail = output<TagRow>();
   readonly editTag = output<TagRow>();
   readonly deleteTag = output<TagRow>();
 
+  readonly titleColumnTemplate =
+    viewChild.required<TemplateRef<{ $implicit: TagRow }>>('titleColumn');
   readonly actionsColumnTemplate =
     viewChild.required<TemplateRef<{ $implicit: TagRow }>>('actionsColumn');
 
@@ -68,6 +74,7 @@ export class TagsTableComponent {
       title: 'Name',
       sortable: true,
       isDefaultSortColumn: true,
+      template: () => this.titleColumnTemplate()
     },
     trackCount: {
       title: 'Tracks',

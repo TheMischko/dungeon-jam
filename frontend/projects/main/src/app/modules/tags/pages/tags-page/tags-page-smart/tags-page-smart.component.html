@@ -1,5 +1,6 @@
 <app-tags-page
   [tags]="tags()"
   [loading]="loading()"
+  (queryChange)="currentQuery.set($event)"
   (showTagDetail)="showTagDetail($event)"
 />

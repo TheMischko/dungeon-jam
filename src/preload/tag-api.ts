@@ -34,6 +34,10 @@ const getTagsTrackCount = async (): Promise<Record<string, number>> => {
   return await ipcRenderer.invoke(TagChannel.GET_TRACKS_COUNT);
 };
 
+const updateTag = async (tag: TagData): Promise<TagData> => {
+  return await ipcRenderer.invoke(TagChannel.UPDATE, tag);
+};
+
 export default {
   getAllTags,
   getSubsetOfTags,
@@ -42,4 +46,5 @@ export default {
   deleteTag,
   clearOrphanedTags,
   getTagsTrackCount,
+  updateTag,
 };

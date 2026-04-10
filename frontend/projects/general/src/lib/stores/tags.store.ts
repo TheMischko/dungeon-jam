@@ -15,8 +15,9 @@ import {
 import { inject } from '@angular/core';
 import { TagApiService } from '@general/services/tag-api.service';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { catchError, EMPTY, finalize, of, pipe, switchMap, tap } from 'rxjs';
+import { catchError, EMPTY, finalize, map, of, pipe, switchMap, tap } from 'rxjs';
 import { SortDirection } from '@shared/models/common.model';
+import { QueryOptions } from '@shared/models/request.model';
 
 type TagsStoreState = {
   initialized: boolean;
@@ -37,17 +38,17 @@ export const TagsStore = signalStore(
   withState<TagsStoreState>(initialState),
   withEntities(tagsConfig),
   withMethods((store, tagApiService = inject(TagApiService)) => {
-    const loadAll = rxMethod<void>(
+    const loadAll = rxMethod<QueryOptions | void>(
       pipe(
         tap(() => {
           patchState(store, { loading: true });
         }),
-        switchMap(()=> {
-          return tagApiService.clearOrphanedTags();
+        switchMap((options)=> {
+          return tagApiService.clearOrphanedTags().pipe(map(() => options));
         }),
-        switchMap(() => {
+        switchMap((options) => {
           return tagApiService
-            .getAllTags({
+            .getAllTags(options ?? {
               sortBy: 'title',
               sortDirection: SortDirection.ASC,
             })
@@ -76,7 +77,7 @@ export const TagsStore = signalStore(
         patchState(store, { loading: true });
       }),
       switchMap((updatedTag) => {
-        return of(updatedTag).pipe(
+        return tagApiService.updateTag(updatedTag).pipe(
           tap((tag) => {
             patchState(store, setEntity(tag));
           }),

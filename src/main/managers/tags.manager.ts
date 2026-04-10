@@ -56,7 +56,10 @@ export class TagsManager {
     });
     ipcMain.handle(TagChannel.GET_TRACKS_COUNT, async () => {
       return await this.getTrackCounts();
-    })
+    });
+    ipcMain.handle(TagChannel.UPDATE, async (_, tag: TagData) => {
+      return await this.updateTag(tag);
+    });
   }
 
   /**
@@ -134,6 +137,10 @@ export class TagsManager {
       await this.delete(orphanedTag.id);
     }
     return orphanedTags.length ?? 0;
+  }
+
+  public async updateTag(tag: TagData): Promise<TagData> {
+    return await this.tagDatabase.replaceRecord(tag);
   }
 
   private static async prepareDatabase(): Promise<DatabaseProvider<TagData>> {

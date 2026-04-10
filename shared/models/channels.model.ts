@@ -42,6 +42,7 @@ export enum TagChannel {
   INSERT = 'tags/insert',
   DELETE_ONE = 'tags/delete-one',
   CLEAR_ORPHANS = 'tags/clear-orphans',
+  UPDATE = 'tags/update',
 }
 
 export enum CaptureChannel {

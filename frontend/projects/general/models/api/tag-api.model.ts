@@ -14,5 +14,6 @@ export type TagApiWindow = Window &
       deleteTag: (tagId: string) => Promise<void>;
       clearOrphanedTags: () => Promise<number>;
       getTagsTrackCount: () => Promise<Record<string, number>>;
+      updateTag: (tag: TagData) => Promise<TagData>;
     };
   };

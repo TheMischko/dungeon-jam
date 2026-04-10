@@ -5,6 +5,7 @@ import {
 } from '@angular/core';
 import { TagRow } from '../../models/tag-row.model';
 import { TagsTableComponent } from './tags-table/tags-table.component';
+import { QueryOptions } from '@shared/models/request.model';
 
 @Component({
   selector: 'app-tags-page',
@@ -18,5 +19,6 @@ export class TagsPageComponent {
   readonly tags = input<TagRow[]>([]);
   readonly loading = input<boolean>(false);
 
+  readonly queryChange = output<QueryOptions>();
   readonly showTagDetail = output<TagRow>();
 }
