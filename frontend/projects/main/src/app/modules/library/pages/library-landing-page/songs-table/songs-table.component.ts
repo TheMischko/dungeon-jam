@@ -68,6 +68,7 @@ export class SongsTableComponent implements OnInit {
   readonly loading = input<boolean>(false);
   readonly showActionsColumn = input<boolean>(true);
   readonly showControls = input<boolean>(true);
+  readonly showFilters = input<boolean>(true);
 
   readonly queryChange = output<QueryOptions>();
   readonly playTrack = output<Track>();

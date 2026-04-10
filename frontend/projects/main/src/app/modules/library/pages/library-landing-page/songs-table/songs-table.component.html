@@ -8,7 +8,7 @@
   [noDataText]="noDataText"
   [noResultsText]="noSearchResultsText"
   [loading]="loading()"
-  [filterEnabled]="showControls()"
+  [filterEnabled]="showControls() && showFilters()"
   [showControls]="showControls()"
   (hoverStart)="hoverStart($event)"
   (hoverEnd)="hoverEnd($event)"

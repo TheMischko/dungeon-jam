@@ -1,8 +1,22 @@
 <div class="tag-detail-page">
-  <h1>{{ pageTitle() }}</h1>
-  <ul>
-    @for (track of tracks(); track track.id) {
-      <li>{{ track.name }}</li>
-    }
-  </ul>
+  <div class="title-header">
+    <h1>{{ pageTitle() }}</h1>
+    <button
+      class="tag-color"
+      [ngStyle]="tagColorStyle()"
+      (click)="openColorPicker()"
+    ></button>
+    <input
+      #colorInput
+      type="color"
+      class="color-input"
+      [value]="tag()?.color"
+      (change)="emitNewColor()"
+    />
+  </div>
+  <app-songs-table
+    [tracks]="tracks()"
+    [loading]="loading()"
+    [showFilters]="false"
+  ></app-songs-table>
 </div>

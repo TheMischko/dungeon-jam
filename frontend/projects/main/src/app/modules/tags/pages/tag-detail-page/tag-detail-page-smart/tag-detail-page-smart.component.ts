@@ -27,4 +27,20 @@ export class TagDetailPageSmartComponent implements OnInit {
   ngOnInit(): void {
     this.tracksStore.load(this.loadQuery);
   }
+
+  updateColor(newColor: string | undefined): void {
+    const tag = this.tag();
+    if(!tag){
+      return;
+    }
+    if(newColor?.length != 7 || !newColor.startsWith('#')){
+      console.warn(`Invalid color emitted: ${newColor}`);
+      return;
+    }
+    const updatedTag = {
+      ...tag,
+      color: newColor,
+    }
+    this.tagsStore.updateTag(updatedTag);
+  }
 }

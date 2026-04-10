@@ -1,6 +1,6 @@
 import {
   entityConfig,
-  setAllEntities,
+  setAllEntities, setEntity,
   withEntities,
 } from '@ngrx/signals/entities';
 import { TagData } from '@shared/models/tag.model';
@@ -15,7 +15,7 @@ import {
 import { inject } from '@angular/core';
 import { TagApiService } from '@general/services/tag-api.service';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { catchError, finalize, of, pipe, switchMap, tap } from 'rxjs';
+import { catchError, EMPTY, finalize, of, pipe, switchMap, tap } from 'rxjs';
 import { SortDirection } from '@shared/models/common.model';
 
 type TagsStoreState = {
@@ -71,9 +71,30 @@ export const TagsStore = signalStore(
       return store.entityMap()[id];
     };
 
+    const updateTag = rxMethod<TagData>(pipe(
+      tap(() => {
+        patchState(store, { loading: true });
+      }),
+      switchMap((updatedTag) => {
+        return of(updatedTag).pipe(
+          tap((tag) => {
+            patchState(store, setEntity(tag));
+          }),
+          catchError((e) => {
+            console.error(`Cannot update tag ${updatedTag.id}`, e);
+            return EMPTY;
+          }),
+          finalize(() => {
+            patchState(store, { loading: false });
+          })
+        )
+      }
+    )));
+
     return {
       loadAll,
       getById,
+      updateTag
     };
   }),
   withHooks({
