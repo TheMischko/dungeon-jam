@@ -1,6 +1,6 @@
 import {
   AudioTrack,
-  PlaylistTracksQuery,
+  PlaylistTracksQuery, TaggedTracksQuery,
   Track,
 } from '@shared/models/track.model';
 import { ipcMain } from 'electron';
@@ -93,6 +93,10 @@ export class TrackManager {
     ipcMain.handle(TrackChannel.DELETE, async (_, id: string) => {
       return await this.deleteById(id);
     });
+
+    ipcMain.handle(TrackChannel.GET_TAGGED_TRACKS, async (_, query: TaggedTracksQuery) => {
+      return await this.getTaggedTracks(query.tagId, query);
+    })
   }
 
   async getAll(query?: QueryRequest): Promise<Track[]> {
@@ -274,5 +278,12 @@ export class TrackManager {
     this.getPlaylistTracks(playlist, allTracks).forEach((item) => tracks.add(item));
 
     return Array.from(tracks.values());
+  }
+
+  async getTaggedTracks(tagId: string, query?: QueryRequest): Promise<Track[]> {
+    return this.tracksProvider.getMatching(
+      (track) => track.tags?.includes(tagId) ?? false,
+      query,
+    );
   }
 }

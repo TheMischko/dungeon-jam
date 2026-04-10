@@ -401,4 +401,29 @@ describe('TrackManager', () => {
       consoleSpy.mockRestore();
     });
   });
+
+  describe('getTaggedTracks', () => {
+    it('should return tracks that have the specified tag', async () => {
+      const tagId = 'tag123';
+      const track1 = mockTrack({ tags: [tagId] });
+      const track2 = mockTrack({ tags: ['tag456', tagId, '587tag'] });
+      const track3 = mockTrack({ tags: [] });
+
+      vi.spyOn(mockDatabaseProviderInstance, 'getAll').mockResolvedValue([
+        track1,
+        track2,
+        track3,
+      ]);
+      vi.spyOn(mockDatabaseProviderInstance, 'getMatching').mockImplementation(async (matchingFn) => {
+        const allTracks = await mockDatabaseProviderInstance.getAll();
+        return allTracks.filter(matchingFn);
+      })
+
+      const result = await trackManager.getTaggedTracks(tagId);
+
+      expect(result).toContainEqual(track1);
+      expect(result).toContainEqual(track2);
+      expect(result).not.toContainEqual(track3);
+    });
+  });
 });

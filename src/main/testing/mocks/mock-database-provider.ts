@@ -1,3 +1,4 @@
+//@ts-nocheck
 import { vi } from 'vitest';
 import { DatabaseProvider } from '../../database/database-provider';
 
@@ -7,6 +8,7 @@ export const mockDatabaseProviderInstance = {
   getSubset: vi.fn<[string, any[], any], Promise<any[]>>(() =>
     Promise.resolve([]),
   ),
+  getMatching: vi.fn<() => boolean, any>(() => Promise.resolve([])),
   create: vi.fn<[any], Promise<any>>(() => Promise.resolve({})),
   update: vi.fn<[any], Promise<any>>(() => Promise.resolve({})),
   delete: vi.fn<[any], Promise<boolean>>(() => Promise.resolve(true)),

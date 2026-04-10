@@ -30,3 +30,7 @@ export interface PlaylistTracksQuery extends QueryRequest {
   playlistId: string;
   includeChildren?: boolean;
 }
+
+export interface TaggedTracksQuery extends QueryRequest {
+  tagId: string;
+}

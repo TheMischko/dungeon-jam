@@ -1,4 +1,4 @@
-import { PlaylistTracksQuery, Track } from '@shared/models/track.model';
+import { PlaylistTracksQuery, TaggedTracksQuery, Track } from '@shared/models/track.model';
 import { ipcRenderer } from 'electron';
 import { TrackChannel } from '@shared/models/channels.model';
 import { QueryRequest } from '@shared/models/request.model';
@@ -42,6 +42,10 @@ const deleteTrack = async (id: string): Promise<boolean> => {
   return await ipcRenderer.invoke(TrackChannel.DELETE, id);
 };
 
+const getTaggedTracks = async (query: TaggedTracksQuery): Promise<Track[]> => {
+  return await ipcRenderer.invoke(TrackChannel.GET_TAGGED_TRACKS, query);
+};
+
 export default {
   getAllTracks,
   getTrackById,
@@ -49,4 +53,5 @@ export default {
   getTracksByPlaylist,
   updateTrack,
   deleteTrack,
+  getTaggedTracks,
 };

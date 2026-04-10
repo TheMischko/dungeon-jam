@@ -81,6 +81,11 @@ export class DatabaseProvider<T> {
     });
   }
 
+  async getMatching<V>(matchingFn: (item: T) => boolean, queryOptions?: QueryOptions): Promise<T[]> {
+    const data: T[] = await this.getAll(queryOptions);
+    return data.filter(matchingFn);
+  }
+
   create<V = Partial<T>>(data: V, id?: string): Promise<T> {
     return new Promise(async (resolve) => {
       if (id) {

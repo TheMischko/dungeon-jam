@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AudioApiWindow } from '../models/window-api.model';
-import { PlaylistTracksQuery, Track } from '@shared/models/track.model';
+import { PlaylistTracksQuery, TaggedTracksQuery, Track } from '@shared/models/track.model';
 import { map, Observable, Subject } from 'rxjs';
 import { QueryRequest } from '@shared/models/request.model';
 
@@ -75,5 +75,18 @@ export class TrackService {
         }));
       })
     )
+  }
+
+  getTaggedTracks(query: TaggedTracksQuery): Observable<Track[]> {
+    const subject = new Subject<Track[]>();
+    this.window.TRACK_API.getTaggedTracks(query)
+      .then((tracks) => {
+        subject.next(tracks);
+        subject.complete();
+      })
+      .catch((error) => {
+        subject.error(error);
+      });
+    return subject.asObservable();
   }
 }

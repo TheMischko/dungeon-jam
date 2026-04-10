@@ -3,6 +3,7 @@ import {
   FileBase64,
   PlaylistTracksQuery,
   StoredPlayback,
+  TaggedTracksQuery,
   Track,
 } from '@shared/models/track.model';
 import { QueryRequest } from '@shared/models/request.model';
@@ -29,6 +30,7 @@ export type AudioApiWindow = Window &
       ) => Promise<Track>;
       updateTrack: (track: Track) => Promise<Track>;
       deleteTrack: (id: string) => Promise<boolean>;
+      getTaggedTracks: (query: TaggedTracksQuery) => Promise<Track[]>;
     };
   } & {
     PLAYBACK_API: {
