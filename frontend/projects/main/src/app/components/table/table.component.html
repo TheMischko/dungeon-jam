@@ -30,11 +30,12 @@
 
       <!-- Data Columns -->
       @for (colName of configColumnNames(); track colName) {
-        @let columnConfig = config()?.[colName];
+        @let columnConfig = config()[colName];
         <ng-container [matColumnDef]="colName">
           <mat-header-cell
             *matHeaderCellDef
-            [attr.mat-sort-header]="columnConfig?.sortable === true"
+            [disabled]="!columnConfig?.sortable"
+            [mat-sort-header]="colName"
             [style.max-width]="columnConfig?.width"
             [ngClass]="{ clickable: !!headerCellMenu() }"
             (contextmenu)="onHeaderCellClicked($event, colName, menuTrigger)"
