@@ -2,21 +2,21 @@
   <lib-input
     class="text-input"
     label="Playlist name"
-    [field]="form()!.name"
+    [formField]="form()!.name"
   ></lib-input>
   <lib-input
     class="text-input"
     label="Description"
-    [field]="form()!.description!"
+    [formField]="form()!.description!"
   ></lib-input>
-  <lib-tags-input [field]="form()!.tags"></lib-tags-input>
+  <lib-tags-input [formField]="form()!.tags"></lib-tags-input>
   <lib-playlist-select
     label="Pick parent playlist (optional)"
-    [field]="form()!.parentPlaylist"
+    [formField]="form()!.parentPlaylist"
   ></lib-playlist-select>
   <lib-input
     class="text-input"
     label="Image URL"
-    [field]="form()!.imageUrl"
+    [formField]="form()!.imageUrl"
   ></lib-input>
 }

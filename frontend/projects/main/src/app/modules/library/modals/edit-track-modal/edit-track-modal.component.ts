@@ -1,7 +1,6 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  effect,
   inject,
   signal,
 } from '@angular/core';
@@ -17,7 +16,7 @@ import { MatButton } from '@angular/material/button';
 import { TrackFormComponent } from '../../../../forms/track-form/track-form.component';
 import { LoaderComponent } from '@general/components/display/loader/loader.component';
 import { toObservable } from '@angular/core/rxjs-interop';
-import { combineLatestWith, map, pipe } from 'rxjs';
+import { combineLatestWith, map } from 'rxjs';
 import { actionsIconSet } from '@general/icons/icons';
 import { LucideAngularModule } from 'lucide-angular';
 
@@ -74,12 +73,12 @@ export class EditTrackModalComponent {
             return this.tagStore.getById(tagId);
           })
           .filter((v) => !!v) || [];
-      this.trackForm().title().setControlValue(this.track.name);
+      this.trackForm().title().value.set(this.track.name);
       this.trackForm()
         .author()
-        .setControlValue(this.track.author ?? '');
-      this.trackForm().path().setControlValue(this.track.url);
-      this.trackForm().tags().setControlValue(tags);
+        .value.set(this.track.author ?? '');
+      this.trackForm().path().value.set(this.track.url);
+      this.trackForm().tags().value.set(tags);
     });
   }
 

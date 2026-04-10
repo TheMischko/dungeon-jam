@@ -3,7 +3,7 @@ import { createPlaylistForm } from './playlist-form.model';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { InputComponent } from '@general/components/controls/input/input.component';
 import { TagsInputComponent } from '@general/components/controls/tags-input/tags-input.component';
-import { Field } from '@angular/forms/signals';
+import { FormField } from '@angular/forms/signals';
 import { PlaylistSelectComponent } from '@general/components/controls/playlist-select/playlist-select.component';
 
 @Component({
@@ -13,7 +13,7 @@ import { PlaylistSelectComponent } from '@general/components/controls/playlist-s
     InputComponent,
     ReactiveFormsModule,
     TagsInputComponent,
-    Field,
+    FormField,
     PlaylistSelectComponent,
   ],
   templateUrl: './playlist-form.component.html',

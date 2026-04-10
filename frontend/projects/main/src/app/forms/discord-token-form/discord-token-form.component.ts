@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { InputComponent } from '@general/components/controls/input/input.component';
-import { Field } from '@angular/forms/signals';
+import { FormField } from '@angular/forms/signals';
 import { createDiscordTokenForm } from './discord-token-form.model';
 
 @Component({
@@ -10,7 +10,7 @@ import { createDiscordTokenForm } from './discord-token-form.model';
     FormsModule,
     InputComponent,
     ReactiveFormsModule,
-    Field,
+    FormField,
   ],
   templateUrl: './discord-token-form.component.html',
   styleUrl: './discord-token-form.component.scss',
