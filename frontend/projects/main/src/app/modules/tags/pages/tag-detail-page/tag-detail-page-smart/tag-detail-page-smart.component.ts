@@ -12,6 +12,9 @@ import { TagDetailPageComponent } from '../tag-detail-page.component';
 import { TaggedTracksQuery, Track } from '@shared/models/track.model';
 import { PlaybackService } from '../../../../../services/playback.service';
 import { toSignal } from '@angular/core/rxjs-interop';
+import {ActionsMenuConfig} from '@general/components/display/actions-menu/actions-menu.component';
+import {Playlist} from '@shared/models/playlist.model';
+import {actionsIconSet} from '@general/icons/icons';
 
 @Component({
   selector: 'app-tag-detail-page-smart',
@@ -34,10 +37,22 @@ export class TagDetailPageSmartComponent implements OnInit {
   readonly playingTrackId = toSignal(this.playbackService.currentTrackId$, {
     initialValue: null,
   });
-
   readonly loadQuery = computed<TaggedTracksQuery>(() => ({
     tagId: this.tagId(),
   }));
+
+  protected songsTableActions: ActionsMenuConfig<Track, Playlist>[] = [
+    {
+      text: 'Remove tag from track',
+      icon: actionsIconSet.CrossIcon,
+      onSelected: (item) => {
+        this.removeTagFromTrack(item)
+      }
+    },
+    {
+      text: 'Cancel'
+    }
+  ]
 
   ngOnInit(): void {
     this.tracksStore.load(this.loadQuery);
@@ -87,5 +102,10 @@ export class TagDetailPageSmartComponent implements OnInit {
 
   pauseTrack(): void {
     this.playbackService.pause();
+  }
+
+  private removeTagFromTrack(item: Track) {
+    console.log(`Removing tag ${this.tag().title} from track ${item.name}`);
+    this.tracksStore.removeTrack(item.id);
   }
 }

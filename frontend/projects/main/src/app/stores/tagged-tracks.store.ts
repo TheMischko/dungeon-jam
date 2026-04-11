@@ -1,17 +1,19 @@
 import { patchState, signalStore, type, withMethods, withState } from '@ngrx/signals';
-import { entityConfig, setAllEntities, withEntities } from '@ngrx/signals/entities';
+import { entityConfig, removeEntity, setAllEntities, withEntities } from '@ngrx/signals/entities';
 import { TaggedTracksQuery, Track } from '@shared/models/track.model';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { catchError, finalize, of, pipe, switchMap, tap } from 'rxjs';
+import { catchError, EMPTY, finalize, of, pipe, switchMap, tap } from 'rxjs';
 import { inject } from '@angular/core';
 import { TrackService } from '../services/track.service';
 
 type TaggedTracksStoreState = {
   loading: boolean;
+  currentTagId: string | null;
 }
 
 const initialState: TaggedTracksStoreState = {
   loading: false,
+  currentTagId: null
 };
 
 const trackEntity = entityConfig({
@@ -37,12 +39,49 @@ export const taggedTracksStore = signalStore(
             return of([]);
           }),
           finalize(() => {
-            patchState(store, { loading: false });
+            patchState(store, { loading: false, currentTagId: query.tagId });
           })
         )
       })
-    ))
+    ));
 
-    return { load };
+    /**
+     * Removes the association of a current tag with a track and updates the collection of tracks for current tag.
+     * @param trackId - The ID of the track to remove the tag from.
+     */
+    const removeTrack = rxMethod<string>(
+      pipe(
+        tap(() => {
+          patchState(store, { loading: true });
+        }),
+        switchMap((trackId) => {
+          const track = store.entityMap()[trackId];
+          const currentTagId = store.currentTagId?.();
+          if(!trackId || !currentTagId){
+            console.error(`Cannot remove tag ${currentTagId} from track ${trackId}. Missing track or tag information.`);
+            patchState(store, { loading: false });
+            return EMPTY;
+          }
+          const updatedTrack: Track = {
+            ...track,
+            tags: track.tags?.filter(assignedTagId => assignedTagId !== currentTagId) ?? []
+          }
+          return trackService.updateTrack(updatedTrack).pipe(
+            tap((newTrack) => {
+              patchState(store, removeEntity(newTrack.id))
+            }),
+            catchError((e) => {
+              console.error(`Cannot remove tag from track ${trackId}`, e);
+              return EMPTY;
+            }),
+            finalize(() => {
+              patchState(store, { loading: false });
+            })
+          )
+        })
+      )
+    )
+
+    return { load, removeTrack };
   })
 )

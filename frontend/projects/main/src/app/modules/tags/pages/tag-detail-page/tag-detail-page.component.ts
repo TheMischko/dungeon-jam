@@ -14,6 +14,8 @@ import { SongsTableComponent } from '../../../library/pages/library-landing-page
 import { NgStyle } from '@angular/common';
 import { IconButtonComponent } from '@general/components/buttons/icon-button/icon-button.component';
 import { actionsIconSet } from '@general/icons/icons';
+import { ActionsMenuConfig } from '@general/components/display/actions-menu/actions-menu.component';
+import { Playlist } from '@shared/models/playlist.model';
 
 @Component({
   selector: 'app-tag-detail-page',
@@ -32,6 +34,7 @@ export class TagDetailPageComponent {
   readonly tracks = input<Track[]>([]);
   readonly loading = input<boolean>(false);
   readonly playingTrackId = input<string | null>(null);
+  readonly songsTableActions = input<ActionsMenuConfig<Track, Playlist>[]>([])
 
   readonly playTrack = output<Track>();
   readonly pauseTrack = output<void>();
