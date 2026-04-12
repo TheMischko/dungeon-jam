@@ -12,7 +12,7 @@ export class SongsDropInZoneComponent {
   dropped = output<AudioTrack[]>();
 
   onFilesDropped(files: AudioTrack[]) {
-    console.log(files);
+    console.log('Audio files dropped', files);
     this.dropped.emit(files);
   }
 }

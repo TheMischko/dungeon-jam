@@ -54,11 +54,14 @@ export class FilesManager {
       parseFile(path)
         .then((metadata) => {
           const metaData = { ...metadata };
+          const genre = metaData.common.genre ?? []
+          const tags = genre?.length === 1 ? genre[0].split(',') : metaData.common.genre;
           resolve({
             title: this.getTrackTitle(path, metaData),
             fullPath: path,
             author: metaData.common.artist,
             length: metaData.format.duration || 0,
+            tags: tags
           });
         })
         .catch((e: Error) => {

@@ -15,6 +15,8 @@ import {
 } from '../modals/bulk-upload-confirmation-modal/bulk-upload-confirmation-modal.component';
 import { TracksUploadModalComponent } from '../modals/tracks-upload-modal/tracks-upload-modal.component';
 import { AudioFilesService } from '../../../services/audio-files.service';
+import { TagApiService } from '@general/services/tag-api.service';
+import { TagData } from '@shared/models/tag.model';
 
 const BULK_UPLOAD_THRESHOLD = 10;
 
@@ -25,6 +27,7 @@ export class NewTrackDropInService {
   private readonly dialogService = inject(DialogService);
   private readonly trackApiService = inject(TrackService);
   private readonly audioFilesService = inject(AudioFilesService);
+  private readonly tagApiService = inject(TagApiService);
 
   private duplicateMap: Map<string, Track> = new Map();
 
@@ -46,12 +49,29 @@ export class NewTrackDropInService {
         if (!tracksToUpload?.length) {
           return EMPTY;
         }
-        if (tracksToUpload.length >= BULK_UPLOAD_THRESHOLD) {
-          return this.openBulkConfirmationDialog(tracksToUpload);
-        }
-        return this.openUploadDialog(tracksToUpload);
+
+        return this.openCorrectUploadDialog(tracksToUpload);
       }),
       finalize(() => this.reset()),
+    );
+  }
+
+  /**
+   * Determines which upload dialog to open based on the number of tracks being uploaded.
+   * If the number of tracks meets or exceeds the defined bulk upload threshold, it opens a bulk confirmation dialog.
+   * Otherwise, it opens the standard upload dialog.
+   * @param tracksToUpload
+   * @private
+   */
+  private openCorrectUploadDialog(tracksToUpload: AudioTrack[]): Observable<void> {
+    return this.resolveTrackTags(tracksToUpload).pipe(
+      switchMap((tagsMap) => {
+        if (tracksToUpload.length >= BULK_UPLOAD_THRESHOLD) {
+          return this.openBulkConfirmationDialog(tracksToUpload, tagsMap);
+        }
+
+        return this.openUploadDialog(tracksToUpload, tagsMap);
+      })
     );
   }
 
@@ -104,7 +124,7 @@ export class NewTrackDropInService {
    * Allows the user to choose between reviewing files manually or autoresolving metadata.
    * Currently only the manual review path continues to the upload dialog.
    */
-  private openBulkConfirmationDialog(audioTracks: AudioTrack[]): Observable<void> {
+  private openBulkConfirmationDialog(audioTracks: AudioTrack[], tagsMap: Map<string, TagData>): Observable<void> {
     const dialogRef = this.dialogService.open<
       BulkUploadConfirmationModalComponent,
       BulkUploadConfirmationModalResult
@@ -115,7 +135,7 @@ export class NewTrackDropInService {
     return dialogRef.afterClosed$.pipe(
       switchMap((result) => {
         if (result === 'manual') {
-          return this.openUploadDialog(audioTracks);
+          return this.openUploadDialog(audioTracks, tagsMap);
         }
         return this.audioFilesService.uploadAudioTracks(audioTracks);
       }),
@@ -125,10 +145,10 @@ export class NewTrackDropInService {
   /**
    * Opens a dialog to edit the provided audio tracks details. After confirmation, it uploads new tracks and overrides duplicates as needed.
    */
-  private openUploadDialog(audioTracks: AudioTrack[]): Observable<void> {
+  private openUploadDialog(audioTracks: AudioTrack[], tagsMap: Map<string, TagData>): Observable<void> {
     const dialog = this.dialogService.open<TracksUploadModalComponent, AudioTrack[] | null>(
       TracksUploadModalComponent,
-      { data: { title: 'Upload Tracks', tracks: audioTracks } },
+      { data: { title: 'Upload Tracks', tracks: audioTracks, tagsMap } },
     );
 
     return dialog.afterClosed$.pipe(
@@ -174,6 +194,31 @@ export class NewTrackDropInService {
       });
 
     return combineLatest(updateObservables).pipe(map(() => void 0));
+  }
+
+  /**
+   * Resolves the tags for the provided audio tracks by first collecting all unique tag labels, then fetching
+   * existing tags from the API, and finally inserting any missing tags.
+   *
+   * It returns a map of tag labels to their corresponding TagData objects for easy reference during track uploading.
+   * @param tracks
+   * @private
+   */
+  private resolveTrackTags(tracks: AudioTrack[]): Observable<Map<string, TagData>> {
+    const allLabels = [...new Set(tracks.flatMap((t) => t.tags ?? []))];
+    if (!allLabels.length) {
+      return of(new Map());
+    }
+    return this.tagApiService.getSubsetOfTags('title', allLabels).pipe(switchMap((existingTags) => {
+      const existingLabels = existingTags.map((t) => t.title);
+      const missingLabels = allLabels.filter((label) => !existingLabels.includes(label));
+      if (!missingLabels.length) {
+        return of(new Map(existingTags.map((t) => [t.title, t])));
+      }
+      return combineLatest(missingLabels.map((label) => this.tagApiService.insertTag({ title: label }))).pipe(
+        map((newTags) => new Map([...existingTags, ...newTags].map((t) => [t.title, t])))
+      )
+    }));
   }
 
   /**

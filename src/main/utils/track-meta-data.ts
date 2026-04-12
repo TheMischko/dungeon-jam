@@ -6,7 +6,7 @@ ffmetadata.setFfmpegPath(ffmpegPath);
 
 export const TrackMetaData = {
   write: (filePath: string, data: WriteTrackMetaDataOptions): Promise<void> => {
-    const tagsString = data.tags?.join(', ') ?? '';
+    const tagsString = data.tags?.join('\,') ?? '';
     const newMetadata: TrackFileMetadata = {
       ...(data.title ? { title: data.title } : {}),
       ...(data.author
@@ -17,9 +17,10 @@ export const TrackMetaData = {
           }
         : {}),
       ...(data.tags
-        ? { comment: tagsString, description: tagsString, COMM: tagsString }
+        ? { comment: tagsString, genre: tagsString }
         : {}),
     };
+
     return new Promise((resolve, reject) => {
       ffmetadata.write(
         filePath,

@@ -15,6 +15,7 @@ import { disabled } from '@angular/forms/signals';
 export type TracksUploadModalData = {
   title: string;
   tracks?: AudioTrack[];
+  tagsMap?: Map<string, TagData>;
 };
 
 @Component({
@@ -47,7 +48,7 @@ export class TracksUploadModalComponent {
         path: track.fullPath,
         title: track.title,
         author: track.author,
-        tags: [] as TagData[],
+        tags: track.tags?.map((tagLabel) => this.tagsMap.get(tagLabel)).filter((t) => !!t) || [],
       },
       (form) => {
         disabled(form.path);
@@ -59,9 +60,11 @@ export class TracksUploadModalComponent {
   get title(): string {
     return this.data.title;
   }
-
   get tracks(): AudioTrack[] {
     return this.data.tracks || [];
+  }
+  get tagsMap(): Map<string, TagData> {
+    return this.data.tagsMap ?? new Map<string, TagData>();
   }
 
   cancel() {
