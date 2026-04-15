@@ -15,8 +15,6 @@
   (queryChange)="updateQuery($event)"
   (menuClosed)="actionMenuClosed.emit($event.reason)"
   (selected)="updateSelection($event)"
-  (filterChange)="setFilters($event)"
-  (filterMatchingChange)="setFilterMatching($event)"
 ></app-smart-table>
 
 <ng-template #playColumn let-row="$implicit">

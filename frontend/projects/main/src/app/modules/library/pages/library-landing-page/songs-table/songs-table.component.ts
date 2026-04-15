@@ -31,10 +31,6 @@ import {
 } from '../../../../../models/table.model';
 import { SmartTableComponent } from '../../../../../components/table/smart-table/smart-table.component';
 import { QueryOptions } from '@shared/models/request.model';
-import {
-  FilterMatchingOption,
-  SongsTableFilters,
-} from '../../../../../../../../general/models/filter.model';
 
 @Component({
   selector: 'app-songs-table',
@@ -69,7 +65,6 @@ export class SongsTableComponent {
   readonly pauseTrack = output();
   readonly actionMenuClosed = output<MenuCloseReason | string>();
   readonly selectionChange = output<Track[]>();
-  readonly filterChange = output<SongsTableFilters>();
 
   readonly playColumnTemplate =
     viewChild.required<TemplateRef<{ $implicit: Track }>>('playColumn');
@@ -85,11 +80,6 @@ export class SongsTableComponent {
     a.id === b.id;
 
   readonly activeRow = signal<Track | null>(null);
-  readonly filters = signal<SongsTableFilters>({
-    matching: 'any',
-    tagIds: [],
-    playlistIds: [],
-  });
   readonly currentSearchValue = signal<string>('');
 
   readonly tableConfig = computed<TableColumnConfiguration<Track>>(() => ({
@@ -170,34 +160,6 @@ export class SongsTableComponent {
 
   updateSelection(selectedTracks: Track[]) {
     this.selectionChange.emit(selectedTracks);
-  }
-
-  protected setFilterMatching(matchingOption: FilterMatchingOption) {
-    this.filters.update((filters) => ({
-      ...filters,
-      matching: matchingOption,
-    }));
-    this.filterChange.emit(this.filters());
-  }
-
-  protected setFilters(update: { collection: string; filters: unknown[] }) {
-    if (update.collection === 'playlists') {
-      this.filters.update((oldValue) => ({
-        ...oldValue,
-        playlistIds: update.filters as string[],
-      }));
-      this.filterChange.emit(this.filters());
-      return;
-    }
-
-    if (update.collection === 'tags') {
-      this.filters.update((oldValue) => ({
-        ...oldValue,
-        tagIds: update.filters as string[],
-      }));
-      this.filterChange.emit(this.filters());
-      return;
-    }
   }
 
   protected updateQuery(query: QueryOptions) {

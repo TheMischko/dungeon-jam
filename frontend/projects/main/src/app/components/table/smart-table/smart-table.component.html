@@ -2,7 +2,7 @@
   <div class="controls">
     @if (filterEnabled()) {
       <app-filter-settings
-        (matchingChange)="filterMatchingChange.emit($event)"
+        (matchingChange)="updateFilterMatchingType($event)"
       />
       <div class="filters">
         <app-tags-filter (selectionChange)="emitTagFilters($event)" />

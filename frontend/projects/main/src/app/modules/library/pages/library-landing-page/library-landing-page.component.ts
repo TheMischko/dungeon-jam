@@ -25,7 +25,6 @@ import {
   EditTrackResult,
 } from '../../modals/edit-track-modal/edit-track-modal.component';
 import { take } from 'rxjs';
-import { SongsTableFilters } from '../../../../../../../general/models/filter.model';
 import { NewTrackDropInService } from '../../services/new-track-drop-in.service';
 import { DialogService } from '../../../../services/dialog.service';
 
@@ -96,7 +95,6 @@ export class LibraryLandingPageComponent implements OnInit {
     sortDirection: SortDirection.ASC,
   });
   readonly showPlaylists = signal<boolean>(false);
-  readonly filters = signal<SongsTableFilters | undefined>(undefined);
 
   readonly defaultSongActions: ActionsMenuBaseConfig<Track>[] = [
     {
@@ -190,12 +188,6 @@ export class LibraryLandingPageComponent implements OnInit {
   }
 
   private updateTrack(_: string, data: Track) {
-    console.log('update', data);
     this.trackStore.updateTrack(data);
-  }
-
-  protected setFilters(filters: SongsTableFilters) {
-    this.filters.set(filters);
-    console.log(this.filters());
   }
 }

@@ -1,14 +1,6 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  effect,
-  input,
-  output,
-  signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, input, output, signal, } from '@angular/core';
 import { SortDirection } from '@shared/models/common.model';
-import { QueryOptions } from '@shared/models/request.model';
+import { FilterMatchType, QueryOptions } from '@shared/models/request.model';
 import { SearchBarComponent } from '@general/components/controls/search-bar/search-bar.component';
 import {
   TableActionsConfigFn,
@@ -21,12 +13,12 @@ import { LoaderComponent } from '@general/components/display/loader/loader.compo
 import { FilterSettingsComponent } from '../../filters/filter-settings/filter-settings.component';
 import { TagsFilterComponent } from '../../filters/tags-filter/tags-filter.component';
 import { PlaylistFilterComponent } from '../../filters/playlist-filter/playlist-filter.component';
-import { FilterMatchingOption } from '../../../../../../general/models/filter.model';
 import { Playlist } from '@shared/models/playlist.model';
 import { TagData } from '@shared/models/tag.model';
 import { MatMenu } from '@angular/material/menu';
 import { ColumnStateManager } from './column-state.manager';
 import { MatCheckbox } from '@angular/material/checkbox';
+import { FilterQuery } from '@shared/models/filter.model';
 
 @Component({
   selector: 'app-smart-table',
@@ -66,18 +58,18 @@ export class SmartTableComponent<T> {
   readonly hoverStart = output<T>();
   readonly hoverEnd = output<T>();
   readonly queryChange = output<QueryOptions>();
-  readonly filterChange = output<{ collection: string; filters: unknown[] }>();
-  readonly filterMatchingChange = output<FilterMatchingOption>();
 
   readonly currentSearch = signal<string>('');
   readonly currentSortBy = signal<string | undefined>(undefined);
   readonly currentSortDirection = signal<SortDirection>(SortDirection.ASC);
+  readonly currentFilters = signal<FilterQuery>(new FilterQuery());
 
   readonly currentQuery = computed<QueryOptions>(() => {
     const query: QueryOptions = {
       search: this.currentSearch(),
       sortBy: this.currentSortBy(),
       sortDirection: this.currentSortDirection(),
+      filters: this.currentFilters()
     };
     return query;
   });
@@ -116,16 +108,14 @@ export class SmartTableComponent<T> {
   }
 
   protected emitPlaylistFilters(playlists: Playlist[]) {
-    this.filterChange.emit({
-      collection: 'playlists',
-      filters: playlists.map((p) => p.id),
+    this.currentFilters.update((filters) => {
+      return filters.updateFilter('playlist', playlists.map((p) => p.id));
     });
   }
 
   protected emitTagFilters(tags: TagData[]) {
-    this.filterChange.emit({
-      collection: 'tags',
-      filters: tags.map((t) => t.id),
+    this.currentFilters.update((filters) => {
+      return filters.updateFilter('tag', tags.map((t) => t.id));
     });
   }
 
@@ -137,5 +127,12 @@ export class SmartTableComponent<T> {
     event.preventDefault();
     event.stopPropagation();
     this.columnStateManager.toggleColumn(colName);
+  }
+
+  protected updateFilterMatchingType(matchType: FilterMatchType) {
+    this.currentFilters.update((filters) => {
+      filters.updateMatchType(matchType);
+      return filters;
+    })
   }
 }
