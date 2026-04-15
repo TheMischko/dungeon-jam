@@ -84,7 +84,7 @@ describe('TrackManager', () => {
     it('should response to GET_PLAYLIST_TRACKS with tracks of the playlist', async () => {
       const query: PlaylistTracksQuery = {
         playlistId: 'test-123',
-        filter: 'test',
+        search: 'test',
       };
       const mockTracks = [mockTrack()];
       vi.spyOn(trackManager, 'getByPlaylist').mockResolvedValue(mockTracks);
@@ -206,7 +206,7 @@ describe('TrackManager', () => {
 
       const query: PlaylistTracksQuery = {
         playlistId: playlist.id,
-        filter: 'Love',
+        search: 'Love',
       };
       const result = await trackManager.getByPlaylist(query);
 

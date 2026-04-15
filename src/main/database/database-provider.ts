@@ -34,9 +34,9 @@ export class DatabaseProvider<T> {
   async getAll(query?: QueryOptions): Promise<T[]> {
     let data: T[] = [...(this.database.readTable<T[]>(this.table) ?? [])];
 
-    if (query?.filter) {
+    if (query?.search) {
       const filterResults = await Promise.all(
-        data.map((item: T) => this.filter(item, query.filter!.toLowerCase())),
+        data.map((item: T) => this.filter(item, query.search!.toLowerCase())),
       );
       data = data.filter((_, index) => filterResults[index]);
     }

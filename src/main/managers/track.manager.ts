@@ -116,7 +116,7 @@ export class TrackManager {
       return [];
     }
     const allTracks = await this.getAll({
-      filter: query?.filter,
+      search: query?.search,
       sortBy: query?.sortBy,
       sortDirection: query?.sortDirection,
     });

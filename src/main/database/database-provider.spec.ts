@@ -68,7 +68,7 @@ describe('DatabaseProvider', () => {
     });
 
     it('should filter the data', async () => {
-      const result = await provider.getAll({ filter: dataH.value });
+      const result = await provider.getAll({ search: dataH.value });
       expect(result).toEqual([dataH]);
     });
   });

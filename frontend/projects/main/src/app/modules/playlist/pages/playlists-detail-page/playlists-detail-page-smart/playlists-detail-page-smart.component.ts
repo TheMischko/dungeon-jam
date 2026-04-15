@@ -88,7 +88,7 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
   readonly currentIncludeChildren = signal<boolean>(false);
 
   readonly loadQuery = computed<PlaylistTracksQuery>(() => ({
-    filter: this.currentFilter(),
+    search: this.currentFilter(),
     sortDirection: this.currentSortDirection(),
     sortBy: this.currentSortBy(),
     playlistId: this.playlistId(),
@@ -206,8 +206,8 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
   }
 
   protected updateQuery(queryOptions: QueryOptions) {
-    if (queryOptions.filter) {
-      this.currentFilter.set(queryOptions.filter);
+    if (queryOptions.search) {
+      this.currentFilter.set(queryOptions.search);
     }
     if (queryOptions.sortBy) {
       this.currentSortBy.set(queryOptions.sortBy);

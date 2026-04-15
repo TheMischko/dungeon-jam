@@ -75,7 +75,7 @@ export class SmartTableComponent<T> {
 
   readonly currentQuery = computed<QueryOptions>(() => {
     const query: QueryOptions = {
-      filter: this.currentSearch(),
+      search: this.currentSearch(),
       sortBy: this.currentSortBy(),
       sortDirection: this.currentSortDirection(),
     };

@@ -23,7 +23,7 @@ describe('PlaylistApiService', () => {
     service = TestBed.inject(PlaylistApiService);
 
     mockQueryRequest = {
-      filter: 'favorite',
+      search: 'favorite',
       sortBy: 'name',
       sortDirection: SortDirection.ASC,
     };

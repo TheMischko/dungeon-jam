@@ -201,7 +201,7 @@ export class SongsTableComponent {
   }
 
   protected updateQuery(query: QueryOptions) {
-    this.currentSearchValue.set(query?.filter?.trim() ?? '');
+    this.currentSearchValue.set(query?.search?.trim() ?? '');
     this.queryChange.emit(query);
   }
 }

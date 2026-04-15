@@ -65,7 +65,7 @@ export class PlaylistGridSmartComponent implements OnInit {
     return getSizeConfig(sliderVal);
   });
   readonly queryOptions = computed<QueryRequest>(() => ({
-    filter: this.searchFilter(),
+    search: this.searchFilter(),
     sortBy: this.sortBy(),
     sortDirection: this.sortDirection(),
   }));
