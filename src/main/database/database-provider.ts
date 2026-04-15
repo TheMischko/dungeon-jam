@@ -8,36 +8,48 @@ import {
   GetSomeMatch,
   GetSomeOptions,
 } from './database-provider.model';
+import { FilterQuery } from '@shared/models/filter.model';
 
 export class DatabaseProvider<T> {
   private readonly table: DatabaseTable;
   private readonly idColumn: keyof T;
-  private readonly filter: SearchFn<T>;
+  private readonly search: SearchFn<T>;
   private readonly sort: SortFn<T>;
+  private readonly filter: FilterFn<T>
 
   constructor(
     private database: DatabaseWrapper,
     table: DatabaseTable = 'tracks',
     idColumn: keyof T = 'id' as keyof T,
-    filter: SearchFn<T> = () => true,
+    search: SearchFn<T> = () => true,
     sort: SortFn<T> = (itemA, itemB, sortBy, direction) =>
       (Number(itemA?.[sortBy as keyof T] ?? 0) -
         Number(itemB?.[sortBy as keyof T] ?? 0)) *
       (direction === SortDirection.ASC ? 1 : -1),
+    filter: FilterFn<T> = () => true
   ) {
     this.table = table;
     this.idColumn = idColumn;
-    this.filter = filter;
+    this.search = search;
     this.sort = sort;
+    this.filter = filter;
   }
 
   async getAll(query?: QueryOptions): Promise<T[]> {
     let data: T[] = [...(this.database.readTable<T[]>(this.table) ?? [])];
 
     if (query?.search) {
-      const filterResults = await Promise.all(
-        data.map((item: T) => this.filter(item, query.search!.toLowerCase())),
+      const searchResults = await Promise.all(
+        data.map((item: T) => this.search(item, query.search!.toLowerCase())),
       );
+      data = data.filter((_, index) => searchResults[index]);
+    }
+
+    if(query?.filters) {
+      const filters = new FilterQuery(query.filters['_matchType'], query.filters['_filters']);
+      const filterResults = await Promise.all(
+        data.map((item: T) => this.filter(item, filters))
+      )
       data = data.filter((_, index) => filterResults[index]);
     }
 
@@ -214,3 +226,8 @@ export type SortFn<T> = (
   sortBy: string,
   direction: SortDirection,
 ) => number;
+
+export type FilterFn<T> = (
+  item: T,
+  filterQuery: FilterQuery
+) => boolean | Promise<boolean>

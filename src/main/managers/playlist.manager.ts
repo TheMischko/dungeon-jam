@@ -202,6 +202,7 @@ export class PlaylistManager {
   async isTrackInPlaylists(
     trackId: string,
     playlistIds: string[],
+    mustMatchAll: boolean = false
   ): Promise<boolean> {
     if (playlistIds.length <= 1) {
       return this.isTrackInPlaylist(trackId, playlistIds[0]);
@@ -210,6 +211,11 @@ export class PlaylistManager {
     const playlists = await this.playlistProvider.getSome('id', playlistIds, {
       match: GetSomeMatch.EXACT,
     });
+
+    if(mustMatchAll){
+      const playlistsMissingTrack = playlists.filter(playlist => !playlist.trackIds.includes(trackId));
+      return playlistsMissingTrack.length === 0;
+    }
 
     return playlists.some((playlist) => playlist.trackIds.includes(trackId));
   }

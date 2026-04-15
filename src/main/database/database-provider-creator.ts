@@ -1,5 +1,5 @@
 import { DatabaseTable } from './init-database';
-import { DatabaseProvider, SearchFn, SortFn } from './database-provider';
+import { DatabaseProvider, FilterFn, SearchFn, SortFn } from './database-provider';
 import { DatabaseWrapper } from './database';
 import { SortDirection } from '@shared/models/common.model';
 
@@ -11,6 +11,7 @@ export class DatabaseProviderCreator<T> {
     (Number(itemA?.[sortBy as keyof T] ?? 0) -
       Number(itemB?.[sortBy as keyof T] ?? 0)) *
     (direction === SortDirection.ASC ? 1 : -1);
+  private filterFn: FilterFn<T> = () => true;
 
   static create<T>(): DatabaseProviderCreator<T> {
     return new DatabaseProviderCreator<T>();
@@ -36,6 +37,11 @@ export class DatabaseProviderCreator<T> {
     return this;
   }
 
+  setFilter(filter: FilterFn<T>): this {
+    this.filterFn = filter;
+    return this;
+  }
+
   async complete(): Promise<DatabaseProvider<T>> {
     const database = await DatabaseWrapper.getInstance();
     return new DatabaseProvider<T>(
@@ -44,6 +50,7 @@ export class DatabaseProviderCreator<T> {
       this.idColumn,
       this.searchFn,
       this.sortFn,
+      this.filterFn,
     );
   }
 }

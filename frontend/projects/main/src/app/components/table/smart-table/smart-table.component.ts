@@ -109,12 +109,18 @@ export class SmartTableComponent<T> {
 
   protected emitPlaylistFilters(playlists: Playlist[]) {
     this.currentFilters.update((filters) => {
+      if(!playlists.length){
+        return filters.removeFilter('playlist');
+      }
       return filters.updateFilter('playlist', playlists.map((p) => p.id));
     });
   }
 
   protected emitTagFilters(tags: TagData[]) {
     this.currentFilters.update((filters) => {
+      if(!tags.length){
+        return filters.removeFilter('tag');
+      }
       return filters.updateFilter('tag', tags.map((t) => t.id));
     });
   }

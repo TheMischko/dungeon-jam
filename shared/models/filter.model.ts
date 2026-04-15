@@ -36,4 +36,9 @@ export class FilterQuery {
     ];
     return new FilterQuery(this._matchType, newFilters);
   }
+
+  removeFilter(property: string): FilterQuery {
+    const oldFilters = this._filters.filter(f => f.property !== property);
+    return new FilterQuery(this._matchType, oldFilters);
+  }
 }

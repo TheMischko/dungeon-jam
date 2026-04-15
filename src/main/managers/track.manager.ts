@@ -1,11 +1,7 @@
-import {
-  AudioTrack,
-  PlaylistTracksQuery, TaggedTracksQuery,
-  Track,
-} from '@shared/models/track.model';
+import { AudioTrack, PlaylistTracksQuery, TaggedTracksQuery, Track, } from '@shared/models/track.model';
 import { ipcMain } from 'electron';
 import { AudioFileChannel, TrackChannel } from '@shared/models/channels.model';
-import { QueryRequest } from '@shared/models/request.model';
+import { FilterMatchType, QueryRequest } from '@shared/models/request.model';
 import { SortDirection } from '@shared/models/common.model';
 import { PlaylistManager } from './playlist.manager';
 import { DatabaseProvider } from '../database/database-provider';
@@ -16,6 +12,7 @@ import { FilesManager } from './files.manager';
 import { Logger } from '../utils/logger';
 import { Playlist } from '@shared/models/playlist.model';
 import { resolveAudioTrack } from '../utils/resolve-audio-track';
+import { FilterQuery } from '@shared/models/filter.model';
 
 export class TrackManager {
   private static _instance: TrackManager;
@@ -33,6 +30,7 @@ export class TrackManager {
         .setTable('tracks')
         .setSort(TrackManager.sortTracks)
         .setSearch(TrackManager.searchTracks)
+        .setFilter(TrackManager.trackMatchingFilters)
         .complete();
       const filesManager = await FilesManager.getInstance();
       TrackManager._instance = new TrackManager(provider, filesManager);
@@ -162,61 +160,6 @@ export class TrackManager {
     return await this.tracksProvider.deleteOne('id', id);
   }
 
-  public static __resetForTests(): void {
-    TrackManager._instance = undefined as unknown as TrackManager;
-  }
-
-  private static async searchTracks(
-    track: Track,
-    filter?: string,
-  ): Promise<boolean> {
-    if (!filter) {
-      return true;
-    }
-    const filterLower = filter.toLowerCase();
-    if (track.name && track.name.toLowerCase().includes(filterLower)) {
-      return true;
-    }
-    if (track?.author && track.author.toLowerCase().includes(filterLower)) {
-      return true;
-    }
-    if (track?.tags) {
-      const tags = await (
-        await TagsManager.getInstance()
-      ).getSubset('id', track.tags, {
-        match: GetSomeMatch.EXACT,
-      });
-      for (const tag of tags) {
-        if (tag.title.toLowerCase().includes(filterLower)) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
-  private static sortTracks(
-    trackA: Track,
-    trackB: Track,
-    sortBy?: string,
-    direction?: SortDirection,
-  ) {
-    if (!direction) {
-      return 0;
-    }
-    type TrackKey = Extract<keyof Omit<Track, 'duration'>, string>;
-    let sortValue: TrackKey = 'name';
-    if (sortBy && ['name', 'author'].includes(sortBy)) {
-      sortValue = sortBy as TrackKey;
-    }
-    const directionNum = direction === SortDirection.ASC ? 1 : -1;
-
-    const valA = trackA[sortValue] as string;
-    const valB = trackB[sortValue] as string;
-
-    return valA.toLowerCase().localeCompare(valB.toLowerCase()) * directionNum;
-  }
-
   private async update(track: Track) {
     this.logger.log('Update track', { trackId: track.id });
     const updatedRecord = await this.tracksProvider.update(
@@ -285,5 +228,96 @@ export class TrackManager {
       (track) => track.tags?.includes(tagId) ?? false,
       query,
     );
+  }
+
+  /***
+   * STATIC METHODS
+   ***/
+
+  public static __resetForTests(): void {
+    TrackManager._instance = undefined as unknown as TrackManager;
+  }
+
+  private static async searchTracks(
+    track: Track,
+    filter?: string,
+  ): Promise<boolean> {
+    if (!filter) {
+      return true;
+    }
+    const filterLower = filter.toLowerCase();
+    if (track.name && track.name.toLowerCase().includes(filterLower)) {
+      return true;
+    }
+    if (track?.author && track.author.toLowerCase().includes(filterLower)) {
+      return true;
+    }
+    if (track?.tags) {
+      const tags = await (
+        await TagsManager.getInstance()
+      ).getSubset('id', track.tags, {
+        match: GetSomeMatch.EXACT,
+      });
+      for (const tag of tags) {
+        if (tag.title.toLowerCase().includes(filterLower)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  private static sortTracks(
+    trackA: Track,
+    trackB: Track,
+    sortBy?: string,
+    direction?: SortDirection,
+  ) {
+    if (!direction) {
+      return 0;
+    }
+    type TrackKey = Extract<keyof Omit<Track, 'duration'>, string>;
+    let sortValue: TrackKey = 'name';
+    if (sortBy && ['name', 'author'].includes(sortBy)) {
+      sortValue = sortBy as TrackKey;
+    }
+    const directionNum = direction === SortDirection.ASC ? 1 : -1;
+
+    const valA = trackA[sortValue] as string;
+    const valB = trackB[sortValue] as string;
+
+    return valA.toLowerCase().localeCompare(valB.toLowerCase()) * directionNum;
+  }
+
+  private static async trackMatchingFilters(track: Track, filterQuery: FilterQuery): Promise<boolean> {
+    if(!filterQuery?.filters?.length) {
+      return true;
+    }
+    const playlistFilters = filterQuery.filters.find(f => f.property === 'playlist');
+    const tagFilters = filterQuery.filters.find(f => f.property === 'tag');
+
+    let matchingPlaylist = true;
+    if(playlistFilters){
+      const playlistManager = await PlaylistManager.getInstance();
+      matchingPlaylist = await playlistManager.isTrackInPlaylists(track.id, playlistFilters.values, filterQuery.matchType === FilterMatchType.ALL)
+    }
+
+    let matchingTags = true;
+    if(tagFilters){
+      const trackTags = track?.tags ?? [];
+      const missingTags = tagFilters.values.filter(tagId => !trackTags.includes(tagId));
+      matchingTags = filterQuery.matchType === FilterMatchType.ANY ? missingTags.length < tagFilters.values.length : missingTags.length === 0;
+    }
+
+    if(tagFilters && playlistFilters){
+      return filterQuery.matchType === FilterMatchType.ANY ? matchingPlaylist || matchingTags : matchingPlaylist && matchingTags;
+    }
+    if(!tagFilters && playlistFilters){
+      return matchingPlaylist;
+    }
+    if(tagFilters && !playlistFilters){
+      return matchingTags;
+    }
+    return true;
   }
 }

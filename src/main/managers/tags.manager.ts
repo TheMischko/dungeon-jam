@@ -169,39 +169,6 @@ export class TagsManager {
     })
   }
 
-  private static async prepareDatabase(): Promise<DatabaseProvider<TagData>> {
-    return await DatabaseProviderCreator.create<TagData>()
-      .setTable('tags')
-      .setIdColumn('id')
-      .setSort(TagsManager.sortTags.bind(this))
-      .setSearch(TagsManager.searchTags.bind(this))
-      .complete();
-  }
-
-  private static sortTags: SortFn<TagData> = (
-    itemA: TagData,
-    itemB: TagData,
-    sortBy: string,
-    direction: SortDirection,
-  ): number => {
-    if (sortBy === 'color') {
-      return 0;
-    }
-    const directionMul = direction === SortDirection.ASC ? 1 : -1;
-    return (
-      (itemA?.[sortBy as keyof TagData]?.localeCompare(
-        itemB?.[sortBy as keyof TagData] ?? '',
-      ) ?? 0) * directionMul
-    );
-  };
-
-  private static searchTags: SearchFn<TagData> = (
-    item: TagData,
-    filter: string,
-  ) => {
-    return item.title.includes(filter) || item.id.includes(filter);
-  };
-
   private async getTrackCounts(): Promise<Record<string, number>> {
     const [tags, trackMap] = await Promise.all([
       this.getAll(),
@@ -246,6 +213,43 @@ export class TagsManager {
     });
     return tagPlaylists;
   }
+
+  /***
+   * STATIC Functions
+   ***/
+
+  private static async prepareDatabase(): Promise<DatabaseProvider<TagData>> {
+    return await DatabaseProviderCreator.create<TagData>()
+      .setTable('tags')
+      .setIdColumn('id')
+      .setSort(TagsManager.sortTags.bind(this))
+      .setSearch(TagsManager.searchTags.bind(this))
+      .complete();
+  }
+
+  private static sortTags: SortFn<TagData> = (
+    itemA: TagData,
+    itemB: TagData,
+    sortBy: string,
+    direction: SortDirection,
+  ): number => {
+    if (sortBy === 'color') {
+      return 0;
+    }
+    const directionMul = direction === SortDirection.ASC ? 1 : -1;
+    return (
+      (itemA?.[sortBy as keyof TagData]?.localeCompare(
+        itemB?.[sortBy as keyof TagData] ?? '',
+      ) ?? 0) * directionMul
+    );
+  };
+
+  private static searchTags: SearchFn<TagData> = (
+    item: TagData,
+    filter: string,
+  ) => {
+    return item.title.includes(filter) || item.id.includes(filter);
+  };
 }
 
 const tagUsedInTableColumnMap = {
