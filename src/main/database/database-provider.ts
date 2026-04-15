@@ -12,14 +12,14 @@ import {
 export class DatabaseProvider<T> {
   private readonly table: DatabaseTable;
   private readonly idColumn: keyof T;
-  private readonly filter: FilterFn<T>;
+  private readonly filter: SearchFn<T>;
   private readonly sort: SortFn<T>;
 
   constructor(
     private database: DatabaseWrapper,
     table: DatabaseTable = 'tracks',
     idColumn: keyof T = 'id' as keyof T,
-    filter: FilterFn<T> = () => true,
+    filter: SearchFn<T> = () => true,
     sort: SortFn<T> = (itemA, itemB, sortBy, direction) =>
       (Number(itemA?.[sortBy as keyof T] ?? 0) -
         Number(itemB?.[sortBy as keyof T] ?? 0)) *
@@ -203,7 +203,7 @@ export class DatabaseProvider<T> {
   }
 }
 
-export type FilterFn<T> = (
+export type SearchFn<T> = (
   item: T,
   filter: string,
 ) => boolean | Promise<boolean>;

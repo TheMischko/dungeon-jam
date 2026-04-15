@@ -3,7 +3,7 @@ import { TagChannel } from '@shared/models/channels.model';
 import { QueryRequest } from '@shared/models/request.model';
 import {
   DatabaseProvider,
-  FilterFn,
+  SearchFn,
   SortFn,
 } from '../database/database-provider';
 import { Tag, TagData, TagDetail } from '@shared/models/tag.model';
@@ -174,7 +174,7 @@ export class TagsManager {
       .setTable('tags')
       .setIdColumn('id')
       .setSort(TagsManager.sortTags.bind(this))
-      .setFilter(TagsManager.filterTags.bind(this))
+      .setSearch(TagsManager.searchTags.bind(this))
       .complete();
   }
 
@@ -195,7 +195,7 @@ export class TagsManager {
     );
   };
 
-  private static filterTags: FilterFn<TagData> = (
+  private static searchTags: SearchFn<TagData> = (
     item: TagData,
     filter: string,
   ) => {

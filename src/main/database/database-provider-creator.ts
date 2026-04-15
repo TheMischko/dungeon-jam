@@ -1,12 +1,12 @@
 import { DatabaseTable } from './init-database';
-import { DatabaseProvider, FilterFn, SortFn } from './database-provider';
+import { DatabaseProvider, SearchFn, SortFn } from './database-provider';
 import { DatabaseWrapper } from './database';
 import { SortDirection } from '@shared/models/common.model';
 
 export class DatabaseProviderCreator<T> {
   private tableName: DatabaseTable = 'tracks';
   private idColumn: keyof T = 'id' as keyof T;
-  private filterFn: FilterFn<T> = () => true;
+  private searchFn: SearchFn<T> = () => true;
   private sortFn: SortFn<T> = (itemA, itemB, sortBy, direction) =>
     (Number(itemA?.[sortBy as keyof T] ?? 0) -
       Number(itemB?.[sortBy as keyof T] ?? 0)) *
@@ -31,8 +31,8 @@ export class DatabaseProviderCreator<T> {
     return this;
   }
 
-  setFilter(filter: FilterFn<T>): this {
-    this.filterFn = filter;
+  setSearch(search: SearchFn<T>): this {
+    this.searchFn = search;
     return this;
   }
 
@@ -42,7 +42,7 @@ export class DatabaseProviderCreator<T> {
       database,
       this.tableName,
       this.idColumn,
-      this.filterFn,
+      this.searchFn,
       this.sortFn,
     );
   }

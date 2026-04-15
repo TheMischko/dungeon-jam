@@ -2,7 +2,7 @@ import { afterEach, describe, expect, vi } from 'vitest';
 import { mockDatabase } from '../testing/mocks/mock-database';
 import { DatabaseProviderCreator } from './database-provider-creator';
 import { DatabaseTable } from './init-database';
-import { DatabaseProvider, FilterFn, SortFn } from './database-provider';
+import { DatabaseProvider, SearchFn, SortFn } from './database-provider';
 import { SortDirection } from '@shared/models/common.model';
 
 vi.mock('./database', () => mockDatabase);
@@ -13,7 +13,7 @@ type TestEntity = {
   priority: number;
 };
 
-const customFilter: FilterFn<TestEntity> = (item, filter) => {
+const customFilter: SearchFn<TestEntity> = (item, filter) => {
   return item.value.toLowerCase().includes(filter.toLowerCase());
 };
 
@@ -117,7 +117,7 @@ describe('DatabaseProviderCreator', () => {
   describe('setFilter', () => {
     it('should set the filter function', async () => {
       const creator =
-        DatabaseProviderCreator.create<TestEntity>().setFilter(customFilter);
+        DatabaseProviderCreator.create<TestEntity>().setSearch(customFilter);
 
       const provider = await creator.complete();
 
@@ -126,7 +126,7 @@ describe('DatabaseProviderCreator', () => {
 
     it('should use provided filter function in provider', async () => {
       const creator =
-        DatabaseProviderCreator.create<TestEntity>().setFilter(customFilter);
+        DatabaseProviderCreator.create<TestEntity>().setSearch(customFilter);
 
       const provider = await creator.complete();
 
@@ -158,7 +158,7 @@ describe('DatabaseProviderCreator', () => {
       const creator = DatabaseProviderCreator.create<TestEntity>()
         .setTable('tags' as DatabaseTable)
         .setIdColumn('value')
-        .setFilter(customFilter)
+        .setSearch(customFilter)
         .setSort(customSort);
 
       const provider = await creator.complete();
@@ -172,7 +172,7 @@ describe('DatabaseProviderCreator', () => {
       const provider = await DatabaseProviderCreator.create<TestEntity>()
         .setTable('playlists' as DatabaseTable)
         .setIdColumn('id')
-        .setFilter(customFilter)
+        .setSearch(customFilter)
         .setSort(customSort)
         .complete();
 
@@ -181,7 +181,7 @@ describe('DatabaseProviderCreator', () => {
 
     it('should support partial fluent API chain', async () => {
       const provider = await DatabaseProviderCreator.create<TestEntity>()
-        .setFilter(customFilter)
+        .setSearch(customFilter)
         .complete();
 
       expect(provider).toBeInstanceOf(DatabaseProvider);
@@ -198,8 +198,8 @@ describe('DatabaseProviderCreator', () => {
       const provider = await DatabaseProviderCreator.create<TestEntity>()
         .setTable('tags' as DatabaseTable)
         .setTable('playlists' as DatabaseTable)
-        .setFilter(customFilter)
-        .setFilter(() => true)
+        .setSearch(customFilter)
+        .setSearch(() => true)
         .complete();
 
       expect(provider).toBeInstanceOf(DatabaseProvider);
@@ -209,7 +209,7 @@ describe('DatabaseProviderCreator', () => {
       const creator = DatabaseProviderCreator.create<TestEntity>();
       const result1 = creator.setTable('tags' as DatabaseTable);
       const result2 = result1.setIdColumn('id');
-      const result3 = result2.setFilter(customFilter);
+      const result3 = result2.setSearch(customFilter);
       const result4 = result3.setSort(customSort);
 
       expect(result1).toBe(creator);
@@ -222,7 +222,7 @@ describe('DatabaseProviderCreator', () => {
   describe('edge cases', () => {
     it('should handle undefined custom functions gracefully', async () => {
       const creator = DatabaseProviderCreator.create<TestEntity>()
-        .setFilter(() => true)
+        .setSearch(() => true)
         .setSort(() => 0);
 
       const provider = await creator.complete();

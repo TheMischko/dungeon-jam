@@ -31,8 +31,8 @@ export class PlaylistManager {
         .setSort((a, b, sortBy, direction) =>
           PlaylistManager.sortPlaylists(a, b, direction, sortBy),
         )
-        .setFilter((item, filter) =>
-          PlaylistManager.filterPlaylists(item, filter),
+        .setSearch((item, filter) =>
+          PlaylistManager.searchPlaylists(item, filter),
         )
         .complete();
       PlaylistManager._instance = new PlaylistManager(database, provider);
@@ -318,7 +318,7 @@ export class PlaylistManager {
     return 0;
   }
 
-  private static filterPlaylists(playlist: Playlist, filter?: string): boolean {
+  private static searchPlaylists(playlist: Playlist, filter?: string): boolean {
     if (!filter) {
       return true;
     }

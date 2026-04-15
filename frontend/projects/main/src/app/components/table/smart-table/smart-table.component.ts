@@ -131,8 +131,7 @@ export class SmartTableComponent<T> {
 
   protected updateFilterMatchingType(matchType: FilterMatchType) {
     this.currentFilters.update((filters) => {
-      filters.updateMatchType(matchType);
-      return filters;
-    })
+      return filters.updateMatchType(matchType);
+    });
   }
 }

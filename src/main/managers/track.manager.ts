@@ -32,7 +32,7 @@ export class TrackManager {
       const provider = await DatabaseProviderCreator.create<Track>()
         .setTable('tracks')
         .setSort(TrackManager.sortTracks)
-        .setFilter(TrackManager.filterTracks)
+        .setSearch(TrackManager.searchTracks)
         .complete();
       const filesManager = await FilesManager.getInstance();
       TrackManager._instance = new TrackManager(provider, filesManager);
@@ -166,7 +166,7 @@ export class TrackManager {
     TrackManager._instance = undefined as unknown as TrackManager;
   }
 
-  private static async filterTracks(
+  private static async searchTracks(
     track: Track,
     filter?: string,
   ): Promise<boolean> {

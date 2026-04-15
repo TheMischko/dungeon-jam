@@ -3,7 +3,7 @@ import {
   mockDatabase,
   mockDatabaseInstance,
 } from '../testing/mocks/mock-database';
-import { DatabaseProvider, FilterFn, SortFn } from './database-provider';
+import { DatabaseProvider, SearchFn, SortFn } from './database-provider';
 import { DatabaseWrapper } from './database';
 import { DatabaseTable } from './init-database';
 import { SortDirection } from '@shared/models/common.model';
@@ -17,7 +17,7 @@ type TestEntity = {
   priority: number;
 };
 
-const testFilter: FilterFn<TestEntity> = (item, filter) => {
+const testFilter: SearchFn<TestEntity> = (item, filter) => {
   return item.value.toLowerCase() === filter.toLowerCase();
 };
 
