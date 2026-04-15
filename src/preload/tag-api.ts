@@ -1,5 +1,5 @@
 import { QueryRequest } from '@shared/models/request.model';
-import { Tag, TagData } from '@shared/models/tag.model';
+import { Tag, TagData, TagDetail } from '@shared/models/tag.model';
 import { ipcRenderer } from 'electron';
 import { TagChannel } from '@shared/models/channels.model';
 
@@ -38,6 +38,10 @@ const updateTag = async (tag: TagData): Promise<TagData> => {
   return await ipcRenderer.invoke(TagChannel.UPDATE, tag);
 };
 
+const getTagDetails = async (query?: QueryRequest): Promise<TagDetail[]> => {
+  return await ipcRenderer.invoke(TagChannel.GET_DETAILS, query);
+};
+
 export default {
   getAllTags,
   getSubsetOfTags,
@@ -47,4 +51,5 @@ export default {
   clearOrphanedTags,
   getTagsTrackCount,
   updateTag,
+  getTagDetails,
 };

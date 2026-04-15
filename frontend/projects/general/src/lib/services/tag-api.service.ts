@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { TagApiWindow } from '../../../models/api/tag-api.model';
 import { QueryRequest } from '@shared/models/request.model';
 import { Observable, Subject } from 'rxjs';
-import { Tag, TagData } from '@shared/models/tag.model';
+import { Tag, TagData, TagDetail } from '@shared/models/tag.model';
 
 @Injectable({
   providedIn: 'root',
@@ -109,6 +109,19 @@ export class TagApiService {
     this.window.TAG_API.updateTag(tag)
       .then((updated) => {
         subject.next(updated);
+        subject.complete();
+      })
+      .catch((err) => {
+        subject.error(err);
+      });
+    return subject.asObservable();
+  }
+
+  getTagDetails(query?: QueryRequest): Observable<TagDetail[]> {
+    const subject = new Subject<TagDetail[]>();
+    this.window.TAG_API.getTagDetails(query)
+      .then((details) => {
+        subject.next(details);
         subject.complete();
       })
       .catch((err) => {

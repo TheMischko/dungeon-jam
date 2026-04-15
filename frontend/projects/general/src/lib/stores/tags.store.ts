@@ -3,7 +3,7 @@ import {
   setAllEntities, setEntity,
   withEntities,
 } from '@ngrx/signals/entities';
-import { TagData } from '@shared/models/tag.model';
+import { TagData, TagDetail } from '@shared/models/tag.model';
 import {
   patchState,
   signalStore,
@@ -18,26 +18,38 @@ import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { catchError, EMPTY, finalize, map, of, pipe, switchMap, tap } from 'rxjs';
 import { SortDirection } from '@shared/models/common.model';
 import { QueryOptions } from '@shared/models/request.model';
+import { TagHelperService } from '@general/services/tag-helper.service';
 
 type TagsStoreState = {
   initialized: boolean;
   loading: boolean;
+  details: Record<string, TagDetail>;
 };
 
 const initialState: TagsStoreState = {
   initialized: false,
   loading: false,
+  details: {},
 };
 
 const tagsConfig = entityConfig({
   entity: type<TagData>(),
 });
 
+const DEFAULT_SORT: QueryOptions = {
+  sortBy: 'title',
+  sortDirection: SortDirection.ASC,
+}
+
 export const TagsStore = signalStore(
   { providedIn: 'root' },
   withState<TagsStoreState>(initialState),
   withEntities(tagsConfig),
-  withMethods((store, tagApiService = inject(TagApiService)) => {
+  withMethods(
+    (store,
+     tagApiService = inject(TagApiService),
+     tagHelperService = inject(TagHelperService),
+    ) => {
     const loadAll = rxMethod<QueryOptions | void>(
       pipe(
         tap(() => {
@@ -48,10 +60,7 @@ export const TagsStore = signalStore(
         }),
         switchMap((options) => {
           return tagApiService
-            .getAllTags(options ?? {
-              sortBy: 'title',
-              sortDirection: SortDirection.ASC,
-            })
+            .getAllTags(options ?? DEFAULT_SORT)
             .pipe(
               tap((tags) => {
                 patchState(store, setAllEntities(tags));
@@ -68,6 +77,29 @@ export const TagsStore = signalStore(
       ),
     );
 
+    const loadDetails = rxMethod<QueryOptions | void>(
+      pipe(
+        tap(() => {
+          patchState(store, { loading: true });
+        }),
+        switchMap((options) => {
+          return tagApiService.getTagDetails(options ?? DEFAULT_SORT).pipe(
+            tap((tagDetails) => {
+              const map = tagHelperService.createTagDetailsMap(tagDetails);
+              patchState(store, { details: map });
+            }),
+            catchError((err) => {
+              console.error('Cannot load tag details', err);
+              return EMPTY;
+            }),
+            finalize(() => {
+              patchState(store, { loading: false });
+            })
+          )
+        })
+      )
+    )
+
     const getById = (id: string): TagData | undefined => {
       return store.entityMap()[id];
     };
@@ -80,6 +112,11 @@ export const TagsStore = signalStore(
         return tagApiService.updateTag(updatedTag).pipe(
           tap((tag) => {
             patchState(store, setEntity(tag));
+            const details = store.details();
+            if(details[tag.id]){
+              const updatedDetails = tagHelperService.updateDetailRecord(tag, details);
+              patchState(store, { details: updatedDetails });
+            }
           }),
           catchError((e) => {
             console.error(`Cannot update tag ${updatedTag.id}`, e);
@@ -95,7 +132,8 @@ export const TagsStore = signalStore(
     return {
       loadAll,
       getById,
-      updateTag
+      updateTag,
+      loadDetails
     };
   }),
   withHooks({

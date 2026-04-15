@@ -6,7 +6,7 @@ import {
   FilterFn,
   SortFn,
 } from '../database/database-provider';
-import { Tag, TagData } from '@shared/models/tag.model';
+import { Tag, TagData, TagDetail } from '@shared/models/tag.model';
 import { DatabaseProviderCreator } from '../database/database-provider-creator';
 import { SortDirection } from '@shared/models/common.model';
 import {
@@ -17,6 +17,7 @@ import {
 import { DatabaseTable } from '../database/init-database';
 import { DatabaseWrapper } from '../database/database';
 import { Track } from '@shared/models/track.model';
+import { Playlist } from '@shared/models/playlist.model';
 
 export class TagsManager {
   private static _instance: TagsManager;
@@ -42,6 +43,12 @@ export class TagsManager {
         return await this.getSubset(column, values);
       },
     );
+    ipcMain.handle(TagChannel.GET_TRACKS_COUNT, async () => {
+      return await this.getTrackCounts();
+    });
+    ipcMain.handle(TagChannel.GET_DETAILS, async (_, query?: QueryRequest) => {
+      return await this.getDetailsList(query);
+    })
     ipcMain.handle(TagChannel.INSERT, async (_, data: Tag) => {
       return await this.insert(data);
     });
@@ -53,9 +60,6 @@ export class TagsManager {
     });
     ipcMain.handle(TagChannel.CLEAR_ORPHANS, async () => {
       return await this.clearOrphanedTags();
-    });
-    ipcMain.handle(TagChannel.GET_TRACKS_COUNT, async () => {
-      return await this.getTrackCounts();
     });
     ipcMain.handle(TagChannel.UPDATE, async (_, tag: TagData) => {
       return await this.updateTag(tag);
@@ -139,8 +143,30 @@ export class TagsManager {
     return orphanedTags.length ?? 0;
   }
 
+  /**
+   * Replaces a tag with a new data. Matching is done on `id` field.
+   * @param tag
+   */
   public async updateTag(tag: TagData): Promise<TagData> {
     return await this.tagDatabase.replaceRecord(tag);
+  }
+
+  public async getDetailsList(query?: QueryRequest): Promise<TagDetail[]> {
+    const [tags, tracksMap, playlistMap] = await Promise.all([
+      this.getAll(query),
+      this.getTagTracksMap(),
+      this.getTagPlaylistMap(),
+    ]);
+
+    return tags.map((tag) => {
+      const tracks = Array.from(tracksMap?.[tag.id]?.values() ?? []);
+      const playlists = Array.from(playlistMap?.[tag.id]?.values() ?? []);
+      return {
+        ...tag,
+        assignedTracks: tracks,
+        assignedPlaylists: playlists
+      } as TagDetail;
+    })
   }
 
   private static async prepareDatabase(): Promise<DatabaseProvider<TagData>> {
@@ -176,17 +202,49 @@ export class TagsManager {
     return item.title.includes(filter) || item.id.includes(filter);
   };
 
-  private async getTrackCounts() {
+  private async getTrackCounts(): Promise<Record<string, number>> {
+    const [tags, trackMap] = await Promise.all([
+      this.getAll(),
+      this.getTagTracksMap()
+    ])
+    return tags.reduce((countMap, tag) => {
+      return {
+        ...countMap,
+        [tag.id]: trackMap[tag.id]?.size,
+      }
+    }, {} as Record<string, number>)
+  }
+
+  private async getTagTracksMap(): Promise<Record<string, Set<Track>>> {
     const database = await DatabaseWrapper.getInstance();
     const tracks = database.readTable<Track[]>('tracks') ?? [];
-    const tagCounts: Record<string, number> = {};
+    const tagTracks: Record<string, Set<Track>> = {};
     tracks.forEach((track) => {
       const tags = track.tags ?? [];
       tags.forEach((tagId) => {
-        tagCounts[tagId] = (tagCounts[tagId] ?? 0) + 1;
+        if(!tagTracks[tagId]) {
+          tagTracks[tagId] = new Set();
+        }
+        tagTracks[tagId]?.add(track);
       });
     });
-    return tagCounts;
+    return tagTracks;
+  }
+
+  private async getTagPlaylistMap(): Promise<Record<string, Set<Playlist>>> {
+    const database = await DatabaseWrapper.getInstance();
+    const playlists = database.readTable<Playlist[]>('playlists') ?? [];
+    const tagPlaylists: Record<string, Set<Playlist>> = {};
+    playlists.forEach((playlist) => {
+      const tags = playlist.tags ?? [];
+      tags.forEach((tagId) => {
+        if(!tagPlaylists[tagId]) {
+          tagPlaylists[tagId] = new Set();
+        }
+        tagPlaylists[tagId]?.add(playlist);
+      });
+    });
+    return tagPlaylists;
   }
 }
 

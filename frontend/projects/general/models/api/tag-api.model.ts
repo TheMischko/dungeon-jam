@@ -1,5 +1,5 @@
 import { QueryRequest } from '@shared/models/request.model';
-import { Tag, TagData } from '@shared/models/tag.model';
+import { Tag, TagData, TagDetail } from '@shared/models/tag.model';
 
 export type TagApiWindow = Window &
   typeof globalThis & {
@@ -15,5 +15,6 @@ export type TagApiWindow = Window &
       clearOrphanedTags: () => Promise<number>;
       getTagsTrackCount: () => Promise<Record<string, number>>;
       updateTag: (tag: TagData) => Promise<TagData>;
+      getTagDetails: (query?: QueryRequest) => Promise<TagDetail[]>;
     };
   };

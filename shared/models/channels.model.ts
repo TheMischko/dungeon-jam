@@ -38,6 +38,7 @@ export enum TagChannel {
   GET_ALL = 'tags/get-all',
   GET_SUBSET = 'tags/get-subset',
   GET_TRACKS_COUNT = 'tags/get-tracks-count',
+  GET_DETAILS = 'tags/get-details',
   SUGGESTION = 'tags/suggestion',
   INSERT = 'tags/insert',
   DELETE_ONE = 'tags/delete-one',
