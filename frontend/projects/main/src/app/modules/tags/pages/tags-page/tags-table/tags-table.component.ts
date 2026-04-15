@@ -76,6 +76,11 @@ export class TagsTableComponent {
       isDefaultSortColumn: true,
       template: () => this.titleColumnTemplate()
     },
+    playlistCount: {
+      title: 'Playlists',
+      sortable: false,
+      width: '120px'
+    },
     trackCount: {
       title: 'Tracks',
       sortable: false,
