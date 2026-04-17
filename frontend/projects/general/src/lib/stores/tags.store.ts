@@ -104,6 +104,10 @@ export const TagsStore = signalStore(
       return store.entityMap()[id];
     };
 
+    const registerTag = (tag: TagData): void => {
+      patchState(store, setEntity(tag));
+    };
+
     const updateTag = rxMethod<TagData>(pipe(
       tap(() => {
         patchState(store, { loading: true });
@@ -133,7 +137,8 @@ export const TagsStore = signalStore(
       loadAll,
       getById,
       updateTag,
-      loadDetails
+      loadDetails,
+      registerTag,
     };
   }),
   withHooks({

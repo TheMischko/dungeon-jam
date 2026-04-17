@@ -17,6 +17,7 @@ import { MatInput, MatLabel } from '@angular/material/input';
 import { Tag, TagData } from '@shared/models/tag.model';
 import { TagListComponent } from '@general/components/display/tag-list/tag-list.component';
 import { TagApiService } from '@general/services/tag-api.service';
+import { TagsStore } from '@general/stores/tags.store';
 import {
   MatAutocomplete,
   MatAutocompleteTrigger,
@@ -49,6 +50,7 @@ import { ValidationError } from '@angular/forms/signals';
 })
 export class TagsInputComponent implements ControlValueAccessor {
   private readonly tagApiService = inject(TagApiService);
+  private readonly tagsStore = inject(TagsStore);
 
   readonly value = model<TagData[]>([]);
   readonly disabled = model<boolean>(false);
@@ -192,6 +194,7 @@ export class TagsInputComponent implements ControlValueAccessor {
       return;
     }
     const newTag = await this.getTagFromValue(trimmedText);
+    this.tagsStore.registerTag(newTag);
     this.value.set([...this.value(), newTag]);
     this.emitValueChange();
   }
