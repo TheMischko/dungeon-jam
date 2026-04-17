@@ -1,6 +1,5 @@
 import { StoredPlayback, Track } from '@shared/models/track.model';
 import { Playlist } from '@shared/models/playlist.model';
-import { playlistsMock } from './playlists.mock';
 import { TagData } from '@shared/models/tag.model';
 import { DiscordTokenData } from '@shared/models/discord.model';
 
@@ -27,28 +26,11 @@ function initPlayback(): StoredPlayback {
 }
 
 function initPlaylists(): Playlist[] {
-  return playlistsMock;
+  return [];
 }
 
 function initTags(): TagData[] {
-  return [
-    {
-      id: 'tag-1',
-      title: 'friendly',
-    },
-    {
-      id: 'tag-2',
-      title: 'unfriendly',
-    },
-    {
-      id: 'tag-3',
-      title: 'outdoor',
-    },
-    {
-      id: 'tag-4',
-      title: 'indoor',
-    },
-  ];
+  return [];
 }
 
 function initDiscordTokens(): DiscordTokenData[] {

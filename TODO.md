@@ -10,3 +10,6 @@ Obviously the project is WIP, so there is just a list of small missing features 
 - [ ] Create custom scrollbar
 - [ ] Use `TableComponent` in `SongsTableComponent` 
 - [x] Table and search box on Tracks landing page disappears if you set invalid search
+- [ ] Better landing page with empty data (no sections etc.)
+- [ ] On multiple track upload (Autoresolve) or maybe in general upload lacks loading spinner
+- [ ] Autoresolve upload does not auto-assign tags from genres
