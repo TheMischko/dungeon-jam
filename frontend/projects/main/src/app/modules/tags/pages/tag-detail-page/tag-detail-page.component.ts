@@ -16,6 +16,8 @@ import { IconButtonComponent } from '@general/components/buttons/icon-button/ico
 import { actionsIconSet } from '@general/icons/icons';
 import { ActionsMenuConfig } from '@general/components/display/actions-menu/actions-menu.component';
 import { Playlist } from '@shared/models/playlist.model';
+import { MatButton } from '@angular/material/button';
+import { LucideAngularModule } from 'lucide-angular';
 
 @Component({
   selector: 'app-tag-detail-page',
@@ -23,6 +25,8 @@ import { Playlist } from '@shared/models/playlist.model';
     SongsTableComponent,
     NgStyle,
     IconButtonComponent,
+    MatButton,
+    LucideAngularModule,
   ],
   templateUrl: './tag-detail-page.component.html',
   styleUrl: './tag-detail-page.component.scss',
@@ -40,6 +44,7 @@ export class TagDetailPageComponent {
   readonly pauseTrack = output<void>();
   readonly colorChange = output<string>();
   readonly titleChange = output<string>();
+  readonly addTracks = output<void>();
 
   readonly titleInput = viewChild('titleInput', { read: ElementRef<HTMLInputElement>});
   readonly colorInput = viewChild.required('colorInput', { read: ElementRef<HTMLInputElement>});
@@ -54,6 +59,7 @@ export class TagDetailPageComponent {
   readonly editIcon = actionsIconSet.EditIcon;
   readonly confirmIcon = actionsIconSet.SaveIcon;
   readonly cancelIcon = actionsIconSet.CrossIcon;
+  readonly addTracksIcon = actionsIconSet.AddIcon;
 
   readonly tagColorStyle = computed(() => {
     const color = this.tag()?.color;

@@ -35,6 +35,14 @@
       <lib-icon-button [icon]="cancelIcon" (clicked)="stopEditMode()" />
     }
   </div>
+  <div class="actions-bar">
+    <button mat-flat-button (click)="addTracks.emit()">
+      <div class="button-content">
+        <lucide-icon [img]="addTracksIcon" />
+        <span>Add tracks to tag</span>
+      </div>
+    </button>
+  </div>
   <app-songs-table
     [tracks]="tracks()"
     [loading]="loading()"

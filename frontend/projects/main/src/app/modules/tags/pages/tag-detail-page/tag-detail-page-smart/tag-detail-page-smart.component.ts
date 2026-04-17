@@ -12,9 +12,15 @@ import { TagDetailPageComponent } from '../tag-detail-page.component';
 import { TaggedTracksQuery, Track } from '@shared/models/track.model';
 import { PlaybackService } from '../../../../../services/playback.service';
 import { toSignal } from '@angular/core/rxjs-interop';
-import {ActionsMenuConfig} from '@general/components/display/actions-menu/actions-menu.component';
-import {Playlist} from '@shared/models/playlist.model';
-import {actionsIconSet} from '@general/icons/icons';
+import { ActionsMenuConfig } from '@general/components/display/actions-menu/actions-menu.component';
+import { Playlist } from '@shared/models/playlist.model';
+import { actionsIconSet } from '@general/icons/icons';
+import { DialogService } from '../../../../../services/dialog.service';
+import {
+  SelectLibraryTracksModalComponent,
+  SelectLibraryTracksModalConfig,
+} from '../../../../library/modals/select-library-tracks-modal/select-library-tracks-modal.component';
+import { SelectLibraryTracksSelection } from '../../../../library/modals/select-library-tracks-modal/select-library-tracks-modal.types';
 
 @Component({
   selector: 'app-tag-detail-page-smart',
@@ -26,6 +32,7 @@ export class TagDetailPageSmartComponent implements OnInit {
   private readonly tracksStore = inject(taggedTracksStore);
   private readonly tagsStore = inject(TagsStore);
   private readonly playbackService = inject(PlaybackService);
+  private readonly dialogService = inject(DialogService);
 
   readonly tagId = input<string>('', { alias: 'id' });
 
@@ -46,13 +53,13 @@ export class TagDetailPageSmartComponent implements OnInit {
       text: 'Remove tag from track',
       icon: actionsIconSet.CrossIcon,
       onSelected: (item) => {
-        this.removeTagFromTrack(item)
-      }
+        this.removeTagFromTrack(item);
+      },
     },
     {
-      text: 'Cancel'
-    }
-  ]
+      text: 'Cancel',
+    },
+  ];
 
   ngOnInit(): void {
     this.tracksStore.load(this.loadQuery);
@@ -95,7 +102,7 @@ export class TagDetailPageSmartComponent implements OnInit {
     const trackIndex = tracks.findIndex((t) => t.id === track.id);
     const queue = [
       ...tracks.slice(trackIndex + 1),
-      ...tracks.slice(0, trackIndex)
+      ...tracks.slice(0, trackIndex),
     ];
     await this.playbackService.play(track, queue);
   }
@@ -104,7 +111,32 @@ export class TagDetailPageSmartComponent implements OnInit {
     this.playbackService.pause();
   }
 
-  private removeTagFromTrack(item: Track) {
+  openAddTracksModal(): void {
+    const dialogRef = this.dialogService.open<
+      SelectLibraryTracksModalComponent,
+      SelectLibraryTracksSelection
+    >(SelectLibraryTracksModalComponent, {
+      data: {
+        excludedTrackIds: this.tracks().map((track) => track.id),
+      },
+    } as SelectLibraryTracksModalConfig);
+
+    dialogRef.afterClosed$.subscribe(
+      (result: SelectLibraryTracksSelection | undefined) => {
+        if (result?.selectedTracks && result.selectedTracks.length > 0) {
+          const tagId = this.tagId();
+          const tracksWithoutTag = result.selectedTracks.filter(
+            (track) => !track.tags?.includes(tagId),
+          );
+          if (tracksWithoutTag.length > 0) {
+            this.tracksStore.addTracksToTag(tracksWithoutTag);
+          }
+        }
+      },
+    );
+  }
+
+  private removeTagFromTrack(item: Track): void {
     console.log(`Removing tag ${this.tag().title} from track ${item.name}`);
     this.tracksStore.removeTrack(item.id);
   }

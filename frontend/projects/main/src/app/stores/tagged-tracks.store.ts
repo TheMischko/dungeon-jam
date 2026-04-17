@@ -1,8 +1,8 @@
 import { patchState, signalStore, type, withMethods, withState } from '@ngrx/signals';
-import { entityConfig, removeEntity, setAllEntities, withEntities } from '@ngrx/signals/entities';
+import { entityConfig, removeEntity, setAllEntities, setEntities, withEntities } from '@ngrx/signals/entities';
 import { TaggedTracksQuery, Track } from '@shared/models/track.model';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { catchError, EMPTY, finalize, of, pipe, switchMap, tap } from 'rxjs';
+import { catchError, EMPTY, finalize, forkJoin, of, pipe, switchMap, tap } from 'rxjs';
 import { inject } from '@angular/core';
 import { TrackService } from '../services/track.service';
 
@@ -82,6 +82,44 @@ export const taggedTracksStore = signalStore(
       )
     )
 
-    return { load, removeTrack };
+    /**
+     * Adds the current tag to the given tracks and refreshes the tagged tracks list.
+     * @param tracks - The tracks to assign the current tag to.
+     */
+    const addTracksToTag = rxMethod<Track[]>(
+      pipe(
+        tap(() => {
+          patchState(store, { loading: true });
+        }),
+        switchMap((tracks) => {
+          const currentTagId = store.currentTagId?.();
+          if (!currentTagId || tracks.length === 0) {
+            patchState(store, { loading: false });
+            return EMPTY;
+          }
+          const updateRequests = tracks.map((track) => {
+            const updatedTrack: Track = {
+              ...track,
+              tags: [...(track.tags ?? []), currentTagId],
+            };
+            return trackService.updateTrack(updatedTrack);
+          });
+          return forkJoin(updateRequests).pipe(
+            tap((updatedTracks) => {
+              patchState(store, setEntities(updatedTracks));
+            }),
+            catchError((e) => {
+              console.error('Cannot add tag to tracks', e);
+              return EMPTY;
+            }),
+            finalize(() => {
+              patchState(store, { loading: false });
+            }),
+          );
+        }),
+      ),
+    );
+
+    return { load, removeTrack, addTracksToTag };
   })
 )
