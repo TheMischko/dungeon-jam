@@ -14,6 +14,7 @@ export type PlaybackState = {
   position: number;
   duration: number;
   repeat: RepeatState;
+  shuffle: boolean;
   playlistId?: string;
 } & StoredPlayback;
 
@@ -25,6 +26,7 @@ export const initialPlaybackState: PlaybackState = {
   position: 0,
   duration: 0,
   volume: 1,
+  shuffle: false,
   repeat: RepeatState.NONE,
 };
 

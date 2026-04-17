@@ -1,0 +1,7 @@
+@use "colors" as col;
+
+:host ::ng-deep{
+  .inactive .mat-mdc-button:not(:disabled){
+    color: col.$button-inactive;
+  }
+}

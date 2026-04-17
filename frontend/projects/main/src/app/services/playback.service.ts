@@ -10,6 +10,7 @@ import { StoredPlayback, Track } from '@shared/models/track.model';
 import { AudioPlayerService } from './audio-player.service';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AudioApiWindow } from '../models/window-api.model';
+import { shuffleList } from '../utils/shuffle-list';
 
 @Injectable({
   providedIn: 'root',
@@ -55,11 +56,15 @@ export class PlaybackService implements OnDestroy {
   async play(track?: Track, queue?: Track[], playlistId?: string) {
     const current = this.state.getValue();
     if (queue && track) {
+      let newQueue = [...queue];
+      if(current.shuffle){
+        newQueue = shuffleList(newQueue);
+      }
       this.state.next({
         ...current,
         history: [],
         currentTrack: track,
-        queue,
+        queue: newQueue,
         isPlaying: true,
         duration: track.duration,
         playlistId,
@@ -185,6 +190,21 @@ export class PlaybackService implements OnDestroy {
     this.state.next({
       ...current,
       repeat: nextRepeat,
+    });
+  }
+
+  shuffle(enabled: boolean) {
+    const state = this.state.getValue();
+
+    let queue = [...state.queue];
+    if(!state.shuffle && enabled && state.queue.length > 1){
+      queue = shuffleList(queue);
+    }
+
+    this.state.next({
+      ...state,
+      shuffle: enabled,
+      queue
     });
   }
 

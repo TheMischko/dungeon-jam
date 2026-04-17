@@ -5,6 +5,10 @@
 <div class="controls">
   <!-- Prev -->
   <div class="buttons">
+    <app-shuffle-button
+      [shuffleState]="shuffle()"
+      (clicked)="shuffleChange.emit()"
+    ></app-shuffle-button>
     <lib-icon-button
       [icon]="prevIcon"
       size="regular"
@@ -39,11 +43,11 @@
   ></app-player-bar>
 </div>
 <div class="volume">
-  @if(queueCount() > 0){
-  <div class="queue-display">
-    <lucide-icon [img]="playlistIcon"></lucide-icon>
-    <span class="queue-count">{{ queueCount() }}</span>
-  </div>
+  @if (queueCount() > 0) {
+    <div class="queue-display">
+      <lucide-icon [img]="playlistIcon"></lucide-icon>
+      <span class="queue-count">{{ queueCount() }}</span>
+    </div>
   }
   <div class="volume-wrapper">
     <app-volume-control

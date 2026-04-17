@@ -15,6 +15,7 @@ import {
   Repeat2Icon,
   SaveIcon,
   SearchIcon,
+  ShuffleIcon,
   SkipBackIcon,
   SkipForwardIcon,
   SquarePlusIcon,
@@ -49,7 +50,8 @@ export const actionsIconSet = {
   SaveIcon: SaveIcon,
   FilterIcon: ListFilterIcon,
   CollapsedArrowIcon: ChevronDownIcon,
-  ExpandedArrowIcon: ChevronUpIcon
+  ExpandedArrowIcon: ChevronUpIcon,
+  ShuffleIcon: ShuffleIcon
 };
 
 export const volumeIconSet = {

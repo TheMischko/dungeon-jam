@@ -52,4 +52,8 @@ export class PlayerSmartComponent {
   changeRepeat() {
     this.playbackService.changeRepeat();
   }
+
+  shuffle(){
+    this.playbackService.shuffle(!this.playBackState().shuffle);
+  }
 }
