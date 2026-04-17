@@ -23,6 +23,12 @@ html {
     )
   );
 
+  @include mat.paginator-overrides((
+    container-background-color: transparent,
+    container-text-color: col.$text-main,
+    container-text-font: typo.$font,
+  ));
+
   scrollbar-width: thin;
   scrollbar-color: col.$primary transparent;
   scrollbar-arrow-color: transparent;

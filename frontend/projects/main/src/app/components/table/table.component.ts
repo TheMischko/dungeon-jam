@@ -46,6 +46,8 @@ import {
   SortDirection as MatSortDirection,
 } from '@angular/material/sort';
 import { SortDirection } from '@shared/models/common.model';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { PaginationConfig } from '../../models/pagination.model';
 
 @Component({
   selector: 'app-table',
@@ -70,6 +72,7 @@ import { SortDirection } from '@shared/models/common.model';
     MatSortHeader,
     MatSort,
     NgClass,
+    MatPaginator,
   ],
   templateUrl: './table.component.html',
   styleUrl: './table.component.scss',
@@ -87,8 +90,10 @@ export class TableComponent<T> {
   readonly uniquenessFn = input<TableUniquenessFn<T>>((_, __) => false);
   readonly headerCellMenu = input<MatMenu | null>(null);
   readonly visibleColumns = input<string[] | null>(null);
+  readonly pagination = input<PaginationConfig | null>(null);
   readonly defaultSortBy = model<string>('');
   readonly defaultSortDirection = model<SortDirection>(SortDirection.ASC);
+
   readonly matSortDirection = computed<MatSortDirection>(() => {
     return this.defaultSortDirection() === SortDirection.ASC ? 'asc' : 'desc';
   });
@@ -101,6 +106,7 @@ export class TableComponent<T> {
     sortBy: string;
     sortDirection: SortDirection;
   }>();
+  readonly pageChange = output<PageEvent>();
 
   readonly ActionsIcon = actionsIconSet.ActionsMenu;
   readonly selectionColumn = 'checkbox';

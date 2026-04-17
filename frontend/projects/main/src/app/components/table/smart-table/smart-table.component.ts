@@ -19,6 +19,8 @@ import { MatMenu } from '@angular/material/menu';
 import { ColumnStateManager } from './column-state.manager';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { FilterQuery } from '@shared/models/filter.model';
+import { PageEvent } from '@angular/material/paginator';
+import { PaginationConfig } from '../../../models/pagination.model';
 
 @Component({
   selector: 'app-smart-table',
@@ -52,12 +54,14 @@ export class SmartTableComponent<T> {
   readonly noResultsText = input<string>('No results found');
   readonly filterEnabled = input<boolean>(false);
   readonly showControls = input<boolean>(true);
+  readonly pagination = input<PaginationConfig | null>(null);
 
   readonly selected = output<T[]>();
   readonly menuClosed = output<{ row: T; reason: string }>();
   readonly hoverStart = output<T>();
   readonly hoverEnd = output<T>();
   readonly queryChange = output<QueryOptions>();
+  readonly pageChange = output<PageEvent>();
 
   readonly currentSearch = signal<string>('');
   readonly currentSortBy = signal<string | undefined>(undefined);

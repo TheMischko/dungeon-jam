@@ -1,6 +1,6 @@
 import {
   Component,
-  computed,
+  computed, effect,
   input,
   output,
   signal,
@@ -31,6 +31,9 @@ import {
 } from '../../../../../models/table.model';
 import { SmartTableComponent } from '../../../../../components/table/smart-table/smart-table.component';
 import { QueryOptions } from '@shared/models/request.model';
+import { SignalPaginationService } from '@general/services/signal-pagination.service';
+import { DEFAULT_PAGE_SIZE, DEFAULT_PAGINATION_PAGES, PaginationConfig } from '../../../../../models/pagination.model';
+import { PageEvent } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-songs-table',
@@ -48,6 +51,8 @@ import { QueryOptions } from '@shared/models/request.model';
   styleUrl: './songs-table.component.scss',
 })
 export class SongsTableComponent {
+  readonly paginationService!: SignalPaginationService<Track>;
+
   readonly tracks = input<Track[]>([]);
   readonly playingTrackId = input<string | null>();
   readonly actionsMenuConfig = input<ActionsMenuConfig<Track, Playlist>[]>([]);
@@ -81,6 +86,14 @@ export class SongsTableComponent {
 
   readonly activeRow = signal<Track | null>(null);
   readonly currentSearchValue = signal<string>('');
+  readonly paginatedTracks = computed(() => this.paginationService?.currentPageData() ?? []);
+
+  readonly paginationConfig = computed<PaginationConfig>(() => ({
+    pageSizeOptions: DEFAULT_PAGINATION_PAGES,
+    pageSize: this.paginationService?.pageSize() ?? DEFAULT_PAGE_SIZE,
+    totalItems: this.paginationService?.totalItems() ?? 0,
+    currentPageIndex: this.paginationService?.currentPageIndex() ?? 0
+  }));
 
   readonly tableConfig = computed<TableColumnConfiguration<Track>>(() => ({
     ...(!this.selection() && {
@@ -124,6 +137,17 @@ export class SongsTableComponent {
     'Oops, there are no tracks yet. You need to upload some!';
   readonly noSearchResultsText = 'No tracks match your search query.';
 
+  constructor() {
+    this.paginationService = SignalPaginationService.create(this.tracks);
+    this.paginationService.pageSize.set(this.paginationConfig().pageSize);
+
+    effect(() => {
+      if(this.loading()){
+        this.paginationService.resetPage();
+      }
+    })
+  }
+
 
   hoverStart(track: Track) {
     this.activeRow.set(track);
@@ -165,5 +189,10 @@ export class SongsTableComponent {
   protected updateQuery(query: QueryOptions) {
     this.currentSearchValue.set(query?.search?.trim() ?? '');
     this.queryChange.emit(query);
+  }
+
+  protected updatePaginationState(event: PageEvent) {
+    this.paginationService.pageSize.set(event.pageSize);
+    this.paginationService.goToPage(event.pageIndex);
   }
 }

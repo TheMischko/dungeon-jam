@@ -93,5 +93,19 @@
         (mouseleave)="hoverEnd.emit(row)"
       ></mat-row>
     </mat-table>
+    @let paginationConfig = pagination();
+    @if (
+      paginationConfig &&
+      paginationConfig.totalItems > paginationConfig.pageSize
+    ) {
+      <mat-paginator
+        [length]="paginationConfig.totalItems"
+        [pageSize]="paginationConfig.pageSize"
+        [pageSizeOptions]="paginationConfig.pageSizeOptions"
+        [pageIndex]="paginationConfig.currentPageIndex"
+        aria-label="Select page"
+        (page)="pageChange.emit($event)"
+      />
+    }
   </div>
 </div>

@@ -37,10 +37,12 @@
     [defaultSortDirection]="currentSortDirection()"
     [headerCellMenu]="columnsMenu"
     [visibleColumns]="enabledColumns()"
+    [pagination]="pagination()"
     (selected)="selected.emit($event)"
     (hoverStart)="hoverStart.emit($event)"
     (hoverEnd)="hoverEnd.emit($event)"
     (sortChange)="setSort($event)"
+    (pageChange)="pageChange.emit($event)"
   ></app-table>
 }
 

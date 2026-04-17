@@ -1,6 +1,6 @@
 <app-smart-table
   [config]="tableConfig()"
-  [dataSet]="tracks()"
+  [dataSet]="paginatedTracks()"
   [selection]="selection()"
   [allSelectedState]="allSelectedState()"
   [trackBy]="trackByTrackId"
@@ -10,11 +10,13 @@
   [loading]="loading()"
   [filterEnabled]="showControls() && showFilters()"
   [showControls]="showControls()"
+  [pagination]="paginationConfig()"
   (hoverStart)="hoverStart($event)"
   (hoverEnd)="hoverEnd($event)"
   (queryChange)="updateQuery($event)"
   (menuClosed)="actionMenuClosed.emit($event.reason)"
   (selected)="updateSelection($event)"
+  (pageChange)="updatePaginationState($event)"
 ></app-smart-table>
 
 <ng-template #playColumn let-row="$implicit">
