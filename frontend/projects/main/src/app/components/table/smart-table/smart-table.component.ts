@@ -1,4 +1,13 @@
-import { ChangeDetectionStrategy, Component, computed, effect, input, output, signal, } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  input,
+  output,
+  signal,
+} from '@angular/core';
 import { SortDirection } from '@shared/models/common.model';
 import { FilterMatchType, QueryOptions } from '@shared/models/request.model';
 import { SearchBarComponent } from '@general/components/controls/search-bar/search-bar.component';
@@ -38,7 +47,7 @@ import { PaginationConfig } from '../../../models/pagination.model';
   styleUrl: './smart-table.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SmartTableComponent<T> {
+export class SmartTableComponent<T> implements AfterViewInit{
   private readonly columnStateManager = new ColumnStateManager<T>();
   readonly config = input.required<TableColumnConfiguration<T>>();
   readonly dataSet = input<T[]>([]);
@@ -55,6 +64,7 @@ export class SmartTableComponent<T> {
   readonly filterEnabled = input<boolean>(false);
   readonly showControls = input<boolean>(true);
   readonly pagination = input<PaginationConfig | null>(null);
+  readonly hiddenColumns = input<string[]>([]);
 
   readonly selected = output<T[]>();
   readonly menuClosed = output<{ row: T; reason: string }>();
@@ -67,6 +77,7 @@ export class SmartTableComponent<T> {
   readonly currentSortBy = signal<string | undefined>(undefined);
   readonly currentSortDirection = signal<SortDirection>(SortDirection.ASC);
   readonly currentFilters = signal<FilterQuery>(new FilterQuery());
+  readonly afterViewInit = signal(false);
 
   readonly currentQuery = computed<QueryOptions>(() => {
     const query: QueryOptions = {
@@ -104,6 +115,24 @@ export class SmartTableComponent<T> {
       const config = this.config();
       this.columnStateManager.config.set(config);
     });
+
+    const initHiddenEffect = effect(() => {
+      const hiddenColumns = this.hiddenColumns();
+      const enabledColumns = this.columnStateManager.enabledColumns();
+      if(!this.afterViewInit()) {
+        return;
+      }
+      hiddenColumns.forEach((col) => {
+        if (enabledColumns.includes(col)) {
+          this.columnStateManager.toggleColumn(col);
+        }
+      });
+      initHiddenEffect.destroy();
+    })
+  }
+
+  ngAfterViewInit() {
+    this.afterViewInit.set(true);
   }
 
   setSort(event: { sortBy: string; sortDirection: SortDirection }) {

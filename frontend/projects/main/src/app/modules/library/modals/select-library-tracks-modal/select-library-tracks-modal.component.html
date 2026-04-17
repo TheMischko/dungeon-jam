@@ -8,11 +8,16 @@
       class="table"
       [tracks]="tracks()"
       [selection]="true"
+      [showPlayWithSelection]="true"
       [allSelectedState]="selectAllState()"
       [loading]="tracksLoading()"
       [showActionsColumn]="false"
+      [playingTrackId]="trackIdPlaying()"
+      [hiddenColumns]="['duration']"
       (queryChange)="tracksQuery.set($event)"
       (selectionChange)="selectionChanged($event)"
+      (playTrack)="playTrack($event)"
+      (pauseTrack)="pauseTrack()"
     ></app-songs-table>
   </div>
 

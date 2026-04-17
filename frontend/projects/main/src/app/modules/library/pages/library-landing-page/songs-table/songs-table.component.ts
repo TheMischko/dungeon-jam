@@ -64,6 +64,8 @@ export class SongsTableComponent {
   readonly showActionsColumn = input<boolean>(true);
   readonly showControls = input<boolean>(true);
   readonly showFilters = input<boolean>(true);
+  readonly showPlayWithSelection = input<boolean>(false);
+  readonly hiddenColumns = input<(keyof Track)[]>([]);
 
   readonly queryChange = output<QueryOptions>();
   readonly playTrack = output<Track>();
@@ -95,12 +97,18 @@ export class SongsTableComponent {
     currentPageIndex: this.paginationService?.currentPageIndex() ?? 0
   }));
 
+  readonly shouldShowPlayCol = computed<boolean>(() => {
+    const selection = this.selection();
+    const showPlay = this.showPlayWithSelection();
+    return !(selection && !showPlay);
+  })
+
   readonly tableConfig = computed<TableColumnConfiguration<Track>>(() => ({
-    ...(!this.selection() && {
+    ...(this.shouldShowPlayCol() && {
       play: {
         title: '',
         template: () => this.playColumnTemplate(),
-        width: '70px',
+        width: '65px',
       },
     }),
     name: {

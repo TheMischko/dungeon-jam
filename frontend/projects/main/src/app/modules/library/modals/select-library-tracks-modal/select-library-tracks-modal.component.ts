@@ -1,11 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  inject,
-  OnInit,
-  signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Track } from '@shared/models/track.model';
 import { TrackService } from '../../../../services/track.service';
@@ -15,10 +8,15 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { SongsTableComponent } from '../../pages/library-landing-page/songs-table/songs-table.component';
 import { TrackLibraryStore } from '../../../../stores/track-library.store';
 import { QueryOptions } from '@shared/models/request.model';
+import { AudioPlayerService } from '../../../../services/audio-player.service';
+import { debounceTime, Subscription } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { PlayingTrackState } from '../../../../models/playback.model';
 
 @Component({
   selector: 'app-select-library-tracks-modal',
   imports: [FormsModule, MatButton, SongsTableComponent],
+  providers: [AudioPlayerService],
   templateUrl: './select-library-tracks-modal.component.html',
   styleUrl: './select-library-tracks-modal.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -29,6 +27,8 @@ export class SelectLibraryTracksModalComponent implements OnInit {
   readonly dialogRef =
     inject<MatDialogRef<SelectLibraryTracksSelection>>(MatDialogRef);
   readonly data = inject<SelectLibraryTracksModalData>(MAT_DIALOG_DATA);
+  readonly audioPlayerService = inject(AudioPlayerService);
+  readonly destroyRef = inject(DestroyRef);
 
   readonly tracks = computed(() => {
     return this.trackStore.entities().filter((track) => {
@@ -41,9 +41,12 @@ export class SelectLibraryTracksModalComponent implements OnInit {
     'unchecked',
   );
   readonly tracksQuery = signal<QueryOptions>({});
+  readonly trackIdPlaying = signal<string | null>(null);
+  protected trackPlayingSubscription: Subscription | undefined;
 
   ngOnInit() {
     this.trackStore.load(this.tracksQuery);
+    this.audioPlayerService.setVolume(0.8);
   }
 
   selectionChanged = (selectedTracks: Track[]) => {
@@ -59,7 +62,6 @@ export class SelectLibraryTracksModalComponent implements OnInit {
   };
 
   cancelClick() {
-    console.log(this.data, this.selection());
     this.dialogRef.close(undefined);
   }
 
@@ -67,6 +69,25 @@ export class SelectLibraryTracksModalComponent implements OnInit {
     this.dialogRef.close({
       selectedTracks: this.selection(),
     });
+  }
+
+  protected async playTrack(track: Track) {
+    this.trackPlayingSubscription?.unsubscribe();
+    this.trackIdPlaying.set(null);
+    await this.audioPlayerService.play(track);
+    this.trackPlayingSubscription = this.audioPlayerService.state$.pipe(takeUntilDestroyed(this.destroyRef), debounceTime(100)).subscribe((state) => {
+      if(state === PlayingTrackState.PLAYING){
+        this.trackIdPlaying.set(track.id);
+      } else {
+        this.trackIdPlaying.set(null);
+      }
+    })
+  }
+
+  protected pauseTrack() {
+    this.audioPlayerService.stop();
+    this.trackIdPlaying.set(null);
+    this.trackPlayingSubscription?.unsubscribe();
   }
 }
 

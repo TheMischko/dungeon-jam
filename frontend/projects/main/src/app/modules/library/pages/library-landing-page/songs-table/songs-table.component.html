@@ -11,6 +11,7 @@
   [filterEnabled]="showControls() && showFilters()"
   [showControls]="showControls()"
   [pagination]="paginationConfig()"
+  [hiddenColumns]="hiddenColumns()"
   (hoverStart)="hoverStart($event)"
   (hoverEnd)="hoverEnd($event)"
   (queryChange)="updateQuery($event)"
