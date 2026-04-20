@@ -19,22 +19,22 @@ export class DefaultTrackActionsService {
   private readonly tracksStore = inject(TrackLibraryStore);
   private readonly dialogService = inject(DialogService);
 
-  readonly _afterPlayNext$ = new Subject<Track>();
+  private readonly _afterPlayNext$ = new Subject<Track>();
   get afterPlayNext$() {
     return this._afterPlayNext$.asObservable();
   }
 
-  readonly _afterAddToPlaylist$ = new Subject<void>();
+  private readonly _afterAddToPlaylist$ = new Subject<void>();
   get afterAddToPlaylist$() {
     return this._afterAddToPlaylist$.asObservable();
   }
 
-  readonly _afterEditTrack$ = new Subject<Track>();
+  private readonly _afterEditTrack$ = new Subject<Track>();
   get afterEditTrack$() {
     return this._afterEditTrack$.asObservable();
   }
 
-  readonly _afterDeleteTrack$ = new Subject<Track>();
+  private readonly _afterDeleteTrack$ = new Subject<Track>();
   get afterDeleteTrack$() {
     return this._afterDeleteTrack$.asObservable();
   }

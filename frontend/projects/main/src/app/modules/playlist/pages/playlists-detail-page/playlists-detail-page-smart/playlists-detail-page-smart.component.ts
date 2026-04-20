@@ -1,6 +1,7 @@
 import {
   Component,
   computed,
+  DestroyRef,
   inject,
   input,
   OnInit,
@@ -10,14 +11,14 @@ import { SortDirection } from '@shared/models/common.model';
 import { PlaylistTracksQuery, Track } from '@shared/models/track.model';
 import { PlaylistTracksStore } from '../../../../../stores/playlist-tracks.store';
 import { PlaylistApiService } from '@general/services/playlist-api.service';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 import { Playlist } from '@shared/models/playlist.model';
 import { PlaylistsDetailPageComponent } from '../playlists-detail-page.component';
 import { PlaybackService } from '../../../../../services/playback.service';
 import { PlaybackState } from '../../../../../models/playback.model';
 import { ActionsMenuConfig } from '@general/components/display/actions-menu/actions-menu.component';
-import { actionsIconSet, iconSet } from '@general/icons/icons';
+import { actionsIconSet } from '@general/icons/icons';
 import { DialogService } from '../../../../../services/dialog.service';
 import {
   SelectLibraryTracksModalComponent,
@@ -28,6 +29,7 @@ import { ToastService } from '../../../../../services/toast.service';
 import { ToastType } from '../../../../../models/toast.model';
 import { QueryOptions } from '@shared/models/request.model';
 import { PlaylistStore } from '@general/stores/playlist.store';
+import { DefaultTrackActionsService } from '../../../../../services/default-track-actions.service';
 
 @Component({
   selector: 'app-playlists-detail-page-smart',
@@ -41,6 +43,8 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
   readonly dialogService = inject(DialogService);
   readonly toastService = inject(ToastService);
   readonly playlistStore = inject(PlaylistStore);
+  readonly defaultActionsService = inject(DefaultTrackActionsService);
+  readonly destroyRef = inject(DestroyRef);
 
   readonly playlistId = input<string>('', { alias: 'id' });
 
@@ -61,7 +65,7 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
 
   readonly childPlaylists = computed(() => {
     const childIds = this.playlist()?.childrenIds;
-    if(!childIds) {
+    if (!childIds) {
       return [];
     }
     const playlistMap = this.playlistStore.entityMap();
@@ -75,9 +79,9 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
           return null;
         }
         return state;
-      }),
+      })
     ),
-    { initialValue: null },
+    { initialValue: null }
   );
   readonly isPlaylistPlaying = computed<boolean>(() => {
     return this.playbackState()?.isPlaying ?? false;
@@ -95,27 +99,28 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
     includeChildren: this.currentIncludeChildren(),
   }));
   songActionsMenuConfig = computed<ActionsMenuConfig<Track, Playlist>[]>(() => {
-    return [
-      {
-        text: 'Play next',
-        icon: iconSet.PlayNextIcon,
-        onSelected: (track: Track) => {
-          this.playNext(track);
+    return this.defaultActionsService.createActions({
+      appendActions: [
+        {
+          text: 'Remove from playlist',
+          icon: actionsIconSet.DeleteIcon,
+          onSelected: (track: Track) => {
+            this.removeTrackFromPlaylist(track);
+          },
         },
-      },
-      {
-        text: 'Remove from playlist',
-        icon: actionsIconSet.DeleteIcon,
-        onSelected: (track: Track) => {
-          this.removeTrackFromPlaylist(track);
-        },
-      },
-    ];
+      ],
+      excludeActions: ['delete'],
+    });
   });
 
   ngOnInit() {
     this.playlistTracksStore.load(this.loadQuery);
     this.playlistStore.load({});
+    this.defaultActionsService.afterEditTrack$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.playlistTracksStore.load(this.loadQuery());
+      });
   }
 
   async playPlaylist() {
@@ -123,7 +128,7 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
     await this.playbackService.play(
       tracks[0],
       tracks.slice(1),
-      this.playlistId(),
+      this.playlistId()
     );
   }
 
@@ -142,7 +147,7 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
         if (result?.selectedTracks && result.selectedTracks.length > 0) {
           this.addTracksToPlaylist(result.selectedTracks);
         }
-      },
+      }
     );
   }
 
@@ -164,7 +169,7 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
           this.toastService.createToast(
             'Assignment failed',
             err.toString(),
-            ToastType.Error,
+            ToastType.Error
           );
         },
       });
@@ -178,17 +183,13 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
     }
     await this.playbackService.play(
       tracks[trackIndex],
-      [...tracks.slice(trackIndex), ...tracks.slice(0, trackIndex)],
-      this.playlistId(),
+      [...tracks.slice(trackIndex + 1), ...tracks.slice(0, trackIndex)],
+      this.playlistId()
     );
   }
 
   async pausePlaying() {
     this.playbackService.pause();
-  }
-
-  private playNext(track: Track): void {
-    console.log(`Play next: ${track.name}`);
   }
 
   private removeTrackFromPlaylist(track: Track) {
@@ -201,7 +202,7 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
   private filterAlreadyIncludedTracks(tracks: Track[]) {
     const currentTrackIds = new Set(this.tracks().map((track) => track.id));
     return tracks.filter(
-      (track) => track?.id && !currentTrackIds.has(track.id),
+      (track) => track?.id && !currentTrackIds.has(track.id)
     );
   }
 
