@@ -38,9 +38,12 @@ export type DiscordTokenData = {
   id: string;
   apiKey: string;
   name: string;
-}
+  updatedAt: Date;
+  lastUsedAt: Date;
+  active: boolean;
+};
 
 export type DiscordTokenUpdateData = {
   apiKey: string;
   name: string;
-}
+};
