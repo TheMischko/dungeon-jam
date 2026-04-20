@@ -67,7 +67,6 @@ export const TrackLibraryStore = signalStore(
 
       const updateTrack = rxMethod<Track>(
         pipe(
-          tap(() => patchState(store, { loading: true })),
           switchMap((track: Track) => {
             return trackApiService.updateTrack(track).pipe(
               catchError((err) => {
@@ -85,10 +84,7 @@ export const TrackLibraryStore = signalStore(
                   ToastType.Success,
                 );
                 patchState(store, setEntity(track));
-              }),
-              finalize(() => {
-                patchState(store, { loading: false });
-              }),
+              })
             );
           }),
         ),

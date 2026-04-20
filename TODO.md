@@ -8,7 +8,7 @@ Obviously the project is WIP, so there is just a list of small missing features 
 - [ ] Fix Playlist card without tags having shifted layout
 - [x] Enable opening of modals after closing them. Currently, if you close a modal, you can open it again without leaving the page
 - [ ] Create custom scrollbar
-- [ ] Use `TableComponent` in `SongsTableComponent` 
+- [x] Use `TableComponent` in `SongsTableComponent` 
 - [x] Table and search box on Tracks landing page disappears if you set invalid search
 - [ ] Better landing page with empty data (no sections etc.)
 - [ ] On multiple track upload (Autoresolve) or maybe in general upload lacks loading spinner
