@@ -16,12 +16,12 @@ export class StartupManager {
 
   private constructor(
     private buildPath: string,
-    private discordToken: string,
+    private discordToken: string
   ) {}
 
   public static getInstance(
     buildPath: string,
-    discordToken: string,
+    discordToken: string
   ): StartupManager {
     if (!StartupManager.instance) {
       StartupManager.instance = new StartupManager(buildPath, discordToken);
@@ -40,7 +40,7 @@ export class StartupManager {
     for (const config of initConfigurations) {
       const result = await this.initializeManager(
         config.name,
-        config.initFunction,
+        config.initFunction
       );
       if (!result) {
         this.logger.logErrorMessage('Failed to initialize manager', {
@@ -84,7 +84,7 @@ export class StartupManager {
         viewManager.appWindow,
         viewManager.captureTab,
         viewManager.frontendTab.tab,
-        this.logger,
+        this.logger
       );
       return true;
     } catch (e) {
@@ -97,7 +97,7 @@ export class StartupManager {
 
   private async initializeManager(
     name: string,
-    initFunction: () => Promise<void>,
+    initFunction: () => Promise<void>
   ): Promise<boolean> {
     try {
       this.logger.log(`Creating ${name}...`);
@@ -117,11 +117,11 @@ async function setupAudioCapture(
   window: BrowserWindow,
   captureTab: WebContentsView,
   youtubeTab: WebContentsView,
-  logger: Logger,
+  logger: Logger
 ) {
   try {
     const sourceId = youtubeTab.webContents.getMediaSourceId(
-      captureTab.webContents,
+      captureTab.webContents
     );
 
     captureTab.webContents.send('setup-audio-capture', {
@@ -135,7 +135,7 @@ async function setupAudioCapture(
 
 function setupWebsocketServer(
   messageCallback?: (msg: RawData) => Promise<void>,
-  logger?: Logger,
+  logger?: Logger
 ) {
   const websocketServer = new WebSocketServer({ port: 17253 });
   const address = websocketServer.address();
@@ -155,7 +155,7 @@ function setupWebsocketServer(
 }
 
 async function setupDiscord(token: string): Promise<DiscordManager> {
-  const discordManager = DiscordManager.getInstance();
+  const discordManager = await DiscordManager.getInstance();
   await discordManager.connect(token);
   return discordManager;
 }

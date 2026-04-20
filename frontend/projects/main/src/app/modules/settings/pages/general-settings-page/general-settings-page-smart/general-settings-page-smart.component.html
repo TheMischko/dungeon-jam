@@ -1,7 +1,9 @@
 <app-general-settings-page
   [tokens]="tokens()"
   [tokensLoading]="tokensLoading()"
+  [tokenConnectionMap]="tokenConnectionMap()"
   (editToken)="editToken($event)"
   (deleteToken)="deleteToken($event)"
   (createToken)="createToken()"
+  (toggleTokenConnection)="toggleTokenState($event)"
 />

@@ -15,7 +15,7 @@ import { DiscordTokenManager } from '../managers/discord-token.manager';
  * Defines the order and dependencies for initializing all application managers
  */
 export function getManagersInitConfig(
-  buildPath: string,
+  buildPath: string
 ): { name: string; initFunction: () => Promise<void> }[] {
   const viewConfig = getDefaultViewConfig(buildPath);
   return [
@@ -65,12 +65,12 @@ export function getManagersInitConfig(
       name: 'DiscordToken',
       initFunction: async () => {
         await DiscordTokenManager.getInstance();
-      }
+      },
     },
     {
       name: 'Discord',
       initFunction: async () => {
-        DiscordManager.getInstance();
+        await DiscordManager.getInstance();
       },
     },
     {

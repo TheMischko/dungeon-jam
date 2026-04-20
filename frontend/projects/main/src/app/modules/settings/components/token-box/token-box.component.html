@@ -1,0 +1,39 @@
+<div class="switch-box">
+  <mat-slide-toggle
+    [checked]="switchValue()"
+    (toggleChange)="toggleConnection.emit(token())"
+  />
+</div>
+<div class="token-item">
+  <div class="token-content">
+    <div class="token-info">
+      <div class="token-name">{{ token().name }}</div>
+      <div class="token-key">{{ token().apiKey | slice: 0 : 20 }}...</div>
+    </div>
+    <div class="token-actions">
+      <lib-icon-button
+        [icon]="icons.Edit"
+        size="small"
+        [color]="iconColors.edit"
+        (clicked)="onEdit()"
+      />
+      <lib-icon-button
+        [icon]="icons.Delete"
+        size="small"
+        [color]="iconColors.delete"
+        (clicked)="onDelete()"
+      />
+    </div>
+  </div>
+  <div class="token-metadata">
+    <div class="metadata">
+      State: <span class="{{ statusCssClass() }}">{{ statusText() }}</span>
+    </div>
+    <div class="metadata">
+      Last used: {{ token().lastUsedAt | date: 'short' }}
+    </div>
+    <div class="metadata">
+      Last updated: {{ token().lastUsedAt | date: 'short' }}
+    </div>
+  </div>
+</div>

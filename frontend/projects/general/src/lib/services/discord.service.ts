@@ -4,6 +4,7 @@ import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import {
   DiscordState,
   DiscordStateType,
+  DiscordTokenData,
   GuildWithChannels,
 } from '@shared/models/discord.model';
 
@@ -58,6 +59,32 @@ export class DiscordService {
     this.window.DISCORD_API.disconnect()
       .then(() => {
         subject.next();
+        subject.complete();
+      })
+      .catch((error: unknown) => {
+        subject.error(error);
+      });
+    return subject.asObservable();
+  }
+
+  connectToken(tokenId: string): Observable<boolean> {
+    const subject = new Subject<boolean>();
+    this.window.DISCORD_API.connectToken(tokenId)
+      .then((result: boolean) => {
+        subject.next(result);
+        subject.complete();
+      })
+      .catch((error: unknown) => {
+        subject.error(error);
+      });
+    return subject.asObservable();
+  }
+
+  getConnectedTokens(): Observable<DiscordTokenData[]> {
+    const subject = new Subject<DiscordTokenData[]>();
+    this.window.DISCORD_API.getConnectedTokens()
+      .then((tokens: DiscordTokenData[]) => {
+        subject.next(tokens);
         subject.complete();
       })
       .catch((error: unknown) => {

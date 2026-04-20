@@ -12,26 +12,13 @@
     } @else {
       <div class="tokens-list">
         @for (token of tokens(); track token.id) {
-          <div class="token-item">
-            <div class="token-info">
-              <div class="token-name">{{ token.name }}</div>
-              <div class="token-key">{{ token.apiKey | slice: 0 : 20 }}...</div>
-            </div>
-            <div class="token-actions">
-              <lib-icon-button
-                [icon]="icons.Edit"
-                size="small"
-                [color]="iconColors.edit"
-                (clicked)="onEditToken(token)"
-              />
-              <lib-icon-button
-                [icon]="icons.Delete"
-                size="small"
-                [color]="iconColors.delete"
-                (clicked)="onDeleteToken(token.id)"
-              />
-            </div>
-          </div>
+          <app-token-box
+            [token]="token"
+            [tokenState]="tokenConnectionMap()[token.id]"
+            (editToken)="onEditToken($event)"
+            (deleteToken)="onDeleteToken($event)"
+            (toggleConnection)="toggleTokenConnection.emit($event)"
+          />
         }
       </div>
     }

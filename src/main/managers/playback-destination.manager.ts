@@ -12,16 +12,16 @@ export class PlaybackDestinationManager {
 
   private constructor(
     private viewManager: ViewManager,
-    private discordManager: DiscordManager,
+    private discordManager: DiscordManager
   ) {}
 
   public static async getInstance(): Promise<PlaybackDestinationManager> {
     if (!PlaybackDestinationManager.instance) {
       const viewManager = await ViewManager.getInstance();
-      const discordManager = DiscordManager.getInstance();
+      const discordManager = await DiscordManager.getInstance();
       PlaybackDestinationManager.instance = new PlaybackDestinationManager(
         viewManager,
-        discordManager,
+        discordManager
       );
       await PlaybackDestinationManager.instance.registerChannels();
     }
@@ -33,9 +33,9 @@ export class PlaybackDestinationManager {
       PlaybackChannel.CAPTURE_SETTINGS,
       (_, settings: CaptureSettings) => {
         this.updateCaptureSettings(settings).catch((e) =>
-          this.logger.logErrorMessage('Error handling update', { error: e }),
+          this.logger.logErrorMessage('Error handling update', { error: e })
         );
-      },
+      }
     );
     this.logger.log('Listeners registered');
   }
@@ -44,7 +44,7 @@ export class PlaybackDestinationManager {
     try {
       this.viewManager.captureTab.webContents.send(
         CaptureChannel.SETTINGS,
-        settings,
+        settings
       );
       if (settings.isLocalMuted) {
         this.discordManager.resumeStreaming();

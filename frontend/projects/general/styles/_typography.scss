@@ -35,3 +35,11 @@ $font: 'Noto Sans', sans-serif;
   line-height: 1.2;
   letter-spacing: 0.45px;
 }
+
+@mixin note() {
+  @include default-font();
+  font-size: 0.75rem;
+  font-weight: normal;
+  line-height: 0.9;
+  letter-spacing: 0.015px;
+}

@@ -1,14 +1,15 @@
 import {
   AudioPlayer,
   AudioResource,
-  createAudioResource, DiscordGatewayAdapterCreator,
+  createAudioResource,
+  DiscordGatewayAdapterCreator,
   joinVoiceChannel,
   NoSubscriberBehavior,
   StreamType,
   VoiceConnection,
   VoiceConnectionStatus,
 } from '@discordjs/voice';
-import { Client, VoiceChannel, IntentsBitField, ChannelType } from 'discord.js';
+import { Client, VoiceChannel, ChannelType } from 'discord.js';
 import {
   ChannelData,
   DiscordState,
@@ -19,20 +20,20 @@ import {
 import { PassThrough, Writable } from 'node:stream';
 import ffmpegPath from 'ffmpeg-static';
 import { JitterBuffer } from '../services/jitter-buffer';
-import {
-  NetworkHealthMonitor,
-  NetworkQuality,
-} from '../services/network-health-monitor';
+import { NetworkHealthMonitor } from '../services/network-health-monitor';
 import { ipcMain } from 'electron';
 import { DiscordChannel } from '@shared/models/channels.model';
 import { ViewManager } from './view.manager';
 import { opus } from 'prism-media';
 import Encoder = opus.Encoder;
 import { Logger } from '../utils/logger';
+import { DiscordTokenManager } from './discord-token.manager';
+import { DiscordConnections } from '../utils/discord-connections';
 
 export class DiscordManager {
   private static instance: DiscordManager;
 
+  private connections = new DiscordConnections();
   private audioPlayer?: AudioPlayer;
   private client?: Client;
   private audioResource?: AudioResource;
@@ -51,16 +52,17 @@ export class DiscordManager {
   private state: DiscordState = { type: DiscordStateType.NONE };
   private logger = new Logger('DiscordManager', 'cyan');
 
-  private constructor() {
+  private constructor(private tokenManager: DiscordTokenManager) {
     this.pauseDrain = new Writable();
     this.pauseDrain._write = (_, __, callback) => {
       callback();
     };
   }
 
-  public static getInstance(): DiscordManager {
+  public static async getInstance(): Promise<DiscordManager> {
     if (!DiscordManager.instance) {
-      DiscordManager.instance = new DiscordManager();
+      const tokenManager = await DiscordTokenManager.getInstance();
+      DiscordManager.instance = new DiscordManager(tokenManager);
       DiscordManager.instance.registerChannels();
     }
     return DiscordManager.instance;
@@ -75,11 +77,17 @@ export class DiscordManager {
       async (_, request: JoinChannelRequest) => {
         this.logger.log('Joining channel', request);
         return await this.joinChannel(request.guildId, request.channelId);
-      },
+      }
     );
     ipcMain.handle(DiscordChannel.DISCONNECT, async (_) => {
       this.logger.log('Disconnecting from current channel');
       return await this.disconnect();
+    });
+    ipcMain.handle(DiscordChannel.CONNECT_TOKEN, async (_, tokenId: string) => {
+      return await this.connectNewToken(tokenId);
+    });
+    ipcMain.handle(DiscordChannel.GET_CONNECTED_TOKENS, async () => {
+      return await this.getActiveTokens();
     });
   }
 
@@ -90,7 +98,7 @@ export class DiscordManager {
       return;
     }
     const channel = (await this.client.channels.fetch(
-      channelId!,
+      channelId!
     )) as VoiceChannel | null;
     if (!channel) {
       this.state = { type: DiscordStateType.NONE };
@@ -134,6 +142,35 @@ export class DiscordManager {
     });
   }
 
+  private async connectNewToken(tokenId: string) {
+    const token = await this.tokenManager.getTokenById(tokenId);
+    if (!token) {
+      this.logger.logErrorMessage('Token not found for ID', { tokenId });
+      return false;
+    }
+
+    this.logger.log('Connecting with new token', {
+      tokenId,
+      key: `${token.apiKey.slice(0, 6)}...`,
+    });
+
+    this.reconnectAttempts = 0;
+    this.isConnecting = true;
+    try {
+      await this.connections.connectToken(token.apiKey);
+      return true;
+    } catch (error) {
+      await this.handleConnectionFailure(token.apiKey);
+      this.logger.logErrorMessage('Failed to connect with new token', {
+        tokenId,
+        error,
+      });
+    } finally {
+      this.isConnecting = false;
+    }
+    return false;
+  }
+
   async connect(token: string): Promise<void> {
     if (this.isConnecting) {
       this.logger.logWarning('Connection already in progress');
@@ -146,37 +183,9 @@ export class DiscordManager {
     }
 
     this.isConnecting = true;
-    const intents = new IntentsBitField();
-    intents.add(IntentsBitField.Flags.Guilds, IntentsBitField.Flags.GuildVoiceStates)
-    this.client = new Client({
-      intents,
-    });
-
-    // Initialize network monitoring
-    this.networkMonitor = new NetworkHealthMonitor();
-    this.networkMonitor.onQualityChanged((quality: NetworkQuality) => {
-      //this.logger.log('Network quality changed', quality);
-    });
-    this.networkMonitor.onBitrateRecommended((rec) => {
-      if (rec.bitrate !== this.currentBitrate) {
-        this.logger.log('Adjusting bitrate', {
-          old: this.currentBitrate,
-          new: rec.bitrate,
-          newQuality: rec.quality,
-        });
-        this.currentBitrate = rec.bitrate;
-        this.updateAudioResourceBitrate();
-      }
-    });
-    this.networkMonitor.startMonitoring(5000);
-
-    const readyPromise = new Promise<void>((resolve) => {
-      this.resolveOnceClientIsReady(resolve);
-    });
 
     try {
-      await this.client.login(token);
-      await readyPromise;
+      this.client = await this.connections.connectToken(token);
       this.reconnectAttempts = 0;
       this.logger.log('Successfully connected to Discord');
     } catch (error) {
@@ -255,7 +264,7 @@ export class DiscordManager {
     if (!this.voiceDataStream || !this.encoder) {
       if (Math.random() <= 0.0001) {
         this.logger.logWarning(
-          'Voice data received but no active voice connection',
+          'Voice data received but no active voice connection'
         );
       }
       return;
@@ -312,7 +321,7 @@ export class DiscordManager {
       }
 
       const channel = (await this.client.channels.fetch(
-        channelId,
+        channelId
       )) as VoiceChannel | null;
       if (!channel) {
         this.logger.log('Channel not found', { channelId });
@@ -327,7 +336,8 @@ export class DiscordManager {
       this.connection = joinVoiceChannel({
         channelId: channelId,
         guildId: guildId,
-        adapterCreator: channel.guild.voiceAdapterCreator as unknown as DiscordGatewayAdapterCreator,
+        adapterCreator: channel.guild
+          .voiceAdapterCreator as unknown as DiscordGatewayAdapterCreator,
       });
 
       this.appendConnectionEventHandlers(guildId, channelId);
@@ -404,7 +414,7 @@ export class DiscordManager {
   startStreaming() {
     if (!this.audioPlayer || !this.connection) {
       throw new Error(
-        '[DiscordManager] Cannot start stream without successful initial setup',
+        '[DiscordManager] Cannot start stream without successful initial setup'
       );
     }
 
@@ -488,7 +498,10 @@ export class DiscordManager {
       const guildChannels = await fetchedGuild.channels.fetch();
       const channels: ChannelData[] = [];
       for (const channel of guildChannels.values()) {
-        if (channel?.type === ChannelType.GuildVoice || channel?.type === ChannelType.GuildStageVoice) {
+        if (
+          channel?.type === ChannelType.GuildVoice ||
+          channel?.type === ChannelType.GuildStageVoice
+        ) {
           channels.push({
             id: channel.id,
             name: channel.name,
@@ -528,7 +541,7 @@ export class DiscordManager {
   private async handleConnectionFailure(token: string): Promise<void> {
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
       this.logger.logErrorMessage(
-        'Max reconnection attempts reached, giving up',
+        'Max reconnection attempts reached, giving up'
       );
       return;
     }
@@ -546,27 +559,6 @@ export class DiscordManager {
     await this.connect(token);
   }
 
-  private updateAudioResourceBitrate(): void {
-    if (!this.audioResource) {
-      this.logger.logWarning('Cannot update bitrate: no audio resource');
-      return;
-    }
-
-    // Note: Bitrate update depends on stream type and encoder configuration
-    // This is typically handled by the encoder on the frontend or requires recreating the resource
-    this.logger.log(
-      'Bitrate update logic not implemented - requires resource recreation or encoder config change',
-    );
-  }
-
-  private resolveOnceClientIsReady(resolve: () => void) {
-    if (!this.client) {
-      resolve();
-      return;
-    }
-    this.client.once('ready', () => resolve());
-  }
-
   /**
    * Initialize audio stream once connection is ready,
    * and set up reconnect on disconnection.
@@ -581,7 +573,7 @@ export class DiscordManager {
    */
   private appendConnectionEventHandlers(
     guildId: string,
-    channelId: string,
+    channelId: string
   ): void {
     if (!this.connection) return;
     // Monitor connection status for unstable networks
@@ -606,5 +598,10 @@ export class DiscordManager {
     const viewManager = await ViewManager.getInstance();
     viewManager.broadcast(DiscordChannel.STATE_UPDATE, undefined, this.state);
     this.logger.log('Broadcasted Discord state update', { state: this.state });
+  }
+
+  private async getActiveTokens() {
+    const tokens = await this.tokenManager.getTokens();
+    return tokens.filter((token) => this.connections.clients.has(token.apiKey));
   }
 }

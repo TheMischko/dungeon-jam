@@ -32,6 +32,8 @@ export type DiscordStateConnected = {
 export enum DiscordStateType {
   NONE = 'NONE',
   CONNECTED = 'CONNECTED',
+  CONNECTING = 'CONNECTING',
+  ERROR = 'ERROR',
 }
 
 export type DiscordTokenData = {

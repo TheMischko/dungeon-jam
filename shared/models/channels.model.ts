@@ -55,6 +55,8 @@ export enum DiscordChannel {
   JOIN_CHANNEL = 'discord/join-channel',
   DISCONNECT = 'discord/disconnect',
   STATE_UPDATE = 'discord/state-update',
+  CONNECT_TOKEN = 'discord/connect-token',
+  GET_CONNECTED_TOKENS = 'discord/get-connected-tokens',
 }
 
 export enum DiscordTokenChannel {
