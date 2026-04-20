@@ -80,6 +80,19 @@ export class DiscordService {
     return subject.asObservable();
   }
 
+  disconnectToken(tokenId: string): Observable<boolean> {
+    const subject = new Subject<boolean>();
+    this.window.DISCORD_API.disconnectToken(tokenId)
+      .then((result: boolean) => {
+        subject.next(result);
+        subject.complete();
+      })
+      .catch((error: unknown) => {
+        subject.error(error);
+      });
+    return subject.asObservable();
+  }
+
   getConnectedTokens(): Observable<DiscordTokenData[]> {
     const subject = new Subject<DiscordTokenData[]>();
     this.window.DISCORD_API.getConnectedTokens()

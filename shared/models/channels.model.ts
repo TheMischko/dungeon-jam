@@ -56,6 +56,7 @@ export enum DiscordChannel {
   DISCONNECT = 'discord/disconnect',
   STATE_UPDATE = 'discord/state-update',
   CONNECT_TOKEN = 'discord/connect-token',
+  DISCONNECT_TOKEN = 'discord/disconnect-token',
   GET_CONNECTED_TOKENS = 'discord/get-connected-tokens',
 }
 

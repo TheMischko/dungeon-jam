@@ -86,6 +86,9 @@ export class DiscordManager {
     ipcMain.handle(DiscordChannel.CONNECT_TOKEN, async (_, tokenId: string) => {
       return await this.connectNewToken(tokenId);
     });
+    ipcMain.handle(DiscordChannel.DISCONNECT_TOKEN, async (_, tokenId: string) => {
+      return await this.disconnectToken(tokenId);
+    });
     ipcMain.handle(DiscordChannel.GET_CONNECTED_TOKENS, async () => {
       return await this.getActiveTokens();
     });
@@ -193,6 +196,26 @@ export class DiscordManager {
       await this.handleConnectionFailure(token);
     } finally {
       this.isConnecting = false;
+    }
+  }
+
+  async disconnectToken(tokenId: string): Promise<boolean> {
+    const token = await this.tokenManager.getTokenById(tokenId);
+    if (!token) {
+      this.logger.logErrorMessage('Token not found for ID', { tokenId });
+      return true;
+    }
+
+    this.logger.log('Disconnecting token', {
+      tokenId,
+      key: `${token.apiKey.slice(0, 6)}...`,
+    });
+
+    try {
+      await this.connections.disconnectToken(token.apiKey);
+      return true;
+    } catch (error) {
+      return false;
     }
   }
 

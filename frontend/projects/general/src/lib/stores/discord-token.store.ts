@@ -144,12 +144,8 @@ export const DiscordTokenStore = signalStore(
             });
           }),
           switchMap((token) => {
-            console.log(`[DiscordTokenStore] Connecting token ${token.id}...`);
             return discordService.connectToken(token.id).pipe(
               tap((success) => {
-                console.log(
-                  `[DiscordTokenStore] Connection result for token ${token.id}: ${success}`
-                );
                 const map = store.connectionMap();
                 patchState(store, {
                   connectionMap: {
@@ -179,12 +175,55 @@ export const DiscordTokenStore = signalStore(
         )
       );
 
+      const disconnectToken = rxMethod<DiscordTokenData>(
+        pipe(
+          switchMap((token) => {
+            return discordService.disconnectToken(token.id).pipe(
+              tap((success) => {
+                const map = store.connectionMap();
+                patchState(store, {
+                  connectionMap: {
+                    ...map,
+                    [token.id]: success
+                      ? DiscordStateType.NONE
+                      : DiscordStateType.ERROR,
+                  },
+                });
+              }),
+              catchError((err) => {
+                console.error(
+                  '[DiscordTokenStore] Failed to disconnect token',
+                  err
+                );
+                const map = store.connectionMap();
+                patchState(store, {
+                  connectionMap: {
+                    ...map,
+                    [token.id]: DiscordStateType.ERROR,
+                  },
+                });
+                setTimeout(() => {
+                  patchState(store, {
+                    connectionMap: {
+                      ...map,
+                      [token.id]: DiscordStateType.CONNECTED,
+                    },
+                  });
+                }, 2000);
+                return EMPTY;
+              })
+            );
+          })
+        )
+      );
+
       return {
         loadTokens,
         createToken,
         removeToken,
         updateToken,
         connectToken,
+        disconnectToken,
       };
     }
   ),

@@ -14,6 +14,7 @@ export type DiscordWindow = Window &
         callback: (state: DiscordState) => void | Promise<void>
       ) => void;
       connectToken: (tokenId: string) => Promise<boolean>;
+      disconnectToken: (tokenId: string) => Promise<boolean>;
       getConnectedTokens: () => Promise<DiscordTokenData[]>;
     };
   };

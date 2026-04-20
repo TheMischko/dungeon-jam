@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { DiscordTokenStore } from '@general/stores/discord-token.store';
 import {
+  DiscordStateType,
   DiscordTokenData,
   DiscordTokenUpdateData,
 } from '@shared/models/discord.model';
@@ -51,6 +52,13 @@ export class GeneralSettingsPageSmartComponent {
   }
 
   toggleTokenState(token: DiscordTokenData): void {
+    if (this.tokenConnectionMap()[token.id] === DiscordStateType.CONNECTING) {
+      return;
+    }
+    if (this.tokenConnectionMap()[token.id] === DiscordStateType.CONNECTED) {
+      this.discordTokenStore.disconnectToken(token);
+      return;
+    }
     this.discordTokenStore.connectToken(token);
   }
 

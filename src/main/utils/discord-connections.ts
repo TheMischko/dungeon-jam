@@ -10,6 +10,7 @@ export class DiscordConnections {
     try {
       await client.login(token);
       this.clients.set(token, client);
+      await this.waitForReady(client);
       console.log(
         `[DiscordConnections] Connected with token: ${this.tokenText(token)}`
       );
@@ -23,7 +24,18 @@ export class DiscordConnections {
     }
   }
 
-  waitForReady(client: Client): Promise<void> {
+  async disconnectToken(token: string) {
+    const client = this.clients.get(token);
+    if (client) {
+      await client.destroy();
+      this.clients.delete(token);
+      console.log(
+        `[DiscordConnections] Disconnected token: ${this.tokenText(token)}`
+      );
+    }
+  }
+
+  private waitForReady(client: Client): Promise<void> {
     return new Promise((resolve, reject) => {
       client.once('ready', () => resolve());
       setTimeout(
