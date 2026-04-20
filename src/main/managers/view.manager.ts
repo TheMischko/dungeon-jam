@@ -14,7 +14,7 @@ export class ViewManager {
     public captureTab: WebContentsView,
     public frontendTab: BaseTab,
     public topBarTab: BaseTab,
-    public sideBarTab: BaseTab,
+    public sideBarTab: BaseTab
   ) {}
 
   static async getInstance(config?: {
@@ -31,24 +31,24 @@ export class ViewManager {
       const appWindow = ViewManager.createWindow(
         config.width,
         config.height,
-        config.defaultPreferences,
+        config.defaultPreferences
       );
       const captureTab = await ViewManager.createCaptureTab(
         appWindow,
         config.defaultPreferences,
-        config.indexHTML,
+        config.indexHTML
       );
       const frontendTab = await ViewManager.createAndLoadTab(
-        () => new FrontendTab(appWindow, config.defaultPreferences),
+        () => new FrontendTab(appWindow, config.defaultPreferences)
       );
       const topBarTab = await ViewManager.createAndLoadTab(
-        () => new TopBarTab(appWindow, config.defaultPreferences),
+        () => new TopBarTab(appWindow, config.defaultPreferences)
       );
       const sideBarTab = await ViewManager.createAndLoadTab(
-        () => new SideBarTab(appWindow, config.defaultPreferences),
+        () => new SideBarTab(appWindow, config.defaultPreferences)
       );
 
-      frontendTab.tab.webContents.openDevTools({
+      sideBarTab.tab.webContents.openDevTools({
         mode: 'detach',
       });
 
@@ -57,7 +57,7 @@ export class ViewManager {
         captureTab,
         frontendTab,
         topBarTab,
-        sideBarTab,
+        sideBarTab
       );
       ViewManager._instance.initializeEventListeners();
     }
@@ -68,7 +68,7 @@ export class ViewManager {
   private static createWindow(
     width: number,
     height: number,
-    defaultPreferences: Partial<WebPreferences>,
+    defaultPreferences: Partial<WebPreferences>
   ): BrowserWindow {
     return new BrowserWindow({
       width: width,
@@ -80,7 +80,7 @@ export class ViewManager {
   }
 
   private static async createAndLoadTab<T extends BaseTab>(
-    factory: () => T,
+    factory: () => T
   ): Promise<T> {
     const tab = factory();
     await tab.load();
@@ -90,14 +90,14 @@ export class ViewManager {
   private static async createCaptureTab(
     appWindow: BrowserWindow,
     defaultPreferences: Partial<WebPreferences>,
-    indexHTML: string,
+    indexHTML: string
   ): Promise<WebContentsView> {
     const capturePreload = path.join(
       __dirname,
       '../',
       'src',
       'sound-capture',
-      'preload.js',
+      'preload.js'
     );
     const captureTab = new WebContentsView({
       webPreferences: {

@@ -1,5 +1,6 @@
 import {
   DiscordState,
+  DiscordTokenActiveUpdate,
   DiscordTokenData,
   GuildWithChannels,
 } from '@shared/models/discord.model';
@@ -12,6 +13,9 @@ export type DiscordWindow = Window &
       disconnect: () => Promise<void>;
       onStateUpdate: (
         callback: (state: DiscordState) => void | Promise<void>
+      ) => void;
+      onActiveTokensUpdate: (
+        callback: (update: DiscordTokenActiveUpdate) => void | Promise<void>
       ) => void;
       connectToken: (tokenId: string) => Promise<boolean>;
       disconnectToken: (tokenId: string) => Promise<boolean>;

@@ -4,6 +4,7 @@ import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import {
   DiscordState,
   DiscordStateType,
+  DiscordTokenActiveUpdate,
   DiscordTokenData,
   GuildWithChannels,
 } from '@shared/models/discord.model';
@@ -16,15 +17,26 @@ export class DiscordService {
   private readonly discordStateSubject = new BehaviorSubject<DiscordState>({
     type: DiscordStateType.NONE,
   });
+  private readonly activeTokensSubject = new BehaviorSubject<string[]>([]);
 
   get discordState$(): Observable<DiscordState> {
     return this.discordStateSubject.asObservable();
+  }
+
+  get activeTokens$(): Observable<string[]> {
+    return this.activeTokensSubject.asObservable();
   }
 
   constructor() {
     this.window.DISCORD_API.onStateUpdate((state: DiscordState) => {
       this.discordStateSubject.next(state);
     });
+    this.window.DISCORD_API.onActiveTokensUpdate(
+      (update: DiscordTokenActiveUpdate) => {
+        console.log('new tokens', update.connectedTokens);
+        this.activeTokensSubject.next(update.connectedTokens);
+      }
+    );
   }
 
   getChannels(): Observable<GuildWithChannels[]> {

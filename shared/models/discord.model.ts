@@ -49,3 +49,7 @@ export type DiscordTokenUpdateData = {
   apiKey: string;
   name: string;
 };
+
+export type DiscordTokenActiveUpdate = {
+  connectedTokens: string[];
+};

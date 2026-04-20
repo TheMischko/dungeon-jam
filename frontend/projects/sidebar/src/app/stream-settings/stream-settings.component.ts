@@ -21,8 +21,11 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import {
   ChannelData,
   DiscordStateType,
+  DiscordTokenData,
   GuildWithChannels,
 } from '@shared/models/discord.model';
+import { DiscordTokenStore } from '@general/stores/discord-token.store';
+import { tap } from 'rxjs';
 
 type PlaybackApiWindow = Window & {
   PLAYBACK_API: {
@@ -46,6 +49,7 @@ type PlaybackApiWindow = Window & {
 export class StreamSettingsComponent implements AfterViewInit {
   private readonly window = window as unknown as PlaybackApiWindow;
   readonly discordService = inject(DiscordService);
+  readonly discordTokenStore = inject(DiscordTokenStore);
   readonly currentStreamDestination = computed<'local' | DiscordPlaybackInfo>(
     () => {
       const discordState = this.discordState();
@@ -58,11 +62,30 @@ export class StreamSettingsComponent implements AfterViewInit {
         };
       }
       return 'local';
-    },
+    }
   );
-  readonly availableDiscordServers = toSignal(
+  readonly connectedTokenIds = toSignal(
+    this.discordService.activeTokens$.pipe(
+      tap((tokens) => console.log('obser', tokens))
+    ),
+    {
+      initialValue: [],
+    }
+  );
+  readonly availableTokens = computed(() => {
+    const tokenIds = this.connectedTokenIds();
+    const tokens = this.discordTokenStore.entityMap();
+    console.log('connected token ids', tokenIds);
+    console.log('all tokens', tokens);
+    const tokenData = tokenIds
+      .map((id) => tokens[id])
+      .filter((token) => token !== undefined);
+    console.log('available token data', tokenData);
+    return tokenData;
+  });
+  readonly availableDiscordChannels = toSignal(
     this.discordService.getChannels(),
-    { initialValue: [] },
+    { initialValue: [] }
   );
 
   readonly discordState = toSignal(this.discordService.discordState$, {
@@ -81,14 +104,21 @@ export class StreamSettingsComponent implements AfterViewInit {
   readonly discordPlaybackIcon = 'discord';
 
   readonly serversFlattened = computed<ActionsMenuBaseConfig<null>[]>(() => {
-    const servers = this.availableDiscordServers();
+    const servers = this.availableDiscordChannels();
     return servers.reduce((channels, server, _, __) => {
       return [
         ...channels,
         ...server.channels.map((channel) =>
-          this.mapServerChannelToActionConfig(server, channel),
+          this.mapServerChannelToActionConfig(server, channel)
         ),
       ];
+    }, [] as ActionsMenuBaseConfig<null>[]);
+  });
+
+  readonly tokensFlattened = computed<ActionsMenuBaseConfig<null>[]>(() => {
+    const tokens = this.availableTokens();
+    return tokens.reduce((channels, token, _, __) => {
+      return [...channels, this.mapTokenToActionConfig(token)];
     }, [] as ActionsMenuBaseConfig<null>[]);
   });
 
@@ -97,15 +127,32 @@ export class StreamSettingsComponent implements AfterViewInit {
       {
         text: 'Local playback',
         icon: this.localPlaybackIcon,
+        cssClasses: this.isActive() ? ['active'] : [],
         onSelected: () => this.switchToLocalPlayback(),
       },
-      ...this.serversFlattened(),
+      ...this.tokensFlattened(),
     ];
   });
 
   readonly isDiscordPlayback = computed<boolean>(() => {
     return this.currentStreamDestination() !== 'local';
   });
+
+  readonly isActive = (activeId: string | null = null) => {
+    const destination = this.currentStreamDestination();
+    if (destination === 'local' && activeId === null) {
+      return true;
+    }
+    if (destination !== 'local' && activeId !== null) {
+      if (activeId === destination.channelId) {
+        return true;
+      }
+      if (activeId === destination.guildId) {
+        return true;
+      }
+    }
+    return false;
+  };
 
   ngAfterViewInit() {
     setTimeout(() => {
@@ -135,7 +182,7 @@ export class StreamSettingsComponent implements AfterViewInit {
 
   private mapServerChannelToActionConfig(
     guild: GuildWithChannels,
-    channel: ChannelData,
+    channel: ChannelData
   ): ActionsMenuBaseConfig<null> {
     return {
       text: `${guild.guildName} - ${channel.name}`,
@@ -149,6 +196,19 @@ export class StreamSettingsComponent implements AfterViewInit {
           channelName: channel.name,
         });
       },
+    };
+  }
+
+  private mapTokenToActionConfig(
+    token: DiscordTokenData
+  ): ActionsMenuBaseConfig<null> {
+    return {
+      text: `${token.name}`,
+      icon: this.discordPlaybackIcon as unknown as LucideIconData,
+      cssClasses: [
+        'discord-icon',
+        ...(this.isActive(token.id) ? ['active'] : []),
+      ],
     };
   }
 }

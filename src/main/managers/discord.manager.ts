@@ -9,11 +9,12 @@ import {
   VoiceConnection,
   VoiceConnectionStatus,
 } from '@discordjs/voice';
-import { Client, VoiceChannel, ChannelType } from 'discord.js';
+import { ChannelType, Client, VoiceChannel } from 'discord.js';
 import {
   ChannelData,
   DiscordState,
   DiscordStateType,
+  DiscordTokenActiveUpdate,
   GuildWithChannels,
   JoinChannelRequest,
 } from '@shared/models/discord.model';
@@ -25,10 +26,10 @@ import { ipcMain } from 'electron';
 import { DiscordChannel } from '@shared/models/channels.model';
 import { ViewManager } from './view.manager';
 import { opus } from 'prism-media';
-import Encoder = opus.Encoder;
 import { Logger } from '../utils/logger';
 import { DiscordTokenManager } from './discord-token.manager';
 import { DiscordConnections } from '../utils/discord-connections';
+import Encoder = opus.Encoder;
 
 export class DiscordManager {
   private static instance: DiscordManager;
@@ -86,9 +87,12 @@ export class DiscordManager {
     ipcMain.handle(DiscordChannel.CONNECT_TOKEN, async (_, tokenId: string) => {
       return await this.connectNewToken(tokenId);
     });
-    ipcMain.handle(DiscordChannel.DISCONNECT_TOKEN, async (_, tokenId: string) => {
-      return await this.disconnectToken(tokenId);
-    });
+    ipcMain.handle(
+      DiscordChannel.DISCONNECT_TOKEN,
+      async (_, tokenId: string) => {
+        return await this.disconnectToken(tokenId);
+      }
+    );
     ipcMain.handle(DiscordChannel.GET_CONNECTED_TOKENS, async () => {
       return await this.getActiveTokens();
     });
@@ -161,6 +165,7 @@ export class DiscordManager {
     this.isConnecting = true;
     try {
       await this.connections.connectToken(token.apiKey);
+      await this.broadcastActiveTokensUpdate();
       return true;
     } catch (error) {
       await this.handleConnectionFailure(token.apiKey);
@@ -189,6 +194,7 @@ export class DiscordManager {
 
     try {
       this.client = await this.connections.connectToken(token);
+      await this.broadcastActiveTokensUpdate();
       this.reconnectAttempts = 0;
       this.logger.log('Successfully connected to Discord');
     } catch (error) {
@@ -213,6 +219,7 @@ export class DiscordManager {
 
     try {
       await this.connections.disconnectToken(token.apiKey);
+      await this.broadcastActiveTokensUpdate();
       return true;
     } catch (error) {
       return false;
@@ -621,6 +628,21 @@ export class DiscordManager {
     const viewManager = await ViewManager.getInstance();
     viewManager.broadcast(DiscordChannel.STATE_UPDATE, undefined, this.state);
     this.logger.log('Broadcasted Discord state update', { state: this.state });
+  }
+
+  private async broadcastActiveTokensUpdate(): Promise<void> {
+    const apiKeys = Array.from(this.connections.clients.keys());
+    const tokens = await this.tokenManager.getTokens();
+    const viewManager = await ViewManager.getInstance();
+    this.logger.log('Broadcasting active tokens update', {
+      connectedTokens: tokens,
+    });
+    const update = apiKeys
+      .map((key) => tokens.find((t) => t.apiKey === key)?.id)
+      .filter((t) => t !== undefined);
+    viewManager.broadcast(DiscordChannel.ACTIVE_TOKENS_UPDATE, undefined, {
+      connectedTokens: update,
+    } as DiscordTokenActiveUpdate);
   }
 
   private async getActiveTokens() {

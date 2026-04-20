@@ -5,6 +5,7 @@ import {
   JoinChannelRequest,
   DiscordState,
   DiscordTokenData,
+  DiscordTokenActiveUpdate,
 } from '@shared/models/discord.model';
 
 const getChannels = async (): Promise<GuildWithChannels[]> => {
@@ -33,6 +34,14 @@ const onStateUpdate = (
   });
 };
 
+const onActiveTokensUpdate = (
+  callback: (update: DiscordTokenActiveUpdate) => void | Promise<void>,
+): void => {
+  ipcRenderer.on(DiscordChannel.ACTIVE_TOKENS_UPDATE, (_, update: DiscordTokenActiveUpdate) => {
+    callback(update);
+  });
+};
+
 const connectToken = async (tokenId: string): Promise<boolean> => {
   return await ipcRenderer.invoke(DiscordChannel.CONNECT_TOKEN, tokenId);
 };
@@ -50,6 +59,7 @@ const DiscordApi = {
   joinChannel,
   disconnect,
   onStateUpdate,
+  onActiveTokensUpdate,
   connectToken,
   disconnectToken,
   getConnectedTokens,
