@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { LucideAngularModule, LucideIconData } from 'lucide-angular';
 import { MatMenuItem } from '@angular/material/menu';
-import {NgClass} from '@angular/common';
+import { NgClass } from '@angular/common';
 
 @Component({
   selector: 'lib-actions-menu',
@@ -26,7 +26,8 @@ export class ActionsMenuComponent<T> {
   }
 }
 
-export type ActionsMenuBaseConfig<T> = {
+export type ActionsMenuBaseConfig<T, K = string> = {
+  key?: K;
   text: string;
   icon?: LucideIconData;
   onSelected?: (item: T, config: ActionsMenuBaseConfig<T>) => void;

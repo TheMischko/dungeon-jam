@@ -20,10 +20,12 @@ export class PlaybackService implements OnDestroy {
   readonly audioPlayerService = inject(AudioPlayerService);
 
   private readonly state = new BehaviorSubject<PlaybackState>(
-    initialPlaybackState,
+    initialPlaybackState
   );
   readonly playback$: Observable<PlaybackState> = this.state.asObservable();
-  readonly currentTrackId$ = this.playback$.pipe(map((state) => state.currentTrack?.id ?? null));
+  readonly currentTrackId$ = this.playback$.pipe(
+    map((state) => state.currentTrack?.id ?? null)
+  );
 
   readonly playerPosition = toSignal(this.audioPlayerService.position$, {
     initialValue: 0,
@@ -38,7 +40,7 @@ export class PlaybackService implements OnDestroy {
       this.state.next({ ...current, position: currentPosition });
     });
     this.trackStateSubscription = this.audioPlayerService.state$.subscribe(
-      (state) => this.handleTrackStateChange(state),
+      (state) => this.handleTrackStateChange(state)
     );
     this.loadInitState();
   }
@@ -57,7 +59,7 @@ export class PlaybackService implements OnDestroy {
     const current = this.state.getValue();
     if (queue && track) {
       let newQueue = [...queue];
-      if(current.shuffle){
+      if (current.shuffle) {
         newQueue = shuffleList(newQueue);
       }
       this.state.next({
@@ -197,14 +199,28 @@ export class PlaybackService implements OnDestroy {
     const state = this.state.getValue();
 
     let queue = [...state.queue];
-    if(!state.shuffle && enabled && state.queue.length > 1){
+    if (!state.shuffle && enabled && state.queue.length > 1) {
       queue = shuffleList(queue);
     }
 
     this.state.next({
       ...state,
       shuffle: enabled,
-      queue
+      queue,
+    });
+  }
+
+  addToQueue(track: Track, playLast: boolean = false) {
+    const state = this.state.getValue();
+    const newQueue = [...state.queue];
+    if (playLast) {
+      newQueue.push(track);
+    } else {
+      newQueue.unshift(track);
+    }
+    this.state.next({
+      ...state,
+      queue: newQueue,
     });
   }
 
@@ -219,7 +235,7 @@ export class PlaybackService implements OnDestroy {
   }
 
   private async handleTrackStateChange(
-    trackState: PlayingTrackState,
+    trackState: PlayingTrackState
   ): Promise<void> {
     switch (trackState) {
       case PlayingTrackState.ENDED:

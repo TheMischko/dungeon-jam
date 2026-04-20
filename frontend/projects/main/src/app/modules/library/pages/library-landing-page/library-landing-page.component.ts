@@ -27,6 +27,7 @@ import {
 import { take } from 'rxjs';
 import { NewTrackDropInService } from '../../services/new-track-drop-in.service';
 import { DialogService } from '../../../../services/dialog.service';
+import { DefaultTrackActionsService } from '../../../../services/default-track-actions.service';
 
 @Component({
   selector: 'app-library-landing-page',
@@ -39,7 +40,10 @@ export class LibraryLandingPageComponent implements OnInit {
   private readonly trackStore = inject(TrackLibraryStore);
   private readonly playbackService = inject(PlaybackService);
   private readonly newTrackDropInService = inject(NewTrackDropInService);
-  readonly playlistsStore = inject(PlaylistStore);
+  private readonly playlistsStore = inject(PlaylistStore);
+  private readonly defaultTrackActionsService = inject(
+    DefaultTrackActionsService
+  );
 
   readonly tracks = this.trackStore.entities;
   readonly tracksLoading = this.trackStore.loading;
@@ -70,7 +74,7 @@ export class LibraryLandingPageComponent implements OnInit {
           keepOpen: false,
           onSelected: (
             track: Track,
-            config: ActionsMenuDataConfig<Track, Playlist>,
+            config: ActionsMenuDataConfig<Track, Playlist>
           ) => {
             this.playlistsStore.addNewTracks({
               [config.data!.id]: [track!.id],
@@ -86,8 +90,8 @@ export class LibraryLandingPageComponent implements OnInit {
       if (this.showPlaylists()) {
         return this.menuPickActions();
       }
-      return this.defaultSongActions;
-    },
+      return this.trackActions;
+    }
   );
 
   readonly currentQuery = signal<QueryOptions>({
@@ -96,6 +100,16 @@ export class LibraryLandingPageComponent implements OnInit {
   });
   readonly showPlaylists = signal<boolean>(false);
 
+  readonly trackActions = this.defaultTrackActionsService.createActions({
+    prependActions: [
+      {
+        text: 'Add to playlist',
+        icon: actionsIconSet.AddIcon,
+        onSelected: () => this.addToPlaylist(),
+        keepOpen: true,
+      },
+    ],
+  });
   readonly defaultSongActions: ActionsMenuBaseConfig<Track>[] = [
     {
       text: 'Play next',
@@ -129,18 +143,20 @@ export class LibraryLandingPageComponent implements OnInit {
   }
 
   openUploadDialog(audioTracks?: AudioTrack[]) {
-    this.newTrackDropInService.startUploadSequence(audioTracks).subscribe(() => {
-      this.trackStore.load(this.currentQuery);
-    });
+    this.newTrackDropInService
+      .startUploadSequence(audioTracks)
+      .subscribe(() => {
+        this.trackStore.load(this.currentQuery);
+      });
   }
 
   playTrack(track: Track) {
     const trackIndex = this.tracks().findIndex(
-      (libraryTrack) => libraryTrack.id === track.id,
+      (libraryTrack) => libraryTrack.id === track.id
     );
     this.playbackService.play(
       track,
-      this.displayTracks().slice(trackIndex + 1),
+      this.displayTracks().slice(trackIndex + 1)
     );
   }
 

@@ -42,7 +42,7 @@ export class EditTrackModalComponent {
   readonly initialized$ = toObservable(this.tagStore.initialized);
   readonly tagsReady = this.loading$.pipe(
     combineLatestWith(this.initialized$),
-    map(([loading, initialized]) => !loading && initialized),
+    map(([loading, initialized]) => !loading && initialized)
   );
 
   readonly saveIcon = actionsIconSet.SaveIcon;
@@ -58,8 +58,8 @@ export class EditTrackModalComponent {
       },
       (form) => {
         disabled(form.path);
-      },
-    ),
+      }
+    )
   );
 
   constructor() {
@@ -112,16 +112,16 @@ export class EditTrackModalComponent {
 
 export type EditTrackResult = CancelResult | DeleteResult | UpdateResult;
 
-type CancelResult = {
+export type CancelResult = {
   type: 'cancel';
 };
 
-type DeleteResult = {
+export type DeleteResult = {
   type: 'delete';
   trackId: string;
 };
 
-type UpdateResult = {
+export type UpdateResult = {
   type: 'update';
   trackId: string;
   data: Track;
