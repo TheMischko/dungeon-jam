@@ -71,8 +71,8 @@ export class PlaylistGridSmartComponent implements OnInit {
   }));
   readonly playingPlaylistId = toSignal(
     this.playbackService.playback$.pipe(
-      map((state) => (state.isPlaying ? state.playlistId : undefined)),
-    ),
+      map((state) => (state.isPlaying ? state.playlistId : undefined))
+    )
   );
 
   ngOnInit() {
@@ -90,9 +90,14 @@ export class PlaylistGridSmartComponent implements OnInit {
     this.trackService
       .getTracksByPlaylist({
         playlistId,
+        sortBy: 'name',
+        sortDirection: SortDirection.ASC,
       })
       .pipe(take(1))
       .subscribe(async (tracks) => {
+        if (!tracks?.length) {
+          return;
+        }
         await this.playbackService.play(tracks[0], tracks.slice(1), playlistId);
       });
   }

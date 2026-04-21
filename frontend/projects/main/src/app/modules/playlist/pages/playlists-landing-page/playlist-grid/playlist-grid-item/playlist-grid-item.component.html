@@ -18,7 +18,7 @@
         {{ parentPlaylist()!.name }}
       </div>
     }
-    @if (isHovering()) {
+    @if (isHovering() && playlist().trackIds.length > 0) {
       <div
         class="image-overlay"
         [ngStyle]="overlaySizeStyle()"
