@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  OnInit,
+} from '@angular/core';
 import { DiscordTokenStore } from '@general/stores/discord-token.store';
 import {
   DiscordStateType,
@@ -15,13 +20,17 @@ import { EditDiscordTokenModalComponent } from '../../../modals/edit-discord-tok
   templateUrl: './general-settings-page-smart.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class GeneralSettingsPageSmartComponent {
+export class GeneralSettingsPageSmartComponent implements OnInit {
   private readonly discordTokenStore = inject(DiscordTokenStore);
   private readonly dialog = inject(MatDialog);
 
   readonly tokens = this.discordTokenStore.entities;
   readonly tokensLoading = this.discordTokenStore.loading;
   readonly tokenConnectionMap = this.discordTokenStore.connectionMap;
+
+  ngOnInit() {
+    this.discordTokenStore.loadTokens();
+  }
 
   editToken(token: DiscordTokenData): void {
     const dialogRef = this.createDiscordTokenDialog(token);

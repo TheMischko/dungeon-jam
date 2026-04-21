@@ -149,7 +149,7 @@ export class DiscordManager {
     });
   }
 
-  private async connectNewToken(tokenId: string) {
+  async connectNewToken(tokenId: string) {
     const token = await this.tokenManager.getTokenById(tokenId);
     if (!token) {
       this.logger.logErrorMessage('Token not found for ID', { tokenId });
@@ -166,6 +166,13 @@ export class DiscordManager {
     try {
       await this.connections.connectToken(token.apiKey);
       await this.broadcastActiveTokensUpdate();
+      await this.tokenManager.saveToken(
+        {
+          ...token,
+          active: true,
+        },
+        token.id
+      );
       return true;
     } catch (error) {
       await this.handleConnectionFailure(token.apiKey);
@@ -220,6 +227,13 @@ export class DiscordManager {
     try {
       await this.connections.disconnectToken(token.apiKey);
       await this.broadcastActiveTokensUpdate();
+      await this.tokenManager.saveToken(
+        {
+          ...token,
+          active: false,
+        },
+        token.id
+      );
       return true;
     } catch (error) {
       return false;

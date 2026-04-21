@@ -10,6 +10,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { LoaderComponent } from '@general/components/display/loader/loader.component';
 import { tap } from 'rxjs';
 import { addAppInitClass } from '@general/utils/add-app-init-class';
+import { DiscordTokenStore } from '@general/stores/discord-token.store';
 
 @Component({
   selector: 'app-root',
@@ -26,11 +27,12 @@ import { addAppInitClass } from '@general/utils/add-app-init-class';
 export class AppComponent {
   private readonly routingListenerService = inject(RoutingListenerService);
   private readonly applicationStateService = inject(ApplicationStateService);
+  private readonly discordTokenStore = inject(DiscordTokenStore);
 
   readonly applicationReady = toSignal(
     this.applicationStateService.applicationReady$.pipe(
-      tap((ready) => addAppInitClass(ready)),
-    ),
+      tap((ready) => addAppInitClass(ready))
+    )
   );
 
   title = 'main';

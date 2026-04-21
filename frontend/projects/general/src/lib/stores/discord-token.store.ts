@@ -21,6 +21,7 @@ import {
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import {
   catchError,
+  debounceTime,
   EMPTY,
   filter,
   finalize,
@@ -28,9 +29,10 @@ import {
   switchMap,
   tap,
 } from 'rxjs';
-import { inject } from '@angular/core';
+import { DestroyRef, inject } from '@angular/core';
 import { DiscordTokenApiService } from '@general/services/discord-token-api.service';
 import { DiscordService } from '@general/services/discord.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 type DiscordTokenStoreState = {
   loading: boolean;
@@ -227,11 +229,30 @@ export const DiscordTokenStore = signalStore(
       };
     }
   ),
-  withHooks((store) => ({
-    onInit() {
-      if (!store.initialized()) {
-        store.loadTokens();
-      }
-    },
-  }))
+  withHooks(
+    (
+      store,
+      destroyRef = inject(DestroyRef),
+      discordService = inject(DiscordService)
+    ) => ({
+      onInit() {
+        if (!store.initialized()) {
+          discordService.activeTokens$
+            .pipe(takeUntilDestroyed(destroyRef), debounceTime(500))
+            .subscribe((tokenIds) => {
+              const connectionMap: { [key: string]: DiscordStateType } = {};
+              tokenIds.forEach((id) => {
+                connectionMap[id] = DiscordStateType.CONNECTED;
+              });
+              console.log(
+                '[DiscordTokenStore] Active token IDs from service:',
+                tokenIds
+              );
+              patchState(store, { connectionMap });
+            });
+        }
+        patchState(store, { initialized: true });
+      },
+    })
+  )
 );
