@@ -64,21 +64,8 @@ export class StreamSettingsComponent implements OnInit, AfterViewInit {
       return 'local';
     }
   );
-  readonly connectedTokenIds = toSignal(this.discordService.activeTokens$, {
-    initialValue: [],
-  });
-  readonly availableTokens = computed(() => {
-    const tokenIds = this.connectedTokenIds();
-    const tokens = this.discordTokenStore.entityMap();
-    const tokenData = tokenIds
-      .map((id) => tokens[id])
-      .filter((token) => token !== undefined);
-    return tokenData;
-  });
-  readonly availableDiscordChannels = toSignal(
-    this.discordService.getChannels(),
-    { initialValue: [] }
-  );
+
+  readonly tokenChannelsMap = this.discordTokenStore.channelsMap;
 
   readonly discordState = toSignal(this.discordService.discordState$, {
     initialValue: { type: DiscordStateType.NONE },
@@ -96,7 +83,10 @@ export class StreamSettingsComponent implements OnInit, AfterViewInit {
   readonly discordPlaybackIcon = 'discord';
 
   readonly serversFlattened = computed<ActionsMenuBaseConfig<null>[]>(() => {
-    const servers = this.availableDiscordChannels();
+    const channelsMap = this.tokenChannelsMap();
+    const servers = Object.keys(channelsMap).flatMap(
+      (tokenId) => channelsMap[tokenId]
+    );
     return servers.reduce((channels, server, _, __) => {
       return [
         ...channels,
@@ -104,13 +94,6 @@ export class StreamSettingsComponent implements OnInit, AfterViewInit {
           this.mapServerChannelToActionConfig(server, channel)
         ),
       ];
-    }, [] as ActionsMenuBaseConfig<null>[]);
-  });
-
-  readonly tokensFlattened = computed<ActionsMenuBaseConfig<null>[]>(() => {
-    const tokens = this.availableTokens();
-    return tokens.reduce((channels, token, _, __) => {
-      return [...channels, this.mapTokenToActionConfig(token)];
     }, [] as ActionsMenuBaseConfig<null>[]);
   });
 
@@ -122,7 +105,7 @@ export class StreamSettingsComponent implements OnInit, AfterViewInit {
         cssClasses: this.isActive() ? ['active'] : [],
         onSelected: () => this.switchToLocalPlayback(),
       },
-      ...this.tokensFlattened(),
+      ...this.serversFlattened(),
     ];
   });
 

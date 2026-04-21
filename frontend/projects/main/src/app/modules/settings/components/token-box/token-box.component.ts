@@ -2,7 +2,6 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  effect,
   input,
   output,
 } from '@angular/core';
@@ -33,16 +32,6 @@ export class TokenBoxComponent {
   readonly switchValue = computed(
     () => this.tokenState() === DiscordStateType.CONNECTED
   );
-  constructor() {
-    effect(() => {
-      const tokenState = this.tokenState();
-      const switchValue = this.switchValue();
-
-      console.log(
-        `${this.token().name} State: ${tokenState}, Switch Value: ${switchValue}`
-      );
-    });
-  }
   readonly statusText = computed(() => {
     switch (this.tokenState()) {
       case DiscordStateType.CONNECTED:

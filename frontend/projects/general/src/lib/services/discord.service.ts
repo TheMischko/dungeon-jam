@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { DiscordWindow } from '../../../models/api/discord-api.model';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, forkJoin, map, Observable, Subject } from 'rxjs';
 import {
   DiscordState,
   DiscordStateType,
@@ -116,5 +116,41 @@ export class DiscordService {
         subject.error(error);
       });
     return subject.asObservable();
+  }
+
+  getChannelsForToken(tokenId: string): Observable<GuildWithChannels[]> {
+    const subject = new Subject<GuildWithChannels[]>();
+    this.window.DISCORD_API.getTokenChannels(tokenId)
+      .then((channels: GuildWithChannels[]) => {
+        subject.next(channels);
+        subject.complete();
+      })
+      .catch((error: unknown) => {
+        subject.error(error);
+      });
+    return subject.asObservable();
+  }
+
+  getChannelsForTokens(
+    tokenIds: string[]
+  ): Observable<Record<string, GuildWithChannels[]>> {
+    const requests = tokenIds.map((tokenId) =>
+      this.getChannelsForToken(tokenId).pipe(
+        map((channels) => ({ tokenId: channels }))
+      )
+    );
+    return forkJoin(requests).pipe(
+      map((records) => {
+        return records.reduce(
+          (acc, record) => {
+            return {
+              ...acc,
+              ...record,
+            };
+          },
+          {} as Record<string, GuildWithChannels[]>
+        );
+      })
+    );
   }
 }

@@ -20,5 +20,6 @@ export type DiscordWindow = Window &
       connectToken: (tokenId: string) => Promise<boolean>;
       disconnectToken: (tokenId: string) => Promise<boolean>;
       getConnectedTokens: () => Promise<DiscordTokenData[]>;
+      getTokenChannels: (tokenId: string) => Promise<GuildWithChannels[]>;
     };
   };
