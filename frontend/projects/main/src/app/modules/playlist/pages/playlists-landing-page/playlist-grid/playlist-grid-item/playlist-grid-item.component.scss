@@ -1,6 +1,11 @@
 @use 'colors' as col;
 @use 'typography' as typo;
 
+:host{
+  display: flex;
+  min-height: 0;
+}
+
 .grid-item {
   display: flex;
   flex-direction: column;

@@ -5,7 +5,7 @@ Obviously the project is WIP, so there is just a list of small missing features 
 - [ ] Playlist filters
 - [x] Change actions menu on playlist detail for individual tracks to include: Play next, Remove from playlist
 - [ ] Fix playing empty playlist resumes currently played queue
-- [ ] Fix Playlist card without tags having shifted layout
+- [x] Fix Playlist card without tags having shifted layout
 - [x] Enable opening of modals after closing them. Currently, if you close a modal, you can open it again without leaving the page
 - [ ] Create custom scrollbar
 - [x] Use `TableComponent` in `SongsTableComponent` 
