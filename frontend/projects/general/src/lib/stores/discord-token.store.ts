@@ -17,31 +17,37 @@ import {
   DiscordStateType,
   DiscordTokenData,
   DiscordTokenUpdateData,
+  GuildWithChannels,
 } from '@shared/models/discord.model';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import {
   catchError,
+  debounceTime,
   EMPTY,
   filter,
   finalize,
   pipe,
   switchMap,
+  take,
   tap,
 } from 'rxjs';
-import { inject } from '@angular/core';
+import { DestroyRef, effect, inject, untracked } from '@angular/core';
 import { DiscordTokenApiService } from '@general/services/discord-token-api.service';
 import { DiscordService } from '@general/services/discord.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 type DiscordTokenStoreState = {
   loading: boolean;
   initialized: boolean;
   connectionMap: Record<string, DiscordStateType>;
+  channelsMap: Record<string, GuildWithChannels[]>;
 };
 
 const initialState: DiscordTokenStoreState = {
   loading: false,
   initialized: false,
   connectionMap: {},
+  channelsMap: {},
 };
 
 const tokenEntity = entityConfig({
@@ -227,11 +233,76 @@ export const DiscordTokenStore = signalStore(
       };
     }
   ),
-  withHooks((store) => ({
-    onInit() {
-      if (!store.initialized()) {
-        store.loadTokens();
-      }
-    },
-  }))
+  withHooks(
+    (
+      store,
+      destroyRef = inject(DestroyRef),
+      discordService = inject(DiscordService)
+    ) => ({
+      onInit() {
+        if (!store.initialized()) {
+          discordService.activeTokens$
+            .pipe(takeUntilDestroyed(destroyRef), debounceTime(500))
+            .subscribe((tokenIds) => {
+              const connectionMap: { [key: string]: DiscordStateType } = {};
+              tokenIds.forEach((id) => {
+                connectionMap[id] = DiscordStateType.CONNECTED;
+              });
+              patchState(store, { connectionMap });
+            });
+        }
+
+        effect(() => {
+          const connectionMap = store.connectionMap();
+          const connectionTokenIds = Object.keys(connectionMap).filter(
+            (id) => connectionMap[id] === DiscordStateType.CONNECTED
+          );
+          const channelsMap = untracked(() => store.channelsMap());
+          const tokensWithChannels = Object.keys(channelsMap);
+          const tokensToFetch = connectionTokenIds.filter(
+            (id) => !tokensWithChannels.includes(id)
+          );
+          const disconnectedTokens = tokensWithChannels.filter(
+            (id) => !connectionTokenIds.includes(id)
+          );
+          const channelsMapWithoutDisconnected = { ...channelsMap };
+          disconnectedTokens.forEach((id) => {
+            delete channelsMapWithoutDisconnected[id];
+          });
+          patchState(store, {
+            channelsMap: channelsMapWithoutDisconnected,
+          });
+
+          if (!tokensToFetch.length) {
+            return;
+          }
+
+          const channelsSub = discordService
+            .getChannelsForTokens(tokensToFetch)
+            .pipe(take(1))
+            .subscribe((result) => {
+              if (!result || typeof result !== 'object') {
+                return;
+              }
+              patchState(store, {
+                channelsMap: {
+                  ...store.channelsMap(),
+                  ...result,
+                },
+              });
+              console.log(
+                '[DiscordTokenStore] Updated channels map',
+                store.channelsMap()
+              );
+            });
+
+          return () => {
+            channelsSub.unsubscribe();
+          };
+        });
+
+        patchState(store, { initialized: true });
+      },
+    })
+  )
 );

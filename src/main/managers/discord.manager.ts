@@ -71,7 +71,7 @@ export class DiscordManager {
 
   private registerChannels(): void {
     ipcMain.handle(DiscordChannel.GET_CHANNELS, async (_) => {
-      return await this.getAvailableChannels();
+      return await this.getAvailableChannels(this.client!);
     });
     ipcMain.handle(
       DiscordChannel.JOIN_CHANNEL,
@@ -84,6 +84,10 @@ export class DiscordManager {
       this.logger.log('Disconnecting from current channel');
       return await this.disconnect();
     });
+
+    /***
+     *  NEW APIs
+     **/
     ipcMain.handle(DiscordChannel.CONNECT_TOKEN, async (_, tokenId: string) => {
       return await this.connectNewToken(tokenId);
     });
@@ -96,6 +100,12 @@ export class DiscordManager {
     ipcMain.handle(DiscordChannel.GET_CONNECTED_TOKENS, async () => {
       return await this.getActiveTokens();
     });
+    ipcMain.handle(
+      DiscordChannel.GET_TOKEN_CHANNELS,
+      async (_, tokenId: string) => {
+        return await this.getVoiceChannelsForToken(tokenId);
+      }
+    );
   }
 
   async updateState(guildId?: string, channelId?: string): Promise<void> {
@@ -149,7 +159,7 @@ export class DiscordManager {
     });
   }
 
-  private async connectNewToken(tokenId: string) {
+  async connectNewToken(tokenId: string) {
     const token = await this.tokenManager.getTokenById(tokenId);
     if (!token) {
       this.logger.logErrorMessage('Token not found for ID', { tokenId });
@@ -166,6 +176,13 @@ export class DiscordManager {
     try {
       await this.connections.connectToken(token.apiKey);
       await this.broadcastActiveTokensUpdate();
+      await this.tokenManager.saveToken(
+        {
+          ...token,
+          active: true,
+        },
+        token.id
+      );
       return true;
     } catch (error) {
       await this.handleConnectionFailure(token.apiKey);
@@ -220,6 +237,13 @@ export class DiscordManager {
     try {
       await this.connections.disconnectToken(token.apiKey);
       await this.broadcastActiveTokensUpdate();
+      await this.tokenManager.saveToken(
+        {
+          ...token,
+          active: false,
+        },
+        token.id
+      );
       return true;
     } catch (error) {
       return false;
@@ -520,8 +544,9 @@ export class DiscordManager {
     }
   }
 
-  async getAvailableChannels() {
-    const guilds = await this.client?.guilds.fetch();
+  async getAvailableChannels(client: Client) {
+    this.logger.log(`Fetching available channels.`);
+    const guilds = await client?.guilds.fetch();
     const collection: GuildWithChannels[] = [];
     for (const guild of guilds?.values() || []) {
       const fetchedGuild = await guild.fetch();
@@ -546,6 +571,22 @@ export class DiscordManager {
       });
     }
     return collection;
+  }
+
+  async getVoiceChannelsForToken(
+    tokenId: string
+  ): Promise<GuildWithChannels[]> {
+    const token = await this.tokenManager.getTokenById(tokenId);
+    if (!token) {
+      this.logger.logErrorMessage('Token not found for ID', { tokenId });
+      return [];
+    }
+    const client = this.connections.clients.get(token.apiKey);
+    if (!client) {
+      this.logger.logErrorMessage('No active client for token', { tokenId });
+      return [];
+    }
+    return this.getAvailableChannels(client);
   }
 
   private attemptReconnect(guildId: string, channelId: string): void {

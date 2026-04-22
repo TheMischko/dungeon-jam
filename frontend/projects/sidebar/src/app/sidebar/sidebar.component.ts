@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, OnInit } from '@angular/core';
+import { Component, computed, inject, OnInit } from '@angular/core';
 import { RedirectPath, RedirectRequest } from '@shared/models/redirect.model';
 import { SidebarItem } from '../../models/sidebar.model';
 import { SidebarItemComponent } from './sidebar-item/sidebar-item.component';
@@ -22,7 +22,7 @@ export class SidebarComponent implements OnInit {
 
   readonly activePath = toSignal(
     this.redirectService.redirect$.pipe(filter((v) => v !== null)),
-    { initialValue: null },
+    { initialValue: null }
   );
 
   readonly items = computed<SidebarItem[]>(() => {
@@ -60,7 +60,7 @@ export class SidebarComponent implements OnInit {
         title: 'Settings',
         redirectRequest: { path: RedirectPath.SETTINGS },
         active: activePath === RedirectPath.SETTINGS,
-      }
+      },
     ];
   });
 
@@ -71,12 +71,6 @@ export class SidebarComponent implements OnInit {
         sortDirection: SortDirection.ASC,
       });
     }, 250);
-  }
-
-  constructor() {
-    effect(() => {
-      console.log('playlists', this.playlists());
-    });
   }
 
   triggerRedirect(request: RedirectRequest) {

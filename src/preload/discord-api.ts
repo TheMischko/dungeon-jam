@@ -54,6 +54,10 @@ const getConnectedTokens = async (): Promise<DiscordTokenData[]> => {
   return await ipcRenderer.invoke(DiscordChannel.GET_CONNECTED_TOKENS);
 };
 
+const getTokenChannels = async (tokenId: string): Promise<GuildWithChannels[]> => {
+  return await ipcRenderer.invoke(DiscordChannel.GET_TOKEN_CHANNELS, tokenId);
+};
+
 const DiscordApi = {
   getChannels,
   joinChannel,
@@ -63,6 +67,7 @@ const DiscordApi = {
   connectToken,
   disconnectToken,
   getConnectedTokens,
+  getTokenChannels,
 };
 
 export default DiscordApi;

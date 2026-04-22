@@ -1,8 +1,8 @@
-import { app, ipcMain } from 'electron';
+import { app } from 'electron';
 import { configDotenv } from 'dotenv';
 import { StartupManager } from './main/managers/startup.manager';
 import { ViewManager } from './main/managers/view.manager';
-import { AppChannel, GeneralChannels } from '@shared/models/channels.model';
+import { GeneralChannels } from '@shared/models/channels.model';
 import { Logger } from './main/utils/logger';
 
 configDotenv();
@@ -23,6 +23,7 @@ app.on('ready', async () => {
   } else {
     await sendAppReadySignal();
   }
+  await startup.afterAllInitialized();
 });
 
 async function sendAppReadySignal() {

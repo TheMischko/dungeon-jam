@@ -7,6 +7,7 @@ import { opus } from 'prism-media';
 import Encoder = opus.Encoder;
 import { getAudioConfig } from '../configs';
 import { Logger } from '../utils/logger';
+import { DiscordTokenManager } from './discord-token.manager';
 
 export class StartupManager {
   private static instance: StartupManager;
@@ -93,6 +94,12 @@ export class StartupManager {
       });
       return false;
     }
+  }
+
+  public async afterAllInitialized(): Promise<void> {
+    this.logger.log('Performing post-initialization tasks');
+    const discordTokenManager = await DiscordTokenManager.getInstance();
+    await discordTokenManager.connectActiveTokens();
   }
 
   private async initializeManager(

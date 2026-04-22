@@ -48,6 +48,7 @@ export type DiscordTokenData = {
 export type DiscordTokenUpdateData = {
   apiKey: string;
   name: string;
+  active?: boolean;
 };
 
 export type DiscordTokenActiveUpdate = {

@@ -4,6 +4,7 @@ import {
   Component,
   computed,
   inject,
+  OnInit,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -25,7 +26,6 @@ import {
   GuildWithChannels,
 } from '@shared/models/discord.model';
 import { DiscordTokenStore } from '@general/stores/discord-token.store';
-import { tap } from 'rxjs';
 
 type PlaybackApiWindow = Window & {
   PLAYBACK_API: {
@@ -46,7 +46,7 @@ type PlaybackApiWindow = Window & {
   styleUrl: './stream-settings.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class StreamSettingsComponent implements AfterViewInit {
+export class StreamSettingsComponent implements OnInit, AfterViewInit {
   private readonly window = window as unknown as PlaybackApiWindow;
   readonly discordService = inject(DiscordService);
   readonly discordTokenStore = inject(DiscordTokenStore);
@@ -64,29 +64,8 @@ export class StreamSettingsComponent implements AfterViewInit {
       return 'local';
     }
   );
-  readonly connectedTokenIds = toSignal(
-    this.discordService.activeTokens$.pipe(
-      tap((tokens) => console.log('obser', tokens))
-    ),
-    {
-      initialValue: [],
-    }
-  );
-  readonly availableTokens = computed(() => {
-    const tokenIds = this.connectedTokenIds();
-    const tokens = this.discordTokenStore.entityMap();
-    console.log('connected token ids', tokenIds);
-    console.log('all tokens', tokens);
-    const tokenData = tokenIds
-      .map((id) => tokens[id])
-      .filter((token) => token !== undefined);
-    console.log('available token data', tokenData);
-    return tokenData;
-  });
-  readonly availableDiscordChannels = toSignal(
-    this.discordService.getChannels(),
-    { initialValue: [] }
-  );
+
+  readonly tokenChannelsMap = this.discordTokenStore.channelsMap;
 
   readonly discordState = toSignal(this.discordService.discordState$, {
     initialValue: { type: DiscordStateType.NONE },
@@ -104,7 +83,10 @@ export class StreamSettingsComponent implements AfterViewInit {
   readonly discordPlaybackIcon = 'discord';
 
   readonly serversFlattened = computed<ActionsMenuBaseConfig<null>[]>(() => {
-    const servers = this.availableDiscordChannels();
+    const channelsMap = this.tokenChannelsMap();
+    const servers = Object.keys(channelsMap).flatMap(
+      (tokenId) => channelsMap[tokenId]
+    );
     return servers.reduce((channels, server, _, __) => {
       return [
         ...channels,
@@ -112,13 +94,6 @@ export class StreamSettingsComponent implements AfterViewInit {
           this.mapServerChannelToActionConfig(server, channel)
         ),
       ];
-    }, [] as ActionsMenuBaseConfig<null>[]);
-  });
-
-  readonly tokensFlattened = computed<ActionsMenuBaseConfig<null>[]>(() => {
-    const tokens = this.availableTokens();
-    return tokens.reduce((channels, token, _, __) => {
-      return [...channels, this.mapTokenToActionConfig(token)];
     }, [] as ActionsMenuBaseConfig<null>[]);
   });
 
@@ -130,7 +105,7 @@ export class StreamSettingsComponent implements AfterViewInit {
         cssClasses: this.isActive() ? ['active'] : [],
         onSelected: () => this.switchToLocalPlayback(),
       },
-      ...this.tokensFlattened(),
+      ...this.serversFlattened(),
     ];
   });
 
@@ -153,6 +128,10 @@ export class StreamSettingsComponent implements AfterViewInit {
     }
     return false;
   };
+
+  ngOnInit() {
+    this.discordTokenStore.loadTokens();
+  }
 
   ngAfterViewInit() {
     setTimeout(() => {

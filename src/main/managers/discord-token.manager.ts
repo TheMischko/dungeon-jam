@@ -7,6 +7,7 @@ import { DiscordTokenChannel } from '@shared/models/channels.model';
 import { DatabaseProvider } from '../database/database-provider';
 import { DatabaseProviderCreator } from '../database/database-provider-creator';
 import { Logger } from '../utils/logger';
+import { DiscordManager } from './discord.manager';
 
 export class DiscordTokenManager {
   private static instance: DiscordTokenManager;
@@ -23,21 +24,22 @@ export class DiscordTokenManager {
   }
 
   public async saveToken(
-    data: DiscordTokenUpdateDataInternal,
+    data: DiscordTokenUpdateData,
     id?: string
   ): Promise<DiscordTokenData> {
-    this.logger.log(`Saving token with id ${id} and data:`, data);
+    const tokenData = this.updateDates(data);
+    this.logger.log(`Saving token with id ${id} and data:`, tokenData);
     try {
-      const oldToken = await this.db.getBy('id', id);
+      const oldToken = id ? await this.db.getBy('id', id) : null;
       this.logger.log('Existing token found:', oldToken!);
       if (oldToken) {
         return await this.db.replaceRecord({
           ...oldToken,
-          ...data,
+          ...tokenData,
         });
       }
       this.logger.log('No existing token found, creating new one', data);
-      return await this.db.create(data, id);
+      return await this.db.create(tokenData, id);
     } catch (error) {
       console.error('[DiscordTokenManager] Failed to save token', error);
       throw error;
@@ -74,21 +76,27 @@ export class DiscordTokenManager {
     }
   }
 
+  public async connectActiveTokens(): Promise<void> {
+    const tokens = await this.getTokens();
+    const discordService = await DiscordManager.getInstance();
+    for (const token of tokens) {
+      this.logger.log(`Connecting with loaded active token ${token.id}...`);
+      await discordService.connectNewToken(token.id);
+    }
+  }
+
   private registerIpcHandlers(): void {
     ipcMain.handle(
       DiscordTokenChannel.CREATE,
       async (_, data: DiscordTokenUpdateData) => {
-        return await this.saveToken(this.updateDates(data));
+        return await this.saveToken(data);
       }
     );
 
     ipcMain.handle(
       DiscordTokenChannel.UPDATE,
       async (_, payload: { id: string; newData: DiscordTokenUpdateData }) => {
-        const result = await this.saveToken(
-          this.updateDates(payload.newData),
-          payload.id
-        );
+        const result = await this.saveToken(payload.newData, payload.id);
         this.logger.log(`Token updated. Result:`, result);
         return result;
       }
