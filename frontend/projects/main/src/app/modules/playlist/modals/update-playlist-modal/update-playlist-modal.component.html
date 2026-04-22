@@ -1,0 +1,16 @@
+<div class="wrapper">
+  <div class="header">
+    <h1>Update playlist {{ dialogData.playlist.name }}</h1>
+  </div>
+
+  <app-playlist-form [form]="form"></app-playlist-form>
+
+  <div class="footer">
+    <div class="buttons">
+      <button mat-flat-button (click)="save()">Save</button>
+      <button mat-flat-button (click)="cancel()" color="tertiary">
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>
