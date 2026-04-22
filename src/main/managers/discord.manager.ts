@@ -77,7 +77,11 @@ export class DiscordManager {
       DiscordChannel.JOIN_CHANNEL,
       async (_, request: JoinChannelRequest) => {
         this.logger.log('Joining channel', request);
-        return await this.joinChannel(request.guildId, request.channelId);
+        return await this.joinChannel(
+          request.guildId,
+          request.channelId,
+          request.tokenId
+        );
       }
     );
     ipcMain.handle(DiscordChannel.DISCONNECT, async (_) => {
@@ -108,26 +112,53 @@ export class DiscordManager {
     );
   }
 
-  async updateState(guildId?: string, channelId?: string): Promise<void> {
-    if ((!guildId && !channelId) || !this.client) {
+  async updateState(
+    guildId?: string,
+    channelId?: string,
+    tokenId?: string
+  ): Promise<void> {
+    if (!guildId || !channelId || !tokenId) {
       this.state = { type: DiscordStateType.NONE };
       await this.broadcastDiscordState();
       return;
     }
-    const channel = (await this.client.channels.fetch(
+    const token = await this.tokenManager.getTokenById(tokenId!);
+    if (!token) {
+      this.logger.logErrorMessage('Token not found during state update.', {
+        tokenId,
+      });
+      this.state = { type: DiscordStateType.NONE };
+      await this.broadcastDiscordState();
+      return;
+    }
+
+    const client = this.connections.clients.get(token.apiKey);
+    if (!client) {
+      this.logger.logErrorMessage('Client not found during state update.', {
+        tokenId,
+      });
+      this.state = { type: DiscordStateType.NONE };
+      await this.broadcastDiscordState();
+      return;
+    }
+
+    const channel = (await client.channels.fetch(
       channelId!
     )) as VoiceChannel | null;
     if (!channel) {
+      this.logger.logErrorMessage('Channel not found during state update.');
       this.state = { type: DiscordStateType.NONE };
       await this.broadcastDiscordState();
       return;
     }
+
     this.state = {
       type: DiscordStateType.CONNECTED,
       guildId: guildId!,
       guildName: channel.guild.name,
       channelId: channelId!,
       channelName: channel.name,
+      tokenId,
     };
     await this.broadcastDiscordState();
   }
@@ -334,9 +365,19 @@ export class DiscordManager {
     }
   }
 
-  async joinChannel(guildId: string, channelId: string): Promise<void> {
-    if (!this.client) {
-      this.logger.logErrorMessage('Client not initialized');
+  async joinChannel(
+    guildId: string,
+    channelId: string,
+    tokenId: string
+  ): Promise<void> {
+    const token = await this.tokenManager.getTokenById(tokenId);
+    if (!token) {
+      this.logger.logErrorMessage('Token not found during join channel.');
+      return;
+    }
+    const client = this.connections.clients.get(token.apiKey);
+    if (!client) {
+      this.logger.logErrorMessage('Client not found during join channel.');
       return;
     }
 
@@ -374,11 +415,13 @@ export class DiscordManager {
         this.voiceDataStream = undefined;
       }
 
-      const channel = (await this.client.channels.fetch(
+      const channel = (await client.channels.fetch(
         channelId
       )) as VoiceChannel | null;
       if (!channel) {
-        this.logger.log('Channel not found', { channelId });
+        this.logger.log('Channel not found during join channel.', {
+          channelId,
+        });
         return;
       }
 
@@ -394,7 +437,7 @@ export class DiscordManager {
           .voiceAdapterCreator as unknown as DiscordGatewayAdapterCreator,
       });
 
-      this.appendConnectionEventHandlers(guildId, channelId);
+      this.appendConnectionEventHandlers(guildId, channelId, token.id);
       this.reconnectAttempts = 0;
     } catch (error) {
       this.logger.logErrorMessage('Failed to join channel', { error });
@@ -589,12 +632,16 @@ export class DiscordManager {
     return this.getAvailableChannels(client);
   }
 
-  private attemptReconnect(guildId: string, channelId: string): void {
+  private async attemptReconnect(
+    guildId: string,
+    channelId: string,
+    tokenId: string
+  ): Promise<void> {
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
       this.logger.log('Max reconnection attempts reached', {
         maxAttempts: this.maxReconnectAttempts,
       });
-      this.updateState().then(() => {});
+      await this.updateState();
       return;
     }
 
@@ -605,7 +652,7 @@ export class DiscordManager {
     });
 
     setTimeout(() => {
-      this.joinChannel(guildId, channelId).catch(console.error);
+      this.joinChannel(guildId, channelId, tokenId).catch(console.error);
     }, this.reconnectDelayMs);
   }
 
@@ -640,24 +687,26 @@ export class DiscordManager {
    *
    * @param guildId ID of the guild (server)
    * @param channelId ID of the voice channel
+   * @param tokenId
    * @private
    */
   private appendConnectionEventHandlers(
     guildId: string,
-    channelId: string
+    channelId: string,
+    tokenId: string
   ): void {
     if (!this.connection) return;
     // Monitor connection status for unstable networks
-    this.connection.on(VoiceConnectionStatus.Ready, () => {
+    this.connection.on(VoiceConnectionStatus.Ready, async () => {
       this.logger.log('Voice connection ready');
       this.startStreaming();
-      this.updateState(guildId, channelId).then(() => {});
+      await this.updateState(guildId, channelId, tokenId);
     });
 
-    this.connection.on(VoiceConnectionStatus.Disconnected, () => {
+    this.connection.on(VoiceConnectionStatus.Disconnected, async () => {
       this.logger.logWarning('Voice connection disconnected');
       // Attempt to reconnect
-      this.attemptReconnect(guildId, channelId);
+      await this.attemptReconnect(guildId, channelId, tokenId);
     });
 
     this.connection.on(VoiceConnectionStatus.Destroyed, () => {

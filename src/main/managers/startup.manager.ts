@@ -15,17 +15,11 @@ export class StartupManager {
   private initialized: boolean = false;
   private logger = new Logger('StartupManager', 'green');
 
-  private constructor(
-    private buildPath: string,
-    private discordToken: string
-  ) {}
+  private constructor(private buildPath: string) {}
 
-  public static getInstance(
-    buildPath: string,
-    discordToken: string
-  ): StartupManager {
+  public static getInstance(buildPath: string): StartupManager {
     if (!StartupManager.instance) {
-      StartupManager.instance = new StartupManager(buildPath, discordToken);
+      StartupManager.instance = new StartupManager(buildPath);
     }
     return StartupManager.instance;
   }
@@ -71,7 +65,7 @@ export class StartupManager {
       encoder.on('end', () => this.logger.log('Audio Encoder ended'));
       encoder.on('drain', () => this.logger.log('Audio Encoder drain event'));
 
-      const discordManager = await setupDiscord(this.discordToken);
+      const discordManager = await DiscordManager.getInstance();
 
       // Setup WebSocket server with jitter buffer for network stability
       setupWebsocketServer(async (data) => {
@@ -159,10 +153,4 @@ function setupWebsocketServer(
   });
 
   return { websocketServer };
-}
-
-async function setupDiscord(token: string): Promise<DiscordManager> {
-  const discordManager = await DiscordManager.getInstance();
-  await discordManager.connect(token);
-  return discordManager;
 }
