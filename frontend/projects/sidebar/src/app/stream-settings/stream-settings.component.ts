@@ -21,8 +21,8 @@ import { DiscordService } from '@general/services/discord.service';
 import { toSignal } from '@angular/core/rxjs-interop';
 import {
   ChannelData,
+  DiscordStateConnected,
   DiscordStateType,
-  DiscordTokenData,
   GuildWithChannels,
 } from '@shared/models/discord.model';
 import { DiscordTokenStore } from '@general/stores/discord-token.store';
@@ -59,6 +59,7 @@ export class StreamSettingsComponent implements OnInit, AfterViewInit {
           guildName: discordState.guildName,
           channelId: discordState.channelId,
           channelName: discordState.channelName,
+          tokenId: discordState.tokenId,
         };
       }
       return 'local';
@@ -84,16 +85,14 @@ export class StreamSettingsComponent implements OnInit, AfterViewInit {
 
   readonly serversFlattened = computed<ActionsMenuBaseConfig<null>[]>(() => {
     const channelsMap = this.tokenChannelsMap();
-    const servers = Object.keys(channelsMap).flatMap(
-      (tokenId) => channelsMap[tokenId]
-    );
-    return servers.reduce((channels, server, _, __) => {
-      return [
-        ...channels,
-        ...server.channels.map((channel) =>
-          this.mapServerChannelToActionConfig(server, channel)
-        ),
-      ];
+    return Object.keys(channelsMap).reduce((channels, tokenId, _, __) => {
+      const serverData = channelsMap[tokenId];
+      const serverChannelActions = serverData.flatMap((guild) => {
+        return guild.channels.map((channel) =>
+          this.mapServerChannelToActionConfig(guild, channel, tokenId)
+        );
+      });
+      return [...channels, ...serverChannelActions];
     }, [] as ActionsMenuBaseConfig<null>[]);
   });
 
@@ -111,6 +110,13 @@ export class StreamSettingsComponent implements OnInit, AfterViewInit {
 
   readonly isDiscordPlayback = computed<boolean>(() => {
     return this.currentStreamDestination() !== 'local';
+  });
+  readonly discordPlayback = computed<DiscordStateConnected>(() => {
+    const destination = this.currentStreamDestination();
+    if (destination === 'local') {
+      throw new Error('Not in Discord playback mode');
+    }
+    return destination as DiscordStateConnected;
   });
 
   readonly isActive = (activeId: string | null = null) => {
@@ -152,7 +158,11 @@ export class StreamSettingsComponent implements OnInit, AfterViewInit {
 
   switchToDiscordPlayback(discordInfo: DiscordPlaybackInfo): void {
     this.discordService
-      .joinChannel(discordInfo.guildId, discordInfo.channelId)
+      .joinChannel(
+        discordInfo.guildId,
+        discordInfo.channelId,
+        discordInfo.tokenId
+      )
       .subscribe();
     // When switching to Discord playback, mute the capture (isLocalMuted = true)
     // This prevents audio from playing through speakers
@@ -161,7 +171,8 @@ export class StreamSettingsComponent implements OnInit, AfterViewInit {
 
   private mapServerChannelToActionConfig(
     guild: GuildWithChannels,
-    channel: ChannelData
+    channel: ChannelData,
+    tokenId: string
   ): ActionsMenuBaseConfig<null> {
     return {
       text: `${guild.guildName} - ${channel.name}`,
@@ -173,21 +184,9 @@ export class StreamSettingsComponent implements OnInit, AfterViewInit {
           guildName: guild.guildName,
           channelId: channel.id,
           channelName: channel.name,
+          tokenId,
         });
       },
-    };
-  }
-
-  private mapTokenToActionConfig(
-    token: DiscordTokenData
-  ): ActionsMenuBaseConfig<null> {
-    return {
-      text: `${token.name}`,
-      icon: this.discordPlaybackIcon as unknown as LucideIconData,
-      cssClasses: [
-        'discord-icon',
-        ...(this.isActive(token.id) ? ['active'] : []),
-      ],
     };
   }
 }
@@ -197,4 +196,5 @@ type DiscordPlaybackInfo = {
   guildName: string;
   channelId: string;
   channelName: string;
+  tokenId: string;
 };

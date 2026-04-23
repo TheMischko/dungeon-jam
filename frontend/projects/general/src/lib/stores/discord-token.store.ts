@@ -290,10 +290,6 @@ export const DiscordTokenStore = signalStore(
                   ...result,
                 },
               });
-              console.log(
-                '[DiscordTokenStore] Updated channels map',
-                store.channelsMap()
-              );
             });
 
           return () => {

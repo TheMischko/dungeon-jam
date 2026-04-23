@@ -33,7 +33,6 @@ export class DiscordService {
     });
     this.window.DISCORD_API.onActiveTokensUpdate(
       (update: DiscordTokenActiveUpdate) => {
-        console.log('new tokens', update.connectedTokens);
         this.activeTokensSubject.next(update.connectedTokens);
       }
     );
@@ -53,9 +52,13 @@ export class DiscordService {
     return subject.asObservable();
   }
 
-  joinChannel(guildId: string, channelId: string): Observable<void> {
+  joinChannel(
+    guildId: string,
+    channelId: string,
+    tokenId: string
+  ): Observable<void> {
     const subject = new Subject<void>();
-    this.window.DISCORD_API.joinChannel(guildId, channelId)
+    this.window.DISCORD_API.joinChannel(guildId, channelId, tokenId)
       .then(() => {
         subject.next();
         subject.complete();
@@ -136,7 +139,7 @@ export class DiscordService {
   ): Observable<Record<string, GuildWithChannels[]>> {
     const requests = tokenIds.map((tokenId) =>
       this.getChannelsForToken(tokenId).pipe(
-        map((channels) => ({ tokenId: channels }))
+        map((channels) => ({ [tokenId]: channels }))
       )
     );
     return forkJoin(requests).pipe(

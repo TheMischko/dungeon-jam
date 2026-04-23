@@ -6,13 +6,11 @@ import { GeneralChannels } from '@shared/models/channels.model';
 import { Logger } from './main/utils/logger';
 
 configDotenv();
-const DISCORD_TOKEN = process.env.DISCORD_TOKEN || 'ERROR';
 const ENV = process.env.ENV || 'production';
-console.log('DISCORD_TOKEN', DISCORD_TOKEN);
 const appLogger = new Logger('APP', 'cyanBright');
 
 app.on('ready', async () => {
-  const startup = StartupManager.getInstance(__dirname, DISCORD_TOKEN);
+  const startup = StartupManager.getInstance(__dirname);
   const managersInitSuccess = await startup.initializeAllManagers();
   const resourcesInitSuccess = await startup.initializeResources();
   const initSuccess = managersInitSuccess && resourcesInitSuccess;

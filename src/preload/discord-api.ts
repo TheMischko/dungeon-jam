@@ -15,10 +15,12 @@ const getChannels = async (): Promise<GuildWithChannels[]> => {
 const joinChannel = async (
   guildId: string,
   channelId: string,
+  tokenId: string,
 ): Promise<void> => {
   return await ipcRenderer.invoke(DiscordChannel.JOIN_CHANNEL, {
     guildId,
     channelId,
+    tokenId,
   } as JoinChannelRequest);
 };
 

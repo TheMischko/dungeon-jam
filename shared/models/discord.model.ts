@@ -13,6 +13,7 @@ export interface ChannelData {
 export interface JoinChannelRequest {
   guildId: string;
   channelId: string;
+  tokenId: string;
 }
 
 export type DiscordState = DiscordStateNone | DiscordStateConnected;
@@ -27,6 +28,7 @@ export type DiscordStateConnected = {
   guildName: string;
   channelId: string;
   channelName: string;
+  tokenId: string;
 };
 
 export enum DiscordStateType {

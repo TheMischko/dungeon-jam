@@ -9,7 +9,7 @@ export type DiscordWindow = Window &
   typeof globalThis & {
     DISCORD_API: {
       getChannels: () => Promise<GuildWithChannels[]>;
-      joinChannel: (guildId: string, channelId: string) => Promise<void>;
+      joinChannel: (guildId: string, channelId: string, tokenId: string) => Promise<void>;
       disconnect: () => Promise<void>;
       onStateUpdate: (
         callback: (state: DiscordState) => void | Promise<void>
