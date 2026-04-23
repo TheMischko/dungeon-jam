@@ -13,7 +13,7 @@ import { PlaylistTracksStore } from '../../../../../stores/playlist-tracks.store
 import { PlaylistApiService } from '@general/services/playlist-api.service';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
-import { Playlist } from '@shared/models/playlist.model';
+import { Playlist, PlaylistUpdateQuery } from '@shared/models/playlist.model';
 import { PlaylistsDetailPageComponent } from '../playlists-detail-page.component';
 import { PlaybackService } from '../../../../../services/playback.service';
 import { PlaybackState } from '../../../../../models/playback.model';
@@ -30,6 +30,10 @@ import { ToastType } from '../../../../../models/toast.model';
 import { QueryOptions } from '@shared/models/request.model';
 import { PlaylistStore } from '@general/stores/playlist.store';
 import { DefaultTrackActionsService } from '../../../../../services/default-track-actions.service';
+import {
+  UpdatePlaylistModalComponent,
+  UpdatePlaylistModalData,
+} from '../../../modals/update-playlist-modal/update-playlist-modal.component';
 
 @Component({
   selector: 'app-playlists-detail-page-smart',
@@ -149,6 +153,25 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
         }
       }
     );
+  }
+
+  openEditPlaylistModal() {
+    const dialogRef = this.dialogService.open<
+      UpdatePlaylistModalComponent,
+      PlaylistUpdateQuery
+    >(UpdatePlaylistModalComponent, {
+      data: {
+        playlist: this.playlist(),
+        parentPlaylist: this.parentPlaylist() ?? undefined,
+      } as UpdatePlaylistModalData,
+    });
+
+    dialogRef.afterClosed$.subscribe((result) => {
+      if (!result) {
+        return;
+      }
+      this.playlistStore.updatePlaylist(result);
+    });
   }
 
   private addTracksToPlaylist(tracks: Track[]): void {

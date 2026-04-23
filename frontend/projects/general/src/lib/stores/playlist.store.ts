@@ -9,12 +9,14 @@ import {
   entityConfig,
   setAllEntities,
   setEntities,
+  setEntity,
   withEntities,
 } from '@ngrx/signals/entities';
 import {
   Playlist,
   PlaylistAddTracksData,
   PlaylistInsertQuery,
+  PlaylistUpdateQuery,
 } from '@shared/models/playlist.model';
 import { inject } from '@angular/core';
 import { PlaylistApiService } from '@general/services/playlist-api.service';
@@ -54,7 +56,7 @@ export const PlaylistStore = signalStore(
     const load = rxMethod<QueryRequest>(
       pipe(
         tap((query) =>
-          patchState(store, { loading: true, lastLoadQuery: query }),
+          patchState(store, { loading: true, lastLoadQuery: query })
         ),
         debounceTime(500),
         switchMap((query) => {
@@ -68,10 +70,10 @@ export const PlaylistStore = signalStore(
             }),
             finalize(() => {
               patchState(store, { loading: false });
-            }),
+            })
           );
-        }),
-      ),
+        })
+      )
     );
 
     const insertNew = rxMethod<PlaylistInsertQuery>(
@@ -86,10 +88,30 @@ export const PlaylistStore = signalStore(
               console.error(err);
               patchState(store, { loading: false });
               return EMPTY;
-            }),
+            })
           );
-        }),
-      ),
+        })
+      )
+    );
+
+    const updatePlaylist = rxMethod<PlaylistUpdateQuery>(
+      pipe(
+        tap(() => patchState(store, { loading: true })),
+        switchMap((query) => {
+          return playlistApiService.updatePlaylist(query).pipe(
+            tap((updatedPlaylist) => {
+              patchState(store, setEntity(updatedPlaylist));
+            }),
+            catchError((err) => {
+              console.error(`Could not update playlist ${query.id}`, err);
+              return EMPTY;
+            }),
+            finalize(() => {
+              patchState(store, { loading: false });
+            })
+          );
+        })
+      )
     );
 
     const addNewTracks = rxMethod<PlaylistAddTracksData>(
@@ -103,11 +125,11 @@ export const PlaylistStore = signalStore(
             tap((updated) => {
               const loadedPlaylistIds = store.ids();
               const updatedPlaylistIds = Array.from(updated.keys()).filter(
-                (key) => loadedPlaylistIds.includes(key),
+                (key) => loadedPlaylistIds.includes(key)
               );
 
               const updatedPlaylists = Array.from(updated.values()).filter(
-                (playlist) => updatedPlaylistIds.includes(playlist.id),
+                (playlist) => updatedPlaylistIds.includes(playlist.id)
               );
 
               patchState(store, setEntities(updatedPlaylists));
@@ -118,10 +140,10 @@ export const PlaylistStore = signalStore(
             }),
             finalize(() => {
               patchState(store, { loading: false });
-            }),
+            })
           );
-        }),
-      ),
+        })
+      )
     );
 
     const getParent = (playlistId: string) => {
@@ -132,13 +154,14 @@ export const PlaylistStore = signalStore(
         return null;
       }
       return playlistMap[parentId] || null;
-    }
+    };
 
     return {
       load,
       insertNew,
       addNewTracks,
-      getParent
+      getParent,
+      updatePlaylist,
     };
-  }),
+  })
 );

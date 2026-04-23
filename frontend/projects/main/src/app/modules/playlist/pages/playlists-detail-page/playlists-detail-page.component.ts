@@ -1,4 +1,11 @@
-import { Component, computed, input, output, TemplateRef, viewChild } from '@angular/core';
+import {
+  Component,
+  computed,
+  input,
+  output,
+  TemplateRef,
+  viewChild,
+} from '@angular/core';
 import { Playlist } from '@shared/models/playlist.model';
 import { Track } from '@shared/models/track.model';
 import { SongsTableComponent } from '../../../library/pages/library-landing-page/songs-table/songs-table.component';
@@ -14,13 +21,9 @@ import { LucideAngularModule } from 'lucide-angular';
 import { QueryOptions } from '@shared/models/request.model';
 import { SwitchComponent } from '@general/components/controls/switch/switch.component';
 import { RouterLink } from '@angular/router';
-import {
-  CollapsibleSectionComponent
-} from '@general/components/display/collapsible-section/collapsible-section.component';
+import { CollapsibleSectionComponent } from '@general/components/display/collapsible-section/collapsible-section.component';
 import { ChildPlaylistBoxComponent } from './child-playlist-box/child-playlist-box.component';
-import {
-  ChildPlaylistActionsSmartComponent
-} from './child-playlist-actions/child-playlist-actions-smart/child-playlist-actions-smart.component';
+import { ChildPlaylistActionsSmartComponent } from './child-playlist-actions/child-playlist-actions-smart/child-playlist-actions-smart.component';
 
 @Component({
   selector: 'app-playlists-detail-page',
@@ -44,7 +47,7 @@ export class PlaylistsDetailPageComponent {
   readonly playlistPlaying = input<boolean>(false);
   readonly playingTrackId = input<string | undefined>();
   readonly songActionsMenuConfig = input<ActionsMenuConfig<Track, Playlist>[]>(
-    [],
+    []
   );
   readonly parentPlaylist = input<Playlist | null>(null);
   readonly childrenPlaylists = input<Playlist[]>([]);
@@ -55,6 +58,7 @@ export class PlaylistsDetailPageComponent {
   readonly queryChange = output<QueryOptions>();
   readonly openAddTracks = output<void>();
   readonly includeChildren = output<boolean>();
+  readonly editPlaylist = output<void>();
 
   readonly parentDetailRoute = computed(() => {
     const parent = this.parentPlaylist();
@@ -65,18 +69,26 @@ export class PlaylistsDetailPageComponent {
   });
 
   readonly childrenSectionConfig = computed(() => {
-    if(!this.childrenPlaylists() || this.childrenPlaylists().length === 0) {
-      return [] as {value: Playlist[], title: string, template: TemplateRef<{ $implicit: Playlist[]}>}[];
+    if (!this.childrenPlaylists() || this.childrenPlaylists().length === 0) {
+      return [] as {
+        value: Playlist[];
+        title: string;
+        template: TemplateRef<{ $implicit: Playlist[] }>;
+      }[];
     }
-    return [{
-      value: this.childrenPlaylists(),
-      title: 'Child Playlists',
-      template: this.childrenSectionTemplate(),
-    }]
+    return [
+      {
+        value: this.childrenPlaylists(),
+        title: 'Child Playlists',
+        template: this.childrenSectionTemplate(),
+      },
+    ];
   });
 
-
-  readonly childrenSectionTemplate = viewChild.required<TemplateRef<{$implicit: Playlist[]}>>('childrenTemplate')
+  readonly childrenSectionTemplate =
+    viewChild.required<TemplateRef<{ $implicit: Playlist[] }>>(
+      'childrenTemplate'
+    );
 
   readonly buttonType = ButtonType.Flat;
   readonly buttonSize: ButtonSize = 'large';
