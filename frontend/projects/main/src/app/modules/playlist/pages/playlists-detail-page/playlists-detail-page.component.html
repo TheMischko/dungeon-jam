@@ -19,14 +19,19 @@
       </div>
     }
   </div>
-  <div class="header-controls">
-    <lib-play-pause-button
-      [state]="playButtonState()"
-      [type]="buttonType"
-      [size]="buttonSize"
-      (toggle)="playPauseClicked($event)"
-    ></lib-play-pause-button>
-    <button mat-flat-button (click)="editPlaylist.emit()">Edit playlist</button>
+  <div class="header-bottom">
+    <div class="header-controls">
+      <lib-play-pause-button
+        [state]="playButtonState()"
+        [type]="buttonType"
+        [size]="buttonSize"
+        (toggle)="playPauseClicked($event)"
+      ></lib-play-pause-button>
+
+      <button mat-flat-button (click)="editPlaylist.emit()">Edit playlist</button>
+      <button mat-flat-button (click)="deletePlaylist.emit()" color="error">Delete playlist</button>
+    </div>
+    <lib-tag-list-smart class="playlist-tags" [tagIds]="playlist()?.tags ?? []"/>
   </div>
 </div>
 

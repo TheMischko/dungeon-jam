@@ -64,12 +64,13 @@ export class UpdatePlaylistModalComponent implements OnInit {
       const formValue = this.form().value();
       const originalTagIds = this.dialogData.playlist.tags ?? [];
       const removedTagIds = this.dialogData.playlist.tags.filter((tagId) =>
-        formValue.tags.some((formTag) => formTag.id === tagId)
+        !formValue.tags.some((formTag) => formTag.id === tagId)
       );
       const addedTagIds = formValue.tags
         .filter((t) => !originalTagIds.includes(t.id))
         .map((t) => t.id);
       this.dialog.close({
+        id: this.dialogData.playlist.id,
         name: formValue.name,
         description: formValue.description,
         imageUrl: formValue.imageUrl,

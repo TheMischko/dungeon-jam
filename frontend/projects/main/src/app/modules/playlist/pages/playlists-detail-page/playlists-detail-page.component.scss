@@ -54,8 +54,17 @@
       font-weight: normal;
     }
   }
-  .header-controls {
+  .header-bottom{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 97%;
     padding: 1rem;
+  }
+  .header-controls {
+    display: flex;
+    gap: 0.5rem;
+    width: 100%;
   }
   .playlist-image {
     position: absolute;
@@ -112,4 +121,8 @@
     flex-wrap: wrap;
     gap: 6px;
   }
+}
+
+:host ::ng-deep .playlist-tags lib-tag-list{
+  justify-content: flex-end;
 }

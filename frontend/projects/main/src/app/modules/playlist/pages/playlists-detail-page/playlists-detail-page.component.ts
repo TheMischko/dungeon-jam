@@ -24,6 +24,7 @@ import { RouterLink } from '@angular/router';
 import { CollapsibleSectionComponent } from '@general/components/display/collapsible-section/collapsible-section.component';
 import { ChildPlaylistBoxComponent } from './child-playlist-box/child-playlist-box.component';
 import { ChildPlaylistActionsSmartComponent } from './child-playlist-actions/child-playlist-actions-smart/child-playlist-actions-smart.component';
+import { TagListSmartComponent } from '@general/components/display/tag-list/tag-list-smart/tag-list-smart.component';
 
 @Component({
   selector: 'app-playlists-detail-page',
@@ -37,6 +38,7 @@ import { ChildPlaylistActionsSmartComponent } from './child-playlist-actions/chi
     CollapsibleSectionComponent,
     ChildPlaylistBoxComponent,
     ChildPlaylistActionsSmartComponent,
+    TagListSmartComponent,
   ],
   templateUrl: './playlists-detail-page.component.html',
   styleUrl: './playlists-detail-page.component.scss',
@@ -59,6 +61,7 @@ export class PlaylistsDetailPageComponent {
   readonly openAddTracks = output<void>();
   readonly includeChildren = output<boolean>();
   readonly editPlaylist = output<void>();
+  readonly deletePlaylist = output<void>();
 
   readonly parentDetailRoute = computed(() => {
     const parent = this.parentPlaylist();
