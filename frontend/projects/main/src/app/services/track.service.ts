@@ -1,7 +1,11 @@
 import { Injectable } from '@angular/core';
 import { AudioApiWindow } from '../models/window-api.model';
-import { PlaylistTracksQuery, TaggedTracksQuery, Track } from '@shared/models/track.model';
-import { map, Observable, Subject } from 'rxjs';
+import {
+  PlaylistTracksQuery,
+  TaggedTracksQuery,
+  Track,
+} from '@shared/models/track.model';
+import { forkJoin, map, Observable, Subject } from 'rxjs';
 import { QueryRequest } from '@shared/models/request.model';
 
 @Injectable({
@@ -51,6 +55,11 @@ export class TrackService {
     return subject.asObservable();
   }
 
+  updateMultiple(tracks: Track[]): Observable<Track[]> {
+    const calls = tracks.map((t) => this.updateTrack(t));
+    return forkJoin(calls);
+  }
+
   deleteTrack(id: string): Observable<boolean> {
     const subject = new Subject<boolean>();
     this.window.TRACK_API.deleteTrack(id)
@@ -64,17 +73,19 @@ export class TrackService {
     return subject.asObservable();
   }
 
-  findDuplicates(paths: string[]): Observable<{ path: string, track: Track | null}[]> {
+  findDuplicates(
+    paths: string[]
+  ): Observable<{ path: string; track: Track | null }[]> {
     return this.getAllTracks().pipe(
       map((tracks) => {
         const trackMap = new Map<string, Track>();
-        tracks.forEach(track => trackMap.set(track.url, track));
-        return paths.map(path => ({
+        tracks.forEach((track) => trackMap.set(track.url, track));
+        return paths.map((path) => ({
           path,
-          track: trackMap.get(path) || null
+          track: trackMap.get(path) || null,
         }));
       })
-    )
+    );
   }
 
   getTaggedTracks(query: TaggedTracksQuery): Observable<Track[]> {

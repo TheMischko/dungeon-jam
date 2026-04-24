@@ -9,11 +9,7 @@ export class DatabaseWrapper {
   private static get DB_FILE(): string {
     let fullPath: string;
 
-    if (app.isPackaged || process.env.ENV === 'production') {
-      fullPath = path.join(app.getPath('userData'), 'db.json');
-    } else {
-      fullPath = path.join(process.cwd(), 'build', 'src', 'db.json');
-    }
+    fullPath = path.join(app.getPath('userData'), 'db.json');
 
     const dir = path.dirname(fullPath);
     if (!fs.existsSync(dir)) {

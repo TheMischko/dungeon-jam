@@ -57,9 +57,11 @@ export class ViewManager {
         serverUrl
       );
 
-      frontendTab.tab.webContents.openDevTools({
-        mode: 'detach',
-      });
+      if (config.env !== 'production') {
+        frontendTab.tab.webContents.openDevTools({
+          mode: 'detach',
+        });
+      }
 
       ViewManager._instance = new ViewManager(
         appWindow,

@@ -7,6 +7,7 @@ import {
 } from '@ngrx/signals';
 import {
   entityConfig,
+  removeAllEntities,
   removeEntity,
   setAllEntities,
   setEntity,
@@ -39,11 +40,11 @@ export const TrackLibraryStore = signalStore(
     (
       store,
       trackApiService = inject(TrackService),
-      toastService = inject(ToastService),
+      toastService = inject(ToastService)
     ) => {
       const load = rxMethod<QueryRequest>(
         pipe(
-          tap(() => patchState(store, { loading: true })),
+          tap(() => patchState(store, { loading: true }, removeAllEntities())),
           switchMap((query: QueryRequest) => {
             return trackApiService.getAllTracks(query).pipe(
               tap((tracks: Track[]) => {
@@ -53,16 +54,16 @@ export const TrackLibraryStore = signalStore(
                 toastService.createToast(
                   'Load error',
                   error.message,
-                  ToastType.Error,
+                  ToastType.Error
                 );
                 return of([]);
               }),
               finalize(() => {
                 patchState(store, { loading: false });
-              }),
+              })
             );
-          }),
-        ),
+          })
+        )
       );
 
       const updateTrack = rxMethod<Track>(
@@ -73,7 +74,7 @@ export const TrackLibraryStore = signalStore(
                 toastService.createToast(
                   'Update error',
                   err.message,
-                  ToastType.Error,
+                  ToastType.Error
                 );
                 return of(null);
               }),
@@ -81,13 +82,13 @@ export const TrackLibraryStore = signalStore(
                 toastService.createToast(
                   'Track updated',
                   'The track was successfully updated.',
-                  ToastType.Success,
+                  ToastType.Success
                 );
                 patchState(store, setEntity(track));
               })
             );
-          }),
-        ),
+          })
+        )
       );
 
       const removeTrack = rxMethod<string>(
@@ -99,7 +100,7 @@ export const TrackLibraryStore = signalStore(
                 toastService.createToast(
                   'Delete error',
                   err.message,
-                  ToastType.Error,
+                  ToastType.Error
                 );
                 return of(false);
               }),
@@ -107,16 +108,16 @@ export const TrackLibraryStore = signalStore(
                 toastService.createToast(
                   'Track deleted',
                   'The track was successfully deleted.',
-                  ToastType.Success,
+                  ToastType.Success
                 );
                 patchState(store, removeEntity(trackId));
               }),
               finalize(() => {
                 patchState(store, { loading: false });
-              }),
+              })
             );
-          }),
-        ),
+          })
+        )
       );
 
       return {
@@ -124,6 +125,6 @@ export const TrackLibraryStore = signalStore(
         updateTrack,
         removeTrack,
       };
-    },
-  ),
+    }
+  )
 );

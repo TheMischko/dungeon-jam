@@ -4,11 +4,19 @@ import { StartupManager } from './main/managers/startup.manager';
 import { ViewManager } from './main/managers/view.manager';
 import { GeneralChannels } from '@shared/models/channels.model';
 import { Logger } from './main/utils/logger';
+import path from 'path';
 
 configDotenv();
 const ENV = process.env.ENV || 'production';
 const appLogger = new Logger('APP', 'cyanBright');
 let startupManager: StartupManager;
+
+app.name = 'dungeon-jam';
+
+if (!app.isPackaged) {
+  const appData = app.getPath('appData');
+  app.setPath('userData', path.join(appData, app.name));
+}
 
 app.on('ready', async () => {
   try {

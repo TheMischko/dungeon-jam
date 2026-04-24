@@ -2,7 +2,17 @@ import { inject, Injectable } from '@angular/core';
 import { AudioTrack, Track } from '@shared/models/track.model';
 import { DialogService } from '../../../services/dialog.service';
 import { TrackService } from '../../../services/track.service';
-import { combineLatest, EMPTY, finalize, map, Observable, of, switchMap, tap } from 'rxjs';
+import {
+  combineLatest,
+  EMPTY,
+  finalize,
+  forkJoin,
+  map,
+  Observable,
+  of,
+  switchMap,
+  tap,
+} from 'rxjs';
 import {
   DuplicateTracksModalComponent,
   DuplicateTracksModalData,
@@ -18,7 +28,7 @@ import { AudioFilesService } from '../../../services/audio-files.service';
 import { TagApiService } from '@general/services/tag-api.service';
 import { TagData } from '@shared/models/tag.model';
 
-const BULK_UPLOAD_THRESHOLD = 10;
+const BULK_UPLOAD_THRESHOLD = 3;
 
 @Injectable({
   providedIn: 'root',
@@ -52,7 +62,7 @@ export class NewTrackDropInService {
 
         return this.openCorrectUploadDialog(tracksToUpload);
       }),
-      finalize(() => this.reset()),
+      finalize(() => this.reset())
     );
   }
 
@@ -63,7 +73,9 @@ export class NewTrackDropInService {
    * @param tracksToUpload
    * @private
    */
-  private openCorrectUploadDialog(tracksToUpload: AudioTrack[]): Observable<void> {
+  private openCorrectUploadDialog(
+    tracksToUpload: AudioTrack[]
+  ): Observable<void> {
     return this.resolveTrackTags(tracksToUpload).pipe(
       switchMap((tagsMap) => {
         if (tracksToUpload.length >= BULK_UPLOAD_THRESHOLD) {
@@ -81,23 +93,30 @@ export class NewTrackDropInService {
    * Emits a boolean indicating whether any duplicates were found.
    */
   private checkDuplicateTracks(tracks: AudioTrack[]): Observable<boolean> {
-    return this.trackApiService.findDuplicates(tracks.map((t) => t.fullPath)).pipe(
-      tap((duplicates) => {
-        duplicates
-          .filter((d) => !!d.track)
-          .forEach((d) => this.duplicateMap.set(d.path, d.track as Track));
-      }),
-      map((duplicates) => duplicates.some((d) => !!d.track)),
-    );
+    return this.trackApiService
+      .findDuplicates(tracks.map((t) => t.fullPath))
+      .pipe(
+        tap((duplicates) => {
+          duplicates
+            .filter((d) => !!d.track)
+            .forEach((d) => this.duplicateMap.set(d.path, d.track as Track));
+        }),
+        map((duplicates) => duplicates.some((d) => !!d.track))
+      );
   }
 
   /**
    * Opens a dialog to inform the user about duplicate tracks and allows them to choose whether to override existing tracks or skip duplicates.
    */
-  private openDuplicatesDialog(audioTracks: AudioTrack[]): Observable<AudioTrack[] | undefined> {
+  private openDuplicatesDialog(
+    audioTracks: AudioTrack[]
+  ): Observable<AudioTrack[] | undefined> {
     const duplicates = audioTracks
       .filter((t) => this.duplicateMap.has(t.fullPath))
-      .map((t) => ({ path: t.fullPath, track: this.duplicateMap.get(t.fullPath) as Track }));
+      .map((t) => ({
+        path: t.fullPath,
+        track: this.duplicateMap.get(t.fullPath) as Track,
+      }));
 
     const dialogRef = this.dialogService.open<
       DuplicateTracksModalComponent,
@@ -115,7 +134,7 @@ export class NewTrackDropInService {
           return audioTracks.filter((t) => !this.duplicateMap.has(t.fullPath));
         }
         return undefined;
-      }),
+      })
     );
   }
 
@@ -124,32 +143,56 @@ export class NewTrackDropInService {
    * Allows the user to choose between reviewing files manually or autoresolving metadata.
    * Currently only the manual review path continues to the upload dialog.
    */
-  private openBulkConfirmationDialog(audioTracks: AudioTrack[], tagsMap: Map<string, TagData>): Observable<void> {
+  private openBulkConfirmationDialog(
+    audioTracks: AudioTrack[],
+    tagsMap: Map<string, TagData>
+  ): Observable<void> {
     const dialogRef = this.dialogService.open<
       BulkUploadConfirmationModalComponent,
       BulkUploadConfirmationModalResult
     >(BulkUploadConfirmationModalComponent, {
-      data: { count: audioTracks.length } satisfies BulkUploadConfirmationModalData,
+      data: {
+        count: audioTracks.length,
+      } satisfies BulkUploadConfirmationModalData,
     });
 
     return dialogRef.afterClosed$.pipe(
       switchMap((result) => {
+        if (!result) {
+          return EMPTY;
+        }
         if (result === 'manual') {
           return this.openUploadDialog(audioTracks, tagsMap);
         }
-        return this.audioFilesService.uploadAudioTracks(audioTracks);
-      }),
+        const tracksWithTags = audioTracks.map((track) => {
+          return {
+            ...track,
+            tags: track.tags?.map((t) => tagsMap?.get(t)?.id ?? t) ?? [],
+          };
+        });
+        const newTracks = tracksWithTags.filter(
+          (t) => !this.duplicateMap.has(t.fullPath)
+        );
+        return forkJoin([
+          this.audioFilesService.uploadAudioTracks(newTracks),
+          this.overrideTracks(tracksWithTags),
+        ]).pipe(switchMap(() => EMPTY));
+      })
     );
   }
-
   /**
    * Opens a dialog to edit the provided audio tracks details. After confirmation, it uploads new tracks and overrides duplicates as needed.
    */
-  private openUploadDialog(audioTracks: AudioTrack[], tagsMap: Map<string, TagData>): Observable<void> {
-    const dialog = this.dialogService.open<TracksUploadModalComponent, AudioTrack[] | null>(
+  private openUploadDialog(
+    audioTracks: AudioTrack[],
+    tagsMap: Map<string, TagData>
+  ): Observable<void> {
+    const dialog = this.dialogService.open<
       TracksUploadModalComponent,
-      { data: { title: 'Upload Tracks', tracks: audioTracks, tagsMap } },
-    );
+      AudioTrack[] | null
+    >(TracksUploadModalComponent, {
+      data: { title: 'Upload Tracks', tracks: audioTracks, tagsMap },
+    });
 
     return dialog.afterClosed$.pipe(
       switchMap((confirmedTracks) => {
@@ -157,8 +200,12 @@ export class NewTrackDropInService {
           return EMPTY;
         }
 
-        const duplicateTracks = confirmedTracks.filter((t) => this.duplicateMap.has(t.fullPath));
-        const newTracks = confirmedTracks.filter((t) => !this.duplicateMap.has(t.fullPath));
+        const duplicateTracks = confirmedTracks.filter((t) =>
+          this.duplicateMap.has(t.fullPath)
+        );
+        const newTracks = confirmedTracks.filter(
+          (t) => !this.duplicateMap.has(t.fullPath)
+        );
 
         const override$ = duplicateTracks.length
           ? this.overrideTracks(duplicateTracks)
@@ -169,7 +216,7 @@ export class NewTrackDropInService {
           : of(undefined);
 
         return combineLatest([override$, upload$]).pipe(map(() => void 0));
-      }),
+      })
     );
   }
 
@@ -178,22 +225,21 @@ export class NewTrackDropInService {
    * Uses the duplicateMap to find existing tracks and updates them with new details before sending update requests to the API.
    */
   private overrideTracks(tracks: AudioTrack[]): Observable<void> {
-    const updateObservables = tracks
+    const updates = tracks
       .filter((t) => this.duplicateMap.has(t.fullPath))
       .map((t) => {
         const existingTrack = this.duplicateMap.get(t.fullPath) as Track;
-        const updatedTrack: Track = {
+        return {
           ...existingTrack,
           name: t.title,
           author: t.author,
           url: t.fullPath,
           duration: t.length,
           tags: t.tags,
-        };
-        return this.trackApiService.updateTrack(updatedTrack);
+        } as Track;
       });
 
-    return combineLatest(updateObservables).pipe(map(() => void 0));
+    return this.trackApiService.updateMultiple(updates).pipe(map(() => void 0));
   }
 
   /**
@@ -204,21 +250,34 @@ export class NewTrackDropInService {
    * @param tracks
    * @private
    */
-  private resolveTrackTags(tracks: AudioTrack[]): Observable<Map<string, TagData>> {
+  private resolveTrackTags(
+    tracks: AudioTrack[]
+  ): Observable<Map<string, TagData>> {
     const allLabels = [...new Set(tracks.flatMap((t) => t.tags ?? []))];
     if (!allLabels.length) {
       return of(new Map());
     }
-    return this.tagApiService.getSubsetOfTags('title', allLabels).pipe(switchMap((existingTags) => {
-      const existingLabels = existingTags.map((t) => t.title);
-      const missingLabels = allLabels.filter((label) => !existingLabels.includes(label));
-      if (!missingLabels.length) {
-        return of(new Map(existingTags.map((t) => [t.title, t])));
-      }
-      return combineLatest(missingLabels.map((label) => this.tagApiService.insertTag({ title: label }))).pipe(
-        map((newTags) => new Map([...existingTags, ...newTags].map((t) => [t.title, t])))
-      )
-    }));
+    return this.tagApiService.getSubsetOfTags('title', allLabels).pipe(
+      switchMap((existingTags) => {
+        const existingLabels = existingTags.map((t) => t.title);
+        const missingLabels = allLabels.filter(
+          (label) => !existingLabels.includes(label)
+        );
+        if (!missingLabels.length) {
+          return of(new Map(existingTags.map((t) => [t.title, t])));
+        }
+        return combineLatest(
+          missingLabels.map((label) =>
+            this.tagApiService.insertTag({ title: label })
+          )
+        ).pipe(
+          map(
+            (newTags) =>
+              new Map([...existingTags, ...newTags].map((t) => [t.title, t]))
+          )
+        );
+      })
+    );
   }
 
   /**

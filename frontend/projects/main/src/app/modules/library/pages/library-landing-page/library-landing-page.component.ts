@@ -28,6 +28,7 @@ import { take } from 'rxjs';
 import { NewTrackDropInService } from '../../services/new-track-drop-in.service';
 import { DialogService } from '../../../../services/dialog.service';
 import { DefaultTrackActionsService } from '../../../../services/default-track-actions.service';
+import { TagsStore } from '@general/stores/tags.store';
 
 @Component({
   selector: 'app-library-landing-page',
@@ -40,6 +41,7 @@ export class LibraryLandingPageComponent implements OnInit {
   private readonly trackStore = inject(TrackLibraryStore);
   private readonly playbackService = inject(PlaybackService);
   private readonly newTrackDropInService = inject(NewTrackDropInService);
+  private readonly tagsStore = inject(TagsStore);
   private readonly playlistsStore = inject(PlaylistStore);
   private readonly defaultTrackActionsService = inject(
     DefaultTrackActionsService
@@ -146,6 +148,7 @@ export class LibraryLandingPageComponent implements OnInit {
     this.newTrackDropInService
       .startUploadSequence(audioTracks)
       .subscribe(() => {
+        this.tagsStore.loadAll();
         this.trackStore.load(this.currentQuery);
       });
   }
