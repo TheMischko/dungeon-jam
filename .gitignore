@@ -10,6 +10,8 @@ node_modules
 
 # Build
 build
+dist
+dist-electron
 
 #ENV files
 *.env*

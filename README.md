@@ -8,15 +8,11 @@
 ### Setup
 1. Make sure NodeJS is installed on your system.
 2. Perform `npm i` to install dependencies.
-3. Create `.env` file in the root of the project and populate it with the DISCORD BOT API token
-```dotenv
-DISCORD_TOKEN="..."
-```
-4. Make sure your Discord bot is part of exactly one Discord server, which has at least one joinable voice channel.
-5. Start the frontend development server by `npm run start:frontend`
-6. Once the Angular frontend is running, run the main app by `npm run start`
-7. Once loaded, check if your Discord bot has logged in and joined the first available voice channel on the server.
-8. Play anything on the left tab. (You should be able to hear that in Discord)
+3. Make sure your Discord bot is part of exactly one Discord server, which has at least one joinable voice channel.
+4. Start the frontend development server by `npm run start:frontend`
+5. Once the Angular frontend is running, run the main app by `npm run start`
+6. Once loaded, check if your Discord bot has logged in and joined the first available voice channel on the server.
+7. Play anything on the left tab. (You should be able to hear that in Discord)
 
 
 Disclaimer:

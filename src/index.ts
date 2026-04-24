@@ -8,26 +8,42 @@ import { Logger } from './main/utils/logger';
 configDotenv();
 const ENV = process.env.ENV || 'production';
 const appLogger = new Logger('APP', 'cyanBright');
+let startupManager: StartupManager;
 
 app.on('ready', async () => {
-  const startup = StartupManager.getInstance(__dirname);
-  const managersInitSuccess = await startup.initializeAllManagers();
-  const resourcesInitSuccess = await startup.initializeResources();
-  const initSuccess = managersInitSuccess && resourcesInitSuccess;
-  if (!initSuccess) {
-    appLogger.logErrorMessage('Failed to initialize all managers. Exiting.');
+  try {
+    startupManager = StartupManager.getInstance(__dirname, ENV);
+    const managersInitSuccess = await startupManager.initializeAllManagers();
+    const resourcesInitSuccess = await startupManager.initializeResources();
+    const initSuccess = managersInitSuccess && resourcesInitSuccess;
+    if (!initSuccess) {
+      appLogger.logErrorMessage('Failed to initialize all managers. Exiting.');
+      app.quit();
+      return;
+    } else {
+      await sendAppReadySignal();
+    }
+    await startupManager.afterAllInitialized();
+  } catch (e) {
+    appLogger.logErrorMessage('Fatal error during startup', {
+      error: String(e),
+    });
     app.quit();
-    return;
-  } else {
-    await sendAppReadySignal();
   }
-  await startup.afterAllInitialized();
 });
 
-async function sendAppReadySignal() {
+app.on('window-all-closed', () => {
+  app.quit();
+});
+
+app.on('before-quit', async () => {
+  await startupManager.onAppEnd();
+});
+
+const sendAppReadySignal = async () => {
   const viewManager = await ViewManager.getInstance();
   viewManager.broadcast(GeneralChannels.APP_READY);
   setInterval(() => {
     viewManager.broadcast(GeneralChannels.APP_READY);
   }, 500);
-}
+};

@@ -7,7 +7,11 @@ export class FrontendTab extends BaseTab {
     super(parent, preferences);
   }
 
-  async load(): Promise<void> {
+  async load(env: string, serverUrl: string): Promise<void> {
+    if (env === 'production') {
+      await this.tab.webContents.loadURL(`${serverUrl}/main/index.html`);
+      return;
+    }
     await this.tab.webContents.loadURL('http://localhost:4200/');
   }
 

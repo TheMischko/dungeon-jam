@@ -1,9 +1,27 @@
 import { JSONFilePreset } from 'lowdb/node';
 import { Low } from 'lowdb';
 import { DatabaseSchema, DatabaseTable, initDatabase } from './init-database';
+import { app } from 'electron';
+import path from 'path';
+import * as fs from 'node:fs';
 
 export class DatabaseWrapper {
-  private static readonly DB_FILE: string = './build/src/db.json';
+  private static get DB_FILE(): string {
+    let fullPath: string;
+
+    if (app.isPackaged || process.env.ENV === 'production') {
+      fullPath = path.join(app.getPath('userData'), 'db.json');
+    } else {
+      fullPath = path.join(process.cwd(), 'build', 'src', 'db.json');
+    }
+
+    const dir = path.dirname(fullPath);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+
+    return fullPath;
+  }
   private static _instance: DatabaseWrapper | undefined = undefined;
 
   private constructor(private database: Low<DatabaseSchema>) {}

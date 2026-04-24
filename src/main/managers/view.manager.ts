@@ -5,6 +5,7 @@ import { TopBarTab } from './tabs/top-bar.tab';
 import { SideBarTab } from './tabs/side-bar.tab';
 import { BaseTab } from './tabs/base-tab';
 import { AppChannel } from '@shared/models/channels.model';
+import { StartupManager } from './startup.manager';
 
 export class ViewManager {
   private static _instance: ViewManager | null = null;
@@ -22,6 +23,7 @@ export class ViewManager {
     height: number;
     defaultPreferences: Partial<WebPreferences>;
     indexHTML: string;
+    env: string;
   }): Promise<ViewManager> {
     if (!ViewManager._instance && !config) {
       throw new Error('ViewManager needs to initialized with config first.');
@@ -38,14 +40,21 @@ export class ViewManager {
         config.defaultPreferences,
         config.indexHTML
       );
+      const serverUrl = StartupManager.tabsServerUrl;
       const frontendTab = await ViewManager.createAndLoadTab(
-        () => new FrontendTab(appWindow, config.defaultPreferences)
+        () => new FrontendTab(appWindow, config.defaultPreferences),
+        config.env,
+        serverUrl
       );
       const topBarTab = await ViewManager.createAndLoadTab(
-        () => new TopBarTab(appWindow, config.defaultPreferences)
+        () => new TopBarTab(appWindow, config.defaultPreferences),
+        config.env,
+        serverUrl
       );
       const sideBarTab = await ViewManager.createAndLoadTab(
-        () => new SideBarTab(appWindow, config.defaultPreferences)
+        () => new SideBarTab(appWindow, config.defaultPreferences),
+        config.env,
+        serverUrl
       );
 
       frontendTab.tab.webContents.openDevTools({
@@ -80,10 +89,12 @@ export class ViewManager {
   }
 
   private static async createAndLoadTab<T extends BaseTab>(
-    factory: () => T
+    factory: () => T,
+    env: string,
+    serverUrl: string
   ): Promise<T> {
     const tab = factory();
-    await tab.load();
+    await tab.load(env, serverUrl);
     return tab;
   }
 

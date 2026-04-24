@@ -37,7 +37,7 @@ export class BaseTab {
     this.tab.webContents.openDevTools();
   }
 
-  async load(): Promise<void> {
+  async load(env: string, serverUrl: string): Promise<void> {
     return;
   }
 

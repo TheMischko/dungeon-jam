@@ -16,7 +16,7 @@ import { DiscordTokenManager } from '../managers/discord-token.manager';
  */
 export function getManagersInitConfig(
   buildPath: string
-): { name: string; initFunction: () => Promise<void> }[] {
+): { name: string; initFunction: (env: string) => Promise<void> }[] {
   const viewConfig = getDefaultViewConfig(buildPath);
   return [
     {
@@ -27,8 +27,11 @@ export function getManagersInitConfig(
     },
     {
       name: 'View',
-      initFunction: async () => {
-        await ViewManager.getInstance(viewConfig);
+      initFunction: async (env) => {
+        await ViewManager.getInstance({
+          ...viewConfig,
+          env,
+        });
       },
     },
     {

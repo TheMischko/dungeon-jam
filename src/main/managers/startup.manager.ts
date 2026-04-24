@@ -8,18 +8,28 @@ import Encoder = opus.Encoder;
 import { getAudioConfig } from '../configs';
 import { Logger } from '../utils/logger';
 import { DiscordTokenManager } from './discord-token.manager';
+import { startLocalServer, stopLocalServer } from '../services/local-server';
 
 export class StartupManager {
   private static instance: StartupManager;
 
   private initialized: boolean = false;
+  private localServerUrl: string = '';
   private logger = new Logger('StartupManager', 'green');
+  private websocketServer: WebSocketServer | undefined;
 
-  private constructor(private buildPath: string) {}
+  private constructor(
+    private buildPath: string,
+    private env: string
+  ) {}
 
-  public static getInstance(buildPath: string): StartupManager {
+  public static get tabsServerUrl(): string {
+    return this.instance.localServerUrl;
+  }
+
+  public static getInstance(buildPath: string, env: string): StartupManager {
     if (!StartupManager.instance) {
-      StartupManager.instance = new StartupManager(buildPath);
+      StartupManager.instance = new StartupManager(buildPath, env);
     }
     return StartupManager.instance;
   }
@@ -29,6 +39,8 @@ export class StartupManager {
       this.logger.log('Managers already initialized');
       return true;
     }
+
+    this.localServerUrl = await startLocalServer(this.buildPath);
 
     const initConfigurations = getManagersInitConfig(this.buildPath);
 
@@ -52,7 +64,9 @@ export class StartupManager {
 
   public async initializeResources(): Promise<boolean> {
     const audioConfig = getAudioConfig();
+    let currentResource: string = '';
     try {
+      currentResource = 'Encoder';
       const encoder = new Encoder({
         channels: audioConfig.numChannels,
         frameSize: audioConfig.frameSize,
@@ -65,16 +79,19 @@ export class StartupManager {
       encoder.on('end', () => this.logger.log('Audio Encoder ended'));
       encoder.on('drain', () => this.logger.log('Audio Encoder drain event'));
 
+      currentResource = 'DiscordManager';
       const discordManager = await DiscordManager.getInstance();
 
       // Setup WebSocket server with jitter buffer for network stability
-      setupWebsocketServer(async (data) => {
+      currentResource = 'Websocket server';
+      this.websocketServer = setupWebsocketServer(async (data) => {
         const buffer = Buffer.from(data as ArrayLike<number>);
         await discordManager.handleVoiceData(buffer);
-      }, this.logger);
+      }, this.logger).websocketServer;
 
       const viewManager = await ViewManager.getInstance();
 
+      currentResource = 'Audio capture';
       await setupAudioCapture(
         viewManager.appWindow,
         viewManager.captureTab,
@@ -83,9 +100,12 @@ export class StartupManager {
       );
       return true;
     } catch (e) {
-      this.logger.logErrorMessage('Resource initialization failed', {
-        error: e,
-      });
+      this.logger.logErrorMessage(
+        `Resource ${currentResource} initialization failed`,
+        {
+          error: e,
+        }
+      );
       return false;
     }
   }
@@ -96,13 +116,18 @@ export class StartupManager {
     await discordTokenManager.connectActiveTokens();
   }
 
+  public async onAppEnd(): Promise<void> {
+    this.websocketServer?.close();
+    await stopLocalServer();
+  }
+
   private async initializeManager(
     name: string,
-    initFunction: () => Promise<void>
+    initFunction: (env: string) => Promise<void>
   ): Promise<boolean> {
     try {
       this.logger.log(`Creating ${name}...`);
-      await initFunction();
+      await initFunction(this.env);
       this.logger.log(`${name} initialized successfully`);
       return true;
     } catch (e) {
@@ -138,7 +163,7 @@ function setupWebsocketServer(
   messageCallback?: (msg: RawData) => Promise<void>,
   logger?: Logger
 ) {
-  const websocketServer = new WebSocketServer({ port: 17253 });
+  const websocketServer = new WebSocketServer({ port: 0 });
   const address = websocketServer.address();
   logger?.log('Websocket server started', { address });
   ipcMain.handle('get-websocket', () => websocketServer.address());
