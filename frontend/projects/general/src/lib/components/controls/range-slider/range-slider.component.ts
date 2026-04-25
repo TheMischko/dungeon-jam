@@ -15,7 +15,7 @@ import { MatSlider, MatSliderThumb } from '@angular/material/slider';
   selector: 'lib-range-slider',
   imports: [MatSlider, MatSliderThumb, LucideAngularModule],
   templateUrl: './range-slider.component.html',
-  styleUrl: './range-slider.component.css',
+  styleUrl: './range-slider.component.scss',
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

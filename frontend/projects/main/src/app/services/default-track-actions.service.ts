@@ -81,7 +81,7 @@ export class DefaultTrackActionsService {
   }
 
   private playNext(track: Track) {
-    this.playbackService.addToQueue(track, false);
+    this.playbackService.injectNext(track);
     this._afterPlayNext$.next(track);
   }
 

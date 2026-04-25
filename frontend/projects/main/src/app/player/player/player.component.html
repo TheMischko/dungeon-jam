@@ -43,12 +43,7 @@
   ></app-player-bar>
 </div>
 <div class="volume">
-  @if (queueCount() > 0) {
-    <div class="queue-display">
-      <lucide-icon [img]="playlistIcon"></lucide-icon>
-      <span class="queue-count">{{ queueCount() }}</span>
-    </div>
-  }
+  <app-queue-indicator [playback]="playBackState()" class="queue-display" />
   <div class="volume-wrapper">
     <app-volume-control
       [volume]="volume()"

@@ -11,6 +11,7 @@ import { LucideAngularModule } from 'lucide-angular';
 import { VolumeControlComponent } from './volume-control/volume-control.component';
 import { RepeatStateButtonComponent } from './repeat-state-button/repeat-state-button.component';
 import { ShuffleButtonComponent } from './shuffle-button/shuffle-button.component';
+import { QueueIndicatorComponent } from './queue-indicator/queue-indicator.component';
 
 @Component({
   selector: 'app-player',
@@ -22,6 +23,7 @@ import { ShuffleButtonComponent } from './shuffle-button/shuffle-button.componen
     VolumeControlComponent,
     RepeatStateButtonComponent,
     ShuffleButtonComponent,
+    QueueIndicatorComponent,
   ],
   templateUrl: './player.component.html',
   styleUrl: './player.component.scss',

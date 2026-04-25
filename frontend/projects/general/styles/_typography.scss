@@ -36,10 +36,48 @@ $font: 'Noto Sans', sans-serif;
   letter-spacing: 0.45px;
 }
 
+@mixin h2() {
+  @include default-font();
+  margin: 0.5rem 0;
+  font-size: 1.5rem;
+  font-weight: bold;
+  line-height: 1.2;
+  letter-spacing: 0.45px;
+}
+
+@mixin h3() {
+  @include default-font();
+  margin: 0.25rem 0;
+  font-size: 1.25rem;
+  font-weight: bold;
+  line-height: 1.2;
+  letter-spacing: 0.45px;
+}
+
 @mixin note() {
   @include default-font();
   font-size: 0.75rem;
   font-weight: normal;
   line-height: 0.9;
   letter-spacing: 0.015px;
+}
+
+@mixin body1() {
+  @include default-font();
+  margin: 0;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  letter-spacing: 0.25px;
+  text-align: left;
+}
+
+@mixin body2() {
+  @include default-font();
+  margin: 0;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  letter-spacing: 0.05px;
+  text-align: left;
 }

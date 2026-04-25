@@ -1,0 +1,76 @@
+@use 'colors' as col;
+@use 'typography' as typo;
+
+.queue-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  color: col.$text-main;
+  border: none;
+  background: none;
+  padding-left: 0;
+  @include typo.body1();
+
+  &:hover {
+    color: col.$primary;
+  }
+
+  .queue-count {
+    padding-bottom: 6px;
+    padding-left: 4px;
+  }
+}
+
+.queue-detail {
+  padding: 0.5rem;
+  color: col.$text-main;
+  width: 320px;
+  min-height: 0;
+  max-height: 70vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  h3 {
+    @include typo.h3();
+
+    &:not(:first-child) {
+      margin-top: 1rem;
+    }
+  }
+
+  .track-list {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+    user-select: none;
+
+    .track-detail {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      height: 40px;
+      width: 100%;
+      padding: 0.5rem;
+      @include typo.body2();
+
+      &:hover {
+        background: col.$background-hover;
+      }
+
+      .track-title {
+        font-weight: normal;
+        color: col.$text-main;
+      }
+      .track-author {
+        color: col.$text-note;
+      }
+    }
+  }
+}
+
+::ng-deep .mat-mdc-menu-panel:has(.queue-detail) {
+  max-width: unset;
+}

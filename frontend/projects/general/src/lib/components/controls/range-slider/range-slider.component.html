@@ -1,5 +1,5 @@
-@if(prefix()){
-  @if(prefixIcon()){
+@if (prefix()) {
+  @if (prefixIcon()) {
     <lucide-icon
       class="prefix side-icon"
       [img]="prefixIcon()"
@@ -13,13 +13,14 @@
   [min]="minValue()"
   [max]="maxValue()"
   [step]="stepSize()"
+  [disableRipple]="true"
   (input)="changeValue($event)"
   class="slider"
 >
   <input matSliderThumb [value]="value()" />
 </mat-slider>
-@if(suffix()){
-  @if(suffixIcon()){
+@if (suffix()) {
+  @if (suffixIcon()) {
     <lucide-icon
       class="prefix side-icon"
       [img]="suffixIcon()"
