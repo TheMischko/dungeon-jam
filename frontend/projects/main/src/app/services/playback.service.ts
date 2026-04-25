@@ -5,6 +5,7 @@ import {
   PlaybackState,
   PlaybackTrackPosition,
   PlayingTrackState,
+  QueueItem,
   RepeatState,
 } from '../models/playback.model';
 import { StoredPlayback, Track } from '@shared/models/track.model';
@@ -70,7 +71,10 @@ export class PlaybackService implements OnDestroy {
   async play(track?: Track, queue?: Track[], playlistId?: string) {
     const current = this.state.getValue();
     if (queue && track) {
-      let newQueue = [...queue];
+      let newQueue: QueueItem[] = queue.map((t) => ({
+        track: t,
+        isInjected: false,
+      }));
       if (current.shuffle) {
         newQueue = shuffleList(newQueue);
       }
@@ -78,14 +82,12 @@ export class PlaybackService implements OnDestroy {
         ...current,
         history: [],
         currentTrack: track,
+        currentTrackIsInjected: false,
         queue: newQueue,
         isPlaying: true,
         playlistId,
       });
-      this.trackPosition.next({
-        position: 0,
-        duration: track.duration,
-      });
+      this.trackPosition.next({ position: 0, duration: track.duration });
       await this.audioPlayerService.play(track);
       return;
     }
@@ -93,12 +95,10 @@ export class PlaybackService implements OnDestroy {
       this.state.next({
         ...current,
         currentTrack: track,
+        currentTrackIsInjected: false,
         isPlaying: true,
       });
-      this.trackPosition.next({
-        position: 0,
-        duration: track.duration,
-      });
+      this.trackPosition.next({ position: 0, duration: track.duration });
       await this.audioPlayerService.play(track);
       return;
     }
@@ -115,33 +115,51 @@ export class PlaybackService implements OnDestroy {
 
   async playNext() {
     const current = this.state.getValue();
-    const nextState = { ...current, position: 0 };
-    if (current.currentTrack) {
-      nextState.history = [...current.history, current.currentTrack];
-    }
+
+    const newHistory =
+      current.currentTrack && !current.currentTrackIsInjected
+        ? [...current.history, current.currentTrack]
+        : [...current.history];
 
     if (current.queue.length > 0) {
-      nextState.currentTrack = current.queue[0];
-      nextState.queue = current.queue.slice(1);
-    } else {
-      if (current.repeat === RepeatState.ALL) {
-        const newQueue = [...nextState.history];
-        nextState.history = [];
-        nextState.currentTrack = newQueue[0];
-        nextState.queue = newQueue.slice(1);
-      } else {
-        // TO-DO: Clear currently played song and stop playing.
+      const [next, ...remaining] = current.queue;
+      this.state.next({
+        ...current,
+        history: newHistory,
+        currentTrack: next.track,
+        currentTrackIsInjected: next.isInjected,
+        queue: remaining,
+        isPlaying: true,
+      });
+      await this.audioPlayerService.play(next.track);
+      this.trackPosition.next({ position: 0, duration: next.track.duration });
+      return;
+    }
+
+    if (current.repeat === RepeatState.ALL) {
+      const recycled: QueueItem[] = newHistory.map((t) => ({
+        track: t,
+        isInjected: false,
+      }));
+      if (recycled.length === 0) {
         this.pause();
         return;
       }
+      const next = recycled[0];
+      this.state.next({
+        ...current,
+        history: [],
+        currentTrack: next.track,
+        currentTrackIsInjected: false,
+        queue: recycled.slice(1),
+        isPlaying: true,
+      });
+      await this.audioPlayerService.play(next.track);
+      this.trackPosition.next({ position: 0, duration: next.track.duration });
+      return;
     }
-    nextState.isPlaying = true;
-    await this.audioPlayerService.play(nextState.currentTrack);
-    this.state.next(nextState);
-    this.trackPosition.next({
-      position: 0,
-      duration: nextState.currentTrack.duration,
-    });
+
+    this.pause();
   }
 
   async playPrev(): Promise<void> {
@@ -161,18 +179,22 @@ export class PlaybackService implements OnDestroy {
     if (current.history.length > 0) {
       const prevTrack = current.history[current.history.length - 1];
       const newHistory = current.history.slice(0, -1);
-      const newQueue = [current.currentTrack, ...current.queue];
+      const newQueue: QueueItem[] = [
+        {
+          track: current.currentTrack,
+          isInjected: current.currentTrackIsInjected,
+        },
+        ...current.queue,
+      ];
       this.state.next({
         ...current,
         currentTrack: prevTrack,
+        currentTrackIsInjected: false,
         history: newHistory,
         queue: newQueue,
         isPlaying: true,
       });
-      this.trackPosition.next({
-        position: 0,
-        duration: prevTrack.duration,
-      });
+      this.trackPosition.next({ position: 0, duration: prevTrack.duration });
       await this.audioPlayerService.play(prevTrack);
     }
   }
@@ -229,29 +251,27 @@ export class PlaybackService implements OnDestroy {
     const state = this.state.getValue();
 
     let queue = [...state.queue];
-    if (!state.shuffle && enabled && state.queue.length > 1) {
-      queue = shuffleList(queue);
+    if (!state.shuffle && enabled && queue.length > 1) {
+      // only the regular portion of queue is reshuffled
+      const injected = queue.filter((item) => item.isInjected);
+      const regular = queue.filter((item) => !item.isInjected);
+      queue = [...injected, ...shuffleList(regular)];
     }
 
-    this.state.next({
-      ...state,
-      shuffle: enabled,
-      queue,
-    });
+    this.state.next({ ...state, shuffle: enabled, queue });
   }
 
   addToQueue(track: Track, playLast: boolean = false) {
     const state = this.state.getValue();
-    const newQueue = [...state.queue];
-    if (playLast) {
-      newQueue.push(track);
-    } else {
-      newQueue.unshift(track);
-    }
-    this.state.next({
-      ...state,
-      queue: newQueue,
-    });
+    const item: QueueItem = { track, isInjected: false };
+    const newQueue = playLast ? [...state.queue, item] : [item, ...state.queue];
+    this.state.next({ ...state, queue: newQueue });
+  }
+
+  injectNext(track: Track) {
+    const state = this.state.getValue();
+    const item: QueueItem = { track, isInjected: true };
+    this.state.next({ ...state, queue: [item, ...state.queue] });
   }
 
   private updateStoredState(state: PlaybackState): void {

@@ -6,9 +6,15 @@ export enum RepeatState {
   ALL,
 }
 
+export type QueueItem = {
+  track: Track;
+  isInjected: boolean;
+};
+
 export type PlaybackState = {
   currentTrack: Track | null;
-  queue: Track[];
+  currentTrackIsInjected: boolean;
+  queue: QueueItem[];
   history: Track[];
   isPlaying: boolean;
   repeat: RepeatState;
@@ -23,6 +29,7 @@ export type PlaybackTrackPosition = {
 
 export const initialPlaybackState: PlaybackState = {
   currentTrack: null,
+  currentTrackIsInjected: false,
   queue: [],
   history: [],
   isPlaying: false,
