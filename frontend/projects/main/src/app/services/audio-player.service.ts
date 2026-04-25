@@ -1,9 +1,10 @@
-import {Injectable, signal} from '@angular/core';
-import {Track} from '@shared/models/track.model';
-import {BehaviorSubject, Observable} from 'rxjs';
-import {AudioApiWindow} from '../models/window-api.model';
+import { Injectable, signal } from '@angular/core';
+import { Track } from '@shared/models/track.model';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { AudioApiWindow } from '../models/window-api.model';
 import { PlayingTrackState } from '../models/playback.model';
 import { Howl } from 'howler';
+import { LRUCache } from '@general/utils/lru-cache';
 
 @Injectable({
   providedIn: 'root',
@@ -13,10 +14,14 @@ export class AudioPlayerService {
   private howl?: Howl;
   private positionSubject = new BehaviorSubject<number>(0);
   private timerId?: number;
-  private trackStateSubject = new BehaviorSubject<PlayingTrackState>(PlayingTrackState.NONE);
+  private trackStateSubject = new BehaviorSubject<PlayingTrackState>(
+    PlayingTrackState.NONE
+  );
   private volume = signal<number>(1);
+  private playIdRef = 0;
+  private currentObjectUrl: string | undefined = undefined;
 
-  private trackDataCache = new Map<string, Blob>();
+  private trackDataCache = new LRUCache<string, Blob>(20);
 
   get position$(): Observable<number> {
     return this.positionSubject.asObservable();
@@ -27,9 +32,15 @@ export class AudioPlayerService {
   }
 
   async play(track: Track) {
+    const id = ++this.playIdRef;
     this.stop();
     const trackData = await this.getTrackData(track);
-    this.howl = this.createHowl(URL.createObjectURL(trackData));
+    // Prevents race condition while track is loading and another `play` is called
+    if (id !== this.playIdRef) {
+      return;
+    }
+    this.currentObjectUrl = URL.createObjectURL(trackData);
+    this.howl = this.createHowl(this.currentObjectUrl);
     this.howl.play();
   }
 
@@ -50,12 +61,15 @@ export class AudioPlayerService {
 
   stop() {
     this.stopWatchdog();
-    if (!this.howl) {
-      return;
+    if (this.howl) {
+      this.howl.stop();
+      this.howl.unload();
+      this.howl = undefined;
     }
-    this.howl.stop();
-    this.howl.unload();
-    this.howl = undefined;
+    if (this.currentObjectUrl) {
+      URL.revokeObjectURL(this.currentObjectUrl);
+      this.currentObjectUrl = undefined;
+    }
   }
 
   seek(position: number) {
@@ -65,12 +79,12 @@ export class AudioPlayerService {
     this.howl.seek(position);
   }
 
-  setVolume(volume: number): void{
+  setVolume(volume: number): void {
     this.volume.set(volume);
     this.howl?.volume(volume);
   }
 
-  private createHowl(src: string): Howl{
+  private createHowl(src: string): Howl {
     const howl = new Howl({
       src: [src],
       html5: true,
@@ -87,7 +101,7 @@ export class AudioPlayerService {
     });
     howl.on('end', () => {
       this.trackStateSubject.next(PlayingTrackState.ENDED);
-    })
+    });
     return howl;
   }
 
@@ -108,11 +122,13 @@ export class AudioPlayerService {
   }
 
   private async getTrackData(track: Track): Promise<Blob> {
-    if (!this.trackDataCache.has(track.id)) {
-      const data = await this.loadTrack(track);
-      this.trackDataCache.set(track.id, data);
+    const cacheData = this.trackDataCache.get(track.id);
+    if (cacheData) {
+      return cacheData;
     }
-    return this.trackDataCache.get(track.id)!;
+    const data = await this.loadTrack(track);
+    this.trackDataCache.put(track.id, data);
+    return data;
   }
 
   private async loadTrack(track: Track): Promise<Blob> {

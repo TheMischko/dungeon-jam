@@ -3,6 +3,7 @@ import { BehaviorSubject, map, Observable, Subscription } from 'rxjs';
 import {
   initialPlaybackState,
   PlaybackState,
+  PlaybackTrackPosition,
   PlayingTrackState,
   RepeatState,
 } from '../models/playback.model';
@@ -22,7 +23,13 @@ export class PlaybackService implements OnDestroy {
   private readonly state = new BehaviorSubject<PlaybackState>(
     initialPlaybackState
   );
+  private readonly trackPosition = new BehaviorSubject<
+    PlaybackTrackPosition | undefined
+  >(undefined);
+
   readonly playback$: Observable<PlaybackState> = this.state.asObservable();
+  readonly position$: Observable<PlaybackTrackPosition | undefined> =
+    this.trackPosition.asObservable();
   readonly currentTrackId$ = this.playback$.pipe(
     map((state) => state.currentTrack?.id ?? null)
   );
@@ -36,8 +43,13 @@ export class PlaybackService implements OnDestroy {
   constructor() {
     effect(() => {
       const currentPosition = this.playerPosition();
-      const current = this.state.getValue();
-      this.state.next({ ...current, position: currentPosition });
+      const currentState = this.state.getValue();
+      const currentTrackPos = this.trackPosition.getValue();
+      const duration =
+        currentTrackPos?.duration ??
+        currentState?.currentTrack?.duration ??
+        currentPosition;
+      this.trackPosition.next({ position: currentPosition, duration });
     });
     this.trackStateSubscription = this.audioPlayerService.state$.subscribe(
       (state) => this.handleTrackStateChange(state)
@@ -68,9 +80,11 @@ export class PlaybackService implements OnDestroy {
         currentTrack: track,
         queue: newQueue,
         isPlaying: true,
-        duration: track.duration,
         playlistId,
+      });
+      this.trackPosition.next({
         position: 0,
+        duration: track.duration,
       });
       await this.audioPlayerService.play(track);
       return;
@@ -80,8 +94,10 @@ export class PlaybackService implements OnDestroy {
         ...current,
         currentTrack: track,
         isPlaying: true,
-        duration: track.duration,
+      });
+      this.trackPosition.next({
         position: 0,
+        duration: track.duration,
       });
       await this.audioPlayerService.play(track);
       return;
@@ -101,7 +117,7 @@ export class PlaybackService implements OnDestroy {
     const current = this.state.getValue();
     const nextState = { ...current, position: 0 };
     if (current.currentTrack) {
-      nextState.history.push(current.currentTrack);
+      nextState.history = [...current.history, current.currentTrack];
     }
 
     if (current.queue.length > 0) {
@@ -119,44 +135,58 @@ export class PlaybackService implements OnDestroy {
         return;
       }
     }
-    nextState.duration = nextState.currentTrack.duration;
-    nextState.position = 0;
     nextState.isPlaying = true;
     await this.audioPlayerService.play(nextState.currentTrack);
     this.state.next(nextState);
+    this.trackPosition.next({
+      position: 0,
+      duration: nextState.currentTrack.duration,
+    });
   }
 
   async playPrev(): Promise<void> {
     const current = this.state.getValue();
+    const trackPosition = this.trackPosition.getValue();
     if (!current.currentTrack) {
       return;
     }
-    if (current.position > this.PLAY_PREV_DURATION_BREAKPOINT_SEC) {
+    if (
+      trackPosition?.position &&
+      trackPosition.position > this.PLAY_PREV_DURATION_BREAKPOINT_SEC
+    ) {
       this.seek(0);
       return;
     }
 
     if (current.history.length > 0) {
-      const prevTrack = current.history.pop()!;
-      current.queue.unshift(current.currentTrack);
+      const prevTrack = current.history[current.history.length - 1];
+      const newHistory = current.history.slice(0, -1);
+      const newQueue = [current.currentTrack, ...current.queue];
       this.state.next({
         ...current,
         currentTrack: prevTrack,
-        position: 0,
+        history: newHistory,
+        queue: newQueue,
         isPlaying: true,
+      });
+      this.trackPosition.next({
+        position: 0,
+        duration: prevTrack.duration,
       });
       await this.audioPlayerService.play(prevTrack);
     }
   }
 
   seek(newPos: number) {
-    if (newPos > this.state.getValue().duration || newPos < 0) {
-      const current = this.state.getValue();
-      this.state.next({ ...current, position: 0 });
+    const currentPosition = this.trackPosition.getValue();
+    if (!currentPosition) {
       return;
     }
-    const current = this.state.getValue();
-    this.state.next({ ...current, position: newPos });
+    if (newPos > currentPosition.duration || newPos < 0) {
+      this.trackPosition.next({ ...currentPosition, position: 0 });
+      return;
+    }
+    this.trackPosition.next({ ...currentPosition, position: newPos });
     this.audioPlayerService.seek(newPos);
   }
 
@@ -246,8 +276,8 @@ export class PlaybackService implements OnDestroy {
 
   private async handleTrackEnded() {
     if (this.state.getValue().repeat === RepeatState.SINGLE) {
-      this.seek(0);
       await this.play();
+      this.seek(0);
       return;
     }
     await this.playNext();

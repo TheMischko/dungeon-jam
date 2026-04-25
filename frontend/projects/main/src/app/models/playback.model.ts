@@ -11,20 +11,21 @@ export type PlaybackState = {
   queue: Track[];
   history: Track[];
   isPlaying: boolean;
-  position: number;
-  duration: number;
   repeat: RepeatState;
   shuffle: boolean;
   playlistId?: string;
 } & StoredPlayback;
+
+export type PlaybackTrackPosition = {
+  position: number;
+  duration: number;
+};
 
 export const initialPlaybackState: PlaybackState = {
   currentTrack: null,
   queue: [],
   history: [],
   isPlaying: false,
-  position: 0,
-  duration: 0,
   volume: 1,
   shuffle: false,
   repeat: RepeatState.NONE,

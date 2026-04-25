@@ -1,31 +1,32 @@
-import {Component, inject} from '@angular/core';
-import {PlayerComponent} from '../player/player.component';
-import {PlaybackService} from '../../services/playback.service';
-import {toSignal} from '@angular/core/rxjs-interop';
-import {initialPlaybackState} from '../../models/playback.model';
+import { Component, inject } from '@angular/core';
+import { PlayerComponent } from '../player/player.component';
+import { PlaybackService } from '../../services/playback.service';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { initialPlaybackState } from '../../models/playback.model';
 
 @Component({
   selector: 'app-player-smart',
-  imports: [
-    PlayerComponent
-  ],
+  imports: [PlayerComponent],
   templateUrl: './player-smart.component.html',
-  styles: ':host{ display: contents }'
+  styles: ':host{ display: contents }',
 })
 export class PlayerSmartComponent {
   playbackService = inject(PlaybackService);
   playBackState = toSignal(this.playbackService.playback$, {
     initialValue: initialPlaybackState,
   });
+  trackPosition = toSignal(this.playbackService.position$, {
+    initialValue: undefined,
+  });
 
   async play() {
-    if(!this.playBackState().isPlaying){
+    if (!this.playBackState().isPlaying) {
       await this.playbackService.play();
     }
   }
 
   pause() {
-    if(this.playBackState().isPlaying){
+    if (this.playBackState().isPlaying) {
       this.playbackService.pause();
     }
   }
@@ -39,8 +40,8 @@ export class PlayerSmartComponent {
   }
 
   async seek(newPos: number) {
-    const currentTrack = this.playBackState().currentTrack
-    if(newPos > 0 && currentTrack && newPos < currentTrack.duration){
+    const currentTrack = this.playBackState().currentTrack;
+    if (newPos > 0 && currentTrack && newPos < currentTrack.duration) {
       this.playbackService.seek(newPos);
     }
   }
@@ -53,7 +54,7 @@ export class PlayerSmartComponent {
     this.playbackService.changeRepeat();
   }
 
-  shuffle(){
+  shuffle() {
     this.playbackService.shuffle(!this.playBackState().shuffle);
   }
 }

@@ -1,12 +1,15 @@
-import {Component, computed, input, output} from '@angular/core';
-import { PlaybackState} from '../../models/playback.model';
+import { Component, computed, input, output } from '@angular/core';
+import {
+  PlaybackState,
+  PlaybackTrackPosition,
+} from '../../models/playback.model';
 import { PlayPauseButtonComponent } from '@general/components/buttons/play-pause-button/play-pause-button.component';
 import { iconSet } from '@general/icons/icons';
 import { IconButtonComponent } from '@general/components/buttons/icon-button/icon-button.component';
 import { PlayerBarComponent } from './player-bar/player-bar.component';
 import { LucideAngularModule } from 'lucide-angular';
 import { VolumeControlComponent } from './volume-control/volume-control.component';
-import {RepeatStateButtonComponent} from './repeat-state-button/repeat-state-button.component';
+import { RepeatStateButtonComponent } from './repeat-state-button/repeat-state-button.component';
 import { ShuffleButtonComponent } from './shuffle-button/shuffle-button.component';
 
 @Component({
@@ -25,6 +28,8 @@ import { ShuffleButtonComponent } from './shuffle-button/shuffle-button.componen
 })
 export class PlayerComponent {
   playBackState = input.required<PlaybackState>();
+  trackPosition = input<PlaybackTrackPosition | undefined>(undefined);
+
   currentTrack = computed(() => this.playBackState().currentTrack);
   playing = computed(() => this.playBackState().isPlaying);
   playPauseState = computed(() => (this.playing() ? 'pause' : 'play'));

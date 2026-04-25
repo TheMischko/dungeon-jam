@@ -37,8 +37,8 @@
 
   <app-player-bar
     class="duration-bar"
-    [duration]="playBackState().duration"
-    [position]="playBackState().position"
+    [duration]="trackPosition()?.duration"
+    [position]="trackPosition()?.position"
     (seek)="seek.emit($event)"
   ></app-player-bar>
 </div>
