@@ -12,6 +12,7 @@ import { VolumeControlComponent } from './volume-control/volume-control.componen
 import { RepeatStateButtonComponent } from './repeat-state-button/repeat-state-button.component';
 import { ShuffleButtonComponent } from './shuffle-button/shuffle-button.component';
 import { QueueIndicatorComponent } from './queue-indicator/queue-indicator.component';
+import { ScrollOverflowTextDirective } from '@general/directives/scroll-overflow-text.directive';
 
 @Component({
   selector: 'app-player',
@@ -24,6 +25,7 @@ import { QueueIndicatorComponent } from './queue-indicator/queue-indicator.compo
     RepeatStateButtonComponent,
     ShuffleButtonComponent,
     QueueIndicatorComponent,
+    ScrollOverflowTextDirective,
   ],
   templateUrl: './player.component.html',
   styleUrl: './player.component.scss',

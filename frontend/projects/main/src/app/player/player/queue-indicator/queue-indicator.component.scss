@@ -26,7 +26,7 @@
 .queue-detail {
   padding: 0.5rem;
   color: col.$text-main;
-  width: 320px;
+  width: 220px;
   min-height: 0;
   max-height: 70vh;
   overflow-y: auto;
@@ -51,9 +51,10 @@
       display: flex;
       flex-direction: column;
       align-items: flex-start;
-      height: 40px;
+      height: 50px;
       width: 100%;
-      padding: 0.5rem;
+      padding: 0.25rem;
+      box-sizing: border-box;
       @include typo.body2();
 
       &:hover {
@@ -66,6 +67,12 @@
       }
       .track-author {
         color: col.$text-note;
+      }
+      .track-title,
+      .track-author {
+        width: 100%;
+        white-space: nowrap;
+        text-wrap: nowrap;
       }
     }
   }

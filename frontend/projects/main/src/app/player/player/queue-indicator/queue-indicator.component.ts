@@ -8,10 +8,16 @@ import { LucideAngularModule } from 'lucide-angular';
 import { iconSet } from '@general/icons/icons';
 import { PlaybackState } from '../../../models/playback.model';
 import { MatMenu, MatMenuTrigger } from '@angular/material/menu';
+import { ScrollOverflowTextDirective } from '@general/directives/scroll-overflow-text.directive';
 
 @Component({
   selector: 'app-queue-indicator',
-  imports: [LucideAngularModule, MatMenuTrigger, MatMenu],
+  imports: [
+    LucideAngularModule,
+    MatMenuTrigger,
+    MatMenu,
+    ScrollOverflowTextDirective,
+  ],
   templateUrl: './queue-indicator.component.html',
   styleUrl: './queue-indicator.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -14,8 +14,10 @@
       <h3>Playing:</h3>
       <div class="track-list">
         <div class="track-detail">
-          <div class="track-title">{{ track.name }}</div>
-          <div class="track-author">{{ track.author }}</div>
+          <div class="track-title" libScrollOverflowText>{{ track.name }}</div>
+          <div class="track-author" libScrollOverflowText>
+            {{ track.author }}
+          </div>
         </div>
       </div>
     }
@@ -23,13 +25,15 @@
     <div class="track-list">
       @for (item of playback().queue; track item.track.id) {
         <div class="track-detail">
-          <div class="track-title">
+          <div class="track-title" libScrollOverflowText>
             @if (item.isInjected) {
               *
             }
             {{ item.track.name }}
           </div>
-          <div class="track-author">{{ item.track.author }}</div>
+          <div class="track-author" libScrollOverflowText>
+            {{ item.track.author }}
+          </div>
         </div>
       }
     </div>

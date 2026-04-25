@@ -29,9 +29,13 @@
   }
 
   .info {
-    text-wrap: nowrap;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    max-width: 200px;
+
+    & > p {
+      text-wrap: nowrap;
+      white-space: nowrap;
+      width: 100%;
+    }
   }
 
   .volume {
