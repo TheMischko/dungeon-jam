@@ -2,7 +2,8 @@ import {Injectable, signal} from '@angular/core';
 import {Track} from '@shared/models/track.model';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {AudioApiWindow} from '../models/window-api.model';
-import {PlayingTrackState} from '../models/playback.model';
+import { PlayingTrackState } from '../models/playback.model';
+import { Howl } from 'howler';
 
 @Injectable({
   providedIn: 'root',
