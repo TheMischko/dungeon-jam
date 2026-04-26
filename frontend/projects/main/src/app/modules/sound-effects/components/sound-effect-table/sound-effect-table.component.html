@@ -1,0 +1,15 @@
+<app-smart-table
+  [config]="config"
+  [dataSet]="soundEffects()"
+  [loading]="loading()"
+></app-smart-table>
+
+<ng-template #tagColumn let-row="$implicit">
+  @if (row.tags) {
+    <lib-tag-list-smart
+      [tagIds]="row.tags"
+      [editable]="false"
+      [priorityValue]="'currentSearchValue()'"
+    />
+  }
+</ng-template>

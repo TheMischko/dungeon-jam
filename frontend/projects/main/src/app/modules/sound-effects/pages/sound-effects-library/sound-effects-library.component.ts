@@ -7,10 +7,11 @@ import {
 import { SoundEffect } from '@shared/models/sound-effect.model';
 import { SongsDropInZoneComponent } from '../../../library/pages/library-landing-page/songs-drop-in-zone/songs-drop-in-zone.component';
 import { AudioTrack } from '@shared/models/track.model';
+import { SoundEffectTableComponent } from '../../components/sound-effect-table/sound-effect-table.component';
 
 @Component({
   selector: 'app-sound-effects-library',
-  imports: [SongsDropInZoneComponent],
+  imports: [SongsDropInZoneComponent, SoundEffectTableComponent],
   templateUrl: './sound-effects-library.component.html',
   styleUrl: './sound-effects-library.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
