@@ -21,10 +21,8 @@ export class SoundEffectsPlayerService {
     if (this.soundEffectStateMap.has(soundEffect.id)) {
       return;
     }
-    console.log('Play effect', soundEffect.name);
     const shouldLoop = loop || (soundEffect?.looping ?? false);
     const howl = await this.createHowl(soundEffect, shouldLoop);
-    console.log('Having howl created', howl);
     this.soundEffectStateMap.set(soundEffect.id, {
       phase: SoundEffectPlayPhase.LOADING,
       soundEffect,
@@ -58,7 +56,6 @@ export class SoundEffectsPlayerService {
     howl.load();
 
     howl.on('play', () => {
-      console.log('Effect is playing', soundEffect.name);
       const effectState = this.soundEffectStateMap.get(soundEffect.id);
       if (!effectState) {
         howl.stop();
