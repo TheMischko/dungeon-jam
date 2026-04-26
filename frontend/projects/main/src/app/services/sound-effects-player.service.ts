@@ -3,6 +3,29 @@ import { SoundEffect } from '@shared/models/sound-effect.model';
 import { LRUCache } from '@general/utils/lru-cache';
 import { LoadSoundService } from './load-sound.service';
 import { Howl } from 'howler';
+import { BehaviorSubject, map, Observable } from 'rxjs';
+
+export interface ActiveSoundEffect {
+  id: string;
+  soundEffect: SoundEffect;
+  phase: SoundEffectPlayPhase;
+  loop: boolean;
+  volume: number;
+}
+
+export enum SoundEffectPlayPhase {
+  LOADING,
+  PLAYING,
+}
+
+type SoundEffectInternalState = {
+  soundEffect: SoundEffect;
+  howl: Howl;
+  phase: SoundEffectPlayPhase;
+  loop: boolean;
+  volume: number;
+  timerId?: number;
+};
 
 @Injectable({
   providedIn: 'root',
@@ -10,34 +33,59 @@ import { Howl } from 'howler';
 export class SoundEffectsPlayerService {
   private readonly loadSoundService = inject(LoadSoundService);
 
-  private soundEffectStateMap = new Map<string, SoundEffectPlayState>();
+  private readonly stateRecord = new BehaviorSubject<Record<string, SoundEffectInternalState>>({});
+  private readonly positionRecord = new BehaviorSubject<Record<string, number>>({});
   private effectDataCache = new LRUCache<string, Blob>(10);
   private effectObjectURLMap = new Map<string, string>();
+
+  readonly playingEffects$: Observable<ActiveSoundEffect[]> = this.stateRecord.pipe(
+    map((record) => Object.values(record).map(toActiveEffect))
+  );
+  readonly effectPositions$: Observable<Record<string, number>> = this.positionRecord.asObservable();
 
   public async playEffect(
     soundEffect: SoundEffect,
     loop: boolean = false
   ): Promise<void> {
-    if (this.soundEffectStateMap.has(soundEffect.id)) {
+    if (this.stateRecord.getValue()[soundEffect.id]) {
       return;
     }
     const shouldLoop = loop || (soundEffect?.looping ?? false);
     const howl = await this.createHowl(soundEffect, shouldLoop);
-    this.soundEffectStateMap.set(soundEffect.id, {
-      phase: SoundEffectPlayPhase.LOADING,
-      soundEffect,
-      howl,
-      loop: shouldLoop,
+    this.stateRecord.next({
+      ...this.stateRecord.getValue(),
+      [soundEffect.id]: {
+        phase: SoundEffectPlayPhase.LOADING,
+        soundEffect,
+        howl,
+        loop: shouldLoop,
+        volume: 0.5,
+      },
     });
+    this.positionRecord.next({ ...this.positionRecord.getValue(), [soundEffect.id]: 0 });
     howl.play();
   }
 
-  public async stopEffect(soundEffect: SoundEffect): Promise<void> {
-    const state = this.soundEffectStateMap.get(soundEffect.id);
+  public stopEffect(soundEffectId: string): void {
+    const state = this.stateRecord.getValue()[soundEffectId];
     if (!state) {
       return;
     }
     state.howl.stop();
+  }
+
+  public setEffectVolume(soundEffectId: string, volume: number): void {
+    const state = this.stateRecord.getValue()[soundEffectId];
+    if (!state) return;
+    state.howl.volume(volume);
+    this.patchState(soundEffectId, { volume });
+  }
+
+  public setEffectLoop(soundEffectId: string, loop: boolean): void {
+    const state = this.stateRecord.getValue()[soundEffectId];
+    if (!state) return;
+    state.howl.loop(loop);
+    this.patchState(soundEffectId, { loop });
   }
 
   private async createHowl(
@@ -56,15 +104,13 @@ export class SoundEffectsPlayerService {
     howl.load();
 
     howl.on('play', () => {
-      const effectState = this.soundEffectStateMap.get(soundEffect.id);
+      const effectState = this.stateRecord.getValue()[soundEffect.id];
       if (!effectState) {
         howl.stop();
         return;
       }
-      this.soundEffectStateMap.set(soundEffect.id, {
-        ...effectState,
-        phase: SoundEffectPlayPhase.PLAYING,
-      });
+      this.patchState(soundEffect.id, { phase: SoundEffectPlayPhase.PLAYING });
+      this.startWatchdog(soundEffect.id);
     });
     howl.on('end', () => {
       this.cleanSoundEffectData(soundEffect);
@@ -75,17 +121,53 @@ export class SoundEffectsPlayerService {
     return howl;
   }
 
+  private patchState(id: string, patch: Partial<SoundEffectInternalState>): void {
+    const current = this.stateRecord.getValue();
+    if (!current[id]) return;
+    this.stateRecord.next({
+      ...current,
+      [id]: { ...current[id], ...patch },
+    });
+  }
+
+  private removeState(id: string): void {
+    const { [id]: _, ...remaining } = this.stateRecord.getValue();
+    this.stateRecord.next(remaining);
+  }
+
+  private startWatchdog(id: string): void {
+    const timerId = setInterval(() => {
+      const state = this.stateRecord.getValue()[id];
+      if (state?.howl.playing()) {
+        this.positionRecord.next({ ...this.positionRecord.getValue(), [id]: state.howl.seek() });
+      }
+    }, 250) as unknown as number;
+    this.patchState(id, { timerId });
+  }
+
+  private stopWatchdog(id: string): void {
+    const state = this.stateRecord.getValue()[id];
+    if (state?.timerId) {
+      clearInterval(state.timerId);
+    }
+  }
+
   private cleanSoundEffectData(soundEffect: SoundEffect): void {
+    this.stopWatchdog(soundEffect.id);
+
+    const { [soundEffect.id]: _, ...remainingPositions } = this.positionRecord.getValue();
+    this.positionRecord.next(remainingPositions);
+
     const blobUrl = this.effectObjectURLMap.get(soundEffect.id);
     if (blobUrl) {
       URL.revokeObjectURL(blobUrl);
       this.effectObjectURLMap.delete(soundEffect.id);
     }
 
-    const state = this.soundEffectStateMap.get(soundEffect.id);
+    const state = this.stateRecord.getValue()[soundEffect.id];
     if (state) {
       state.howl.unload();
-      this.soundEffectStateMap.delete(soundEffect.id);
+      this.removeState(soundEffect.id);
     }
   }
 
@@ -116,14 +198,12 @@ export class SoundEffectsPlayerService {
   }
 }
 
-type SoundEffectPlayState = {
-  phase: SoundEffectPlayPhase;
-  soundEffect: SoundEffect;
-  howl: Howl;
-  loop: boolean;
-};
-
-enum SoundEffectPlayPhase {
-  LOADING,
-  PLAYING,
+function toActiveEffect(state: SoundEffectInternalState): ActiveSoundEffect {
+  return {
+    id: state.soundEffect.id,
+    soundEffect: state.soundEffect,
+    phase: state.phase,
+    loop: state.loop,
+    volume: state.volume,
+  };
 }
