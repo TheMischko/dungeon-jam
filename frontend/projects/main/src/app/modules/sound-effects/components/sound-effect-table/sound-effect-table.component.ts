@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   input,
+  output,
   TemplateRef,
   viewChild,
 } from '@angular/core';
@@ -10,10 +11,15 @@ import { SmartTableComponent } from '../../../../components/table/smart-table/sm
 import { TableColumnConfiguration } from '../../../../models/table.model';
 import { TrackDurationPipe } from '@general/pipes/track-duration.pipe';
 import { TagListSmartComponent } from '@general/components/display/tag-list/tag-list-smart/tag-list-smart.component';
+import { PlayPauseButtonComponent } from '@general/components/buttons/play-pause-button/play-pause-button.component';
 
 @Component({
   selector: 'app-sound-effect-table',
-  imports: [SmartTableComponent, TagListSmartComponent],
+  imports: [
+    SmartTableComponent,
+    TagListSmartComponent,
+    PlayPauseButtonComponent,
+  ],
   templateUrl: './sound-effect-table.component.html',
   styleUrl: './sound-effect-table.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -23,9 +29,25 @@ export class SoundEffectTableComponent {
   readonly soundEffects = input.required<SoundEffect[]>();
   readonly loading = input<boolean>(false);
 
+  /**
+   * List of currently playing Sound Effect's IDs.
+   */
+  readonly currentlyPlaying = input<string[]>([]);
+
+  readonly playEffect = output<SoundEffect>();
+  readonly stopEffect = output<SoundEffect>();
+
   readonly tagColumn = viewChild.required('tagColumn', { read: TemplateRef });
+  readonly playColumnTemplate = viewChild.required('playColumn', {
+    read: TemplateRef,
+  });
 
   readonly config: TableColumnConfiguration<SoundEffect> = {
+    play: {
+      title: '',
+      template: () => this.playColumnTemplate(),
+      width: '65px',
+    },
     name: {
       title: 'Name',
     },
@@ -41,4 +63,19 @@ export class SoundEffectTableComponent {
       customValueFn: (entity) => this.durationPipe.transform(entity.duration),
     },
   };
+
+  emitPlayOrPause(effect: SoundEffect): void {
+    if (this.currentlyPlaying().includes(effect.id)) {
+      this.stopEffect.emit(effect);
+      return;
+    }
+    this.playEffect.emit(effect);
+  }
+
+  protected getPlayBtnState(effect: SoundEffect): 'play' | 'pause' {
+    if (this.currentlyPlaying().includes(effect.id)) {
+      return 'pause';
+    }
+    return 'play';
+  }
 }

@@ -1,16 +1,18 @@
-import { Injectable, signal } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { Track } from '@shared/models/track.model';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { AudioApiWindow } from '../models/window-api.model';
 import { PlayingTrackState } from '../models/playback.model';
 import { Howl } from 'howler';
 import { LRUCache } from '@general/utils/lru-cache';
+import { LoadSoundService } from './load-sound.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AudioPlayerService {
-  private readonly window: AudioApiWindow = <AudioApiWindow>window;
+  private readonly loadSoundService = inject(LoadSoundService);
+
   private howl?: Howl;
   private positionSubject = new BehaviorSubject<number>(0);
   private timerId?: number;
@@ -132,12 +134,6 @@ export class AudioPlayerService {
   }
 
   private async loadTrack(track: Track): Promise<Blob> {
-    const data = await this.window.AUDIO_FILES_API.loadFileBase64(track.url);
-    const byteChars = atob(data.base64);
-    const byteNumbers = new Uint8Array(byteChars.length);
-    for (let i = 0; i < byteChars.length; i++) {
-      byteNumbers[i] = byteChars.charCodeAt(i);
-    }
-    return new Blob([byteNumbers], { type: data.mimeType });
+    return this.loadSoundService.loadTrack(track);
   }
 }

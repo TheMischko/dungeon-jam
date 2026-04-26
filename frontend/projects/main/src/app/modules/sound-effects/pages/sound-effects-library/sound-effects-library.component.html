@@ -1,4 +1,9 @@
 <h1>Sound Effects</h1>
 <app-songs-drop-in-zone (dropped)="uploadAudioFiles.emit($event)">
-  <app-sound-effect-table [soundEffects]="dataset()" [loading]="loading()" />
+  <app-sound-effect-table
+    [soundEffects]="dataset()"
+    [loading]="loading()"
+    (playEffect)="playEffect.emit($event)"
+    (stopEffect)="stopEffect.emit($event)"
+  />
 </app-songs-drop-in-zone>

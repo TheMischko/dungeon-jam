@@ -9,6 +9,8 @@ import { SoundEffectsLibraryComponent } from '../sound-effects-library.component
 import { AudioTrack } from '@shared/models/track.model';
 import { NewSoundEffectUploadService } from '../../../services/new-sound-effect-upload.service';
 import { take } from 'rxjs';
+import { SoundEffect } from '@shared/models/sound-effect.model';
+import { SoundEffectsPlayerService } from '../../../../../services/sound-effects-player.service';
 
 @Component({
   selector: 'app-sound-effects-library-smart',
@@ -22,6 +24,7 @@ export class SoundEffectsLibrarySmartComponent implements OnInit {
   private readonly newSoundEffectUploadService = inject(
     NewSoundEffectUploadService
   );
+  private readonly soundEffectPlayerService = inject(SoundEffectsPlayerService);
 
   readonly soundEffects = this.soundEffectStore.entities;
   readonly loading = this.soundEffectStore.loading;
@@ -36,5 +39,13 @@ export class SoundEffectsLibrarySmartComponent implements OnInit {
       .startUploadSequence(audioTracks)
       .pipe(take(1))
       .subscribe();
+  }
+
+  async playEffect(effect: SoundEffect): Promise<void> {
+    await this.soundEffectPlayerService.playEffect(effect);
+  }
+
+  async stopEffect(effect: SoundEffect): Promise<void> {
+    await this.soundEffectPlayerService.playEffect(effect);
   }
 }

@@ -4,6 +4,13 @@
   [loading]="loading()"
 ></app-smart-table>
 
+<ng-template #playColumn let-row="$implicit">
+  <lib-play-pause-button
+    [state]="getPlayBtnState(row)"
+    (toggle)="emitPlayOrPause(row)"
+  />
+</ng-template>
+
 <ng-template #tagColumn let-row="$implicit">
   @if (row.tags) {
     <lib-tag-list-smart
