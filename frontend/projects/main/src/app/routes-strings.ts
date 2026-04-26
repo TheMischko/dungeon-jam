@@ -3,5 +3,6 @@ export const routesStrings = {
   library: 'library',
   playlists: 'playlists',
   tags: 'tags',
-  settings: 'settings'
-}
+  settings: 'settings',
+  soundEffects: 'sound-effects',
+};

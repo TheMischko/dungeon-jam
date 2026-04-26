@@ -71,8 +71,11 @@ export class RoutingListenerService {
         case RedirectPath.SETTINGS:
           await this.router.navigate([
             routesStrings.settings,
-            settingsRouteStrings.general
+            settingsRouteStrings.general,
           ]);
+          break;
+        case RedirectPath.SOUND_EFFECTS:
+          await this.router.navigate([routesStrings.soundEffects]);
           break;
         default:
           console.error(`Unknow redirect to: ${redirect.path}`);

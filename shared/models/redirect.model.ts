@@ -9,4 +9,5 @@ export enum RedirectPath {
   PLAYLISTS = 'playlists',
   TAGS = 'tags',
   SETTINGS = 'settings',
+  SOUND_EFFECTS = 'sound-effects',
 }

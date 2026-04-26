@@ -52,6 +52,11 @@ export class SidebarComponent implements OnInit {
         })),
       },
       {
+        title: 'Sound Effects',
+        redirectRequest: { path: RedirectPath.SOUND_EFFECTS },
+        active: activePath === RedirectPath.SOUND_EFFECTS,
+      },
+      {
         title: 'Tags',
         redirectRequest: { path: RedirectPath.TAGS },
         active: activePath === RedirectPath.TAGS,
