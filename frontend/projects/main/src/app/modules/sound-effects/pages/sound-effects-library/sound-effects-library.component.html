@@ -3,6 +3,7 @@
   <app-sound-effect-table
     [soundEffects]="dataset()"
     [loading]="loading()"
+    [currentlyPlaying]="playingEffectIds()"
     (playEffect)="playEffect.emit($event)"
     (stopEffect)="stopEffect.emit($event)"
   />

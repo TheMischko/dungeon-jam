@@ -1,6 +1,7 @@
 <app-sound-effects-library
   [dataset]="soundEffects()"
   [loading]="loading()"
+  [playingEffectIds]="playingEffectIds()"
   (uploadAudioFiles)="createFromFiles($event)"
   (playEffect)="playEffect($event)"
   (stopEffect)="stopEffect($event)"

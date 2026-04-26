@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   inject,
   OnInit,
 } from '@angular/core';
@@ -11,6 +12,7 @@ import { NewSoundEffectUploadService } from '../../../services/new-sound-effect-
 import { take } from 'rxjs';
 import { SoundEffect } from '@shared/models/sound-effect.model';
 import { SoundEffectsPlayerService } from '../../../../../services/sound-effects-player.service';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-sound-effects-library-smart',
@@ -25,6 +27,14 @@ export class SoundEffectsLibrarySmartComponent implements OnInit {
     NewSoundEffectUploadService
   );
   private readonly soundEffectPlayerService = inject(SoundEffectsPlayerService);
+
+  private readonly playingEffects = toSignal(
+    this.soundEffectPlayerService.playingEffects$,
+    { initialValue: [] }
+  );
+  readonly playingEffectIds = computed(() =>
+    this.playingEffects().map((e) => e.id)
+  );
 
   readonly soundEffects = this.soundEffectStore.entities;
   readonly loading = this.soundEffectStore.loading;
@@ -45,7 +55,7 @@ export class SoundEffectsLibrarySmartComponent implements OnInit {
     await this.soundEffectPlayerService.playEffect(effect);
   }
 
-  async stopEffect(effect: SoundEffect): Promise<void> {
-    await this.soundEffectPlayerService.playEffect(effect);
+  stopEffect(effect: SoundEffect): void {
+    this.soundEffectPlayerService.stopEffect(effect.id);
   }
 }

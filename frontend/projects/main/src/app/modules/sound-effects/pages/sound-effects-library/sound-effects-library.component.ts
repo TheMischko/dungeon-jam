@@ -19,6 +19,7 @@ import { SoundEffectTableComponent } from '../../components/sound-effect-table/s
 export class SoundEffectsLibraryComponent {
   readonly dataset = input<SoundEffect[]>([]);
   readonly loading = input<boolean>(false);
+  readonly playingEffectIds = input<string[]>([]);
 
   readonly uploadAudioFiles = output<AudioTrack[]>();
   readonly playEffect = output<SoundEffect>();
