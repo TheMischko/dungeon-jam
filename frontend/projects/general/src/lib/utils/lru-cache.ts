@@ -6,7 +6,10 @@
  */
 export class LRUCache<K, V> {
   private cache: Map<K, V>;
-  constructor(private capacity: number) {
+  constructor(
+    private capacity: number,
+    private recordCleanupFn?: (key: K, value: V) => void | Promise<void>
+  ) {
     if (capacity <= 0) {
       throw Error('Capacity of LRU Cache has to be greater than 0!');
     }
@@ -17,6 +20,9 @@ export class LRUCache<K, V> {
     if (this.cache.has(key)) {
       this.cache.delete(key);
     } else if (this.cache.size === this.capacity) {
+      const first = this.first!;
+      const firstRecord = this.cache.get(first);
+      this.recordCleanupFn?.(first, firstRecord!);
       this.cache.delete(this.first!);
     }
     this.cache.set(key, value);
