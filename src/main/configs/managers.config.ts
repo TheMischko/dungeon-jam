@@ -9,6 +9,7 @@ import { DiscordManager } from '../managers/discord.manager';
 import { PlaybackDestinationManager } from '../managers/playback-destination.manager';
 import { getDefaultViewConfig } from './view.config';
 import { DiscordTokenManager } from '../managers/discord-token.manager';
+import { SoundEffectManager } from '../managers/sound-effect.manager';
 
 /**
  * Manager initialization configuration
@@ -50,6 +51,12 @@ export function getManagersInitConfig(
       name: 'Track',
       initFunction: async () => {
         await TrackManager.getInstance();
+      },
+    },
+    {
+      name: 'SoundEffect',
+      initFunction: async () => {
+        await SoundEffectManager.getInstance();
       },
     },
     {

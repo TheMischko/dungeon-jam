@@ -2,6 +2,7 @@ import { StoredPlayback, Track } from '@shared/models/track.model';
 import { Playlist } from '@shared/models/playlist.model';
 import { TagData } from '@shared/models/tag.model';
 import { DiscordTokenData } from '@shared/models/discord.model';
+import { SoundEffect } from '@shared/models/sound-effect.model';
 
 export function initDatabase() {
   return {
@@ -10,6 +11,7 @@ export function initDatabase() {
     playback: initPlayback(),
     tags: initTags(),
     discordTokens: initDiscordTokens(),
+    soundEffects: initSoundEffects(),
   };
 }
 export type DatabaseSchema = ReturnType<typeof initDatabase>;
@@ -34,5 +36,9 @@ function initTags(): TagData[] {
 }
 
 function initDiscordTokens(): DiscordTokenData[] {
+  return [];
+}
+
+function initSoundEffects(): SoundEffect[] {
   return [];
 }
