@@ -1,1 +1,7 @@
-<p>sound-effects-library works!</p>
+<app-songs-drop-in-zone (dropped)="uploadAudioFiles.emit($event)">
+  @if (loading()) {
+    <p>Loading...</p>
+  } @else {
+    <p>Has got {{ dataset().length }} sound effects ready.</p>
+  }
+</app-songs-drop-in-zone>

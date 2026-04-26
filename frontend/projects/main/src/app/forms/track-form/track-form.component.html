@@ -1,6 +1,6 @@
-@if (form()) {
-  <lib-input label="Title" [formField]="form()!.title"></lib-input>
-  <lib-input label="Author" [formField]="form()!.author"></lib-input>
-  <lib-tags-input [formField]="form()!.tags"></lib-tags-input>
-  <lib-input label="Path" [formField]="form()!.path"></lib-input>
+@if (form(); as form) {
+  <lib-input label="Title" [formField]="form.title"></lib-input>
+  <lib-input label="Author" [formField]="form.author"></lib-input>
+  <lib-tags-input [formField]="form.tags"></lib-tags-input>
+  <lib-input label="Path" [formField]="form.path"></lib-input>
 }

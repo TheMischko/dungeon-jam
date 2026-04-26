@@ -1,0 +1,6 @@
+@if (form(); as form) {
+  <lib-input label="Title" [formField]="form.title" />
+  <lib-input label="Description" [formField]="form.description" />
+  <lib-tags-input [formField]="form.tags" />
+  <lib-input label="Path" [formField]="form.path" />
+}
