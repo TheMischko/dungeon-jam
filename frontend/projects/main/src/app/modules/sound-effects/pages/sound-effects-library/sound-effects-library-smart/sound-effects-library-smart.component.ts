@@ -51,11 +51,26 @@ export class SoundEffectsLibrarySmartComponent implements OnInit {
       .subscribe();
   }
 
-  async playEffect(effect: SoundEffect): Promise<void> {
-    await this.soundEffectPlayerService.playEffect(effect);
+  async playEffect(soundEffect: SoundEffect): Promise<void> {
+    await this.soundEffectPlayerService.playEffect(soundEffect);
   }
 
-  stopEffect(effect: SoundEffect): void {
-    this.soundEffectPlayerService.stopEffect(effect.id);
+  stopEffect(soundEffect: SoundEffect): void {
+    this.soundEffectPlayerService.stopEffect(soundEffect.id);
+  }
+
+  protected toggleEffectLoop(soundEffect: SoundEffect) {
+    console.log('toggleEffectLoop', soundEffect);
+    this.soundEffectStore.updateEffect({
+      ...soundEffect,
+      looping: !soundEffect.looping,
+    });
+    const isPlaying = this.playingEffectIds().includes(soundEffect.id);
+    if (isPlaying) {
+      this.soundEffectPlayerService.setEffectLoop(
+        soundEffect.id,
+        !soundEffect.looping
+      );
+    }
   }
 }

@@ -12,6 +12,8 @@ import { TableColumnConfiguration } from '../../../../models/table.model';
 import { TrackDurationPipe } from '@general/pipes/track-duration.pipe';
 import { TagListSmartComponent } from '@general/components/display/tag-list/tag-list-smart/tag-list-smart.component';
 import { PlayPauseButtonComponent } from '@general/components/buttons/play-pause-button/play-pause-button.component';
+import { RepeatStateButtonComponent } from '../../../../player/player/repeat-state-button/repeat-state-button.component';
+import { RepeatState } from '../../../../models/playback.model';
 
 @Component({
   selector: 'app-sound-effect-table',
@@ -19,6 +21,7 @@ import { PlayPauseButtonComponent } from '@general/components/buttons/play-pause
     SmartTableComponent,
     TagListSmartComponent,
     PlayPauseButtonComponent,
+    RepeatStateButtonComponent,
   ],
   templateUrl: './sound-effect-table.component.html',
   styleUrl: './sound-effect-table.component.scss',
@@ -36,16 +39,23 @@ export class SoundEffectTableComponent {
 
   readonly playEffect = output<SoundEffect>();
   readonly stopEffect = output<SoundEffect>();
+  readonly toggleEffectLoop = output<SoundEffect>();
 
   readonly tagColumn = viewChild.required('tagColumn', { read: TemplateRef });
   readonly playColumnTemplate = viewChild.required('playColumn', {
     read: TemplateRef,
   });
+  readonly loopColumn = viewChild.required('loopColumn', { read: TemplateRef });
 
   readonly config: TableColumnConfiguration<SoundEffect> = {
     play: {
       title: '',
       template: () => this.playColumnTemplate(),
+      width: '65px',
+    },
+    looping: {
+      title: '',
+      template: () => this.loopColumn(),
       width: '65px',
     },
     name: {
@@ -64,16 +74,23 @@ export class SoundEffectTableComponent {
     },
   };
 
-  emitPlayOrPause(effect: SoundEffect): void {
-    if (this.currentlyPlaying().includes(effect.id)) {
-      this.stopEffect.emit(effect);
+  emitPlayOrPause(soundEffect: SoundEffect): void {
+    if (this.currentlyPlaying().includes(soundEffect.id)) {
+      this.stopEffect.emit(soundEffect);
       return;
     }
-    this.playEffect.emit(effect);
+    this.playEffect.emit(soundEffect);
   }
 
-  protected getPlayBtnState(effect: SoundEffect): 'play' | 'pause' {
-    if (this.currentlyPlaying().includes(effect.id)) {
+  getRepeatState(soundEffect: SoundEffect): RepeatState {
+    if (soundEffect.looping) {
+      return RepeatState.ALL;
+    }
+    return RepeatState.NONE;
+  }
+
+  protected getPlayBtnState(soundEffect: SoundEffect): 'play' | 'pause' {
+    if (this.currentlyPlaying().includes(soundEffect.id)) {
       return 'pause';
     }
     return 'play';

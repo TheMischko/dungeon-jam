@@ -6,5 +6,6 @@
     [currentlyPlaying]="playingEffectIds()"
     (playEffect)="playEffect.emit($event)"
     (stopEffect)="stopEffect.emit($event)"
+    (toggleEffectLoop)="toggleEffectLoop.emit($event)"
   />
 </app-songs-drop-in-zone>

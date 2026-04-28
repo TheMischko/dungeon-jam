@@ -97,6 +97,7 @@ export const SoundEffectStore = signalStore(
     const updateEffect = rxMethod<SoundEffectUpdateData>(
       pipe(
         tap(() => {
+          console.log('update');
           patchState(store, { loading: true });
         }),
         switchMap((data) => {

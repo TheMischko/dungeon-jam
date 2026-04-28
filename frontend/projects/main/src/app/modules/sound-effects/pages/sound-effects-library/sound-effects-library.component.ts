@@ -24,4 +24,5 @@ export class SoundEffectsLibraryComponent {
   readonly uploadAudioFiles = output<AudioTrack[]>();
   readonly playEffect = output<SoundEffect>();
   readonly stopEffect = output<SoundEffect>();
+  readonly toggleEffectLoop = output<SoundEffect>();
 }

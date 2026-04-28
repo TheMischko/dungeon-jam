@@ -24,4 +24,6 @@ export interface SoundEffectUpdateData {
   url?: string;
   duration?: number;
   tags?: string[];
+  looping?: boolean;
+  volume?: number;
 }

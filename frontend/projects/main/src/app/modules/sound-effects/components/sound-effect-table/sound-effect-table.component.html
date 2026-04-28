@@ -11,6 +11,10 @@
   />
 </ng-template>
 
+<ng-template #loopColumn let-row="$implicit">
+  <app-repeat-state-button [repeatState]="getRepeatState(row)" (clicked)="toggleEffectLoop.emit(row)" />
+</ng-template>
+
 <ng-template #tagColumn let-row="$implicit">
   @if (row.tags) {
     <lib-tag-list-smart
