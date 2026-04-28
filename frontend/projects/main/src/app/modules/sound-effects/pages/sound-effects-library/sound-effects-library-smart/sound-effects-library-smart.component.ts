@@ -60,7 +60,6 @@ export class SoundEffectsLibrarySmartComponent implements OnInit {
   }
 
   protected toggleEffectLoop(soundEffect: SoundEffect) {
-    console.log('toggleEffectLoop', soundEffect);
     this.soundEffectStore.updateEffect({
       ...soundEffect,
       looping: !soundEffect.looping,
