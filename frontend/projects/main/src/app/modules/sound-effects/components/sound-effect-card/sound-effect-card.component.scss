@@ -1,0 +1,53 @@
+.grid-item {
+  display: grid;
+  grid-template-areas:
+    'name loop sidebar'
+    'volume play sidebar';
+  grid-template-columns: 4fr 1fr 10px;
+  grid-template-rows: 1fr 1fr;
+  gap: 1rem;
+  padding: 1rem;
+  background: transparent;
+  border-radius: 12px;
+  transition: background-color 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  &:hover {
+    background-color: rgba(#000, 0.25);
+  }
+}
+
+.item-name {
+  grid-area: name;
+  justify-content: flex-start;
+}
+.item-volume {
+  grid-area: volume;
+}
+.item-loop {
+  grid-area: loop;
+
+  & > * {
+    margin-bottom: -10px;
+  }
+}
+.item-play {
+  grid-area: play;
+
+  & > * {
+    margin-top: -6px;
+  }
+}
+.item-sidebar {
+  grid-area: sidebar;
+}
+
+.item-name,
+.item-loop {
+  display: flex;
+  align-items: flex-end;
+}
+
+.item-volume,
+.item-play {
+  display: flex;
+  align-items: center;
+}

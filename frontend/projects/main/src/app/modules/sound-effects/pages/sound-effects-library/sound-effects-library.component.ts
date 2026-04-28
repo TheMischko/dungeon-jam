@@ -3,12 +3,14 @@ import {
   Component,
   input,
   output,
+  signal,
 } from '@angular/core';
 import { SoundEffect } from '@shared/models/sound-effect.model';
 import { SongsDropInZoneComponent } from '../../../library/pages/library-landing-page/songs-drop-in-zone/songs-drop-in-zone.component';
 import { AudioTrack } from '@shared/models/track.model';
 import { SoundEffectTableComponent } from '../../components/sound-effect-table/sound-effect-table.component';
 import { MatSlideToggle } from '@angular/material/slide-toggle';
+import { SoundEffectCardGridComponent } from '../../components/sound-effect-card-grid/sound-effect-card-grid.component';
 
 @Component({
   selector: 'app-sound-effects-library',
@@ -16,6 +18,7 @@ import { MatSlideToggle } from '@angular/material/slide-toggle';
     SongsDropInZoneComponent,
     SoundEffectTableComponent,
     MatSlideToggle,
+    SoundEffectCardGridComponent,
   ],
   templateUrl: './sound-effects-library.component.html',
   styleUrl: './sound-effects-library.component.scss',
@@ -30,4 +33,6 @@ export class SoundEffectsLibraryComponent {
   readonly playEffect = output<SoundEffect>();
   readonly stopEffect = output<SoundEffect>();
   readonly toggleEffectLoop = output<SoundEffect>();
+
+  readonly showGrid = signal<boolean>(true);
 }

@@ -1,9 +1,17 @@
-import { Component, computed, inject, input, output, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  input,
+  output,
+  signal,
+} from '@angular/core';
 import { NgStyle } from '@angular/common';
 import { iconSet, volumeIconSet } from '@general/icons/icons';
 import { LucideAngularModule, LucideIconData } from 'lucide-angular';
 import { PlaylistWithTagData } from '../../../../../../../../../general/models/playlist.model';
 import { PlaylistStore } from '@general/stores/playlist.store';
+import { GridItemSizeConfig } from '../../../../../../models/grid-item-size-config.model';
 
 @Component({
   selector: 'app-playlist-grid-item',
@@ -24,7 +32,7 @@ export class PlaylistGridItemComponent {
   readonly isHovering = signal(false);
   readonly parentPlaylist = computed(() => {
     return this.playlistStore.getParent(this.playlist().id);
-  })
+  });
 
   readonly DEFAULT_IMAGE = '/assets/playlist.img';
   readonly playIcon = iconSet.PlayIcon;
@@ -101,13 +109,3 @@ export class PlaylistGridItemComponent {
     this.playlistClick.emit(this.playlist().id);
   }
 }
-
-export type GridItemSizeConfig = {
-  imageSize: number;
-  fontSize: number;
-  overlaySize: number;
-  trackCountSize?: number;
-  titleBold: boolean;
-  hideTags: boolean;
-  hideTracks: boolean;
-};

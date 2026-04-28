@@ -1,0 +1,27 @@
+<div
+  class="grid-item"
+  (mouseenter)="onMouseEnter()"
+  (mouseleave)="onMouseLeave()"
+>
+  @let effect = soundEffect();
+  <div class="item-name">{{ effect.name }}</div>
+  <div class="item-volume">
+    <app-volume-control
+      [volume]="volumeState()"
+      (changed)="volumeChange.emit($event)"
+    ></app-volume-control>
+  </div>
+  <div class="item-loop">
+    <app-repeat-state-button
+      [repeatState]="repeatState()"
+      (clicked)="loopingChange.emit()"
+    ></app-repeat-state-button>
+  </div>
+  <div class="item-play">
+    <lib-play-pause-button
+      [state]="playPauseState()"
+      (toggle)="handlePlayPause($event)"
+    ></lib-play-pause-button>
+  </div>
+  <div class="item-sidebar">.</div>
+</div>
