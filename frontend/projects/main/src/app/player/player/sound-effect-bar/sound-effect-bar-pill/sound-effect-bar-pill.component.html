@@ -1,0 +1,6 @@
+<div class="sound-effect-content" [ngStyle]="playPositionBackground()">
+  <span>{{ soundEffect().name }}</span>
+  <button class="stop-button" (click)="close.emit()">
+    <lucide-icon [size]="16" [img]="stopIcon" />
+  </button>
+</div>

@@ -98,7 +98,7 @@ export class SoundEffectsPlayerService {
           soundEffect,
           howl,
           loop: shouldLoop,
-          volume: 0.5,
+          volume: 0.1,
         },
       });
       this.positionRecord.next({
@@ -143,7 +143,7 @@ export class SoundEffectsPlayerService {
       src: [soundBlobUrl],
       html5: true,
       format: '',
-      volume: 0.5,
+      volume: 0.1,
       loop,
     });
 

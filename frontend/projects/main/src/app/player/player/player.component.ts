@@ -13,6 +13,7 @@ import { RepeatStateButtonComponent } from './repeat-state-button/repeat-state-b
 import { ShuffleButtonComponent } from './shuffle-button/shuffle-button.component';
 import { QueueIndicatorComponent } from './queue-indicator/queue-indicator.component';
 import { ScrollOverflowTextDirective } from '@general/directives/scroll-overflow-text.directive';
+import { SoundEffectBarSmartComponent } from './sound-effect-bar/sound-effect-bar-smart/sound-effect-bar-smart.component';
 
 @Component({
   selector: 'app-player',
@@ -26,6 +27,7 @@ import { ScrollOverflowTextDirective } from '@general/directives/scroll-overflow
     ShuffleButtonComponent,
     QueueIndicatorComponent,
     ScrollOverflowTextDirective,
+    SoundEffectBarSmartComponent,
   ],
   templateUrl: './player.component.html',
   styleUrl: './player.component.scss',

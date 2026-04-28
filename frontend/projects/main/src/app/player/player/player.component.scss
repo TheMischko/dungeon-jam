@@ -1,14 +1,22 @@
 @use 'colors' as col;
 @use 'sass:color';
 
-:host {
+:host{
   z-index: 10;
   position: absolute;
-  bottom: 1%;
+  bottom: 2%;
   left: 50%;
   transform: translateX(-50%);
-  height: 80px;
   width: 90%;
+  min-height: 80px;
+
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: stretch;
+  justify-content: flex-end;
+}
+
+.player-content {
   border-radius: 8px;
 
   padding: 0.5rem 1rem;
@@ -51,7 +59,6 @@
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    margin-bottom: -8px;
 
     .buttons {
       display: flex;
@@ -59,7 +66,6 @@
       align-items: center;
       justify-content: center;
       gap: 1rem;
-      margin-top: -1.5rem;
     }
   }
 

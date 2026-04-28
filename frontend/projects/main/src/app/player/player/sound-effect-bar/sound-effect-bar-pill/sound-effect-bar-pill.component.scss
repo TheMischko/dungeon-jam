@@ -1,0 +1,42 @@
+@use "colors" as col;
+@use "typography" as typo;
+
+:host{
+  background: col.$primary-dark;
+  border-radius: 20px;
+
+  .sound-effect-content{
+    padding: 4px 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-width: 80px;
+    max-width: 150px;
+    border-radius: 20px;
+    @include typo.body2();
+
+
+    .stop-button{
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 24px;
+      width: 24px;
+      border: none;
+      margin-right: -2px;
+      padding: 4px;
+      border-radius: 50%;
+      background: none;
+      color: col.$text-main;
+      cursor: pointer;
+
+      lucide-icon{
+        margin-bottom: -3px;
+      }
+
+      &:hover {
+        background: col.$transparent-dark-medium
+      }
+    }
+  }
+}

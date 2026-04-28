@@ -1,0 +1,9 @@
+<div class="sound-effects">
+  @for (soundEffect of playingEffects(); track soundEffect.id) {
+    <app-sound-effect-bar-pill
+      [soundEffect]="soundEffect.soundEffect"
+      [position]="playingEffectsPositions()?.[soundEffect.id] ?? 0"
+      (close)="stopSoundEffect.emit(soundEffect.id)"
+    />
+  }
+</div>
