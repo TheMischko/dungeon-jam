@@ -1,4 +1,7 @@
 <h1>Sound Effects</h1>
+<mat-slide-toggle [hideIcon]="true" [checked]="true"
+  >Show grid</mat-slide-toggle
+>
 <app-songs-drop-in-zone (dropped)="uploadAudioFiles.emit($event)">
   <app-sound-effect-table
     [soundEffects]="dataset()"

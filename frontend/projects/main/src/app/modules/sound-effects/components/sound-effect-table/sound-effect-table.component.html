@@ -2,6 +2,7 @@
   [config]="config"
   [dataSet]="soundEffects()"
   [loading]="loading()"
+  [showControls]="false"
 ></app-smart-table>
 
 <ng-template #playColumn let-row="$implicit">
@@ -12,7 +13,10 @@
 </ng-template>
 
 <ng-template #loopColumn let-row="$implicit">
-  <app-repeat-state-button [repeatState]="getRepeatState(row)" (clicked)="toggleEffectLoop.emit(row)" />
+  <app-repeat-state-button
+    [repeatState]="getRepeatState(row)"
+    (clicked)="toggleEffectLoop.emit(row)"
+  />
 </ng-template>
 
 <ng-template #tagColumn let-row="$implicit">
