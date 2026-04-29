@@ -77,6 +77,12 @@ export enum SoundEffectChannel {
   GET_ALL = 'sound-effects/get-all',
 }
 
+export enum ImageChannel {
+  OPEN_PICKER = 'image/open-picker',
+  PROCESS_AND_SAVE = 'image/process-and-save',
+  DELETE = 'image/delete',
+}
+
 export type AppChannel =
   | GeneralChannels
   | TrackChannel
@@ -87,4 +93,5 @@ export type AppChannel =
   | CaptureChannel
   | DiscordChannel
   | DiscordTokenChannel
-  | SoundEffectChannel;
+  | SoundEffectChannel
+  | ImageChannel;
