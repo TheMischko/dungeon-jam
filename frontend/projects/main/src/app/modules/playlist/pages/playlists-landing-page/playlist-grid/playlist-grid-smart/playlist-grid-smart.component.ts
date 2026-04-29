@@ -9,7 +9,6 @@ import {
 } from '@angular/core';
 import { PlaylistGridComponent } from '../playlist-grid.component';
 import { Playlist } from '@shared/models/playlist.model';
-import { GridItemSizeConfig } from '../playlist-grid-item/playlist-grid-item.component';
 import { SortDirection } from '@shared/models/common.model';
 import { QueryRequest } from '@shared/models/request.model';
 import { PlaylistStore } from '@general/stores/playlist.store';
@@ -21,6 +20,7 @@ import { map, take } from 'rxjs';
 import { TrackService } from '../../../../../../services/track.service';
 import { TagsStore } from '@general/stores/tags.store';
 import { PlaylistWithTagData } from '../../../../../../../../../general/models/playlist.model';
+import { GridItemSizeConfig } from '../../../../../../models/grid-item-size-config.model';
 
 @Component({
   selector: 'app-playlist-grid-smart',

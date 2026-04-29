@@ -1,11 +1,25 @@
 <h1>Sound Effects</h1>
+<mat-slide-toggle [hideIcon]="true" [checked]="showGrid()"
+  >Show grid</mat-slide-toggle
+>
 <app-songs-drop-in-zone (dropped)="uploadAudioFiles.emit($event)">
-  <app-sound-effect-table
-    [soundEffects]="dataset()"
-    [loading]="loading()"
-    [currentlyPlaying]="playingEffectIds()"
-    (playEffect)="playEffect.emit($event)"
-    (stopEffect)="stopEffect.emit($event)"
-    (toggleEffectLoop)="toggleEffectLoop.emit($event)"
-  />
+  @if (showGrid()) {
+    <app-sound-effect-card-grid
+      [soundEffects]="dataset()"
+      [loading]="loading()"
+      [currentlyPlaying]="playingEffectIds()"
+      (playEffect)="playEffect.emit($event)"
+      (stopEffect)="stopEffect.emit($event)"
+      (toggleEffectLoop)="toggleEffectLoop.emit($event)"
+    ></app-sound-effect-card-grid>
+  } @else {
+    <app-sound-effect-table
+      [soundEffects]="dataset()"
+      [loading]="loading()"
+      [currentlyPlaying]="playingEffectIds()"
+      (playEffect)="playEffect.emit($event)"
+      (stopEffect)="stopEffect.emit($event)"
+      (toggleEffectLoop)="toggleEffectLoop.emit($event)"
+    ></app-sound-effect-table>
+  }
 </app-songs-drop-in-zone>

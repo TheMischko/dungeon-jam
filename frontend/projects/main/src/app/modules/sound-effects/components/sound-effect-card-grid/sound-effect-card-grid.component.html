@@ -1,0 +1,30 @@
+<div class="wrapper">
+  <div class="controls">
+    <lib-range-slider
+      class="size-slider"
+      [minValue]="0"
+      [maxValue]="100"
+      [stepSize]="5"
+      [value]="75"
+      [prefix]="gridSmallIcon"
+      [suffix]="gridBigIcon"
+      (inputChange)="updateSize($event)"
+    />
+  </div>
+
+  <div class="grid-content">
+    @if (loading()) {
+      <lib-loader [center]="true" [size]="'large'"></lib-loader>
+    }
+    @for (soundEffect of soundEffects(); track soundEffect.id) {
+      <app-sound-effect-card
+        [soundEffect]="soundEffect"
+        [isPlaying]="isPlaying(soundEffect.id)"
+        [sizeConfig]="sizeConfig()"
+        (play)="playEffect.emit(soundEffect)"
+        (pause)="playEffect.emit(soundEffect)"
+        (loopingChange)="toggleEffectLoop.emit(soundEffect)"
+      ></app-sound-effect-card>
+    }
+  </div>
+</div>
