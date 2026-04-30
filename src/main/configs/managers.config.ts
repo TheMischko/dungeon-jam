@@ -10,6 +10,7 @@ import { PlaybackDestinationManager } from '../managers/playback-destination.man
 import { getDefaultViewConfig } from './view.config';
 import { DiscordTokenManager } from '../managers/discord-token.manager';
 import { SoundEffectManager } from '../managers/sound-effect.manager';
+import { ImageManager } from '../managers/image.manager';
 
 /**
  * Manager initialization configuration
@@ -87,6 +88,12 @@ export function getManagersInitConfig(
       name: 'PlaybackDestination',
       initFunction: async () => {
         await PlaybackDestinationManager.getInstance();
+      },
+    },
+    {
+      name: 'ImageManager',
+      initFunction: async () => {
+        await ImageManager.getInstance();
       },
     },
   ];

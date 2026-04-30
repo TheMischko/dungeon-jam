@@ -1,0 +1,11 @@
+<div class="control-wrapper">
+  @if (hasImage()) {
+    <button class="discard-button" (click)="discardImage()">X</button>
+    <img class="selected-image" [src]="imageDataUrl()" [alt]="imagePath()" />
+  } @else {
+    <div class="upload-wrapper" (click)="openImageDialog()">
+      <b>Playlist Image</b>
+      <span>Click here to select an image.</span>
+    </div>
+  }
+</div>

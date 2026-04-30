@@ -19,4 +19,8 @@
     label="Image URL"
     [formField]="form()!.imageUrl"
   ></lib-input>
+  <app-image-upload
+    class="image-upload"
+    (imageSelected)="updateImage($event)"
+  />
 }

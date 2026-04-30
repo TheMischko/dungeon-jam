@@ -3,3 +3,8 @@
 :host {
   @include mix.base-form();
 }
+
+:host ::ng-deep .image-upload {
+  width: 350px;
+  height: 350px;
+}

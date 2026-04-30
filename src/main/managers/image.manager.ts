@@ -40,9 +40,6 @@ export class ImageManager {
   }
 
   public async fetchImage(imagePath: string): Promise<string | null> {
-    if (!imagePath.includes(ImageManager.imageStorageFolder)) {
-      return null;
-    }
     try {
       const cached = this.cache.get(imagePath);
       if (cached) {
