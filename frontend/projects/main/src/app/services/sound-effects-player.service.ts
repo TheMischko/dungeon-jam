@@ -90,7 +90,7 @@ export class SoundEffectsPlayerService {
     let howl: Howl | undefined;
 
     try {
-      howl = await this.createHowl(soundEffect, shouldLoop);
+      howl = await this.createHowl(soundEffect);
       this.stateRecord.next({
         ...this.stateRecord.getValue(),
         [soundEffect.id]: {
@@ -130,13 +130,11 @@ export class SoundEffectsPlayerService {
   public setEffectLoop(soundEffectId: string, loop: boolean): void {
     const state = this.stateRecord.getValue()[soundEffectId];
     if (!state) return;
-    state.howl.loop(loop);
     this.patchState(soundEffectId, { loop });
   }
 
   private async createHowl(
-    soundEffect: SoundEffect,
-    loop: boolean = false
+    soundEffect: SoundEffect
   ): Promise<Howl> {
     const soundBlobUrl = await this.getBlobUrl(soundEffect);
     const howl = new Howl({
@@ -144,7 +142,7 @@ export class SoundEffectsPlayerService {
       html5: true,
       format: '',
       volume: 0.1,
-      loop,
+      loop: false,
     });
 
     howl.load();
@@ -169,7 +167,15 @@ export class SoundEffectsPlayerService {
     this.startWatchdog(soundEffectId);
   }
 
-  private handleHowlEnd(soundEffectId: string): void {
+  private async handleHowlEnd(soundEffectId: string): Promise<void> {
+    const effectState = this.stateRecord.getValue()[soundEffectId];
+    if (!effectState) return;
+
+    if (effectState.loop) {
+      effectState.howl.play();
+      effectState.howl.seek(0);
+      return;
+    }
     this.cleanSoundEffectDataById(soundEffectId);
   }
 
@@ -204,6 +210,7 @@ export class SoundEffectsPlayerService {
   }
 
   private startWatchdog(id: string): void {
+    this.stopWatchdog(id);
     const timerId = setInterval(() => {
       const state = this.stateRecord.getValue()[id];
       if (state?.howl.playing()) {
@@ -220,6 +227,7 @@ export class SoundEffectsPlayerService {
     const state = this.stateRecord.getValue()[id];
     if (state?.timerId) {
       clearInterval(state.timerId);
+      this.patchState(id, { timerId: undefined });
     }
   }
 
