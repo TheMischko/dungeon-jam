@@ -22,8 +22,9 @@
         [isPlaying]="isPlaying(soundEffect.id)"
         [sizeConfig]="sizeConfig()"
         (play)="playEffect.emit(soundEffect)"
-        (pause)="playEffect.emit(soundEffect)"
+        (pause)="stopEffect.emit(soundEffect)"
         (loopingChange)="toggleEffectLoop.emit(soundEffect)"
+        (volumeChange)="emitVolumeChange(soundEffect, $event)"
       ></app-sound-effect-card>
     }
   </div>

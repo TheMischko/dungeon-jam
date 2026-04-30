@@ -19,7 +19,16 @@ import {
   SoundEffectUpdateData,
 } from '@shared/models/sound-effect.model';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { catchError, EMPTY, finalize, map, pipe, switchMap, tap } from 'rxjs';
+import {
+  catchError,
+  debounceTime,
+  EMPTY,
+  finalize,
+  map,
+  pipe,
+  switchMap,
+  tap,
+} from 'rxjs';
 import { inject } from '@angular/core';
 import { SoundEffectService } from '@general/services/sound-effect.service';
 
@@ -96,10 +105,7 @@ export const SoundEffectStore = signalStore(
 
     const updateEffect = rxMethod<SoundEffectUpdateData>(
       pipe(
-        tap(() => {
-          console.log('update');
-          patchState(store, { loading: true });
-        }),
+        debounceTime(250),
         switchMap((data) => {
           return soundEffectService.update(data).pipe(
             tap((updatedEffect) => {
@@ -122,9 +128,6 @@ export const SoundEffectStore = signalStore(
                 err
               );
               return EMPTY;
-            }),
-            finalize(() => {
-              patchState(store, { loading: false });
             })
           );
         })

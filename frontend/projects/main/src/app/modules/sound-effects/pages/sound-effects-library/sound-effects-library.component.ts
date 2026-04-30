@@ -11,6 +11,7 @@ import { AudioTrack } from '@shared/models/track.model';
 import { SoundEffectTableComponent } from '../../components/sound-effect-table/sound-effect-table.component';
 import { MatSlideToggle } from '@angular/material/slide-toggle';
 import { SoundEffectCardGridComponent } from '../../components/sound-effect-card-grid/sound-effect-card-grid.component';
+import { SoundEffectVolumeChange } from './sound-effects-library-smart/sound-effects-library-smart.component';
 
 @Component({
   selector: 'app-sound-effects-library',
@@ -33,6 +34,7 @@ export class SoundEffectsLibraryComponent {
   readonly playEffect = output<SoundEffect>();
   readonly stopEffect = output<SoundEffect>();
   readonly toggleEffectLoop = output<SoundEffect>();
+  readonly effectVolumeChange = output<SoundEffectVolumeChange>();
 
   readonly showGrid = signal<boolean>(true);
 }

@@ -58,7 +58,6 @@ export class ScrollOverflowTextDirective implements OnInit, OnDestroy {
 
   private checkOverflow(): void {
     this.overflowing = this.element.scrollWidth > this.element.offsetWidth + 15;
-    console.log('overflow', this.element, this.overflowing);
   }
 
   @HostListener('mouseenter')

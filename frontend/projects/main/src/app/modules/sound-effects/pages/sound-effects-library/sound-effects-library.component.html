@@ -11,6 +11,7 @@
       (playEffect)="playEffect.emit($event)"
       (stopEffect)="stopEffect.emit($event)"
       (toggleEffectLoop)="toggleEffectLoop.emit($event)"
+      (effectVolumeChange)="effectVolumeChange.emit($event)"
     ></app-sound-effect-card-grid>
   } @else {
     <app-sound-effect-table

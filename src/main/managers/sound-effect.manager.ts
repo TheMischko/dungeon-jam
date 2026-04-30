@@ -1,5 +1,13 @@
-import { DatabaseProvider, SearchFn, SortFn } from '../database/database-provider';
-import { SoundEffect, SoundEffectCreateData, SoundEffectUpdateData } from '@shared/models/sound-effect.model';
+import {
+  DatabaseProvider,
+  SearchFn,
+  SortFn,
+} from '../database/database-provider';
+import {
+  SoundEffect,
+  SoundEffectCreateData,
+  SoundEffectUpdateData,
+} from '@shared/models/sound-effect.model';
 import { DatabaseProviderCreator } from '../database/database-provider-creator';
 import { ipcMain } from 'electron';
 import { SoundEffectChannel } from '@shared/models/channels.model';
@@ -48,12 +56,15 @@ export class SoundEffectManager {
         return data;
       }
     );
-    ipcMain.handle(SoundEffectChannel.GET_BY_ID, async (_, id: string): Promise<SoundEffect | null> => {
-      this.logger.log(`Fetching record with ID: ${id}.`);
-      const record = await this.getById(id);
-      this.logger.log(`Record found: ${record ? 'yes' : 'no'}.`);
-      return record;
-    });
+    ipcMain.handle(
+      SoundEffectChannel.GET_BY_ID,
+      async (_, id: string): Promise<SoundEffect | null> => {
+        this.logger.log(`Fetching record with ID: ${id}.`);
+        const record = await this.getById(id);
+        this.logger.log(`Record found: ${record ? 'yes' : 'no'}.`);
+        return record;
+      }
+    );
     ipcMain.handle(
       SoundEffectChannel.CREATE,
       async (_, data: SoundEffectCreateData): Promise<SoundEffect> => {
@@ -68,10 +79,13 @@ export class SoundEffectManager {
         return this.update(data);
       }
     );
-    ipcMain.handle(SoundEffectChannel.DELETE, async (_, id: string): Promise<boolean> => {
-      this.logger.log(`Deleting record with ID: ${id}.`);
-      return this.deleteById(id);
-    });
+    ipcMain.handle(
+      SoundEffectChannel.DELETE,
+      async (_, id: string): Promise<boolean> => {
+        this.logger.log(`Deleting record with ID: ${id}.`);
+        return this.deleteById(id);
+      }
+    );
   }
 
   private async getAll(query: QueryRequest): Promise<SoundEffect[]> {
@@ -83,7 +97,11 @@ export class SoundEffectManager {
   }
 
   private async create(data: SoundEffectCreateData): Promise<SoundEffect> {
-    return this.database.create(data);
+    return this.database.create({
+      ...data,
+      volume: 1,
+      looping: false,
+    });
   }
 
   private async update(
@@ -129,19 +147,19 @@ export class SoundEffectManager {
     sfx: SoundEffect,
     filter: string
   ): Promise<boolean> => {
-    if(sfx.name.includes(filter)){
+    if (sfx.name.includes(filter)) {
       return true;
     }
-    if(!sfx.tags?.length){
+    if (!sfx.tags?.length) {
       return false;
     }
     const tagsManager = await TagsManager.getInstance();
     const matchingTags = await tagsManager.getSubset('title', [filter], {
-      match: GetSomeMatch.STARTS_WITH
+      match: GetSomeMatch.STARTS_WITH,
     });
-    if(!matchingTags.length){
+    if (!matchingTags.length) {
       return false;
     }
     return matchingTags.some((tag) => sfx.tags!.includes(tag.id));
-  }
+  };
 }

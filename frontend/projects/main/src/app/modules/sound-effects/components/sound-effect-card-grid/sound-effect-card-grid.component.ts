@@ -12,6 +12,7 @@ import { iconSet } from '@general/icons/icons';
 import { LoaderComponent } from '@general/components/display/loader/loader.component';
 import { SoundEffectCardComponent } from '../sound-effect-card/sound-effect-card.component';
 import { GridItemSizeConfig } from '../../../../models/grid-item-size-config.model';
+import { SoundEffectVolumeChange } from '../../pages/sound-effects-library/sound-effects-library-smart/sound-effects-library-smart.component';
 
 @Component({
   selector: 'app-sound-effect-card-grid',
@@ -32,6 +33,7 @@ export class SoundEffectCardGridComponent {
   readonly playEffect = output<SoundEffect>();
   readonly stopEffect = output<SoundEffect>();
   readonly toggleEffectLoop = output<SoundEffect>();
+  readonly effectVolumeChange = output<SoundEffectVolumeChange>();
 
   readonly sizeConfig = computed<GridItemSizeConfig>(() => {
     return {
@@ -55,5 +57,12 @@ export class SoundEffectCardGridComponent {
 
   updateSize(value: number): void {
     this.cardSize.set(value / 100);
+  }
+
+  emitVolumeChange(soundEffect: SoundEffect, volume: number): void {
+    this.effectVolumeChange.emit({
+      soundEffect: soundEffect,
+      volume,
+    });
   }
 }

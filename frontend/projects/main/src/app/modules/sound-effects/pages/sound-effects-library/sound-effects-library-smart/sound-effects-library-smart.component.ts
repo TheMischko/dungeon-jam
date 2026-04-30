@@ -39,7 +39,7 @@ export class SoundEffectsLibrarySmartComponent implements OnInit {
   readonly soundEffects = this.soundEffectStore.entities;
   readonly loading = this.soundEffectStore.loading;
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.soundEffectStore.loadAll();
   }
 
@@ -59,7 +59,7 @@ export class SoundEffectsLibrarySmartComponent implements OnInit {
     this.soundEffectPlayerService.stopEffect(soundEffect.id);
   }
 
-  protected toggleEffectLoop(soundEffect: SoundEffect) {
+  protected toggleEffectLoop(soundEffect: SoundEffect): void {
     this.soundEffectStore.updateEffect({
       ...soundEffect,
       looping: !soundEffect.looping,
@@ -72,4 +72,26 @@ export class SoundEffectsLibrarySmartComponent implements OnInit {
       );
     }
   }
+
+  protected updateVolume(change: SoundEffectVolumeChange): void {
+    if (change.volume < 0 || change.volume > 1) {
+      return;
+    }
+    this.soundEffectStore.updateEffect({
+      ...change.soundEffect,
+      volume: change.volume,
+    });
+    const isPlaying = this.playingEffectIds().includes(change.soundEffect.id);
+    if (isPlaying) {
+      this.soundEffectPlayerService.setEffectVolume(
+        change.soundEffect.id,
+        change.volume
+      );
+    }
+  }
 }
+
+export type SoundEffectVolumeChange = {
+  soundEffect: SoundEffect;
+  volume: number;
+};
