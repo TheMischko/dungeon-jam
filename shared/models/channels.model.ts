@@ -81,6 +81,7 @@ export enum ImageChannel {
   OPEN_PICKER = 'image/open-picker',
   PROCESS_AND_SAVE = 'image/process-and-save',
   DELETE = 'image/delete',
+  FETCH_IMAGE = 'image/fetch',
 }
 
 export type AppChannel =

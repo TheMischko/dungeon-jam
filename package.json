@@ -14,6 +14,7 @@
     "build:electron": "node esbuild.config.mjs",
     "build:dir": "electron-builder --dir",
     "build:dist": "electron-builder",
+    "rebuild:dir": "npx shx rm -r build && npm run compile:prod && npm run build:dir",
     "compile:dev": "npm run build:electron && npm run copyfiles:dev && npm run build:frontend",
     "compile:prod": "npm run build:electron && npm run copyfiles:prod && npm run build:frontend",
     "start": "npm run build:electron && npm run copyfiles:dev && electron build/src/index.js",
@@ -77,8 +78,9 @@
     "opusscript": "^0.0.8",
     "picocolors": "^1.1.1",
     "prism-media": "^1.3.5",
+    "sharp": "^0.34.5",
     "typescript": "^6.0.2",
-    "uuid": "^13.0.0",
+    "uuid": "^14.0.0",
     "ws": "^8.20.0"
   },
   "devDependencies": {

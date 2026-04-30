@@ -9,6 +9,7 @@ import TagApi from './preload/tag-api';
 import DiscordApi from './preload/discord-api';
 import DiscordTokenApi from './preload/discord-token-api';
 import SoundEffectApi from './preload/sound-effect-api';
+import ImageApi from './preload/image-api';
 
 const generalApi = {
   triggerRedirect(request: RedirectRequest) {
@@ -39,6 +40,7 @@ declare global {
     DISCORD_API: typeof DiscordApi;
     DISCORD_TOKEN_API: typeof DiscordTokenApi;
     SOUND_EFFECT_API: typeof SoundEffectApi;
+    IMAGE_API: typeof ImageApi;
   }
 }
 
@@ -51,3 +53,4 @@ contextBridge.exposeInMainWorld('TAG_API', TagApi);
 contextBridge.exposeInMainWorld('DISCORD_API', DiscordApi);
 contextBridge.exposeInMainWorld('DISCORD_TOKEN_API', DiscordTokenApi);
 contextBridge.exposeInMainWorld('SOUND_EFFECT_API', SoundEffectApi);
+contextBridge.exposeInMainWorld('IMAGE_API', ImageApi);
