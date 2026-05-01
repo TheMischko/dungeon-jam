@@ -4,6 +4,7 @@ import {
   EllipsisVerticalIcon,
   Grid2x2Icon,
   Grid3x3Icon,
+  ImageUpIcon,
   ListFilterIcon,
   ListMusicIcon,
   ListStartIcon,
@@ -51,7 +52,8 @@ export const actionsIconSet = {
   FilterIcon: ListFilterIcon,
   CollapsedArrowIcon: ChevronDownIcon,
   ExpandedArrowIcon: ChevronUpIcon,
-  ShuffleIcon: ShuffleIcon
+  ShuffleIcon: ShuffleIcon,
+  UploadImageIcon: ImageUpIcon,
 };
 
 export const volumeIconSet = {

@@ -1,7 +1,7 @@
 <div
   class="drop-zone-wrapper"
   appDnd
-  accept="audio/.*"
+  [accept]="accept()"
   (filesDropped)="onFilesDropped($event)"
 >
   <div class="content">

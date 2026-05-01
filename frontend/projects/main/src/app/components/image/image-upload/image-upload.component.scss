@@ -1,6 +1,7 @@
 @use 'colors' as col;
 
 :host {
+  position: relative;
   display: flex;
   align-items: stretch;
   justify-content: stretch;
@@ -15,9 +16,9 @@
     align-items: stretch;
     justify-content: stretch;
 
-    margin: 1rem;
+    margin: 1rem 0;
     padding: 1rem;
-    border: 2px solid col.$text-main;
+    border: 1px solid col.$text-main;
     border-radius: 8px;
 
     .selected-image {
@@ -54,6 +55,21 @@
       }
     }
 
+    .drop-in-zone {
+      flex: 1;
+      display: flex;
+      min-height: 0;
+      min-width: 0;
+
+      ::ng-deep .drop-zone-wrapper,
+      ::ng-deep .drop-zone-wrapper .content {
+        flex: 1;
+        display: flex;
+        min-height: 0;
+        min-width: 0;
+      }
+    }
+
     .upload-wrapper {
       display: flex;
       flex-direction: column;
@@ -68,4 +84,14 @@
       border: 2px dashed col.$text-main;
     }
   }
+}
+
+.upload-label{
+  position: absolute;
+  top: -0.75rem;
+  left: 5%;
+  color: col.$text-main;
+  background: col.$background-main;
+  padding: 2px;
+  font-size: 14px;
 }

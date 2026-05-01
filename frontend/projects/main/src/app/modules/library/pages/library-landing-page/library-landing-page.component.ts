@@ -1,5 +1,5 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import { SongsDropInZoneComponent } from './songs-drop-in-zone/songs-drop-in-zone.component';
+import { FilesDropInZoneComponent } from './songs-drop-in-zone/files-drop-in-zone.component';
 import { AudioTrack, Track } from '@shared/models/track.model';
 import { SongsTableComponent } from './songs-table/songs-table.component';
 import { PlaybackService } from '../../../../services/playback.service';
@@ -32,7 +32,7 @@ import { TagsStore } from '@general/stores/tags.store';
 
 @Component({
   selector: 'app-library-landing-page',
-  imports: [SongsDropInZoneComponent, SongsTableComponent],
+  imports: [FilesDropInZoneComponent, SongsTableComponent],
   templateUrl: './library-landing-page.component.html',
   styleUrl: './library-landing-page.component.scss',
 })

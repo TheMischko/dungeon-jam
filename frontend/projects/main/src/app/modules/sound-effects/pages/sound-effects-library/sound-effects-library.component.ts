@@ -6,7 +6,7 @@ import {
   signal,
 } from '@angular/core';
 import { SoundEffect } from '@shared/models/sound-effect.model';
-import { SongsDropInZoneComponent } from '../../../library/pages/library-landing-page/songs-drop-in-zone/songs-drop-in-zone.component';
+import { FilesDropInZoneComponent } from '../../../library/pages/library-landing-page/songs-drop-in-zone/files-drop-in-zone.component';
 import { AudioTrack } from '@shared/models/track.model';
 import { SoundEffectTableComponent } from '../../components/sound-effect-table/sound-effect-table.component';
 import { MatSlideToggle } from '@angular/material/slide-toggle';
@@ -16,7 +16,7 @@ import { SoundEffectVolumeChange } from './sound-effects-library-smart/sound-eff
 @Component({
   selector: 'app-sound-effects-library',
   imports: [
-    SongsDropInZoneComponent,
+    FilesDropInZoneComponent,
     SoundEffectTableComponent,
     MatSlideToggle,
     SoundEffectCardGridComponent,

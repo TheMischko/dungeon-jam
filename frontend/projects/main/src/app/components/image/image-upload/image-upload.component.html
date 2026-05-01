@@ -3,9 +3,12 @@
     <button class="discard-button" (click)="discardImage()">X</button>
     <img class="selected-image" [src]="imageDataUrl()" [alt]="imagePath()" />
   } @else {
+    <app-songs-drop-in-zone class="drop-in-zone">
     <div class="upload-wrapper" (click)="openImageDialog()">
-      <b>Playlist Image</b>
+      <lucide-icon [img]="UploadIcon" [size]="48"></lucide-icon>
       <span>Click here to select an image.</span>
     </div>
+    </app-songs-drop-in-zone>
   }
+  <div class="upload-label">{{label()}}{{required() ? '*' : ''}}</div>
 </div>

@@ -1,18 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SongsDropInZoneComponent } from './songs-drop-in-zone.component';
+import { FilesDropInZoneComponent } from './files-drop-in-zone.component';
 
 describe('SongsDropInZoneComponent', () => {
-  let component: SongsDropInZoneComponent;
-  let fixture: ComponentFixture<SongsDropInZoneComponent>;
+  let component: FilesDropInZoneComponent;
+  let fixture: ComponentFixture<FilesDropInZoneComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SongsDropInZoneComponent]
-    })
-    .compileComponents();
+      imports: [FilesDropInZoneComponent],
+    }).compileComponents();
 
-    fixture = TestBed.createComponent(SongsDropInZoneComponent);
+    fixture = TestBed.createComponent(FilesDropInZoneComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
