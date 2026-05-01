@@ -20,6 +20,7 @@ import { GridItemSizeConfig } from '../../../../../models/grid-item-size-config.
 })
 export class PlaylistGridComponent {
   readonly dataSet = input.required<PlaylistWithTagData[]>();
+  readonly playlistImageMap = input<Record<string, string | null>>({});
   readonly sizeConfig = input.required<GridItemSizeConfig>();
   readonly playingPlaylistId = input<string | null>();
   readonly loading = input<boolean>(false);
@@ -33,6 +34,10 @@ export class PlaylistGridComponent {
 
   readonly gridBigIcon = iconSet.GridBigIcon;
   readonly gridSmallIcon = iconSet.GridSmallIcon;
+
+  getPlaylistImageUrl(playlist: PlaylistWithTagData) {
+    return this.playlistImageMap()[playlist.id] || null;
+  }
 
   isPlaying(playlistId: string): boolean {
     return this.playingPlaylistId() === playlistId;

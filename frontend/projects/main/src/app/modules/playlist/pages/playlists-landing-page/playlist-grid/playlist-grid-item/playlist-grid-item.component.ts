@@ -24,6 +24,7 @@ export class PlaylistGridItemComponent {
   readonly playlist = input.required<PlaylistWithTagData>();
   readonly sizeConfig = input.required<GridItemSizeConfig>();
   readonly isPlaying = input<boolean>(false);
+  readonly playlistImageUrl = input<string | null>(null);
 
   readonly playlistClick = output<string>();
   readonly playPlaylist = output<string>();
@@ -41,7 +42,7 @@ export class PlaylistGridItemComponent {
   readonly playingIcon = volumeIconSet.NormalIcon;
 
   readonly imageSrc = computed<string>(() => {
-    return this.playlist()?.imageUrl ?? this.DEFAULT_IMAGE;
+    return this.playlistImageUrl() ?? this.DEFAULT_IMAGE;
   });
   readonly imageSizeStyle = computed<Record<string, string>>(() => {
     const size = `${this.sizeConfig().imageSize ?? 250}px`;

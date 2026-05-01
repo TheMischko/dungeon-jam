@@ -25,6 +25,7 @@
     } @else { @for (playlist of dataSet(); track trackPlaylist(playlist)){
     <app-playlist-grid-item
       [playlist]="playlist"
+      [playlistImageUrl]="getPlaylistImageUrl(playlist)"
       [sizeConfig]="sizeConfig()"
       [isPlaying]="isPlaying(playlist.id)"
       (playlistClick)="playlistClick.emit($event)"

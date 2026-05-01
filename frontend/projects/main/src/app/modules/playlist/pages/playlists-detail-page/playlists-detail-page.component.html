@@ -1,9 +1,11 @@
 <div class="header">
-  <img
-    class="playlist-image"
-    [src]="playlist()?.imageUrl"
-    [alt]="playlist()?.name"
-  />
+  @if(playlistImageUrl(); as imageUrl){
+    <img
+      class="playlist-image"
+      [src]="imageUrl"
+      [alt]="playlist()?.name"
+    />
+  }
   <div class="header-content">
     <div class="header-info">
       <h1>{{ playlist()?.name }}</h1>

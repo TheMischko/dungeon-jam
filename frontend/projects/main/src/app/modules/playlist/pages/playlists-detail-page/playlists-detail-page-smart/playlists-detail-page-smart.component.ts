@@ -2,6 +2,7 @@ import {
   Component,
   computed,
   DestroyRef,
+  effect,
   inject,
   input,
   OnInit,
@@ -34,6 +35,7 @@ import {
   UpdatePlaylistModalComponent,
   UpdatePlaylistModalData,
 } from '../../../modals/update-playlist-modal/update-playlist-modal.component';
+import { ImageApiService } from '@general/services/image-api.service';
 
 @Component({
   selector: 'app-playlists-detail-page-smart',
@@ -48,6 +50,7 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
   readonly toastService = inject(ToastService);
   readonly playlistStore = inject(PlaylistStore);
   readonly defaultActionsService = inject(DefaultTrackActionsService);
+  readonly imageApiService = inject(ImageApiService);
   readonly destroyRef = inject(DestroyRef);
 
   readonly playlistId = input<string>('', { alias: 'id' });
@@ -90,6 +93,7 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
   readonly isPlaylistPlaying = computed<boolean>(() => {
     return this.playbackState()?.isPlaying ?? false;
   });
+  readonly playlistImageUrl = signal<string | null>(null);
   readonly currentFilter = signal<string>('');
   readonly currentSortBy = signal<string>('name');
   readonly currentSortDirection = signal<SortDirection>(SortDirection.ASC);
@@ -116,6 +120,23 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
       excludeActions: ['delete'],
     });
   });
+
+  constructor() {
+    effect(() => {
+      const playlist = this.playlist();
+      if (!playlist || !playlist.imageUrl) {
+        return;
+      }
+      const sub = this.imageApiService
+        .fetchImage(playlist.imageUrl)
+        .subscribe((image) => {
+          this.playlistImageUrl.set(image);
+        });
+      return () => {
+        sub?.unsubscribe();
+      };
+    });
+  }
 
   ngOnInit() {
     this.playlistTracksStore.load(this.loadQuery);

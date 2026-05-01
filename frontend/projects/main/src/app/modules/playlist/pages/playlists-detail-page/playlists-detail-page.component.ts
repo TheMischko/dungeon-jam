@@ -45,6 +45,7 @@ import { TagListSmartComponent } from '@general/components/display/tag-list/tag-
 })
 export class PlaylistsDetailPageComponent {
   readonly playlist = input.required<Playlist | null>();
+  readonly playlistImageUrl = input<string | null>();
   readonly tracks = input.required<Track[]>();
   readonly playlistPlaying = input<boolean>(false);
   readonly playingTrackId = input<string | undefined>();

@@ -1,6 +1,7 @@
 import {
   Component,
   computed,
+  effect,
   inject,
   input,
   OnInit,
@@ -16,11 +17,12 @@ import { Router } from '@angular/router';
 import { playlistRouteStrings } from '../../../../playlist-route-strings';
 import { PlaybackService } from '../../../../../../services/playback.service';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { map, take } from 'rxjs';
+import { forkJoin, map, Observable, of, take, tap } from 'rxjs';
 import { TrackService } from '../../../../../../services/track.service';
 import { TagsStore } from '@general/stores/tags.store';
 import { PlaylistWithTagData } from '../../../../../../../../../general/models/playlist.model';
 import { GridItemSizeConfig } from '../../../../../../models/grid-item-size-config.model';
+import { ImageApiService } from '@general/services/image-api.service';
 
 @Component({
   selector: 'app-playlist-grid-smart',
@@ -34,9 +36,11 @@ export class PlaylistGridSmartComponent implements OnInit {
   readonly playbackService = inject(PlaybackService);
   readonly trackService = inject(TrackService);
   readonly router = inject(Router);
+  readonly imageApiService = inject(ImageApiService);
 
   readonly showControls = input<boolean>(true);
 
+  readonly playlistImageMap = signal<Record<string, string | null>>({});
   readonly sizeSliderValue = signal<number>(0.75);
   readonly searchFilter = signal<string>('');
   readonly sortDirection = signal<SortDirection>(SortDirection.ASC);
@@ -75,6 +79,20 @@ export class PlaylistGridSmartComponent implements OnInit {
     )
   );
 
+  constructor() {
+    effect(() => {
+      const playlists = this.playlistStore.entities();
+      if (!playlists?.length) {
+        return;
+      }
+      const sub = this.updateImageMap(playlists).subscribe();
+
+      return () => {
+        sub?.unsubscribe();
+      };
+    });
+  }
+
   ngOnInit() {
     this.playlistStore.load(this.queryOptions);
   }
@@ -112,6 +130,39 @@ export class PlaylistGridSmartComponent implements OnInit {
       playlistRouteStrings.detail,
       playlistId,
     ]);
+  }
+
+  private updateImageMap(playlists: Playlist[]): Observable<void> {
+    const imageRequests = playlists.map((p) => {
+      if (p.imageUrl) {
+        return this.imageApiService.fetchImage(p.imageUrl).pipe(
+          map((imageUrl) => ({
+            playlistId: p.id,
+            imageUrl,
+          }))
+        );
+      }
+      return of({
+        playlistId: p.id,
+        imageUrl: null,
+      });
+    });
+
+    return forkJoin(imageRequests).pipe(
+      tap((responses) => {
+        const imageMap = responses.reduce(
+          (map, response) => {
+            return {
+              ...map,
+              [response.playlistId]: response.imageUrl,
+            };
+          },
+          {} as Record<string, string | null>
+        );
+        this.playlistImageMap.set(imageMap);
+      }),
+      map(() => void 0)
+    );
   }
 }
 
