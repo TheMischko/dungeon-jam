@@ -2,7 +2,7 @@
 <mat-slide-toggle [hideIcon]="true" [checked]="showGrid()"
   >Show grid</mat-slide-toggle
 >
-<app-songs-drop-in-zone (dropped)="uploadAudioFiles.emit($event)">
+<app-songs-drop-in-zone (audioDropped)="uploadAudioFiles.emit($event)">
   @if (showGrid()) {
     <app-sound-effect-card-grid
       [soundEffects]="dataset()"

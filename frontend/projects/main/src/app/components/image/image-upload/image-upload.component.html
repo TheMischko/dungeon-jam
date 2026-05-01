@@ -3,7 +3,11 @@
     <button class="discard-button" (click)="discardImage()">X</button>
     <img class="selected-image" [src]="imageDataUrl()" [alt]="imagePath()" />
   } @else {
-    <app-songs-drop-in-zone class="drop-in-zone">
+    <app-songs-drop-in-zone
+      class="drop-in-zone"
+      accept="image/.*"
+      (filesDropped)="processDroppedFiles($event)"
+    >
     <div class="upload-wrapper" (click)="openImageDialog()">
       <lucide-icon [img]="UploadIcon" [size]="48"></lucide-icon>
       <span>Click here to select an image.</span>

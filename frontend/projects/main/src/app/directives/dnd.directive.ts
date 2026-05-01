@@ -1,21 +1,46 @@
-import { Directive, HostBinding, HostListener, inject, input, output } from '@angular/core';
+import {
+  AfterViewInit,
+  Directive,
+  HostBinding,
+  HostListener,
+  inject,
+  input,
+  output,
+} from '@angular/core';
 import { AudioFilesService } from '../services/audio-files.service';
 import { AudioTrack } from '@shared/models/track.model';
+import { AudioApiWindow } from '../models/window-api.model';
 
 @Directive({
   selector: '[appDnd]',
 })
-export class DndDirective {
+export class DndDirective implements AfterViewInit {
+  private readonly window = <AudioApiWindow>window;
   readonly audioFilesService = inject(AudioFilesService);
 
-  readonly accept = input<string>('.*');
+  /**
+   * Sets an accept RegExp for general file drop. If undefined only audio files are registered.
+   *
+   * Use values like `image/.*` or `audio/.*`.
+   */
+  readonly accept = input<string | undefined>(undefined);
 
-  readonly filesDropped = output<AudioTrack[]>();
+  /**
+   * Emits dropped files. It is triggered only with `[accept]` input set.
+   */
+  readonly filesDropped = output<string[]>();
+  readonly audioFilesDropped = output<AudioTrack[]>();
 
-  constructor() {
-    this.audioFilesService.registerDrop((paths) => {
-      this.filesDropped.emit(paths);
-    });
+  ngAfterViewInit() {
+    if (!this.accept()) {
+      this.audioFilesService.registerAudioDrop((paths) => {
+        this.audioFilesDropped.emit(paths);
+      });
+    } else {
+      this.window.AUDIO_FILES_API.registerFileDrop(this.accept()!, (paths) => {
+        this.filesDropped.emit(paths);
+      });
+    }
   }
 
   @HostBinding('class.file-over')

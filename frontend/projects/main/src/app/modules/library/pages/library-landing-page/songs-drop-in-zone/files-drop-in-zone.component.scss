@@ -11,7 +11,7 @@
     visibility: hidden;
     position: absolute;
     top: 0;
-    right: 0;
+    left: 0;
     width: 100%;
     max-width: 92.5vw;
     height: 100%;
@@ -20,7 +20,6 @@
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    padding: 1rem;
     border: 2px dashed white;
     background-color: rgba(0, 0, 0, 0.48);
     transition: visibility 0.2s ease-in-out;

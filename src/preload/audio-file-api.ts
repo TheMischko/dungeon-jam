@@ -8,7 +8,7 @@ const fetchAudioData = async (paths: string[]): Promise<AudioTrack[]> => {
   return await ipcRenderer.invoke(AudioFileChannel.FETCH_DATA, paths);
 };
 
-const registerFileDrop = (callback: (paths: AudioTrack[]) => void) => {
+const registerAudioFileDrop = (callback: (paths: AudioTrack[]) => void) => {
   window.addEventListener('drop', async (e) => {
     e.preventDefault();
     const paths = [...e.dataTransfer!.files]
@@ -16,6 +16,21 @@ const registerFileDrop = (callback: (paths: AudioTrack[]) => void) => {
       .map((file) => webUtils.getPathForFile(file));
     const data = await fetchAudioData([...paths]);
     callback(data);
+  });
+  window.addEventListener('dragover', (e) => e.preventDefault());
+};
+
+const registerFileDrop = (
+  accept: string,
+  callback: (paths: string[]) => void
+) => {
+  const acceptRegExp = new RegExp(accept);
+  window.addEventListener('drop', async (e) => {
+    e.preventDefault();
+    const paths = [...e.dataTransfer!.files]
+      .filter((file) => acceptRegExp.test(file.type))
+      .map((file) => webUtils.getPathForFile(file));
+    callback(paths);
   });
   window.addEventListener('dragover', (e) => e.preventDefault());
 };
@@ -30,6 +45,7 @@ const loadFileBase64 = async (filePath: string): Promise<FileBase64> => {
 
 export default {
   fetchAudioData,
+  registerAudioFileDrop,
   registerFileDrop,
   uploadTracks,
   loadFileBase64,

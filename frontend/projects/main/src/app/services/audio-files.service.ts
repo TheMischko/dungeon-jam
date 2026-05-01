@@ -10,8 +10,10 @@ export class AudioFilesService {
   private readonly window = <AudioApiWindow>window;
   constructor() {}
 
-  registerDrop(callback: (paths: AudioTrack[]) => void): void {
-    this.window.AUDIO_FILES_API.registerFileDrop((paths) => callback(paths));
+  registerAudioDrop(callback: (paths: AudioTrack[]) => void): void {
+    this.window.AUDIO_FILES_API.registerAudioFileDrop((paths) =>
+      callback(paths)
+    );
   }
 
   uploadAudioTracks(tracks: AudioTrack[]): Observable<void> {

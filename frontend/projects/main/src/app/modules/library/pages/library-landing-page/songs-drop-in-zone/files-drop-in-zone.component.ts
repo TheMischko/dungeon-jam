@@ -9,11 +9,19 @@ import { AudioTrack } from '@shared/models/track.model';
   styleUrl: './files-drop-in-zone.component.scss',
 })
 export class FilesDropInZoneComponent {
-  readonly accept = input<string>('audio/.*');
-  readonly dropped = output<AudioTrack[]>();
+  /**
+   * Sets an accept RegExp for general file drop. If undefined only audio files are registered.
+   *
+   * Use values like `image/.*` or `audio/.*`.
+   */
+  readonly accept = input<string | undefined>(undefined);
+  /**
+   * Emits dropped file paths. It is triggered only with `[accept]` input set.
+   */
+  readonly filesDropped = output<string[]>();
+  readonly audioDropped = output<AudioTrack[]>();
 
-  onFilesDropped(files: AudioTrack[]) {
-    console.log('Audio files dropped', files);
-    this.dropped.emit(files);
+  onAudioFilesDropped(files: AudioTrack[]) {
+    this.audioDropped.emit(files);
   }
 }

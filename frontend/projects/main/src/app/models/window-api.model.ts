@@ -12,7 +12,11 @@ export type AudioApiWindow = Window &
   typeof globalThis & {
     AUDIO_FILES_API: {
       fetchAudioData: (files: FileList) => Promise<void>;
-      registerFileDrop: (callback: (paths: AudioTrack[]) => void) => void;
+      registerFileDrop: (
+        accept: string,
+        callback: (paths: string[]) => void
+      ) => void;
+      registerAudioFileDrop: (callback: (tracks: AudioTrack[]) => void) => void;
       uploadTracks: (tracks: AudioTrack[]) => Promise<void>;
       loadFileBase64: (filePath: string) => Promise<FileBase64>;
     };
@@ -26,7 +30,7 @@ export type AudioApiWindow = Window &
         url: string,
         duration: number,
         author?: string,
-        tags?: string[],
+        tags?: string[]
       ) => Promise<Track>;
       updateTrack: (track: Track) => Promise<Track>;
       deleteTrack: (id: string) => Promise<boolean>;

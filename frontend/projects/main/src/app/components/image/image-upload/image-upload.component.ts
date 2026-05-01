@@ -95,6 +95,13 @@ export class ImageUploadComponent implements ControlValueAccessor {
     this.touched();
   }
 
+  protected processDroppedFiles(paths: string[]) {
+    if (!paths?.length) {
+      return;
+    }
+    this.imagePath.set(paths[0]);
+  }
+
   writeValue(imagePath: string): void {
     this.imagePath.set(imagePath);
   }
