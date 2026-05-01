@@ -7,6 +7,8 @@ import { lookup } from 'mime-types';
 import { TrackMetaData } from '../utils/track-meta-data';
 import { TagsManager } from './tags.manager';
 import { Logger } from '../utils/logger';
+import { getTitleFromFileName } from '../utils/resolve-audio-track';
+import path from 'path';
 
 export class FilesManager {
   private static _instance: FilesManager;
@@ -54,14 +56,15 @@ export class FilesManager {
       parseFile(path)
         .then((metadata) => {
           const metaData = { ...metadata };
-          const genre = metaData.common.genre ?? []
-          const tags = genre?.length === 1 ? genre[0].split(',') : metaData.common.genre;
+          const genre = metaData.common.genre ?? [];
+          const tags =
+            genre?.length === 1 ? genre[0].split(',') : metaData.common.genre;
           resolve({
             title: this.getTrackTitle(path, metaData),
             fullPath: path,
             author: metaData.common.artist,
             length: metaData.format.duration || 0,
-            tags: tags
+            tags: tags,
           });
         })
         .catch((e: Error) => {
@@ -79,11 +82,12 @@ export class FilesManager {
     });
   }
 
-  private getTrackTitle(_: string, metadata: IAudioMetadata): string {
+  private getTrackTitle(filePath: string, metadata: IAudioMetadata): string {
     if (metadata.common.title) {
       return metadata.common.title;
     }
-    return '';
+    const filename = path.basename(filePath);
+    return getTitleFromFileName(filename);
   }
 
   private async loadFileBase64(filePath: string): Promise<FileBase64> {
