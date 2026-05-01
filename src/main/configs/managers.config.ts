@@ -49,6 +49,12 @@ export function getManagersInitConfig(
       },
     },
     {
+      name: 'ImageManager',
+      initFunction: async () => {
+        await ImageManager.getInstance();
+      },
+    },
+    {
       name: 'Track',
       initFunction: async () => {
         await TrackManager.getInstance();
@@ -88,12 +94,6 @@ export function getManagersInitConfig(
       name: 'PlaybackDestination',
       initFunction: async () => {
         await PlaybackDestinationManager.getInstance();
-      },
-    },
-    {
-      name: 'ImageManager',
-      initFunction: async () => {
-        await ImageManager.getInstance();
       },
     },
   ];

@@ -94,13 +94,14 @@ export class ImageManager {
     originalPath: string,
     entityType: string
   ): Promise<string> {
+    if (await ImageManager.doesImageAlreadyExists(originalPath)) {
+      return originalPath;
+    }
     const fileName = uuid() + '.jpg';
-    const filePath = path.join(
-      ImageManager.imageStorageFolder,
-      entityType,
-      fileName
-    );
+    const entityFolder = path.join(ImageManager.imageStorageFolder, entityType);
+    const filePath = path.join(entityFolder, fileName);
     try {
+      await fs.promises.mkdir(entityFolder, { recursive: true });
       await sharp(originalPath)
         .resize({
           width: 600,
@@ -134,7 +135,18 @@ export class ImageManager {
   }
 
   private static get imageStorageFolder(): string {
-    return path.normalize(path.join(app.getPath('appData'), 'Images'));
+    return path.normalize(path.join(app.getPath('userData'), 'Images'));
+  }
+
+  private static doesImageAlreadyExists(imagePath: string): Promise<boolean> {
+    if (!imagePath.startsWith(this.imageStorageFolder)) {
+      return Promise.resolve(false);
+    }
+    return new Promise((resolve) => {
+      fs.access(imagePath, (err) => {
+        resolve(!err);
+      });
+    });
   }
 
   private static async prepareImageStorageFolder(): Promise<void> {
@@ -150,4 +162,10 @@ export class ImageManager {
       });
     });
   }
+}
+
+export enum ImageEntityType {
+  PLAYLIST = 'playlist',
+  SOUND_EFFECT = 'soundEffect',
+  OTHER = 'OTHER',
 }

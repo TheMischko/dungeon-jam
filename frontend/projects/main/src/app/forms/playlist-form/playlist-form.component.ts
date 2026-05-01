@@ -27,6 +27,6 @@ export class PlaylistFormComponent {
 
   protected updateImage(event: string | null) {
     // To-DO: Reenable this or remake image upload to form control
-    //this.form().imageUrl().value.set(event);
+    this.form().imageUrl().value.set(event);
   }
 }
