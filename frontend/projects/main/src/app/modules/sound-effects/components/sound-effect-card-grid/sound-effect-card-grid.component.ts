@@ -11,7 +11,7 @@ import { RangeSliderComponent } from '@general/components/controls/range-slider/
 import { iconSet } from '@general/icons/icons';
 import { LoaderComponent } from '@general/components/display/loader/loader.component';
 import { SoundEffectCardComponent } from '../sound-effect-card/sound-effect-card.component';
-import { GridItemSizeConfig } from '../../../../models/grid-item-size-config.model';
+import { GridSoundEffectSizeConfig } from '../../../../models/grid-item-size-config.model';
 import { SoundEffectVolumeChange } from '../../pages/sound-effects-library/sound-effects-library-smart/sound-effects-library-smart.component';
 
 @Component({
@@ -35,18 +35,11 @@ export class SoundEffectCardGridComponent {
   readonly toggleEffectLoop = output<SoundEffect>();
   readonly effectVolumeChange = output<SoundEffectVolumeChange>();
 
-  readonly sizeConfig = computed<GridItemSizeConfig>(() => {
-    return {
-      imageSize: 24,
-      fontSize: 16,
-      overlaySize: 0,
-      titleBold: true,
-      hideTags: true,
-      hideTracks: true,
-    };
+  readonly sizeConfig = computed<GridSoundEffectSizeConfig>(() => {
+    return getSizeConfig(this.cardSize());
   });
 
-  readonly cardSize = signal<number>(0.5);
+  readonly cardSize = signal<number>(0.75);
 
   readonly gridBigIcon = iconSet.GridBigIcon;
   readonly gridSmallIcon = iconSet.GridSmallIcon;
@@ -56,6 +49,9 @@ export class SoundEffectCardGridComponent {
   }
 
   updateSize(value: number): void {
+    if (value > 100 || value < 0) {
+      return;
+    }
     this.cardSize.set(value / 100);
   }
 
@@ -64,5 +60,38 @@ export class SoundEffectCardGridComponent {
       soundEffect: soundEffect,
       volume,
     });
+  }
+}
+
+function getSizeConfig(size: number): GridSoundEffectSizeConfig {
+  switch (true) {
+    case size >= 0.75:
+      return {
+        imageSize: 24,
+        fontSize: 24,
+      };
+    case size >= 0.5:
+      return {
+        imageSize: 24,
+        fontSize: 18,
+      };
+    case size >= 0.25:
+      return {
+        imageSize: 24,
+        fontSize: 16,
+        hideLoop: true,
+      };
+    case size >= 0:
+      return {
+        imageSize: 24,
+        fontSize: 14,
+        hideVolume: true,
+        hideLoop: true,
+      };
+    default:
+      return {
+        imageSize: 24,
+        fontSize: 16,
+      };
   }
 }

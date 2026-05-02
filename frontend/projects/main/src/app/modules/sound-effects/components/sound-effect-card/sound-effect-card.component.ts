@@ -7,11 +7,12 @@ import {
   signal,
 } from '@angular/core';
 import { SoundEffect } from '@shared/models/sound-effect.model';
-import { GridItemSizeConfig } from '../../../../models/grid-item-size-config.model';
+import { GridSoundEffectSizeConfig } from '../../../../models/grid-item-size-config.model';
 import { PlayPauseButtonComponent } from '@general/components/buttons/play-pause-button/play-pause-button.component';
 import { RepeatStateButtonComponent } from '../../../../player/player/repeat-state-button/repeat-state-button.component';
 import { RepeatState } from '../../../../models/playback.model';
 import { VolumeControlComponent } from '../../../../player/player/volume-control/volume-control.component';
+import { NgStyle } from '@angular/common';
 
 @Component({
   selector: 'app-sound-effect-card',
@@ -19,6 +20,7 @@ import { VolumeControlComponent } from '../../../../player/player/volume-control
     PlayPauseButtonComponent,
     RepeatStateButtonComponent,
     VolumeControlComponent,
+    NgStyle,
   ],
   templateUrl: './sound-effect-card.component.html',
   styleUrl: './sound-effect-card.component.scss',
@@ -27,7 +29,7 @@ import { VolumeControlComponent } from '../../../../player/player/volume-control
 export class SoundEffectCardComponent {
   readonly soundEffect = input.required<SoundEffect>();
   readonly isPlaying = input<boolean>(false);
-  readonly sizeConfig = input.required<GridItemSizeConfig>();
+  readonly sizeConfig = input.required<GridSoundEffectSizeConfig>();
 
   readonly play = output<void>();
   readonly pause = output<void>();
@@ -51,21 +53,27 @@ export class SoundEffectCardComponent {
     }
     return RepeatState.NONE;
   });
-  readonly titleSizeStyle = computed<Record<string, unknown>>(() => {
+  readonly titleSizeStyle = computed<Record<string, string>>(() => {
     const sizeConfig = this.sizeConfig();
     return {
       'font-weight': sizeConfig.titleBold ? 'bold' : 'normal',
       'font-size': `${sizeConfig.fontSize}px`,
     };
   });
-
-  readonly overlaySizeStyle = computed<Record<string, string>>(() => {
+  readonly gridStyle = computed<Record<string, string>>(() => {
+    return {};
+  });
+  readonly showVolume = computed<boolean>(() => {
     const sizeConfig = this.sizeConfig();
-    return {
-      width: `${sizeConfig.imageSize}px`,
-      height: `${sizeConfig.imageSize}px`,
-      padding: `${sizeConfig.imageSize / 4}px`,
-    };
+    return !sizeConfig?.hideVolume;
+  });
+  readonly showLoop = computed<boolean>(() => {
+    const sizeConfig = this.sizeConfig();
+    return !sizeConfig?.hideLoop;
+  });
+  readonly showPlay = computed<boolean>(() => {
+    const sizeConfig = this.sizeConfig();
+    return !sizeConfig?.hidePlay;
   });
 
   onMouseEnter() {

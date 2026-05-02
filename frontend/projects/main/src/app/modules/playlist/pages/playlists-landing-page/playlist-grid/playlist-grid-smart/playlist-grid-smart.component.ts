@@ -21,7 +21,7 @@ import { forkJoin, map, Observable, of, take, tap } from 'rxjs';
 import { TrackService } from '../../../../../../services/track.service';
 import { TagsStore } from '@general/stores/tags.store';
 import { PlaylistWithTagData } from '../../../../../../../../../general/models/playlist.model';
-import { GridItemSizeConfig } from '../../../../../../models/grid-item-size-config.model';
+import { GridPlaylistSizeConfig } from '../../../../../../models/grid-item-size-config.model';
 import { ImageApiService } from '@general/services/image-api.service';
 
 @Component({
@@ -64,7 +64,7 @@ export class PlaylistGridSmartComponent implements OnInit {
   readonly loading = computed<boolean>(() => {
     return this.playlistStore.loading() || this.tagsStore.loading();
   });
-  readonly sizeConfig = computed<GridItemSizeConfig>(() => {
+  readonly sizeConfig = computed<GridPlaylistSizeConfig>(() => {
     const sliderVal = this.sizeSliderValue();
     return getSizeConfig(sliderVal);
   });

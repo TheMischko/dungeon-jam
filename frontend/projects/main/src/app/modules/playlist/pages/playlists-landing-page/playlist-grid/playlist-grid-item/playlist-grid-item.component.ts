@@ -11,7 +11,7 @@ import { iconSet, volumeIconSet } from '@general/icons/icons';
 import { LucideAngularModule, LucideIconData } from 'lucide-angular';
 import { PlaylistWithTagData } from '../../../../../../../../../general/models/playlist.model';
 import { PlaylistStore } from '@general/stores/playlist.store';
-import { GridItemSizeConfig } from '../../../../../../models/grid-item-size-config.model';
+import { GridPlaylistSizeConfig } from '../../../../../../models/grid-item-size-config.model';
 
 @Component({
   selector: 'app-playlist-grid-item',
@@ -22,7 +22,7 @@ import { GridItemSizeConfig } from '../../../../../../models/grid-item-size-conf
 export class PlaylistGridItemComponent {
   private readonly playlistStore = inject(PlaylistStore);
   readonly playlist = input.required<PlaylistWithTagData>();
-  readonly sizeConfig = input.required<GridItemSizeConfig>();
+  readonly sizeConfig = input.required<GridPlaylistSizeConfig>();
   readonly isPlaying = input<boolean>(false);
   readonly playlistImageUrl = input<string | null>(null);
 

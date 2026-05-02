@@ -1,4 +1,4 @@
-export type GridItemSizeConfig = {
+export type GridPlaylistSizeConfig = {
   imageSize: number;
   fontSize: number;
   overlaySize: number;
@@ -6,4 +6,13 @@ export type GridItemSizeConfig = {
   titleBold?: boolean;
   hideTags?: boolean;
   hideTracks?: boolean;
+};
+
+export type GridSoundEffectSizeConfig = {
+  imageSize: number;
+  fontSize: number;
+  titleBold?: boolean;
+  hideVolume?: boolean;
+  hideLoop?: boolean;
+  hidePlay?: boolean;
 };

@@ -5,7 +5,7 @@ import { RangeSliderComponent } from '@general/components/controls/range-slider/
 import { iconSet } from '@general/icons/icons';
 import { PlaylistWithTagData } from '../../../../../../../../general/models/playlist.model';
 import { LoaderComponent } from '@general/components/display/loader/loader.component';
-import { GridItemSizeConfig } from '../../../../../models/grid-item-size-config.model';
+import { GridPlaylistSizeConfig } from '../../../../../models/grid-item-size-config.model';
 
 @Component({
   selector: 'app-playlist-grid',
@@ -21,7 +21,7 @@ import { GridItemSizeConfig } from '../../../../../models/grid-item-size-config.
 export class PlaylistGridComponent {
   readonly dataSet = input.required<PlaylistWithTagData[]>();
   readonly playlistImageMap = input<Record<string, string | null>>({});
-  readonly sizeConfig = input.required<GridItemSizeConfig>();
+  readonly sizeConfig = input.required<GridPlaylistSizeConfig>();
   readonly playingPlaylistId = input<string | null>();
   readonly loading = input<boolean>(false);
   readonly showControls = input<boolean>(true);
