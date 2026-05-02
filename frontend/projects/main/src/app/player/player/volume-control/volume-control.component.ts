@@ -13,6 +13,12 @@ import { RangeSliderComponent } from '@general/components/controls/range-slider/
 })
 export class VolumeControlComponent {
   volume = input.required<number>();
+  /**
+   * Determines the size of the control.
+   *
+   * Default value is 1. Half the size is 0.5 and double size is 2.
+   */
+  size = input<number>(1);
 
   volumeNormalized = computed(() => {
     return Math.max(0, Math.min(this.volume(), 1));

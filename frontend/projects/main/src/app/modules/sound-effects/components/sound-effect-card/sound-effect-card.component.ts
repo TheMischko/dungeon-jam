@@ -60,21 +60,12 @@ export class SoundEffectCardComponent {
       'font-size': `${sizeConfig.fontSize}px`,
     };
   });
-  readonly gridStyle = computed<Record<string, string>>(() => {
-    return {};
-  });
-  readonly showVolume = computed<boolean>(() => {
-    const sizeConfig = this.sizeConfig();
-    return !sizeConfig?.hideVolume;
-  });
-  readonly showLoop = computed<boolean>(() => {
-    const sizeConfig = this.sizeConfig();
-    return !sizeConfig?.hideLoop;
-  });
-  readonly showPlay = computed<boolean>(() => {
-    const sizeConfig = this.sizeConfig();
-    return !sizeConfig?.hidePlay;
-  });
+  readonly showVolume = computed<boolean>(() => !this.sizeConfig()?.hideVolume);
+  readonly showLoop = computed<boolean>(() => !this.sizeConfig()?.hideLoop);
+  readonly showPlay = computed<boolean>(() => !this.sizeConfig()?.hidePlay);
+  readonly isSingleRow = computed<boolean>(
+    () => !this.showVolume() && !this.showLoop() && this.showPlay()
+  );
 
   onMouseEnter() {
     this.isHovering.set(true);

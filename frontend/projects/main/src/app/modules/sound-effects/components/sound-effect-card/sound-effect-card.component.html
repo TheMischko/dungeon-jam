@@ -1,33 +1,53 @@
 <div
-  class="grid-item"
+  class="card"
   (mouseenter)="onMouseEnter()"
   (mouseleave)="onMouseLeave()"
 >
   @let effect = soundEffect();
-  <div class="item-name" [ngStyle]="titleSizeStyle()">{{ effect.name }}</div>
-  @if (showVolume()){
-    <div class="item-volume">
-      <app-volume-control
-        [volume]="volumeState()"
-        (changed)="volumeChange.emit($event)"
-      ></app-volume-control>
+
+  @if (isSingleRow()) {
+    <div class="card-row card-row--centered">
+      <div class="item-name" [ngStyle]="titleSizeStyle()">{{ effect.name }}</div>
+      <lib-play-pause-button
+        animate.enter="fade-in-animation"
+        animate.leave="fade-out-animation"
+        [state]="playPauseState()"
+        (toggle)="handlePlayPause($event)"
+      />
     </div>
+  } @else {
+    <div class="card-row">
+      <div class="item-name" [ngStyle]="titleSizeStyle()">{{ effect.name }}</div>
+      @if (showLoop()) {
+        <app-repeat-state-button
+          animate.enter="fade-in-animation"
+          animate.leave="fade-out-animation"
+          [repeatState]="repeatState()"
+          (clicked)="loopingChange.emit()"
+        />
+      }
+    </div>
+
+    @if (showVolume() || showPlay()) {
+      <div class="card-row">
+        @if (showVolume()) {
+          <app-volume-control
+            animate.enter="fade-in-animation"
+            animate.leave="fade-out-animation"
+            [volume]="volumeState()"
+            (changed)="volumeChange.emit($event)"
+          />
+        }
+        <div class="item-spacer"></div>
+        @if (showPlay()) {
+          <lib-play-pause-button
+            animate.enter="fade-in-animation"
+            animate.leave="fade-out-animation"
+            [state]="playPauseState()"
+            (toggle)="handlePlayPause($event)"
+          />
+        }
+      </div>
+    }
   }
-  @if (showLoop()){
-  <div class="item-loop">
-    <app-repeat-state-button
-      [repeatState]="repeatState()"
-      (clicked)="loopingChange.emit()"
-    ></app-repeat-state-button>
-  </div>
-  }
-  @if (showPlay()){
-  <div class="item-play">
-    <lib-play-pause-button
-      [state]="playPauseState()"
-      (toggle)="handlePlayPause($event)"
-    ></lib-play-pause-button>
-  </div>
-  }
-  <div class="item-sidebar">.</div>
 </div>
