@@ -35,7 +35,12 @@
         ></lucide-icon>
       </div>
     }
-    <img [src]="imageSrc()" alt="{{ playlist().name }}" />
+    @if (playlistImageUrl()){
+      <img [src]="imageSrc()" alt="{{ playlist().name }}" />
+    } @else {
+      <lucide-icon class="playlist-icon" [img]="PlaylistIcon" [size]="defaultIconSize()" />
+    }
+
   </div>
   <div class="properties">
     <div class="title" [ngStyle]="titleSizeStyle()">{{ playlist().name }}</div>

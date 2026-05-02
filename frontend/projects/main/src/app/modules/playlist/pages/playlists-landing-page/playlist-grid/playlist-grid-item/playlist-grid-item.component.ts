@@ -35,14 +35,14 @@ export class PlaylistGridItemComponent {
     return this.playlistStore.getParent(this.playlist().id);
   });
 
-  readonly DEFAULT_IMAGE = '/assets/playlist.img';
+  readonly PlaylistIcon = iconSet.PlaylistIcon;
   readonly playIcon = iconSet.PlayIcon;
   readonly pauseIcon = iconSet.PauseIcon;
   readonly tracksIcon = iconSet.TracksIcon;
   readonly playingIcon = volumeIconSet.NormalIcon;
 
   readonly imageSrc = computed<string>(() => {
-    return this.playlistImageUrl() ?? this.DEFAULT_IMAGE;
+    return this.playlistImageUrl() ?? '';
   });
   readonly imageSizeStyle = computed<Record<string, string>>(() => {
     const size = `${this.sizeConfig().imageSize ?? 250}px`;
@@ -50,6 +50,9 @@ export class PlaylistGridItemComponent {
       width: size,
       height: size,
     };
+  });
+  readonly defaultIconSize = computed<number>(() => {
+    return this.sizeConfig().imageSize / 2;
   });
   readonly titleSizeStyle = computed<Record<string, unknown>>(() => {
     const sizeConfig = this.sizeConfig();

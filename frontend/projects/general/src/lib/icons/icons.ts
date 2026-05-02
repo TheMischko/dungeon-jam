@@ -39,6 +39,7 @@ export const iconSet = {
   GridSmallIcon: Grid3x3Icon,
   TracksIcon: Music2Icon,
   LoadingIcon: LoaderCircleIcon,
+  PlaylistIco: ListMusicIcon,
 };
 
 export const actionsIconSet = {
