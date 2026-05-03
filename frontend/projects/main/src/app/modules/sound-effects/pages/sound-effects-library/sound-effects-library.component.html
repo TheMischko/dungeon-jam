@@ -1,7 +1,5 @@
 <h1>Sound Effects</h1>
-<mat-slide-toggle [hideIcon]="true" [checked]="showGrid()"
-  >Show grid</mat-slide-toggle
->
+<app-sound-effect-display-mode-switch [mode]="viewMode()" (modeChange)="toggleViewMode($event)" />
 <app-songs-drop-in-zone (audioDropped)="uploadAudioFiles.emit($event)">
   @if (showGrid()) {
     <app-sound-effect-card-grid
