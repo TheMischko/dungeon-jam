@@ -1,4 +1,5 @@
 import {
+  AudioLinesIcon,
   ChevronDownIcon,
   ChevronUpIcon,
   EllipsisVerticalIcon,
@@ -40,6 +41,7 @@ export const iconSet = {
   TracksIcon: Music2Icon,
   LoadingIcon: LoaderCircleIcon,
   PlaylistIco: ListMusicIcon,
+  AudioWaveIcon: AudioLinesIcon,
 };
 
 export const actionsIconSet = {

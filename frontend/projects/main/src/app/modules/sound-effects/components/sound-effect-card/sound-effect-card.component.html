@@ -5,49 +5,55 @@
 >
   @let effect = soundEffect();
 
-  @if (isSingleRow()) {
-    <div class="card-row card-row--centered">
-      <div class="item-name" [ngStyle]="titleSizeStyle()">{{ effect.name }}</div>
-      <lib-play-pause-button
-        animate.enter="fade-in-animation"
-        animate.leave="fade-out-animation"
-        [state]="playPauseState()"
-        (toggle)="handlePlayPause($event)"
-      />
-    </div>
-  } @else {
-    <div class="card-row">
-      <div class="item-name" [ngStyle]="titleSizeStyle()">{{ effect.name }}</div>
-      @if (showLoop()) {
-        <app-repeat-state-button
+  <div class="card-icon">
+    <lucide-icon [img]="SoundEffectIcon" [size]="iconSize()" />
+  </div>
+
+  <div class="card-content">
+    @if (isSingleRow()) {
+      <div class="card-row card-row--centered" animate.enter="">
+        <div class="item-name" [ngStyle]="titleSizeStyle()">{{ effect.name }}</div>
+        <lib-play-pause-button
           animate.enter="fade-in-animation"
           animate.leave="fade-out-animation"
-          [repeatState]="repeatState()"
-          (clicked)="loopingChange.emit()"
+          [state]="playPauseState()"
+          (toggle)="handlePlayPause($event)"
         />
-      }
-    </div>
-
-    @if (showVolume() || showPlay()) {
+      </div>
+    } @else {
       <div class="card-row">
-        @if (showVolume()) {
-          <app-volume-control
+        <div class="item-name" [ngStyle]="titleSizeStyle()">{{ effect.name }}</div>
+        @if (showLoop()) {
+          <app-repeat-state-button
             animate.enter="fade-in-animation"
             animate.leave="fade-out-animation"
-            [volume]="volumeState()"
-            (changed)="volumeChange.emit($event)"
-          />
-        }
-        <div class="item-spacer"></div>
-        @if (showPlay()) {
-          <lib-play-pause-button
-            animate.enter="fade-in-animation"
-            animate.leave="fade-out-animation"
-            [state]="playPauseState()"
-            (toggle)="handlePlayPause($event)"
+            [repeatState]="repeatState()"
+            (clicked)="loopingChange.emit()"
           />
         }
       </div>
+
+      @if (showVolume() || showPlay()) {
+        <div class="card-row">
+          @if (showVolume()) {
+            <app-volume-control
+              animate.enter="fade-in-animation"
+              animate.leave="fade-out-animation"
+              [volume]="volumeState()"
+              (changed)="volumeChange.emit($event)"
+            />
+          }
+          <div class="item-spacer"></div>
+          @if (showPlay()) {
+            <lib-play-pause-button
+              animate.enter="fade-in-animation"
+              animate.leave="fade-out-animation"
+              [state]="playPauseState()"
+              (toggle)="handlePlayPause($event)"
+            />
+          }
+        </div>
+      }
     }
-  }
+  </div>
 </div>

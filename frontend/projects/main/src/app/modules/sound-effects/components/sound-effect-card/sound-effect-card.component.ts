@@ -13,6 +13,8 @@ import { RepeatStateButtonComponent } from '../../../../player/player/repeat-sta
 import { RepeatState } from '../../../../models/playback.model';
 import { VolumeControlComponent } from '../../../../player/player/volume-control/volume-control.component';
 import { NgStyle } from '@angular/common';
+import { iconSet } from '@general/icons/icons';
+import { LucideAngularModule } from 'lucide-angular';
 
 @Component({
   selector: 'app-sound-effect-card',
@@ -21,6 +23,7 @@ import { NgStyle } from '@angular/common';
     RepeatStateButtonComponent,
     VolumeControlComponent,
     NgStyle,
+    LucideAngularModule,
   ],
   templateUrl: './sound-effect-card.component.html',
   styleUrl: './sound-effect-card.component.scss',
@@ -37,6 +40,7 @@ export class SoundEffectCardComponent {
   readonly volumeChange = output<number>();
 
   readonly isHovering = signal(false);
+  readonly SoundEffectIcon = iconSet.AudioWaveIcon;
 
   readonly volumeState = computed<number>(() => {
     return this.soundEffect()?.volume ?? 0;
@@ -59,6 +63,9 @@ export class SoundEffectCardComponent {
       'font-weight': sizeConfig.titleBold ? 'bold' : 'normal',
       'font-size': `${sizeConfig.fontSize}px`,
     };
+  });
+  readonly iconSize = computed<number>(() => {
+    return this.sizeConfig().imageSize / 2;
   });
   readonly showVolume = computed<boolean>(() => !this.sizeConfig()?.hideVolume);
   readonly showLoop = computed<boolean>(() => !this.sizeConfig()?.hideLoop);

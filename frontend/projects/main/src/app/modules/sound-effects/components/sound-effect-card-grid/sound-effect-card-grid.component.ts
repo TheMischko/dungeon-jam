@@ -65,32 +65,32 @@ export class SoundEffectCardGridComponent {
 
 function getSizeConfig(size: number): GridSoundEffectSizeConfig {
   switch (true) {
-    case size >= 0.75:
+    case size > 0.75:
       return {
-        imageSize: 24,
+        imageSize: 80,
         fontSize: 24,
       };
-    case size >= 0.5:
+    case size > 0.5:
       return {
-        imageSize: 24,
+        imageSize: 60,
         fontSize: 18,
       };
-    case size >= 0.25:
+    case size > 0.25:
       return {
-        imageSize: 24,
+        imageSize: 50,
         fontSize: 16,
         hideLoop: true,
       };
     case size >= 0:
       return {
-        imageSize: 24,
+        imageSize: 40,
         fontSize: 14,
         hideVolume: true,
         hideLoop: true,
       };
     default:
       return {
-        imageSize: 24,
+        imageSize: 50,
         fontSize: 16,
       };
   }
