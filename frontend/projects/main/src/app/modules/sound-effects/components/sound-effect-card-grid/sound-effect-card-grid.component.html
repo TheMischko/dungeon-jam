@@ -21,6 +21,7 @@
         [soundEffect]="soundEffect"
         [isPlaying]="isPlaying(soundEffect.id)"
         [sizeConfig]="sizeConfig()"
+        [actionsMenu]="actionsMenu()"
         (play)="playEffect.emit(soundEffect)"
         (pause)="stopEffect.emit(soundEffect)"
         (loopingChange)="toggleEffectLoop.emit(soundEffect)"

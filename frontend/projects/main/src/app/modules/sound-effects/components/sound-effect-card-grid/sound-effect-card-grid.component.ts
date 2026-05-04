@@ -13,6 +13,7 @@ import { LoaderComponent } from '@general/components/display/loader/loader.compo
 import { SoundEffectCardComponent } from '../sound-effect-card/sound-effect-card.component';
 import { GridSoundEffectSizeConfig } from '../../../../models/grid-item-size-config.model';
 import { SoundEffectVolumeChange } from '../../pages/sound-effects-library/sound-effects-library-smart/sound-effects-library-smart.component';
+import { ActionsMenuBaseConfig } from '@general/components/display/actions-menu/actions-menu.component';
 
 @Component({
   selector: 'app-sound-effect-card-grid',
@@ -24,6 +25,7 @@ import { SoundEffectVolumeChange } from '../../pages/sound-effects-library/sound
 export class SoundEffectCardGridComponent {
   readonly soundEffects = input.required<SoundEffect[]>();
   readonly loading = input<boolean>(false);
+  readonly actionsMenu = input<ActionsMenuBaseConfig<SoundEffect>[]>([]);
 
   /**
    * List of currently playing Sound Effect's IDs.

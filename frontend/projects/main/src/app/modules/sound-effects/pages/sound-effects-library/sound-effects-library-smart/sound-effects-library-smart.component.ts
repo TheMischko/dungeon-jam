@@ -96,6 +96,14 @@ export class SoundEffectsLibrarySmartComponent implements OnInit {
       );
     }
   }
+
+  protected editSoundEffect(soundEffect: SoundEffect): void {
+    console.log('Edit soundEffect', soundEffect);
+  }
+
+  protected deleteSoundEffect(soundEffect: SoundEffect): void {
+    console.log('Deleting soundEffect', soundEffect);
+  }
 }
 
 export type SoundEffectVolumeChange = {

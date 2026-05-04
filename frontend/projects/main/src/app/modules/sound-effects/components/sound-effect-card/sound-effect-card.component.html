@@ -56,4 +56,10 @@
       }
     }
   </div>
+  <div class="actions">
+    <lib-icon-button [matMenuTriggerFor]="menu" [icon]="ActionsIcon" />
+    <mat-menu #menu="matMenu">
+      <lib-actions-menu [item]="soundEffect()" [config]="actionsMenu()" />
+    </mat-menu>
+  </div>
 </div>

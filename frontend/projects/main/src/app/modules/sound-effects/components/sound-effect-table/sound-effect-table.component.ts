@@ -14,6 +14,13 @@ import { TagListSmartComponent } from '@general/components/display/tag-list/tag-
 import { PlayPauseButtonComponent } from '@general/components/buttons/play-pause-button/play-pause-button.component';
 import { RepeatStateButtonComponent } from '../../../../player/player/repeat-state-button/repeat-state-button.component';
 import { RepeatState } from '../../../../models/playback.model';
+import {
+  ActionsMenuBaseConfig,
+  ActionsMenuComponent,
+} from '@general/components/display/actions-menu/actions-menu.component';
+import { IconButtonComponent } from '@general/components/buttons/icon-button/icon-button.component';
+import { MatMenu, MatMenuTrigger } from '@angular/material/menu';
+import { actionsIconSet } from '@general/icons/icons';
 
 @Component({
   selector: 'app-sound-effect-table',
@@ -22,6 +29,10 @@ import { RepeatState } from '../../../../models/playback.model';
     TagListSmartComponent,
     PlayPauseButtonComponent,
     RepeatStateButtonComponent,
+    ActionsMenuComponent,
+    IconButtonComponent,
+    MatMenu,
+    MatMenuTrigger,
   ],
   templateUrl: './sound-effect-table.component.html',
   styleUrl: './sound-effect-table.component.scss',
@@ -31,6 +42,7 @@ export class SoundEffectTableComponent {
   readonly durationPipe = new TrackDurationPipe();
   readonly soundEffects = input.required<SoundEffect[]>();
   readonly loading = input<boolean>(false);
+  readonly actionsMenu = input<ActionsMenuBaseConfig<SoundEffect>[]>([]);
 
   /**
    * List of currently playing Sound Effect's IDs.
@@ -46,7 +58,11 @@ export class SoundEffectTableComponent {
     read: TemplateRef,
   });
   readonly loopColumn = viewChild.required('loopColumn', { read: TemplateRef });
+  readonly actionsColumn = viewChild.required('actionsColumn', {
+    read: TemplateRef,
+  });
 
+  readonly ActionsIcon = actionsIconSet.ActionsMenu;
   readonly config: TableColumnConfiguration<SoundEffect> = {
     play: {
       title: '',
@@ -71,6 +87,11 @@ export class SoundEffectTableComponent {
     duration: {
       title: 'Length',
       customValueFn: (entity) => this.durationPipe.transform(entity.duration),
+    },
+    actions: {
+      title: '',
+      template: () => this.actionsColumn(),
+      width: '65px',
     },
   };
 

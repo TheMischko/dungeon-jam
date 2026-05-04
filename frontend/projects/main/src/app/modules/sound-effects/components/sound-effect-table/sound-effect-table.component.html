@@ -28,3 +28,10 @@
     />
   }
 </ng-template>
+
+<ng-template #actionsColumn let-row="$implicit">
+  <lib-icon-button [matMenuTriggerFor]="menu" [icon]="ActionsIcon" />
+  <mat-menu #menu="matMenu">
+    <lib-actions-menu [item]="row" [config]="actionsMenu()" />
+  </mat-menu>
+</ng-template>

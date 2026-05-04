@@ -17,6 +17,10 @@ import { SoundEffectDisplayModeSwitchComponent } from '../../components/sound-ef
 import { SearchBarComponent } from '@general/components/controls/search-bar/search-bar.component';
 import { QueryOptions } from '@shared/models/request.model';
 import { SortDirection } from '@shared/models/common.model';
+import {
+  ActionsMenuBaseConfig,
+  ActionsMenuConfig,
+} from '@general/components/display/actions-menu/actions-menu.component';
 
 @Component({
   selector: 'app-sound-effects-library',
@@ -42,6 +46,8 @@ export class SoundEffectsLibraryComponent {
   readonly toggleEffectLoop = output<SoundEffect>();
   readonly effectVolumeChange = output<SoundEffectVolumeChange>();
   readonly queryOptions = output<QueryOptions>();
+  readonly editSoundEffect = output<SoundEffect>();
+  readonly deleteSoundEffect = output<SoundEffect>();
 
   readonly showGrid = signal<boolean>(true);
   readonly currentSearch = signal<string | undefined>(undefined);
@@ -52,6 +58,16 @@ export class SoundEffectsLibraryComponent {
       sortDirection: SortDirection.ASC,
     };
   });
+  readonly actionMenuConfig: ActionsMenuBaseConfig<SoundEffect>[] = [
+    {
+      text: 'Edit',
+      onSelected: (soundEffect) => this.editSoundEffect.emit(soundEffect),
+    },
+    {
+      text: 'Delete',
+      onSelected: (soundEffect) => this.deleteSoundEffect.emit(soundEffect),
+    },
+  ];
 
   constructor() {
     effect(() => {

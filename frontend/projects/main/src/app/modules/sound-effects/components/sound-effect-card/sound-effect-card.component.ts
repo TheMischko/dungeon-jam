@@ -13,8 +13,14 @@ import { RepeatStateButtonComponent } from '../../../../player/player/repeat-sta
 import { RepeatState } from '../../../../models/playback.model';
 import { VolumeControlComponent } from '../../../../player/player/volume-control/volume-control.component';
 import { NgStyle } from '@angular/common';
-import { iconSet } from '@general/icons/icons';
+import { actionsIconSet, iconSet } from '@general/icons/icons';
 import { LucideAngularModule } from 'lucide-angular';
+import {
+  ActionsMenuBaseConfig,
+  ActionsMenuComponent,
+} from '@general/components/display/actions-menu/actions-menu.component';
+import { IconButtonComponent } from '@general/components/buttons/icon-button/icon-button.component';
+import { MatMenu, MatMenuTrigger } from '@angular/material/menu';
 
 @Component({
   selector: 'app-sound-effect-card',
@@ -24,6 +30,10 @@ import { LucideAngularModule } from 'lucide-angular';
     VolumeControlComponent,
     NgStyle,
     LucideAngularModule,
+    ActionsMenuComponent,
+    IconButtonComponent,
+    MatMenu,
+    MatMenuTrigger,
   ],
   templateUrl: './sound-effect-card.component.html',
   styleUrl: './sound-effect-card.component.scss',
@@ -33,6 +43,7 @@ export class SoundEffectCardComponent {
   readonly soundEffect = input.required<SoundEffect>();
   readonly isPlaying = input<boolean>(false);
   readonly sizeConfig = input.required<GridSoundEffectSizeConfig>();
+  readonly actionsMenu = input<ActionsMenuBaseConfig<SoundEffect>[]>([]);
 
   readonly play = output<void>();
   readonly pause = output<void>();
@@ -73,6 +84,7 @@ export class SoundEffectCardComponent {
   readonly isSingleRow = computed<boolean>(
     () => !this.showVolume() && !this.showLoop() && this.showPlay()
   );
+  readonly ActionsIcon = actionsIconSet.ActionsMenu;
 
   onMouseEnter() {
     this.isHovering.set(true);

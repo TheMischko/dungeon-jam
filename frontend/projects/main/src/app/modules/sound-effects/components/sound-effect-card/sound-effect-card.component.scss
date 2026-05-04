@@ -57,6 +57,20 @@
   flex: 1;
 }
 
+.actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  align-self: stretch;
+  width: 25px;
+  margin-left: -10px;
+
+  ::ng-deep .mdc-button__ripple{
+    display: none;
+  }
+}
+
 .fade-in-animation {
   animation: fade-in 0.4s;
 }
