@@ -147,7 +147,7 @@ export class SoundEffectManager {
     sfx: SoundEffect,
     filter: string
   ): Promise<boolean> => {
-    if (sfx.name.includes(filter)) {
+    if (sfx.name.toLowerCase().includes(filter.toLowerCase())) {
       return true;
     }
     if (!sfx.tags?.length) {

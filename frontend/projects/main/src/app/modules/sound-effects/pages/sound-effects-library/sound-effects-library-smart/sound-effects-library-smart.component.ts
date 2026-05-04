@@ -4,6 +4,7 @@ import {
   computed,
   inject,
   OnInit,
+  signal,
 } from '@angular/core';
 import { SoundEffectStore } from '@general/stores/sound-effect.store';
 import { SoundEffectsLibraryComponent } from '../sound-effects-library.component';
@@ -13,6 +14,8 @@ import { take } from 'rxjs';
 import { SoundEffect } from '@shared/models/sound-effect.model';
 import { SoundEffectsPlayerService } from '../../../../../services/sound-effects-player.service';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { QueryOptions } from '@shared/models/request.model';
+import { SortDirection } from '@shared/models/common.model';
 
 @Component({
   selector: 'app-sound-effects-library-smart',
@@ -36,11 +39,15 @@ export class SoundEffectsLibrarySmartComponent implements OnInit {
     this.playingEffects().map((e) => e.id)
   );
 
+  readonly currentQueryOptions = signal<QueryOptions>({
+    sortBy: 'name',
+    sortDirection: SortDirection.ASC,
+  });
   readonly soundEffects = this.soundEffectStore.entities;
   readonly loading = this.soundEffectStore.loading;
 
   ngOnInit(): void {
-    this.soundEffectStore.loadAll();
+    this.soundEffectStore.loadAll(this.currentQueryOptions);
   }
 
   createFromFiles(audioTracks?: AudioTrack[]): void {

@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   input,
   output,
   signal,
@@ -13,6 +14,9 @@ import { SoundEffectTableComponent } from '../../components/sound-effect-table/s
 import { SoundEffectCardGridComponent } from '../../components/sound-effect-card-grid/sound-effect-card-grid.component';
 import { SoundEffectVolumeChange } from './sound-effects-library-smart/sound-effects-library-smart.component';
 import { SoundEffectDisplayModeSwitchComponent } from '../../components/sound-effect-display-mode-switch/sound-effect-display-mode-switch.component';
+import { SearchBarComponent } from '@general/components/controls/search-bar/search-bar.component';
+import { QueryOptions } from '@shared/models/request.model';
+import { SortDirection } from '@shared/models/common.model';
 
 @Component({
   selector: 'app-sound-effects-library',
@@ -21,6 +25,7 @@ import { SoundEffectDisplayModeSwitchComponent } from '../../components/sound-ef
     SoundEffectTableComponent,
     SoundEffectCardGridComponent,
     SoundEffectDisplayModeSwitchComponent,
+    SearchBarComponent,
   ],
   templateUrl: './sound-effects-library.component.html',
   styleUrl: './sound-effects-library.component.scss',
@@ -36,8 +41,24 @@ export class SoundEffectsLibraryComponent {
   readonly stopEffect = output<SoundEffect>();
   readonly toggleEffectLoop = output<SoundEffect>();
   readonly effectVolumeChange = output<SoundEffectVolumeChange>();
+  readonly queryOptions = output<QueryOptions>();
 
   readonly showGrid = signal<boolean>(true);
+  readonly currentSearch = signal<string | undefined>(undefined);
+  readonly currentQueryOptions = computed<QueryOptions>(() => {
+    return {
+      search: this.currentSearch(),
+      sortBy: 'name',
+      sortDirection: SortDirection.ASC,
+    };
+  });
+
+  constructor() {
+    effect(() => {
+      const queryOptions = this.currentQueryOptions();
+      this.queryOptions.emit(queryOptions);
+    });
+  }
 
   readonly viewMode = computed(() => {
     return this.showGrid() ? 'grid' : 'table';
