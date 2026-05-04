@@ -21,6 +21,10 @@ import {
   ConfirmationDialogComponent,
   ConfirmationDialogData,
 } from '../../../../../components/dialog/confirmation-dialog/confirmation-dialog.component';
+import {
+  EditSoundEffectResult,
+  SoundEffectEditModalComponent,
+} from '../../../modals/sound-effect-edit-modal/sound-effect-edit-modal.component';
 
 @Component({
   selector: 'app-sound-effects-library-smart',
@@ -104,7 +108,22 @@ export class SoundEffectsLibrarySmartComponent implements OnInit {
   }
 
   protected editSoundEffect(soundEffect: SoundEffect): void {
-    console.log('Edit soundEffect', soundEffect);
+    const dialogRef = this.dialogService.open<
+      SoundEffectEditModalComponent,
+      EditSoundEffectResult
+    >(SoundEffectEditModalComponent, { data: soundEffect });
+    dialogRef.afterClosed$.pipe(take(1)).subscribe((result) => {
+      if (!result || result.type === 'cancel') {
+        return;
+      }
+      if (result.type === 'delete') {
+        this.deleteSoundEffect(soundEffect);
+        return;
+      }
+      if (result.type === 'update') {
+        this.soundEffectStore.updateEffect(result.data);
+      }
+    });
   }
 
   protected deleteSoundEffect(soundEffect: SoundEffect): void {
