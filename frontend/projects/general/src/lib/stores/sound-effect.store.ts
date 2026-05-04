@@ -134,6 +134,10 @@ export const SoundEffectStore = signalStore(
       )
     );
 
+    /**
+     * Deletes the sound effect matching the ID.
+     * @param soundEffectId string
+     */
     const deleteEffect = rxMethod<string>(
       pipe(
         tap(() => {
@@ -143,6 +147,7 @@ export const SoundEffectStore = signalStore(
           return soundEffectService.deleteById(id).pipe(
             tap(() => {
               patchState(store, removeEntity(id));
+              loadAll(store.lastLoadOptions() ?? {});
             }),
             catchError((err) => {
               console.error('[SoundEffectStore] Cannot delete effect', err);

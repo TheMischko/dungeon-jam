@@ -16,6 +16,11 @@ import { SoundEffectsPlayerService } from '../../../../../services/sound-effects
 import { toSignal } from '@angular/core/rxjs-interop';
 import { QueryOptions } from '@shared/models/request.model';
 import { SortDirection } from '@shared/models/common.model';
+import { DialogService } from '../../../../../services/dialog.service';
+import {
+  ConfirmationDialogComponent,
+  ConfirmationDialogData,
+} from '../../../../../components/dialog/confirmation-dialog/confirmation-dialog.component';
 
 @Component({
   selector: 'app-sound-effects-library-smart',
@@ -30,6 +35,7 @@ export class SoundEffectsLibrarySmartComponent implements OnInit {
     NewSoundEffectUploadService
   );
   private readonly soundEffectPlayerService = inject(SoundEffectsPlayerService);
+  private readonly dialogService = inject(DialogService);
 
   private readonly playingEffects = toSignal(
     this.soundEffectPlayerService.playingEffects$,
@@ -102,7 +108,19 @@ export class SoundEffectsLibrarySmartComponent implements OnInit {
   }
 
   protected deleteSoundEffect(soundEffect: SoundEffect): void {
-    console.log('Deleting soundEffect', soundEffect);
+    const data: ConfirmationDialogData = {
+      title: 'Delete Sound Effect',
+      message: `Are you sure you want to delete this sound effect: ${soundEffect.name}?`,
+    };
+    const dialogRef = this.dialogService.open(ConfirmationDialogComponent, {
+      data,
+    });
+    dialogRef.afterClosed$.pipe(take(1)).subscribe((confirmed) => {
+      if (!confirmed) {
+        return;
+      }
+      this.soundEffectStore.deleteEffect(soundEffect.id);
+    });
   }
 }
 

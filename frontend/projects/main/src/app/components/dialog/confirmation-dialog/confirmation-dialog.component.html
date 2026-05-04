@@ -7,8 +7,8 @@
       <p>{{ message }}</p>
     </div>
     <div class="footer">
-      <button mat-flat-button>{{ confirmText }}</button>
-      <button mat-flat-button>{{ dismissText }}</button>
+      <button mat-flat-button (click)="confirm()">{{ confirmText }}</button>
+      <button mat-flat-button (click)="reject()">{{ dismissText }}</button>
     </div>
   </div>
 </div>

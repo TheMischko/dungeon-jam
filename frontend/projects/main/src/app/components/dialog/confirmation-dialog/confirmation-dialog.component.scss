@@ -2,4 +2,13 @@
 
 :host{
   @include mix.base-dialog();
+
+  .footer{
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+  }
 }
