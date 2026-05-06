@@ -1,4 +1,9 @@
-import { AudioTrack, PlaylistTracksQuery, TaggedTracksQuery, Track, } from '@shared/models/track.model';
+import {
+  AudioTrack,
+  PlaylistTracksQuery,
+  TaggedTracksQuery,
+  Track,
+} from '@shared/models/track.model';
 import { ipcMain } from 'electron';
 import { AudioFileChannel, TrackChannel } from '@shared/models/channels.model';
 import { FilterMatchType, QueryRequest } from '@shared/models/request.model';
@@ -21,7 +26,7 @@ export class TrackManager {
 
   private constructor(
     private tracksProvider: DatabaseProvider<Track>,
-    private filesManager: FilesManager,
+    private filesManager: FilesManager
   ) {}
 
   public static async getInstance() {
@@ -40,19 +45,28 @@ export class TrackManager {
   }
 
   private registerChannels(): void {
-    ipcMain.handle(TrackChannel.GET_ALL, (_, query?: QueryRequest) => {
-      return this.getAll(query);
+    ipcMain.handle(TrackChannel.GET_ALL, async (_, query?: QueryRequest) => {
+      this.logger.log('Fetching playlist tracks', { query });
+      const result = await this.getAll(query);
+      this.logger.log(`Found ${result.length} matching tracks`);
+      return result;
     });
 
-    ipcMain.handle(TrackChannel.GET_BY_ID, (_, id: string) => {
-      return this.get(id);
+    ipcMain.handle(TrackChannel.GET_BY_ID, async (_, id: string) => {
+      this.logger.log('Fetching playlist tracks', { id });
+      const result = await this.get(id);
+      this.logger.log('Found:', { track: result });
+      return result;
     });
 
     ipcMain.handle(
       TrackChannel.GET_PLAYLIST_TRACKS,
-      (_, query: PlaylistTracksQuery) => {
-        return this.getByPlaylist(query);
-      },
+      async (_, query: PlaylistTracksQuery) => {
+        this.logger.log('Fetching playlist tracks', { query });
+        const result = await this.getByPlaylist(query);
+        this.logger.log(`Found ${result.length} matching tracks`);
+        return result;
+      }
     );
 
     ipcMain.handle(
@@ -63,23 +77,28 @@ export class TrackManager {
         url: string,
         duration: number,
         author?: string,
-        tags?: string[],
+        tags?: string[]
       ) => {
         return await this.insert(name, url, duration, author, tags);
-      },
+      }
     );
 
     ipcMain.handle(AudioFileChannel.UPLOAD, async (_, tracks: AudioTrack[]) => {
       for (const track of tracks) {
         const resolved = resolveAudioTrack(track);
-        this.logger.log('Uploading track', { name: resolved.name, url: resolved.url, author: resolved.author, duration: resolved.duration });
+        this.logger.log('Uploading track', {
+          name: resolved.name,
+          url: resolved.url,
+          author: resolved.author,
+          duration: resolved.duration,
+        });
 
         await this.insert(
           resolved.name,
           resolved.url,
           resolved.duration,
           resolved.author,
-          resolved.tags,
+          resolved.tags
         );
       }
     });
@@ -92,9 +111,12 @@ export class TrackManager {
       return await this.deleteById(id);
     });
 
-    ipcMain.handle(TrackChannel.GET_TAGGED_TRACKS, async (_, query: TaggedTracksQuery) => {
-      return await this.getTaggedTracks(query.tagId, query);
-    })
+    ipcMain.handle(
+      TrackChannel.GET_TAGGED_TRACKS,
+      async (_, query: TaggedTracksQuery) => {
+        return await this.getTaggedTracks(query.tagId, query);
+      }
+    );
   }
 
   async getAll(query?: QueryRequest): Promise<Track[]> {
@@ -113,13 +135,8 @@ export class TrackManager {
     if (!playlist) {
       return [];
     }
-    const allTracks = await this.getAll({
-      search: query?.search,
-      sortBy: query?.sortBy,
-      sortDirection: query?.sortDirection,
-    });
-
-    if(query.includeChildren){
+    const allTracks = await this.getAll(query);
+    if (query.includeChildren) {
       return this.getPlaylistTracksWithChildren(playlist, allTracks);
     }
 
@@ -131,7 +148,7 @@ export class TrackManager {
     url: string,
     duration: number,
     author?: string,
-    tags?: string[],
+    tags?: string[]
   ): Promise<Track> {
     const newTrack = {
       name,
@@ -141,7 +158,13 @@ export class TrackManager {
       tags,
     };
     const newRecord = await this.tracksProvider.create(newTrack);
-    this.logger.log('Insert track', { trackId: newRecord.id, name, url, author, duration });
+    this.logger.log('Insert track', {
+      trackId: newRecord.id,
+      name,
+      url,
+      author,
+      duration,
+    });
     try {
       await this.filesManager.updateTrackFile(newRecord);
     } catch (e) {
@@ -165,7 +188,7 @@ export class TrackManager {
     const updatedRecord = await this.tracksProvider.update(
       'id',
       track.id,
-      track,
+      track
     );
     try {
       await this.filesManager.updateTrackFile(updatedRecord);
@@ -186,39 +209,59 @@ export class TrackManager {
     }, [] as Track[]);
   }
 
-  private async getPlaylistTracksWithChildren(playlist: Playlist, allTracks: Track[]) {
+  private async getPlaylistTracksWithChildren(
+    playlist: Playlist,
+    allTracks: Track[]
+  ) {
     const playlistManager = await PlaylistManager.getInstance();
-    if(!playlist.childrenIds || playlist.childrenIds.length === 0){
+    if (!playlist.childrenIds || playlist.childrenIds.length === 0) {
       return this.getPlaylistTracks(playlist, allTracks);
     }
     const allPlaylists = await playlistManager.getAll();
 
-
-    const relatedTracks = this.getTracksFromChildren(playlist, allTracks, allPlaylists);
-    const relatedTrackIds = relatedTracks.map(track => track.id);
+    const relatedTracks = this.getTracksFromChildren(
+      playlist,
+      allTracks,
+      allPlaylists
+    );
+    const relatedTrackIds = relatedTracks.map((track) => track.id);
     const trackIdsUniqueSet = new Set(relatedTrackIds);
-    return allTracks.filter(track => trackIdsUniqueSet.has(track.id));
+    return allTracks.filter((track) => trackIdsUniqueSet.has(track.id));
   }
 
-  getTracksFromChildren(playlist: Playlist, allTracks: Track[], allPlaylists: Playlist[], currentIteration: number = 0): Track[] {
-    if(currentIteration > this.MAX_CHILDREN_DEPTH){
+  getTracksFromChildren(
+    playlist: Playlist,
+    allTracks: Track[],
+    allPlaylists: Playlist[],
+    currentIteration: number = 0
+  ): Track[] {
+    if (currentIteration > this.MAX_CHILDREN_DEPTH) {
       return [];
     }
-    if(!playlist?.childrenIds?.length){
+    if (!playlist?.childrenIds?.length) {
       return this.getPlaylistTracks(playlist, allTracks);
     }
 
-    const childrenPlaylists = allPlaylists.filter(p => playlist.childrenIds!.includes(p.id));
+    const childrenPlaylists = allPlaylists.filter((p) =>
+      playlist.childrenIds!.includes(p.id)
+    );
 
     const tracks = childrenPlaylists.reduce((tracks, childPlaylist, _, __) => {
       const childTracks = this.getPlaylistTracks(childPlaylist, allTracks);
       childTracks.forEach((track) => tracks.add(track));
-      const childChildrenTracks = this.getTracksFromChildren(childPlaylist, allTracks, allPlaylists, currentIteration + 1);
+      const childChildrenTracks = this.getTracksFromChildren(
+        childPlaylist,
+        allTracks,
+        allPlaylists,
+        currentIteration + 1
+      );
       childChildrenTracks.forEach((track) => tracks.add(track));
       return tracks;
-    }, new Set<Track>())
+    }, new Set<Track>());
 
-    this.getPlaylistTracks(playlist, allTracks).forEach((item) => tracks.add(item));
+    this.getPlaylistTracks(playlist, allTracks).forEach((item) =>
+      tracks.add(item)
+    );
 
     return Array.from(tracks.values());
   }
@@ -226,7 +269,7 @@ export class TrackManager {
   async getTaggedTracks(tagId: string, query?: QueryRequest): Promise<Track[]> {
     return this.tracksProvider.getMatching(
       (track) => track.tags?.includes(tagId) ?? false,
-      query,
+      query
     );
   }
 
@@ -240,7 +283,7 @@ export class TrackManager {
 
   private static async searchTracks(
     track: Track,
-    filter?: string,
+    filter?: string
   ): Promise<boolean> {
     if (!filter) {
       return true;
@@ -271,7 +314,7 @@ export class TrackManager {
     trackA: Track,
     trackB: Track,
     sortBy?: string,
-    direction?: SortDirection,
+    direction?: SortDirection
   ) {
     if (!direction) {
       return 0;
@@ -289,33 +332,49 @@ export class TrackManager {
     return valA.toLowerCase().localeCompare(valB.toLowerCase()) * directionNum;
   }
 
-  private static async trackMatchingFilters(track: Track, filterQuery: FilterQuery): Promise<boolean> {
-    if(!filterQuery?.filters?.length) {
+  private static async trackMatchingFilters(
+    track: Track,
+    filterQuery: FilterQuery
+  ): Promise<boolean> {
+    if (!filterQuery?.filters?.length) {
       return true;
     }
-    const playlistFilters = filterQuery.filters.find(f => f.property === 'playlist');
-    const tagFilters = filterQuery.filters.find(f => f.property === 'tag');
+    const playlistFilters = filterQuery.filters.find(
+      (f) => f.property === 'playlist'
+    );
+    const tagFilters = filterQuery.filters.find((f) => f.property === 'tag');
 
     let matchingPlaylist = true;
-    if(playlistFilters){
+    if (playlistFilters) {
       const playlistManager = await PlaylistManager.getInstance();
-      matchingPlaylist = await playlistManager.isTrackInPlaylists(track.id, playlistFilters.values, filterQuery.matchType === FilterMatchType.ALL)
+      matchingPlaylist = await playlistManager.isTrackInPlaylists(
+        track.id,
+        playlistFilters.values,
+        filterQuery.matchType === FilterMatchType.ALL
+      );
     }
 
     let matchingTags = true;
-    if(tagFilters){
+    if (tagFilters) {
       const trackTags = track?.tags ?? [];
-      const missingTags = tagFilters.values.filter(tagId => !trackTags.includes(tagId));
-      matchingTags = filterQuery.matchType === FilterMatchType.ANY ? missingTags.length < tagFilters.values.length : missingTags.length === 0;
+      const missingTags = tagFilters.values.filter(
+        (tagId) => !trackTags.includes(tagId)
+      );
+      matchingTags =
+        filterQuery.matchType === FilterMatchType.ANY
+          ? missingTags.length < tagFilters.values.length
+          : missingTags.length === 0;
     }
 
-    if(tagFilters && playlistFilters){
-      return filterQuery.matchType === FilterMatchType.ANY ? matchingPlaylist || matchingTags : matchingPlaylist && matchingTags;
+    if (tagFilters && playlistFilters) {
+      return filterQuery.matchType === FilterMatchType.ANY
+        ? matchingPlaylist || matchingTags
+        : matchingPlaylist && matchingTags;
     }
-    if(!tagFilters && playlistFilters){
+    if (!tagFilters && playlistFilters) {
       return matchingPlaylist;
     }
-    if(tagFilters && !playlistFilters){
+    if (tagFilters && !playlistFilters) {
       return matchingTags;
     }
     return true;

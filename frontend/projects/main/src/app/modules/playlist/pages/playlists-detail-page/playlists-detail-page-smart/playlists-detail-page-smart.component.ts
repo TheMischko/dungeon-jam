@@ -36,6 +36,7 @@ import {
   UpdatePlaylistModalData,
 } from '../../../modals/update-playlist-modal/update-playlist-modal.component';
 import { ImageApiService } from '@general/services/image-api.service';
+import { FilterQuery } from '@shared/models/filter.model';
 
 @Component({
   selector: 'app-playlists-detail-page-smart',
@@ -98,12 +99,14 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
   readonly currentSortBy = signal<string>('name');
   readonly currentSortDirection = signal<SortDirection>(SortDirection.ASC);
   readonly currentIncludeChildren = signal<boolean>(false);
+  readonly currentFilters = signal<FilterQuery>(new FilterQuery());
 
   readonly loadQuery = computed<PlaylistTracksQuery>(() => ({
     search: this.currentFilter(),
     sortDirection: this.currentSortDirection(),
     sortBy: this.currentSortBy(),
     playlistId: this.playlistId(),
+    filters: this.currentFilters(),
     includeChildren: this.currentIncludeChildren(),
   }));
   songActionsMenuConfig = computed<ActionsMenuConfig<Track, Playlist>[]>(() => {
@@ -259,6 +262,9 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
     }
     if (queryOptions.sortDirection) {
       this.currentSortDirection.set(queryOptions.sortDirection);
+    }
+    if (queryOptions.filters) {
+      this.currentFilters.set(queryOptions.filters);
     }
   }
 

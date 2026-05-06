@@ -35,6 +35,7 @@ export class ViewManager {
         config.height,
         config.defaultPreferences
       );
+      appWindow.setMenu(null);
       const captureTab = await ViewManager.createCaptureTab(
         appWindow,
         config.defaultPreferences,
