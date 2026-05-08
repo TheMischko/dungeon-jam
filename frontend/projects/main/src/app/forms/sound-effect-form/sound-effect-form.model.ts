@@ -11,7 +11,6 @@ import { signal } from '@angular/core';
 export interface SoundEffectFormData {
   title: string;
   path: string;
-  description: string;
   tags: TagData[];
 }
 
@@ -22,7 +21,6 @@ export const createSoundEffectForm = (
   const fields = signal<SoundEffectFormData>({
     title: data?.title ?? '',
     path: data?.path ?? '',
-    description: data?.description ?? '',
     tags: data?.tags ?? [],
   });
   return form(fields, (form) => {

@@ -71,17 +71,20 @@ function getSizeConfig(size: number): GridSoundEffectSizeConfig {
       return {
         imageSize: 80,
         fontSize: 24,
+        volumeSize: 1.25,
       };
     case size > 0.5:
       return {
         imageSize: 60,
         fontSize: 18,
+        volumeSize: 1,
       };
     case size > 0.25:
       return {
         imageSize: 50,
         fontSize: 16,
         hideLoop: true,
+        volumeSize: 0.75,
       };
     case size >= 0:
       return {
@@ -94,6 +97,7 @@ function getSizeConfig(size: number): GridSoundEffectSizeConfig {
       return {
         imageSize: 50,
         fontSize: 16,
+        volumeSize: 1,
       };
   }
 }

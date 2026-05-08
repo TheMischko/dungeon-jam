@@ -1,15 +1,15 @@
-:host{
+:host {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: stretch;
 
-  .mode-switcher{
+  .mode-switcher {
     align-self: flex-end;
     margin: 0 1rem 0.5rem 0;
   }
 
-  .controls{
+  .controls {
     width: 98%;
     min-width: 0;
     display: flex;
@@ -17,11 +17,12 @@
     justify-content: space-between;
   }
 
-  .content{
+  .content {
     width: 100%;
+    margin-bottom: 10vh;
   }
 
-  .effect-table{
+  .effect-table {
     width: 100%;
   }
 }

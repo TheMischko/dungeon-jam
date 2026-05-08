@@ -11,6 +11,7 @@ export type GridPlaylistSizeConfig = {
 export type GridSoundEffectSizeConfig = {
   imageSize: number;
   fontSize: number;
+  volumeSize?: number;
   titleBold?: boolean;
   hideVolume?: boolean;
   hideLoop?: boolean;

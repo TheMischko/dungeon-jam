@@ -1,8 +1,4 @@
-<div
-  class="card"
-  (mouseenter)="onMouseEnter()"
-  (mouseleave)="onMouseLeave()"
->
+<div class="card" (mouseenter)="onMouseEnter()" (mouseleave)="onMouseLeave()">
   @let effect = soundEffect();
 
   <div class="card-icon">
@@ -12,7 +8,9 @@
   <div class="card-content">
     @if (isSingleRow()) {
       <div class="card-row card-row--centered" animate.enter="">
-        <div class="item-name" [ngStyle]="titleSizeStyle()">{{ effect.name }}</div>
+        <div class="item-name" [ngStyle]="titleSizeStyle()">
+          {{ effect.name }}
+        </div>
         <lib-play-pause-button
           animate.enter="fade-in-animation"
           animate.leave="fade-out-animation"
@@ -22,7 +20,9 @@
       </div>
     } @else {
       <div class="card-row">
-        <div class="item-name" [ngStyle]="titleSizeStyle()">{{ effect.name }}</div>
+        <div class="item-name" [ngStyle]="titleSizeStyle()">
+          {{ effect.name }}
+        </div>
         @if (showLoop()) {
           <app-repeat-state-button
             animate.enter="fade-in-animation"
@@ -39,6 +39,7 @@
             <app-volume-control
               animate.enter="fade-in-animation"
               animate.leave="fade-out-animation"
+              [size]="volumeSize()"
               [volume]="volumeState()"
               (changed)="volumeChange.emit($event)"
             />

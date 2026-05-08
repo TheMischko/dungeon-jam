@@ -53,7 +53,6 @@ export class SoundEffectEditModalComponent {
       {
         title: '',
         path: '',
-        description: '',
         tags: [],
       },
       (form) => {
@@ -72,9 +71,6 @@ export class SoundEffectEditModalComponent {
           ?.map((tagId) => this.tagStore.getById(tagId))
           .filter((v) => !!v) || [];
       this.soundEffectForm().title().value.set(this.soundEffect.name);
-      this.soundEffectForm()
-        .description()
-        .value.set(this.soundEffect.description ?? '');
       this.soundEffectForm().path().value.set(this.soundEffect.url);
       this.soundEffectForm().tags().value.set(tags);
     });
@@ -96,17 +92,13 @@ export class SoundEffectEditModalComponent {
       data: {
         ...this.soundEffect,
         name: updateValues.title!,
-        description: updateValues.description!,
         tags: updateValues.tags.map((t) => t.id),
       },
     });
   }
 }
 
-export type EditSoundEffectResult =
-  | CancelResult
-  | DeleteResult
-  | UpdateResult;
+export type EditSoundEffectResult = CancelResult | DeleteResult | UpdateResult;
 
 export type CancelResult = {
   type: 'cancel';

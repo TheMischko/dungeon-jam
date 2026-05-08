@@ -21,6 +21,7 @@ import {
 import { IconButtonComponent } from '@general/components/buttons/icon-button/icon-button.component';
 import { MatMenu, MatMenuTrigger } from '@angular/material/menu';
 import { actionsIconSet } from '@general/icons/icons';
+import { VolumeControlComponent } from '../../../../player/player/volume-control/volume-control.component';
 
 @Component({
   selector: 'app-sound-effect-table',
@@ -33,6 +34,7 @@ import { actionsIconSet } from '@general/icons/icons';
     IconButtonComponent,
     MatMenu,
     MatMenuTrigger,
+    VolumeControlComponent,
   ],
   templateUrl: './sound-effect-table.component.html',
   styleUrl: './sound-effect-table.component.scss',
@@ -61,6 +63,9 @@ export class SoundEffectTableComponent {
   readonly actionsColumn = viewChild.required('actionsColumn', {
     read: TemplateRef,
   });
+  readonly volumeColumn = viewChild.required('volumeColumn', {
+    read: TemplateRef,
+  });
 
   readonly ActionsIcon = actionsIconSet.ActionsMenu;
   readonly config: TableColumnConfiguration<SoundEffect> = {
@@ -77,8 +82,9 @@ export class SoundEffectTableComponent {
     name: {
       title: 'Name',
     },
-    description: {
-      title: 'Description',
+    volume: {
+      title: 'Volume',
+      template: () => this.volumeColumn(),
     },
     tags: {
       title: 'Tags',
@@ -87,6 +93,7 @@ export class SoundEffectTableComponent {
     duration: {
       title: 'Length',
       customValueFn: (entity) => this.durationPipe.transform(entity.duration),
+      width: '80px',
     },
     actions: {
       title: '',

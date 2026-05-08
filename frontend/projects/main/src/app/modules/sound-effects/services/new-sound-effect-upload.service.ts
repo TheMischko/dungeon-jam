@@ -36,7 +36,6 @@ export class NewSoundEffectUploadService {
             )!;
             return {
               name: sfx.title,
-              description: sfx.description ?? '',
               tags: sfx.tags.map((t) => t.id),
               url: track.fullPath,
               duration: track.length,

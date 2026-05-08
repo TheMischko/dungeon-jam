@@ -10,10 +10,11 @@ import {
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { LucideAngularModule, LucideIconData } from 'lucide-angular';
 import { MatSlider, MatSliderThumb } from '@angular/material/slider';
+import { NgStyle } from '@angular/common';
 
 @Component({
   selector: 'lib-range-slider',
-  imports: [MatSlider, MatSliderThumb, LucideAngularModule],
+  imports: [MatSlider, MatSliderThumb, LucideAngularModule, NgStyle],
   templateUrl: './range-slider.component.html',
   styleUrl: './range-slider.component.scss',
   providers: [
@@ -31,6 +32,7 @@ export class RangeSliderComponent implements ControlValueAccessor {
   readonly prefix = input<string | LucideIconData>();
   readonly suffix = input<string | LucideIconData>();
   readonly iconSize = input<number>(18);
+  readonly knobSize = input<number>(20);
 
   readonly inputChange = output<number>();
   readonly touchedChange = output<void>();
@@ -45,13 +47,19 @@ export class RangeSliderComponent implements ControlValueAccessor {
     }
     return prefix;
   });
-
   readonly suffixIcon = computed<LucideIconData | undefined>(() => {
     const suffix = this.suffix();
     if (!suffix || typeof suffix === 'string') {
       return;
     }
     return suffix;
+  });
+  readonly sliderStyles = computed<Record<string, string>>(() => {
+    const knobSize = this.knobSize();
+    return {
+      '--mat-slider-handle-width': `${knobSize}px`,
+      '--mat-slider-handle-height': `${knobSize}px`,
+    };
   });
 
   readonly isSuffixIcon = computed<boolean>(() => {

@@ -1,7 +1,6 @@
 export interface SoundEffect {
   id: string;
   name: string;
-  description?: string;
   url: string;
   duration: number;
   tags?: string[];

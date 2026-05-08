@@ -19,6 +19,10 @@
   />
 </ng-template>
 
+<ng-template #volumeColumn let-row="$implicit">
+  <app-volume-control [volume]="row.volume" [showIcon]="false" [size]="0.75" />
+</ng-template>
+
 <ng-template #tagColumn let-row="$implicit">
   @if (row.tags) {
     <lib-tag-list-smart

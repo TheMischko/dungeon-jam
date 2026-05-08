@@ -78,6 +78,9 @@ export class SoundEffectCardComponent {
   readonly iconSize = computed<number>(() => {
     return this.sizeConfig().imageSize / 2;
   });
+  readonly volumeSize = computed<number>(
+    () => this.sizeConfig()?.volumeSize ?? 1
+  );
   readonly showVolume = computed<boolean>(() => !this.sizeConfig()?.hideVolume);
   readonly showLoop = computed<boolean>(() => !this.sizeConfig()?.hideLoop);
   readonly showPlay = computed<boolean>(() => !this.sizeConfig()?.hidePlay);

@@ -16,6 +16,7 @@
   [disableRipple]="true"
   (input)="changeValue($event)"
   class="slider"
+  [ngStyle]="sliderStyles()"
 >
   <input matSliderThumb [value]="value()" />
 </mat-slider>

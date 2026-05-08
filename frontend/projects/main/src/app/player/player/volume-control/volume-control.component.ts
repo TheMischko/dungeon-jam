@@ -19,6 +19,7 @@ export class VolumeControlComponent {
    * Default value is 1. Half the size is 0.5 and double size is 2.
    */
   size = input<number>(1);
+  showIcon = input<boolean>(true);
 
   volumeNormalized = computed(() => {
     return Math.max(0, Math.min(this.volume(), 1));
@@ -34,6 +35,19 @@ export class VolumeControlComponent {
         return this.NormalVolumeIcon;
     }
   });
+  iconSize = computed(() => {
+    if (!this.showIcon()) {
+      return 0;
+    }
+    return this.ICON_BASE_SIZE * this.size();
+  });
+  knobSize = computed(() => {
+    const size = this.size();
+    if (size > 1) {
+      return this.KNOB_BASE_SIZE;
+    }
+    return this.KNOB_BASE_SIZE * size;
+  });
 
   changed = output<number>();
 
@@ -41,6 +55,9 @@ export class VolumeControlComponent {
   controlValueChanged = toSignal(this.control.valueChanges, {
     initialValue: null,
   });
+
+  private readonly ICON_BASE_SIZE = 24;
+  private readonly KNOB_BASE_SIZE = 16;
 
   constructor() {
     effect(() => {
