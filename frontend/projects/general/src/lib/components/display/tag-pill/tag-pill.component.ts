@@ -3,6 +3,10 @@ import { Tag, TagData } from '@shared/models/tag.model';
 import { NgClass, NgStyle } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import { actionsIconSet } from '@general/icons/icons';
+import {
+  calculateRelativeLuminance,
+  hexToRGB,
+} from '@general/utils/color.utils';
 
 @Component({
   selector: 'lib-tag-pill',
@@ -20,9 +24,16 @@ export class TagPillComponent {
 
   readonly removeIcon = actionsIconSet.CrossIcon;
 
+  textColor = computed(() => {
+    const bgColor = this.tag().color ?? '#000000';
+    const bgRGB = hexToRGB(bgColor);
+    const luminance = calculateRelativeLuminance(bgRGB);
+    return luminance > 0.5 ? 'black' : 'white';
+  });
   pillStyles = computed(() => {
     return {
       background: this.tag().color ?? undefined,
+      color: this.textColor(),
       'font-size': `${this.fontSize()}px`,
     };
   });
