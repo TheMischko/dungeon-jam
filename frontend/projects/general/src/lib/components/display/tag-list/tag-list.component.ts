@@ -14,6 +14,7 @@ export class TagListComponent {
   readonly editable = input<boolean>(false);
   readonly maxShownTags = input<number | null>(null);
   readonly priorityValue = input<string | null>(null);
+  readonly fontSize = input<number>(14);
 
   readonly shownTags = computed<TagData[]>(() => {
     if (this.maxShownTags() !== null) {

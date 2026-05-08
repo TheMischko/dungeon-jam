@@ -23,11 +23,13 @@ html {
     )
   );
 
-  @include mat.paginator-overrides((
-    container-background-color: transparent,
-    container-text-color: col.$text-main,
-    container-text-font: typo.$font,
-  ));
+  @include mat.paginator-overrides(
+    (
+      container-background-color: transparent,
+      container-text-color: col.$text-main,
+      container-text-font: typo.$font,
+    )
+  );
 
   scrollbar-width: thin;
   scrollbar-color: col.$primary transparent;
@@ -132,15 +134,46 @@ button.mdc-button {
     margin-bottom: -3px;
   }
 }
- a {
-   @include typo.default-font();
+a {
+  @include typo.default-font();
+  color: col.$text-main;
+
+  &:active,
+  &:focus {
     color: col.$text-main;
+  }
 
-   &:active, &:focus{
-      color: col.$text-main;
-   }
+  &:hover {
+    color: col.$primary;
+  }
+}
 
-   &:hover {
-     color: col.$primary;
-   }
- }
+.fade-in-animation {
+  animation: fade-in 0.4s;
+}
+
+.fade-out-animation {
+  animation: fade-out 0.4s;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0);
+  }
+}

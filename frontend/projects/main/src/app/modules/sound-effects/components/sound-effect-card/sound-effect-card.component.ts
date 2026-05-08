@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  inject,
   input,
   output,
   signal,
@@ -21,6 +22,8 @@ import {
 } from '@general/components/display/actions-menu/actions-menu.component';
 import { IconButtonComponent } from '@general/components/buttons/icon-button/icon-button.component';
 import { MatMenu, MatMenuTrigger } from '@angular/material/menu';
+import { TagListSmartComponent } from '@general/components/display/tag-list/tag-list-smart/tag-list-smart.component';
+import { TagsStore } from '@general/stores/tags.store';
 
 @Component({
   selector: 'app-sound-effect-card',
@@ -34,12 +37,15 @@ import { MatMenu, MatMenuTrigger } from '@angular/material/menu';
     IconButtonComponent,
     MatMenu,
     MatMenuTrigger,
+    TagListSmartComponent,
   ],
   templateUrl: './sound-effect-card.component.html',
   styleUrl: './sound-effect-card.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SoundEffectCardComponent {
+  readonly tagsStore = inject(TagsStore);
+
   readonly soundEffect = input.required<SoundEffect>();
   readonly isPlaying = input<boolean>(false);
   readonly sizeConfig = input.required<GridSoundEffectSizeConfig>();
@@ -81,9 +87,13 @@ export class SoundEffectCardComponent {
   readonly volumeSize = computed<number>(
     () => this.sizeConfig()?.volumeSize ?? 1
   );
+  readonly tagFontSize = computed<number>(
+    () => this.sizeConfig()?.tagFontSize ?? 13
+  );
   readonly showVolume = computed<boolean>(() => !this.sizeConfig()?.hideVolume);
   readonly showLoop = computed<boolean>(() => !this.sizeConfig()?.hideLoop);
   readonly showPlay = computed<boolean>(() => !this.sizeConfig()?.hidePlay);
+  readonly showTags = computed<boolean>(() => !this.sizeConfig()?.hideTags);
   readonly isSingleRow = computed<boolean>(
     () => !this.showVolume() && !this.showLoop() && this.showPlay()
   );

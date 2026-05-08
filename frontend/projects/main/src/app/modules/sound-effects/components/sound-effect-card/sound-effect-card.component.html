@@ -11,6 +11,7 @@
         <div class="item-name" [ngStyle]="titleSizeStyle()">
           {{ effect.name }}
         </div>
+
         <lib-play-pause-button
           animate.enter="fade-in-animation"
           animate.leave="fade-out-animation"
@@ -20,9 +21,21 @@
       </div>
     } @else {
       <div class="card-row">
-        <div class="item-name" [ngStyle]="titleSizeStyle()">
-          {{ effect.name }}
-        </div>
+        @if (showTags()) {
+          <div class="name-and-tags">
+            <div class="item-name" [ngStyle]="titleSizeStyle()">
+              {{ effect.name }}
+            </div>
+            <lib-tag-list-smart
+              [tagIds]="soundEffect()?.tags ?? []"
+              [fontSize]="tagFontSize()"
+            />
+          </div>
+        } @else {
+          <div class="item-name" [ngStyle]="titleSizeStyle()">
+            {{ effect.name }}
+          </div>
+        }
         @if (showLoop()) {
           <app-repeat-state-button
             animate.enter="fade-in-animation"

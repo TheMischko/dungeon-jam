@@ -2,10 +2,13 @@ import {
   AfterViewInit,
   ChangeDetectionStrategy,
   Component,
-  computed, ElementRef,
+  computed,
+  ElementRef,
   inject,
-  input, OnDestroy,
-  output, signal,
+  input,
+  OnDestroy,
+  output,
+  signal,
 } from '@angular/core';
 import { Tag, TagData } from '@shared/models/tag.model';
 import { TagsStore } from '@general/stores/tags.store';
@@ -18,7 +21,7 @@ import { TagListComponent } from '@general/components/display/tag-list/tag-list.
   styleUrl: './tag-list-smart.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TagListSmartComponent implements AfterViewInit, OnDestroy{
+export class TagListSmartComponent implements AfterViewInit, OnDestroy {
   private readonly elementRef = inject(ElementRef<HTMLElement>);
   readonly tagStore = inject(TagsStore);
 
@@ -26,6 +29,7 @@ export class TagListSmartComponent implements AfterViewInit, OnDestroy{
   readonly tagIds = input<string[]>([]);
   readonly priorityValue = input<string | null>(null);
   readonly editable = input<boolean>(false);
+  readonly fontSize = input<number>(14);
 
   readonly removed = output<Tag>();
 
@@ -44,9 +48,9 @@ export class TagListSmartComponent implements AfterViewInit, OnDestroy{
   });
   private resizeObserver?: ResizeObserver;
 
-  ngAfterViewInit(){
+  ngAfterViewInit() {
     this.resizeObserver = new ResizeObserver((entries) => {
-      if(entries[0]){
+      if (entries[0]) {
         const width = entries[0].contentRect.width;
         this.updateMaxShownTags(width);
       }

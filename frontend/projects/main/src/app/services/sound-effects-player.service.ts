@@ -133,15 +133,13 @@ export class SoundEffectsPlayerService {
     this.patchState(soundEffectId, { loop });
   }
 
-  private async createHowl(
-    soundEffect: SoundEffect
-  ): Promise<Howl> {
+  private async createHowl(soundEffect: SoundEffect): Promise<Howl> {
     const soundBlobUrl = await this.getBlobUrl(soundEffect);
     const howl = new Howl({
       src: [soundBlobUrl],
       html5: true,
       format: '',
-      volume: 0.1,
+      volume: soundEffect?.volume ?? 1,
       loop: false,
     });
 

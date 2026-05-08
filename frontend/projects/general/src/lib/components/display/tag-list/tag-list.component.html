@@ -1,6 +1,7 @@
 @for (tag of shownTags(); track tag.title) {
   <lib-tag-pill
     [tag]="tag"
+    [fontSize]="fontSize()"
     [removable]="editable()"
     [highlighted]="matchesPriority(tag)"
     (removed)="tagRemoved($event)"
@@ -11,6 +12,7 @@
     matTooltipClass="tags-tooltip"
     [matTooltip]="leftoverTagsTooltip()"
     [tag]="leftoverTagCount()!"
+    [fontSize]="fontSize()"
     (removed)="tagRemoved($event)"
   ></lib-tag-pill>
 }

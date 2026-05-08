@@ -10,7 +10,9 @@
   background: col.$primary;
   color: col.$text-main;
 
-  &.highlighted{
+  transition: font-size 0.4s ease-in-out;
+
+  &.highlighted {
     background: col.$primary-light;
     color: col.$primary-dark-dark;
   }
