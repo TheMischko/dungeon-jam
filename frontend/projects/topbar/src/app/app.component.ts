@@ -33,7 +33,7 @@ export class AppComponent {
     const offset = this.offsetTitleForMacOS();
     return {
       ...(offset && {
-        'padding-left': '100px',
+        'padding-left': '80px',
       }),
     };
   });

@@ -1,5 +1,5 @@
 import { BaseTab, TabPreferences } from './base-tab';
-import { BrowserWindow } from 'electron';
+import { BrowserWindow, WebContentsView } from 'electron';
 import { getMainTabRect } from './tab-config';
 
 export class FrontendTab extends BaseTab {
@@ -13,6 +13,19 @@ export class FrontendTab extends BaseTab {
       return;
     }
     await this.tab.webContents.loadURL('http://localhost:4200/');
+
+    // const youtube = new WebContentsView();
+    // this.parent.contentView.addChildView(youtube);
+    //
+    // const bounds = this.tab.getBounds();
+    // youtube.setBounds({
+    //   x: bounds.x,
+    //   y: bounds.y + 50,
+    //   width: bounds.width,
+    //   height: bounds.height - 50,
+    // });
+    // await youtube.webContents.loadURL('https://youtube.com');
+    // youtube.webContents.focus();
   }
 
   resize(bounds: Electron.CrossProcessExports.Rectangle) {

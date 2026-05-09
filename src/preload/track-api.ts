@@ -1,7 +1,14 @@
-import { PlaylistTracksQuery, TaggedTracksQuery, Track } from '@shared/models/track.model';
+import {
+  PlaylistTracksQuery,
+  TaggedTracksQuery,
+  Track,
+} from '@shared/models/track.model';
 import { ipcRenderer } from 'electron';
 import { TrackChannel } from '@shared/models/channels.model';
-import { QueryRequest } from '@shared/models/request.model';
+import {
+  PlaylistDiscoverBatchRequest,
+  QueryRequest,
+} from '@shared/models/request.model';
 
 const getAllTracks = async (query?: QueryRequest): Promise<Track[]> => {
   return await ipcRenderer.invoke(TrackChannel.GET_ALL, query);
@@ -12,7 +19,7 @@ const getTrackById = async (id: string): Promise<Track | null> => {
 };
 
 const getTracksByPlaylist = async (
-  query: PlaylistTracksQuery,
+  query: PlaylistTracksQuery
 ): Promise<Track[]> => {
   return await ipcRenderer.invoke(TrackChannel.GET_PLAYLIST_TRACKS, query);
 };
@@ -22,7 +29,7 @@ const createTrack = async (
   url: string,
   duration: number,
   author?: string,
-  tags?: string[],
+  tags?: string[]
 ): Promise<Track> => {
   return await ipcRenderer.invoke(
     TrackChannel.INSERT,
@@ -30,7 +37,7 @@ const createTrack = async (
     url,
     duration,
     author,
-    tags,
+    tags
   );
 };
 
@@ -46,6 +53,12 @@ const getTaggedTracks = async (query: TaggedTracksQuery): Promise<Track[]> => {
   return await ipcRenderer.invoke(TrackChannel.GET_TAGGED_TRACKS, query);
 };
 
+const discoverTracks = async (
+  query: PlaylistDiscoverBatchRequest
+): Promise<Track[]> => {
+  return await ipcRenderer.invoke(TrackChannel.PLAYLIST_DISCOVER, query);
+};
+
 export default {
   getAllTracks,
   getTrackById,
@@ -54,4 +67,5 @@ export default {
   updateTrack,
   deleteTrack,
   getTaggedTracks,
+  discoverTracks,
 };

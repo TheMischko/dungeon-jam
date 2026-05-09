@@ -6,7 +6,10 @@ import {
   TaggedTracksQuery,
   Track,
 } from '@shared/models/track.model';
-import { QueryRequest } from '@shared/models/request.model';
+import {
+  PlaylistDiscoverBatchRequest,
+  QueryRequest,
+} from '@shared/models/request.model';
 
 export type AudioApiWindow = Window &
   typeof globalThis & {
@@ -35,6 +38,7 @@ export type AudioApiWindow = Window &
       updateTrack: (track: Track) => Promise<Track>;
       deleteTrack: (id: string) => Promise<boolean>;
       getTaggedTracks: (query: TaggedTracksQuery) => Promise<Track[]>;
+      discoverTracks: (query: PlaylistDiscoverBatchRequest) => Promise<Track[]>;
     };
   } & {
     PLAYBACK_API: {

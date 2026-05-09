@@ -6,7 +6,10 @@ import {
   Track,
 } from '@shared/models/track.model';
 import { forkJoin, map, Observable, Subject } from 'rxjs';
-import { QueryRequest } from '@shared/models/request.model';
+import {
+  PlaylistDiscoverBatchRequest,
+  QueryRequest,
+} from '@shared/models/request.model';
 
 @Injectable({
   providedIn: 'root',
@@ -91,6 +94,23 @@ export class TrackService {
   getTaggedTracks(query: TaggedTracksQuery): Observable<Track[]> {
     const subject = new Subject<Track[]>();
     this.window.TRACK_API.getTaggedTracks(query)
+      .then((tracks) => {
+        subject.next(tracks);
+        subject.complete();
+      })
+      .catch((error) => {
+        subject.error(error);
+      });
+    return subject.asObservable();
+  }
+
+  /**
+   * Finds a batch of new tracks, that does not belong to given playlist.
+   * @param query
+   */
+  discoverTracks(query: PlaylistDiscoverBatchRequest): Observable<Track[]> {
+    const subject = new Subject<Track[]>();
+    this.window.TRACK_API.discoverTracks(query)
       .then((tracks) => {
         subject.next(tracks);
         subject.complete();

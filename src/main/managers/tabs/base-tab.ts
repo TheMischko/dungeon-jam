@@ -14,7 +14,10 @@ export class BaseTab {
     this._tab = tab;
   }
 
-  constructor(parent: BrowserWindow, preferences: TabPreferences) {
+  constructor(
+    protected parent: BrowserWindow,
+    preferences: TabPreferences
+  ) {
     this.tab = new WebContentsView({
       webPreferences: {
         ...preferences,

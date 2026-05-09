@@ -6,7 +6,11 @@ import {
 } from '@shared/models/track.model';
 import { ipcMain } from 'electron';
 import { AudioFileChannel, TrackChannel } from '@shared/models/channels.model';
-import { FilterMatchType, QueryRequest } from '@shared/models/request.model';
+import {
+  FilterMatchType,
+  PlaylistDiscoverBatchRequest,
+  QueryRequest,
+} from '@shared/models/request.model';
 import { SortDirection } from '@shared/models/common.model';
 import { PlaylistManager } from './playlist.manager';
 import { DatabaseProvider } from '../database/database-provider';
@@ -18,6 +22,7 @@ import { Logger } from '../utils/logger';
 import { Playlist } from '@shared/models/playlist.model';
 import { resolveAudioTrack } from '../utils/resolve-audio-track';
 import { FilterQuery } from '@shared/models/filter.model';
+import { shuffleList } from '../../../frontend/projects/main/src/app/utils/shuffle-list';
 
 export class TrackManager {
   private static _instance: TrackManager;
@@ -65,6 +70,18 @@ export class TrackManager {
         this.logger.log('Fetching playlist tracks', { query });
         const result = await this.getByPlaylist(query);
         this.logger.log(`Found ${result.length} matching tracks`);
+        return result;
+      }
+    );
+
+    ipcMain.handle(
+      TrackChannel.PLAYLIST_DISCOVER,
+      async (_, query: PlaylistDiscoverBatchRequest) => {
+        this.logger.log(`Fetching discover tracks for playlist.`, { query });
+        const result = await this.discoverTracks(query);
+        this.logger.log(`Tracks discovered.`, {
+          result: result.map((r) => ({ id: r.id, name: r.name })),
+        });
         return result;
       }
     );
@@ -378,5 +395,27 @@ export class TrackManager {
       return matchingTags;
     }
     return true;
+  }
+
+  private async discoverTracks(
+    query: PlaylistDiscoverBatchRequest
+  ): Promise<Track[]> {
+    const playlistTracks = await this.getByPlaylist({
+      playlistId: query.playlistId,
+      includeChildren: true,
+    });
+    const excludedTrackIds = new Set(playlistTracks.map((t) => t.id));
+
+    const allTracks = await this.tracksProvider.getAll(query);
+    const validTracks = allTracks.filter((t) => !excludedTrackIds.has(t.id));
+    const shuffled = shuffleList(validTracks);
+    const batch = shuffled.slice(0, query.batchSize);
+    const hasSort =
+      query?.sortBy !== undefined && query?.sortDirection !== undefined;
+    return hasSort
+      ? batch.sort((a, b) =>
+          TrackManager.sortTracks(a, b, query.sortBy, query.sortDirection)
+        )
+      : batch;
   }
 }

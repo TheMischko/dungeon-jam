@@ -1,5 +1,4 @@
-import
-{SortDirection } from '@shared/models/common.model';
+import { SortDirection } from '@shared/models/common.model';
 import { FilterQuery } from '@shared/models/filter.model';
 
 export interface QueryRequest {
@@ -15,7 +14,17 @@ export interface FilterConstrain {
 }
 
 export enum FilterMatchType {
-  ALL = 'ALL', ANY = 'ANY'
+  ALL = 'ALL',
+  ANY = 'ANY',
 }
 
 export type QueryOptions = QueryRequest;
+
+export interface BatchRequest extends QueryRequest {
+  batchSize: number;
+  random?: string;
+}
+
+export interface PlaylistDiscoverBatchRequest extends BatchRequest {
+  playlistId: string;
+}

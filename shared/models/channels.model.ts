@@ -18,6 +18,7 @@ export enum TrackChannel {
   DELETE = 'tracks/delete',
   GET_PLAYLIST_TRACKS = 'tracks/get-playlist-tracks',
   GET_TAGGED_TRACKS = 'tracks/get-tagged-tracks',
+  PLAYLIST_DISCOVER = 'tracks/playlist-discover',
 }
 
 export enum AudioFileChannel {
