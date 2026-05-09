@@ -8,6 +8,7 @@ import { ApplicationStateService } from '@general/services/application-state.ser
 import { toSignal } from '@angular/core/rxjs-interop';
 import { OperatingSystem } from '@shared/models/application.model';
 import { WindowControlButtonComponent } from './window-control-button/window-control-button.component';
+import { actionsIconSet } from '@general/icons/icons';
 
 @Component({
   selector: 'app-window-controls',
@@ -27,6 +28,15 @@ export class WindowControlsComponent {
     const os = this.operatingSystem();
     return os !== undefined && os !== OperatingSystem.MacOS;
   });
+  readonly showUnmaximizeButton = toSignal(
+    this.applicationStateService.isMaximized$,
+    { initialValue: false }
+  );
+
+  readonly MinimizeIcon = actionsIconSet.MinimizeIcon;
+  readonly MaximizeIcon = actionsIconSet.MaximizeIcon;
+  readonly UnmaximizeIcon = actionsIconSet.UnmaximizeIcon;
+  readonly CloseIcon = actionsIconSet.CloseAppIcon;
 
   closeApp() {
     this.applicationStateService.closeApp();
@@ -38,5 +48,9 @@ export class WindowControlsComponent {
 
   maximize() {
     this.applicationStateService.maximizeApp();
+  }
+
+  unmaximize() {
+    this.applicationStateService.unmaximizeApp();
   }
 }

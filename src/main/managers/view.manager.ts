@@ -35,7 +35,8 @@ export class ViewManager {
         config.height,
         config.defaultPreferences
       );
-      appWindow.setMenu(null);
+      ViewManager.setupAppWindow(appWindow);
+
       const captureTab = await ViewManager.createCaptureTab(
         appWindow,
         config.defaultPreferences,
@@ -88,6 +89,7 @@ export class ViewManager {
       webPreferences: {
         ...defaultPreferences,
       },
+      titleBarStyle: 'hidden',
     });
   }
 
@@ -122,6 +124,10 @@ export class ViewManager {
     appWindow.contentView.addChildView(captureTab);
     await captureTab.webContents.loadFile(indexHTML);
     return captureTab;
+  }
+
+  private static setupAppWindow(appWindow: BrowserWindow) {
+    appWindow.setMenu(null);
   }
 
   public get tabs(): BaseTab[] {

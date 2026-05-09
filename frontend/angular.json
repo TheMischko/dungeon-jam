@@ -250,6 +250,7 @@
       "architect": {
         "build": {
           "builder": "@angular/build:application",
+
           "options": {
             "outputPath": "../build/topbar",
             "index": "projects/topbar/src/index.html",
@@ -257,6 +258,7 @@
             "polyfills": [
               "zone.js"
             ],
+
             "tsConfig": "projects/topbar/tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [

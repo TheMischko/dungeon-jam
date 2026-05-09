@@ -1,23 +1,20 @@
 import { Rectangle } from 'electron';
 
 const SIDEBAR_WIDTH = 0.3;
-const TOPBAR_HEIGHT = 0.1;
+const TOPBAR_HEIGHT_PX = 60;
 
-export const getTopBarRect = (
-  windowWidth: number,
-  windowHeight: number,
-): Rectangle => {
+export const getTopBarRect = (windowWidth: number, _: number): Rectangle => {
   return {
     x: 0,
     y: 0,
     width: windowWidth,
-    height: windowHeight * TOPBAR_HEIGHT,
+    height: TOPBAR_HEIGHT_PX,
   };
 };
 
 export const getSideBarRect = (
   windowWidth: number,
-  windowHeight: number,
+  windowHeight: number
 ): Rectangle => {
   const topBar = getTopBarRect(windowWidth, windowHeight);
   return {
@@ -30,7 +27,7 @@ export const getSideBarRect = (
 
 export const getMainTabRect = (
   windowWidth: number,
-  windowHeight: number,
+  windowHeight: number
 ): Rectangle => {
   const sideBar = getSideBarRect(windowWidth, windowHeight);
   return {

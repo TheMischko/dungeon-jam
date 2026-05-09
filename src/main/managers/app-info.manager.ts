@@ -108,7 +108,6 @@ export class AppInfoManager {
     this.logger.log('Broadcasting application ready event');
     this.viewManager.broadcast(GeneralChannels.APP_READY);
     setInterval(() => {
-      this.logger.log('Broadcasting application ready event');
       this.viewManager.broadcast(GeneralChannels.APP_READY);
     }, 500);
   }

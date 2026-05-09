@@ -2,6 +2,7 @@ import {
   AudioLinesIcon,
   ChevronDownIcon,
   ChevronUpIcon,
+  CopyIcon,
   EllipsisVerticalIcon,
   Grid2x2Icon,
   Grid3x3Icon,
@@ -10,6 +11,7 @@ import {
   ListMusicIcon,
   ListStartIcon,
   LoaderCircleIcon,
+  MinusIcon,
   Music2Icon,
   PauseIcon,
   PencilIcon,
@@ -20,6 +22,7 @@ import {
   ShuffleIcon,
   SkipBackIcon,
   SkipForwardIcon,
+  SquareIcon,
   SquarePlusIcon,
   Trash2Icon,
   Volume1Icon,
@@ -57,6 +60,10 @@ export const actionsIconSet = {
   ExpandedArrowIcon: ChevronUpIcon,
   ShuffleIcon: ShuffleIcon,
   UploadImageIcon: ImageUpIcon,
+  CloseAppIcon: XIcon,
+  MinimizeIcon: MinusIcon,
+  MaximizeIcon: SquareIcon,
+  UnmaximizeIcon: CopyIcon,
 };
 
 export const volumeIconSet = {

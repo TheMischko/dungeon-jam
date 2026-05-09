@@ -1,11 +1,15 @@
 @if (showControls()) {
-  <app-window-control-button (click)="minimize()"
-    >Minimize</app-window-control-button
-  >
-  <app-window-control-button (click)="maximize()"
-    >Maximize</app-window-control-button
-  >
-  <app-window-control-button (click)="closeApp()"
-    >Close</app-window-control-button
-  >
+  <app-window-control-button (click)="minimize()" [icon]="MinimizeIcon" />
+
+  @if (showUnmaximizeButton()) {
+    <app-window-control-button
+      class="unmaximize-icon"
+      (click)="unmaximize()"
+      [icon]="UnmaximizeIcon"
+    />
+  } @else {
+    <app-window-control-button (click)="maximize()" [icon]="MaximizeIcon" />
+  }
+
+  <app-window-control-button (click)="closeApp()" [icon]="CloseIcon" />
 }
