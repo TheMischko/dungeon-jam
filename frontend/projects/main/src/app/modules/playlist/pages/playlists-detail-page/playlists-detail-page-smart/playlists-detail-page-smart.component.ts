@@ -37,6 +37,10 @@ import {
 } from '../../../modals/update-playlist-modal/update-playlist-modal.component';
 import { ImageApiService } from '@general/services/image-api.service';
 import { FilterQuery } from '@shared/models/filter.model';
+import {
+  DiscoverTracksModalComponent,
+  DiscoverTracksModalData,
+} from '../../../../library/modals/discover-tracks-modal/discover-tracks-modal.component';
 
 @Component({
   selector: 'app-playlists-detail-page-smart',
@@ -270,5 +274,31 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
 
   protected updateIncludeChildren(include: boolean) {
     this.currentIncludeChildren.set(include);
+  }
+
+  protected openDiscoverModal() {
+    const dialog = this.dialogService.open<
+      DiscoverTracksModalComponent,
+      { selectedTracks: Track[]; again: boolean }
+    >(DiscoverTracksModalComponent, {
+      data: {
+        playlist: this.playlist(),
+      } as DiscoverTracksModalData,
+    });
+
+    dialog.afterClosed$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(
+        (result: { selectedTracks: Track[]; again: boolean } | undefined) => {
+          const triggerRepeat = result?.again
+            ? () => setTimeout(() => this.openDiscoverModal(), 1000)
+            : () => {};
+          if (!result || result.selectedTracks.length === 0) {
+            return triggerRepeat();
+          }
+          this.addTracksToPlaylist(result.selectedTracks);
+          return triggerRepeat();
+        }
+      );
   }
 }

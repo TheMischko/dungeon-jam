@@ -63,6 +63,7 @@ export class PlaylistsDetailPageComponent {
   readonly includeChildren = output<boolean>();
   readonly editPlaylist = output<void>();
   readonly deletePlaylist = output<void>();
+  readonly openDiscover = output<void>();
 
   readonly parentDetailRoute = computed(() => {
     const parent = this.parentPlaylist();

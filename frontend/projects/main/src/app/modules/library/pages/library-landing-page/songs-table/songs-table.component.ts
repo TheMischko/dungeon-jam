@@ -1,6 +1,7 @@
 import {
   Component,
-  computed, effect,
+  computed,
+  effect,
   input,
   output,
   signal,
@@ -32,7 +33,11 @@ import {
 import { SmartTableComponent } from '../../../../../components/table/smart-table/smart-table.component';
 import { QueryOptions } from '@shared/models/request.model';
 import { SignalPaginationService } from '@general/services/signal-pagination.service';
-import { DEFAULT_PAGE_SIZE, DEFAULT_PAGINATION_PAGES, PaginationConfig } from '../../../../../models/pagination.model';
+import {
+  DEFAULT_PAGE_SIZE,
+  DEFAULT_PAGINATION_PAGES,
+  PaginationConfig,
+} from '../../../../../models/pagination.model';
 import { PageEvent } from '@angular/material/paginator';
 
 @Component({
@@ -58,7 +63,7 @@ export class SongsTableComponent {
   readonly actionsMenuConfig = input<ActionsMenuConfig<Track, Playlist>[]>([]);
   readonly selection = input<boolean>(false);
   readonly allSelectedState = input<'checked' | 'unchecked' | 'indeterminate'>(
-    'unchecked',
+    'unchecked'
   );
   readonly loading = input<boolean>(false);
   readonly showActionsColumn = input<boolean>(true);
@@ -66,12 +71,15 @@ export class SongsTableComponent {
   readonly showFilters = input<boolean>(true);
   readonly showPlayWithSelection = input<boolean>(false);
   readonly hiddenColumns = input<(keyof Track)[]>([]);
+  readonly paginationPages = input<number[] | undefined>(undefined);
+  readonly initialPageSize = input<number>(DEFAULT_PAGE_SIZE);
 
   readonly queryChange = output<QueryOptions>();
   readonly playTrack = output<Track>();
   readonly pauseTrack = output();
   readonly actionMenuClosed = output<MenuCloseReason | string>();
   readonly selectionChange = output<Track[]>();
+  readonly pageSizeChange = output<number>();
 
   readonly playColumnTemplate =
     viewChild.required<TemplateRef<{ $implicit: Track }>>('playColumn');
@@ -88,20 +96,22 @@ export class SongsTableComponent {
 
   readonly activeRow = signal<Track | null>(null);
   readonly currentSearchValue = signal<string>('');
-  readonly paginatedTracks = computed(() => this.paginationService?.currentPageData() ?? []);
+  readonly paginatedTracks = computed(
+    () => this.paginationService?.currentPageData() ?? []
+  );
 
   readonly paginationConfig = computed<PaginationConfig>(() => ({
-    pageSizeOptions: DEFAULT_PAGINATION_PAGES,
-    pageSize: this.paginationService?.pageSize() ?? DEFAULT_PAGE_SIZE,
+    pageSizeOptions: this.paginationPages() ?? DEFAULT_PAGINATION_PAGES,
+    pageSize: this.paginationService?.pageSize(),
     totalItems: this.paginationService?.totalItems() ?? 0,
-    currentPageIndex: this.paginationService?.currentPageIndex() ?? 0
+    currentPageIndex: this.paginationService?.currentPageIndex() ?? 0,
   }));
 
   readonly shouldShowPlayCol = computed<boolean>(() => {
     const selection = this.selection();
     const showPlay = this.showPlayWithSelection();
     return !(selection && !showPlay);
-  })
+  });
 
   readonly tableConfig = computed<TableColumnConfiguration<Track>>(() => ({
     ...(this.shouldShowPlayCol() && {
@@ -147,15 +157,17 @@ export class SongsTableComponent {
 
   constructor() {
     this.paginationService = SignalPaginationService.create(this.tracks);
-    this.paginationService.pageSize.set(this.paginationConfig().pageSize);
+    effect(() => {
+      const pageSize = this.initialPageSize();
+      this.paginationService.pageSize.set(pageSize);
+    });
 
     effect(() => {
-      if(this.loading()){
+      if (this.loading()) {
         this.paginationService.resetPage();
       }
-    })
+    });
   }
-
 
   hoverStart(track: Track) {
     this.activeRow.set(track);
@@ -202,5 +214,6 @@ export class SongsTableComponent {
   protected updatePaginationState(event: PageEvent) {
     this.paginationService.pageSize.set(event.pageSize);
     this.paginationService.goToPage(event.pageIndex);
+    this.pageSizeChange.emit(event.pageSize);
   }
 }

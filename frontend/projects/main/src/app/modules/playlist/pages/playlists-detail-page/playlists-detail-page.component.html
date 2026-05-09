@@ -1,10 +1,6 @@
 <div class="header">
-  @if(playlistImageUrl(); as imageUrl){
-    <img
-      class="playlist-image"
-      [src]="imageUrl"
-      [alt]="playlist()?.name"
-    />
+  @if (playlistImageUrl(); as imageUrl) {
+    <img class="playlist-image" [src]="imageUrl" [alt]="playlist()?.name" />
   }
   <div class="header-content">
     <div class="header-info">
@@ -30,10 +26,20 @@
         (toggle)="playPauseClicked($event)"
       ></lib-play-pause-button>
 
-      <button mat-flat-button (click)="editPlaylist.emit()">Edit playlist</button>
-      <button mat-flat-button (click)="deletePlaylist.emit()" color="error">Delete playlist</button>
+      <button mat-flat-button (click)="editPlaylist.emit()">
+        Edit playlist
+      </button>
+      <button mat-flat-button (click)="openDiscover.emit()">
+        Discover new tracks
+      </button>
+      <button mat-flat-button (click)="deletePlaylist.emit()" color="error">
+        Delete playlist
+      </button>
     </div>
-    <lib-tag-list-smart class="playlist-tags" [tagIds]="playlist()?.tags ?? []"/>
+    <lib-tag-list-smart
+      class="playlist-tags"
+      [tagIds]="playlist()?.tags ?? []"
+    />
   </div>
 </div>
 

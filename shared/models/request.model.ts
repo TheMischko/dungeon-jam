@@ -22,7 +22,7 @@ export type QueryOptions = QueryRequest;
 
 export interface BatchRequest extends QueryRequest {
   batchSize: number;
-  random?: string;
+  random?: boolean;
 }
 
 export interface PlaylistDiscoverBatchRequest extends BatchRequest {

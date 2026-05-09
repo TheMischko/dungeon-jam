@@ -94,10 +94,7 @@
       ></mat-row>
     </mat-table>
     @let paginationConfig = pagination();
-    @if (
-      paginationConfig &&
-      paginationConfig.totalItems > paginationConfig.pageSize
-    ) {
+    @if (paginationConfig) {
       <mat-paginator
         [length]="paginationConfig.totalItems"
         [pageSize]="paginationConfig.pageSize"
