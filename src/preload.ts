@@ -2,6 +2,7 @@ import { contextBridge, ipcRenderer } from 'electron';
 import { GeneralChannels } from '@shared/models/channels.model';
 import TrackApi from './preload/track-api';
 import { RedirectRequest } from '@shared/models/redirect.model';
+import { OperatingSystem } from '@shared/models/application.model';
 import AudioFileApi from './preload/audio-file-api';
 import PlaybackApi from './preload/playback-api';
 import PlaylistApi from './preload/playlist-api';
@@ -26,6 +27,18 @@ const generalApi = {
     ipcRenderer.on(GeneralChannels.APP_READY, () => {
       callback();
     });
+  },
+  closeApp(): Promise<void> {
+    return ipcRenderer.invoke(GeneralChannels.CLOSE_APP);
+  },
+  minimizeApp(): Promise<void> {
+    return ipcRenderer.invoke(GeneralChannels.MINIMIZE_APP);
+  },
+  maximizeApp(): Promise<void> {
+    return ipcRenderer.invoke(GeneralChannels.MAXIMIZE_APP);
+  },
+  getOS(): Promise<OperatingSystem> {
+    return ipcRenderer.invoke(GeneralChannels.GET_OS);
   },
 };
 

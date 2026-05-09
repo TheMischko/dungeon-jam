@@ -59,7 +59,7 @@ export class ViewManager {
       );
 
       if (config.env !== 'production') {
-        frontendTab.tab.webContents.openDevTools({
+        topBarTab.tab.webContents.openDevTools({
           mode: 'detach',
         });
       }

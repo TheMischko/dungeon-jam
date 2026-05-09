@@ -11,6 +11,7 @@ import { getDefaultViewConfig } from './view.config';
 import { DiscordTokenManager } from '../managers/discord-token.manager';
 import { SoundEffectManager } from '../managers/sound-effect.manager';
 import { ImageManager } from '../managers/image.manager';
+import { AppInfoManager } from '../managers/app-info.manager';
 
 /**
  * Manager initialization configuration
@@ -21,6 +22,12 @@ export function getManagersInitConfig(
 ): { name: string; initFunction: (env: string) => Promise<void> }[] {
   const viewConfig = getDefaultViewConfig(buildPath);
   return [
+    {
+      name: 'AppInfo',
+      initFunction: async () => {
+        await AppInfoManager.getInstance();
+      },
+    },
     {
       name: 'StoredPlayback',
       initFunction: async () => {

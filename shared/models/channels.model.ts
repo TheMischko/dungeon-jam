@@ -2,6 +2,9 @@ export enum GeneralChannels {
   GET_OS = 'GET_OS',
   REDIRECT = 'redirect',
   APP_READY = 'app/ready',
+  CLOSE_APP = 'app/close',
+  MINIMIZE_APP = 'app/minimize',
+  MAXIMIZE_APP = 'app/maximize',
 }
 
 export enum TrackChannel {

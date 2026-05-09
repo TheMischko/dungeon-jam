@@ -5,6 +5,7 @@ import { ViewManager } from './main/managers/view.manager';
 import { GeneralChannels } from '@shared/models/channels.model';
 import { Logger } from './main/utils/logger';
 import path from 'path';
+import { AppInfoManager } from './main/managers/app-info.manager';
 
 configDotenv();
 const ENV = process.env.ENV || 'production';
@@ -29,7 +30,8 @@ app.on('ready', async () => {
       app.quit();
       return;
     } else {
-      await sendAppReadySignal();
+      const appInfoManager = await AppInfoManager.getInstance();
+      await appInfoManager.sendAppReadySignal();
     }
     await startupManager.afterAllInitialized();
   } catch (e) {
@@ -47,11 +49,3 @@ app.on('window-all-closed', () => {
 app.on('before-quit', async () => {
   await startupManager.onAppEnd();
 });
-
-const sendAppReadySignal = async () => {
-  const viewManager = await ViewManager.getInstance();
-  viewManager.broadcast(GeneralChannels.APP_READY);
-  setInterval(() => {
-    viewManager.broadcast(GeneralChannels.APP_READY);
-  }, 500);
-};
