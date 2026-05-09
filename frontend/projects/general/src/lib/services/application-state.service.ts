@@ -13,6 +13,8 @@ export class ApplicationStateService {
   private operatingSystem = new BehaviorSubject<OperatingSystem | undefined>(
     undefined
   );
+  private isMinimized = new BehaviorSubject<boolean>(false);
+  private isMaximized = new BehaviorSubject<boolean>(false);
 
   public get applicationReady$() {
     return this.isApplicationReady.asObservable();
@@ -20,6 +22,14 @@ export class ApplicationStateService {
 
   public get operatingSystem$() {
     return this.operatingSystem.asObservable();
+  }
+
+  public get isMinimized$(): Observable<boolean> {
+    return this.isMinimized.asObservable();
+  }
+
+  public get isMaximized$(): Observable<boolean> {
+    return this.isMaximized.asObservable();
   }
 
   constructor() {
@@ -30,6 +40,14 @@ export class ApplicationStateService {
       this.isApplicationReady.next(true);
 
       await this.updateOSInfo();
+    });
+
+    this.window.GENERAL_API.onAppMinimized((isMinimized) => {
+      this.isMinimized.next(isMinimized);
+    });
+
+    this.window.GENERAL_API.onAppMaximized((isMaximized) => {
+      this.isMaximized.next(isMaximized);
     });
   }
 
@@ -69,6 +87,22 @@ export class ApplicationStateService {
     const subject = new Subject<void>();
 
     this.window.GENERAL_API.maximizeApp()
+      .then(() => {
+        subject.next();
+        subject.complete();
+      })
+      .catch((err) => {
+        subject.error(err);
+        subject.complete();
+      });
+
+    return subject;
+  }
+
+  public unmaximizeApp(): Observable<void> {
+    const subject = new Subject<void>();
+
+    this.window.GENERAL_API.unmaximizeApp()
       .then(() => {
         subject.next();
         subject.complete();

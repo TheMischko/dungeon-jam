@@ -37,6 +37,19 @@ const generalApi = {
   maximizeApp(): Promise<void> {
     return ipcRenderer.invoke(GeneralChannels.MAXIMIZE_APP);
   },
+  unmaximizeApp(): Promise<void> {
+    return ipcRenderer.invoke(GeneralChannels.UNMAXIMIZE_APP);
+  },
+  onAppMinimized(callback: (isMinimized: boolean) => void | Promise<void>) {
+    ipcRenderer.on(GeneralChannels.APP_MINIMIZED, (_, isMinimized: boolean) => {
+      callback(isMinimized);
+    });
+  },
+  onAppMaximized(callback: (isMaximized: boolean) => void | Promise<void>) {
+    ipcRenderer.on(GeneralChannels.APP_MAXIMIZED, (_, isMaximized: boolean) => {
+      callback(isMaximized);
+    });
+  },
   getOS(): Promise<OperatingSystem> {
     return ipcRenderer.invoke(GeneralChannels.GET_OS);
   },

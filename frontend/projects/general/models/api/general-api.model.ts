@@ -12,6 +12,9 @@ export type GeneralApiModel = Window &
       closeApp: () => Promise<void>;
       minimizeApp: () => Promise<void>;
       maximizeApp: () => Promise<void>;
+      unmaximizeApp: () => Promise<void>;
+      onAppMinimized: (callback: (isMinimized: boolean) => void | Promise<void>) => void;
+      onAppMaximized: (callback: (isMaximized: boolean) => void | Promise<void>) => void;
       getOS: () => Promise<OperatingSystem>;
     };
   };
