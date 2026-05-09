@@ -5,6 +5,9 @@ export enum GeneralChannels {
   CLOSE_APP = 'app/close',
   MINIMIZE_APP = 'app/minimize',
   MAXIMIZE_APP = 'app/maximize',
+  UNMAXIMIZE_APP = 'app/unmaximize',
+  APP_MINIMIZED = 'app/minimized',
+  APP_MAXIMIZED = 'app/maximized',
 }
 
 export enum TrackChannel {

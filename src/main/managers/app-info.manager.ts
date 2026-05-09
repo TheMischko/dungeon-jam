@@ -39,6 +39,12 @@ export class AppInfoManager {
       this.logger.log('Maximizing Application via API.');
       return this.maximizeApp();
     });
+    ipcMain.handle(GeneralChannels.UNMAXIMIZE_APP, () => {
+      this.logger.log('Unmaximizing Application via API.');
+      return this.unmaximizeApp();
+    });
+
+    this.registerEventHandlersBroadcast();
   }
 
   public getOS(): OperatingSystem {
@@ -68,9 +74,41 @@ export class AppInfoManager {
     this.viewManager.appWindow.maximize();
   }
 
+  public unmaximizeApp() {
+    this.viewManager.appWindow.unmaximize();
+  }
+
+  public registerEventHandlersBroadcast(): void {
+    this.viewManager.appWindow.on('minimize', () => {
+      this.logger.log('Broadcasting minimize event');
+      this.viewManager.broadcast(GeneralChannels.APP_MINIMIZED, null, true);
+    });
+    this.viewManager.appWindow.on('restore', () => {
+      this.logger.log('Broadcasting restore event (minimized false)');
+      this.viewManager.broadcast(GeneralChannels.APP_MINIMIZED, null, false);
+    });
+    this.viewManager.appWindow.on('maximize', () => {
+      this.logger.log('Broadcasting maximize event');
+      this.viewManager.broadcast(GeneralChannels.APP_MAXIMIZED, null, true);
+    });
+    this.viewManager.appWindow.on('unmaximize', () => {
+      this.logger.log('Broadcasting unmaximize event');
+      this.viewManager.broadcast(GeneralChannels.APP_MAXIMIZED, null, false);
+    });
+    this.viewManager.appWindow.on('resized', () => {
+      if (!this.viewManager.appWindow.isMaximized()) {
+        return;
+      }
+      this.logger.log('Broadcasting unmaximize event by resizing');
+      this.viewManager.broadcast(GeneralChannels.APP_MAXIMIZED, null, false);
+    });
+  }
+
   public sendAppReadySignal() {
+    this.logger.log('Broadcasting application ready event');
     this.viewManager.broadcast(GeneralChannels.APP_READY);
     setInterval(() => {
+      this.logger.log('Broadcasting application ready event');
       this.viewManager.broadcast(GeneralChannels.APP_READY);
     }, 500);
   }

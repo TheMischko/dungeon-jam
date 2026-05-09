@@ -23,12 +23,6 @@ export function getManagersInitConfig(
   const viewConfig = getDefaultViewConfig(buildPath);
   return [
     {
-      name: 'AppInfo',
-      initFunction: async () => {
-        await AppInfoManager.getInstance();
-      },
-    },
-    {
       name: 'StoredPlayback',
       initFunction: async () => {
         await StoredPlaybackManager.getInstance();
@@ -41,6 +35,12 @@ export function getManagersInitConfig(
           ...viewConfig,
           env,
         });
+      },
+    },
+    {
+      name: 'AppInfo',
+      initFunction: async () => {
+        await AppInfoManager.getInstance();
       },
     },
     {
