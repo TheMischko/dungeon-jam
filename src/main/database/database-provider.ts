@@ -15,7 +15,7 @@ export class DatabaseProvider<T> {
   private readonly idColumn: keyof T;
   private readonly search: SearchFn<T>;
   private readonly sort: SortFn<T>;
-  private readonly filter: FilterFn<T>
+  private readonly filter: FilterFn<T>;
 
   constructor(
     private database: DatabaseWrapper,
@@ -40,22 +40,25 @@ export class DatabaseProvider<T> {
 
     if (query?.search) {
       const searchResults = await Promise.all(
-        data.map((item: T) => this.search(item, query.search!.toLowerCase())),
+        data.map((item: T) => this.search(item, query.search!.toLowerCase()))
       );
       data = data.filter((_, index) => searchResults[index]);
     }
 
-    if(query?.filters) {
-      const filters = new FilterQuery(query.filters['_matchType'], query.filters['_filters']);
+    if (query?.filters) {
+      const filters = new FilterQuery(
+        query.filters['_matchType'],
+        query.filters['_filters']
+      );
       const filterResults = await Promise.all(
         data.map((item: T) => this.filter(item, filters))
-      )
+      );
       data = data.filter((_, index) => filterResults[index]);
     }
 
     if (query?.sortBy && query?.sortDirection) {
       data = data.sort((a, b) =>
-        this.sort(a, b, query.sortBy!, query.sortDirection!),
+        this.sort(a, b, query.sortBy!, query.sortDirection!)
       );
     }
 
@@ -77,7 +80,7 @@ export class DatabaseProvider<T> {
   getSome<V>(
     column: keyof T,
     values: V[],
-    options: GetSomeOptions = DefaultGetSomeOptions,
+    options: GetSomeOptions = DefaultGetSomeOptions
   ): Promise<T[]> {
     return new Promise<T[]>(async (resolve) => {
       const data: T[] = await this.getAll();
@@ -86,14 +89,17 @@ export class DatabaseProvider<T> {
         return;
       }
       const result = data.filter((item) =>
-        this.getSomeFilter(item, column, values, options),
+        this.getSomeFilter(item, column, values, options)
       );
 
       resolve(result.slice(0, options.limit ?? undefined));
     });
   }
 
-  async getMatching<V>(matchingFn: (item: T) => boolean, queryOptions?: QueryOptions): Promise<T[]> {
+  async getMatching<V>(
+    matchingFn: (item: T) => boolean,
+    queryOptions?: QueryOptions
+  ): Promise<T[]> {
     const data: T[] = await this.getAll(queryOptions);
     return data.filter(matchingFn);
   }
@@ -117,11 +123,24 @@ export class DatabaseProvider<T> {
     });
   }
 
+  createMultiple(data: T[]): Promise<T[]> {
+    return new Promise(async (resolve) => {
+      const createData = data.map((item) => ({
+        [this.idColumn]: item[this.idColumn] ? item[this.idColumn] : uuid(),
+        ...item,
+      }));
+
+      const allData = await this.getAll();
+      await this.database.updateTable(this.table, [...allData, ...createData]);
+      resolve(createData);
+    });
+  }
+
   update<V>(column: keyof T, matchValue: V, newValue: T): Promise<T> {
     return new Promise<T>(async (resolve) => {
       const data = await this.getAll();
       const existingIndex = data.findIndex(
-        (item: T) => matchValue === (item[column] as V),
+        (item: T) => matchValue === (item[column] as V)
       );
 
       if (existingIndex === -1) {
@@ -140,7 +159,7 @@ export class DatabaseProvider<T> {
     return new Promise<boolean>(async (resolve) => {
       const data = await this.getAll();
       const deleteIndex = data.findIndex(
-        (item: T) => matchValue === (item[column] as V),
+        (item: T) => matchValue === (item[column] as V)
       );
 
       if (deleteIndex === -1) {
@@ -154,17 +173,26 @@ export class DatabaseProvider<T> {
     });
   }
 
+  deleteMultiple(matchingFn: (item: T) => boolean): Promise<boolean> {
+    return new Promise<boolean>(async (resolve) => {
+      const data = await this.getAll();
+      const filtered = data.filter((item) => !matchingFn(item));
+      await this.database.updateTable(this.table, filtered);
+      resolve(true);
+    });
+  }
+
   replaceRecord(newRecord: T): Promise<T> {
     return new Promise<T>(async (resolve, reject) => {
       const data = await this.getAll();
       const recordId = newRecord[this.idColumn];
       const existingIndex = data.findIndex(
-        (item: T) => recordId === item[this.idColumn],
+        (item: T) => recordId === item[this.idColumn]
       );
 
       if (existingIndex === -1) {
         reject(
-          `Record with id ${recordId} does not exist and cannot be replaced.`,
+          `Record with id ${recordId} does not exist and cannot be replaced.`
         );
         return;
       }
@@ -179,7 +207,7 @@ export class DatabaseProvider<T> {
     item: T,
     column: keyof T,
     matchValues: V[],
-    options: GetSomeOptions,
+    options: GetSomeOptions
   ): boolean {
     const itemValue = item[column];
     switch (options.match) {
@@ -195,7 +223,7 @@ export class DatabaseProvider<T> {
   private contains<V>(value: V, matchValues: V[]) {
     if (typeof value === 'string') {
       return matchValues.some((toMatch) =>
-        (<string>value).toLowerCase().includes((<string>toMatch).toLowerCase()),
+        (<string>value).toLowerCase().includes((<string>toMatch).toLowerCase())
       );
     }
     return false;
@@ -204,7 +232,7 @@ export class DatabaseProvider<T> {
   private startsWith<V>(value: V, matchValues: V[]) {
     if (typeof value === 'string') {
       return matchValues.some((toMatch) =>
-        (<string>value).startsWith(<string>toMatch),
+        (<string>value).startsWith(<string>toMatch)
       );
     }
     return false;
@@ -217,17 +245,17 @@ export class DatabaseProvider<T> {
 
 export type SearchFn<T> = (
   item: T,
-  filter: string,
+  filter: string
 ) => boolean | Promise<boolean>;
 
 export type SortFn<T> = (
   itemA: T,
   itemB: T,
   sortBy: string,
-  direction: SortDirection,
+  direction: SortDirection
 ) => number;
 
 export type FilterFn<T> = (
   item: T,
   filterQuery: FilterQuery
-) => boolean | Promise<boolean>
+) => boolean | Promise<boolean>;

@@ -12,6 +12,7 @@ import { DiscordTokenManager } from '../managers/discord-token.manager';
 import { SoundEffectManager } from '../managers/sound-effect.manager';
 import { ImageManager } from '../managers/image.manager';
 import { AppInfoManager } from '../managers/app-info.manager';
+import { DisplayOrderManager } from '../managers/display-order.manager';
 
 /**
  * Manager initialization configuration
@@ -59,6 +60,12 @@ export function getManagersInitConfig(
       name: 'ImageManager',
       initFunction: async () => {
         await ImageManager.getInstance();
+      },
+    },
+    {
+      name: 'DisplayOrder',
+      initFunction: async () => {
+        await DisplayOrderManager.getInstance();
       },
     },
     {

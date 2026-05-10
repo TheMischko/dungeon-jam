@@ -4,6 +4,8 @@ import {
   PlaylistAddTracksData,
   PlaylistFetchQuery,
   PlaylistInsertQuery,
+  PlaylistOrderContext,
+  PlaylistReorderQuery,
   PlaylistUpdateQuery,
 } from '@shared/models/playlist.model';
 import { ipcMain } from 'electron';
@@ -17,6 +19,12 @@ import { GetSomeMatch } from '../database/database-provider.model';
 import { PlaylistHelper } from '../utils/playlist-helper';
 import { ImageEntityType, ImageManager } from './image.manager';
 import { Logger } from '../utils/logger';
+import { DisplayOrderManager } from './display-order.manager';
+import {
+  DisplayOrder,
+  DisplayOrderBase,
+  OrderableEntityType,
+} from '@shared/models/display-order.model';
 
 export class PlaylistManager {
   private static _instance: PlaylistManager;
@@ -25,7 +33,8 @@ export class PlaylistManager {
   private constructor(
     private database: DatabaseWrapper,
     private playlistProvider: DatabaseProvider<Playlist>,
-    private imageManager: ImageManager
+    private imageManager: ImageManager,
+    private displayOrderManager: DisplayOrderManager
   ) {}
 
   public static async getInstance() {
@@ -41,10 +50,12 @@ export class PlaylistManager {
         )
         .complete();
       const imageManager = await ImageManager.getInstance();
+      const orderManager = await DisplayOrderManager.getInstance();
       PlaylistManager._instance = new PlaylistManager(
         database,
         provider,
-        imageManager
+        imageManager,
+        orderManager
       );
       PlaylistManager._instance.registerChannels();
     }
@@ -54,7 +65,7 @@ export class PlaylistManager {
   private registerChannels(): void {
     ipcMain.handle(PlaylistChannel.GET_ALL, async (_, query?: QueryRequest) => {
       this.logger.log('Getting playlist channels', { query });
-      return await this.playlistProvider.getAll(query);
+      return await this.getAllPlaylists(query);
     });
     ipcMain.handle(PlaylistChannel.GET_BY_ID, async (_, id: string) => {
       this.logger.log('Getting playlist by id', { id });
@@ -81,6 +92,40 @@ export class PlaylistManager {
         return await this.update(query);
       }
     );
+    ipcMain.handle(
+      PlaylistChannel.CHANGE_ORDER,
+      async (_, query: PlaylistReorderQuery) => {
+        this.logger.log('Changing order of a playlist', { query });
+        return await this.changePlaylistOrder(query);
+      }
+    );
+  }
+
+  async getAllPlaylists(query?: QueryRequest): Promise<Playlist[]> {
+    const playlists = await this.playlistProvider.getAll(query);
+
+    let orderMap = await this.displayOrderManager.getOrderMap(
+      OrderableEntityType.Playlist,
+      PlaylistOrderContext.Landing
+    );
+    if (orderMap.size !== playlists.length) {
+      orderMap = await this.repairOrderRecords(
+        playlists,
+        orderMap,
+        PlaylistOrderContext.Landing
+      );
+    }
+
+    if (!query?.sortBy) {
+      playlists.sort((a, b) => {
+        const orderA = orderMap.get(a.id)!;
+        const orderB = orderMap.get(b.id)!;
+
+        return (orderA?.order ?? 0) - (orderB?.order ?? 0);
+      });
+    }
+
+    return playlists;
   }
 
   async insert(query: PlaylistInsertQuery): Promise<Playlist> {
@@ -297,6 +342,16 @@ export class PlaylistManager {
     return playlist.trackIds.includes(trackId);
   }
 
+  async changePlaylistOrder(query: PlaylistReorderQuery): Promise<void> {
+    return await this.displayOrderManager.setDisplayOrder(
+      query.playlistId,
+      query.newOrder,
+      OrderableEntityType.Playlist,
+      query.contextType,
+      query.contextId
+    );
+  }
+
   private createNewPlaylist(
     data: PlaylistInsertQuery,
     order: number
@@ -404,5 +459,38 @@ export class PlaylistManager {
     }
     // Check if filter matches any tag
     return playlist.tags.some((tag) => tag.toLowerCase().includes(filterLower));
+  }
+
+  private async repairOrderRecords(
+    playlists: Playlist[],
+    orderMap: Map<string, DisplayOrder>,
+    contextType: string,
+    contextId?: string
+  ) {
+    const healedRecords: DisplayOrderBase[] = [];
+
+    playlists
+      .sort((a, b) => {
+        const orderA =
+          orderMap.get(a.id)?.order ?? a?.dateUpdated?.getTime?.() ?? 0;
+        const orderB =
+          orderMap.get(b.id)?.order ?? b?.dateUpdated?.getTime?.() ?? 0;
+        return orderA - orderB;
+      })
+      .forEach((playlist, index) => {
+        healedRecords.push({
+          entityId: playlist.id,
+          order: index,
+        });
+      });
+
+    const newOrder = await this.displayOrderManager.replaceCollection(
+      healedRecords,
+      OrderableEntityType.Playlist,
+      contextType,
+      contextId
+    );
+
+    return new Map(newOrder.map((r) => [r.entityId, r]));
   }
 }

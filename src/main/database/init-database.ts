@@ -3,6 +3,7 @@ import { Playlist } from '@shared/models/playlist.model';
 import { TagData } from '@shared/models/tag.model';
 import { DiscordTokenData } from '@shared/models/discord.model';
 import { SoundEffect } from '@shared/models/sound-effect.model';
+import { DisplayOrder } from '@shared/models/display-order.model';
 
 export function initDatabase() {
   return {
@@ -12,6 +13,7 @@ export function initDatabase() {
     tags: initTags(),
     discordTokens: initDiscordTokens(),
     soundEffects: initSoundEffects(),
+    displayOrder: initDisplayOrder(),
   };
 }
 export type DatabaseSchema = ReturnType<typeof initDatabase>;
@@ -40,5 +42,9 @@ function initDiscordTokens(): DiscordTokenData[] {
 }
 
 function initSoundEffects(): SoundEffect[] {
+  return [];
+}
+
+function initDisplayOrder(): DisplayOrder[] {
   return [];
 }

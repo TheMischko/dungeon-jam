@@ -39,6 +39,7 @@ export class PlaylistGridSmartComponent implements OnInit {
   readonly imageApiService = inject(ImageApiService);
 
   readonly showControls = input<boolean>(true);
+  readonly limit = input<number | undefined>(undefined);
 
   readonly playlistImageMap = signal<Record<string, string | null>>({});
   readonly sizeSliderValue = signal<number>(0.75);
@@ -52,13 +53,18 @@ export class PlaylistGridSmartComponent implements OnInit {
       return [];
     }
     const tags = untracked(() => this.tagsStore.entityMap());
-    return this.playlistStore.entities().map((playlist) => {
-      const playlistTags = playlist.tags.map((t) => tags[t]).filter((t) => !!t);
-      return {
-        ...playlist,
-        tags: playlistTags,
-      };
-    });
+    const playlists = this.playlistStore.entities();
+    return playlists
+      .map((playlist) => {
+        const playlistTags = playlist.tags
+          .map((t) => tags[t])
+          .filter((t) => !!t);
+        return {
+          ...playlist,
+          tags: playlistTags,
+        };
+      })
+      .slice(0, this.limit() ?? playlists.length);
   });
 
   readonly loading = computed<boolean>(() => {

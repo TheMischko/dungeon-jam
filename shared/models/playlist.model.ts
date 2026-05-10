@@ -36,7 +36,7 @@ export interface PlaylistUpdateQuery {
   parentPlaylistId?: string;
 }
 
-export interface PlaylistFetchQuery extends QueryRequest{
+export interface PlaylistFetchQuery extends QueryRequest {
   groupByParent?: boolean;
   hideChildren?: boolean;
 }
@@ -45,3 +45,15 @@ export interface PlaylistFetchQuery extends QueryRequest{
  * Collection of track IDs under playlist ID keys.
  */
 export type PlaylistAddTracksData = { [playlistId: string]: string[] };
+
+export interface PlaylistReorderQuery {
+  playlistId: string;
+  newOrder: number;
+  contextType: PlaylistOrderContext;
+  contextId?: string;
+}
+
+export enum PlaylistOrderContext {
+  Landing = 'landing',
+  Parent = 'parent',
+}

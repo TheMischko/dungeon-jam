@@ -39,6 +39,7 @@ export enum PlaylistChannel {
   INSERT = 'playlists/insert',
   ADD_TRACKS = 'playlists/add-tracks',
   UPDATE = 'playlists/update',
+  CHANGE_ORDER = 'playlists/change-order',
 }
 
 export enum TagChannel {
