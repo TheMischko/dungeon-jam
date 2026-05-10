@@ -6,6 +6,7 @@ import { iconSet } from '@general/icons/icons';
 import { PlaylistWithTagData } from '../../../../../../../../general/models/playlist.model';
 import { LoaderComponent } from '@general/components/display/loader/loader.component';
 import { GridPlaylistSizeConfig } from '../../../../../models/grid-item-size-config.model';
+import { CdkDrag, CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-playlist-grid',
@@ -14,6 +15,8 @@ import { GridPlaylistSizeConfig } from '../../../../../models/grid-item-size-con
     SearchBarComponent,
     RangeSliderComponent,
     LoaderComponent,
+    CdkDrag,
+    CdkDropList,
   ],
   templateUrl: './playlist-grid.component.html',
   styleUrl: './playlist-grid.component.scss',
@@ -25,12 +28,14 @@ export class PlaylistGridComponent {
   readonly playingPlaylistId = input<string | null>();
   readonly loading = input<boolean>(false);
   readonly showControls = input<boolean>(true);
+  readonly reorderingEnabled = input<boolean>(true);
 
   readonly sizeChange = output<number>();
   readonly playPlaylist = output<string>();
   readonly pausePlaylist = output<string>();
   readonly playlistClick = output<string>();
   readonly search = output<string>();
+  readonly reorderDrop = output<CdkDragDrop<PlaylistWithTagData[]>>();
 
   readonly gridBigIcon = iconSet.GridBigIcon;
   readonly gridSmallIcon = iconSet.GridSmallIcon;
@@ -49,5 +54,10 @@ export class PlaylistGridComponent {
 
   sizeInput(value: number) {
     this.sizeChange.emit(value / 100);
+  }
+
+  protected playlistDropped(event: CdkDragDrop<PlaylistWithTagData[]>) {
+    console.log(event);
+    this.reorderDrop.emit(event);
   }
 }

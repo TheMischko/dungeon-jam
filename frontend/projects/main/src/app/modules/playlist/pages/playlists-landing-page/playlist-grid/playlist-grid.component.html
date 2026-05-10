@@ -1,37 +1,60 @@
 <div class="wrapper">
-  @if(showControls()){
-  <div class="controls">
-    <div class="filters">Filters</div>
-    <div class="search">
-      <lib-search-bar (search)="search.emit($event)"></lib-search-bar>
+  @if (showControls()) {
+    <div class="controls">
+      <div class="filters">Filters</div>
+      <div class="search">
+        <lib-search-bar (search)="search.emit($event)"></lib-search-bar>
+      </div>
+      <div class="size-control">
+        <lib-range-slider
+          [minValue]="0"
+          [maxValue]="100"
+          [stepSize]="5"
+          [value]="75"
+          [prefix]="gridSmallIcon"
+          [suffix]="gridBigIcon"
+          (inputChange)="sizeInput($event)"
+        />
+      </div>
     </div>
-    <div class="size-control">
-      <lib-range-slider
-        [minValue]="0"
-        [maxValue]="100"
-        [stepSize]="5"
-        [value]="75"
-        [prefix]="gridSmallIcon"
-        [suffix]="gridBigIcon"
-        (inputChange)="sizeInput($event)"
-      />
-    </div>
-  </div>
   }
 
-  <div class="grid-content">
+  <div
+    class="grid-content"
+    cdkDropList
+    cdkDropListOrientation="mixed"
+    [cdkDropListData]="dataSet()"
+    (cdkDropListDropped)="playlistDropped($event)"
+  >
     @if (loading()) {
-    <lib-loader [center]="true" [size]="'large'"></lib-loader>
-    } @else { @for (playlist of dataSet(); track trackPlaylist(playlist)){
-    <app-playlist-grid-item
-      [playlist]="playlist"
-      [playlistImageUrl]="getPlaylistImageUrl(playlist)"
-      [sizeConfig]="sizeConfig()"
-      [isPlaying]="isPlaying(playlist.id)"
-      (playlistClick)="playlistClick.emit($event)"
-      (playPlaylist)="playPlaylist.emit($event)"
-      (pausePlaylist)="pausePlaylist.emit($event)"
-    ></app-playlist-grid-item>
-    } }
+      <lib-loader [center]="true" [size]="'large'"></lib-loader>
+    } @else {
+      @for (playlist of dataSet(); track trackPlaylist(playlist)) {
+        @if (reorderingEnabled()) {
+          <app-playlist-grid-item
+            cdkDrag
+            class="grid-item"
+            [cdkDragData]="playlist"
+            [playlist]="playlist"
+            [playlistImageUrl]="getPlaylistImageUrl(playlist)"
+            [sizeConfig]="sizeConfig()"
+            [isPlaying]="isPlaying(playlist.id)"
+            (playlistClick)="playlistClick.emit($event)"
+            (playPlaylist)="playPlaylist.emit($event)"
+            (pausePlaylist)="pausePlaylist.emit($event)"
+          ></app-playlist-grid-item>
+        } @else {
+          <app-playlist-grid-item
+            [playlist]="playlist"
+            [playlistImageUrl]="getPlaylistImageUrl(playlist)"
+            [sizeConfig]="sizeConfig()"
+            [isPlaying]="isPlaying(playlist.id)"
+            (playlistClick)="playlistClick.emit($event)"
+            (playPlaylist)="playPlaylist.emit($event)"
+            (pausePlaylist)="pausePlaylist.emit($event)"
+          ></app-playlist-grid-item>
+        }
+      }
+    }
   </div>
 </div>

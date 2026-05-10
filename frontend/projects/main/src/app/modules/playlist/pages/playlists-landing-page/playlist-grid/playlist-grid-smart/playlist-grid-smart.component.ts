@@ -23,6 +23,7 @@ import { TagsStore } from '@general/stores/tags.store';
 import { PlaylistWithTagData } from '../../../../../../../../../general/models/playlist.model';
 import { GridPlaylistSizeConfig } from '../../../../../../models/grid-item-size-config.model';
 import { ImageApiService } from '@general/services/image-api.service';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-playlist-grid-smart',
@@ -47,13 +48,14 @@ export class PlaylistGridSmartComponent implements OnInit {
   readonly sortDirection = signal<SortDirection>(SortDirection.ASC);
   readonly sortBy = signal<Extract<keyof Playlist, string>>('order');
 
+  readonly playlists = signal<Playlist[]>([]);
   readonly dataSet = computed<PlaylistWithTagData[]>(() => {
     const loading = this.loading();
     if (loading) {
       return [];
     }
     const tags = untracked(() => this.tagsStore.entityMap());
-    const playlists = this.playlistStore.entities();
+    const playlists = this.playlists();
     return playlists
       .map((playlist) => {
         const playlistTags = playlist.tags
@@ -76,8 +78,6 @@ export class PlaylistGridSmartComponent implements OnInit {
   });
   readonly queryOptions = computed<QueryRequest>(() => ({
     search: this.searchFilter(),
-    sortBy: this.sortBy(),
-    sortDirection: this.sortDirection(),
   }));
   readonly playingPlaylistId = toSignal(
     this.playbackService.playback$.pipe(
@@ -88,6 +88,7 @@ export class PlaylistGridSmartComponent implements OnInit {
   constructor() {
     effect(() => {
       const playlists = this.playlistStore.entities();
+      this.playlists.set(playlists);
       if (!playlists?.length) {
         return;
       }
@@ -169,6 +170,19 @@ export class PlaylistGridSmartComponent implements OnInit {
       }),
       map(() => void 0)
     );
+  }
+
+  protected reorderPlaylist(event: CdkDragDrop<PlaylistWithTagData[]>) {
+    const item = this.playlists()[event.previousIndex];
+    this.playlists.update((playlists) => {
+      const update = [...playlists];
+      moveItemInArray(update, event.previousIndex, event.currentIndex);
+      return update;
+    });
+    this.playlistStore.changeOrder({
+      playlistId: item.id,
+      newOrder: event.currentIndex,
+    });
   }
 }
 

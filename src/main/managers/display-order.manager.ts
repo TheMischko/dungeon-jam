@@ -147,11 +147,7 @@ export class DisplayOrderManager {
       (item, index) => item !== orderedEntityList[index]
     );
 
-    await Promise.all(
-      changedEntities.map((entity) =>
-        this.displayOrderProvider.replaceRecord(entity)
-      )
-    );
+    await this.displayOrderProvider.replaceMultiple(changedEntities);
   }
 
   public async replaceCollection(

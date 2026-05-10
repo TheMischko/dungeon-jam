@@ -58,6 +58,7 @@ export class PlaylistManager {
         orderManager
       );
       PlaylistManager._instance.registerChannels();
+      await PlaylistManager._instance.repairOrderRecordsInit();
     }
     return PlaylistManager._instance!;
   }
@@ -492,5 +493,22 @@ export class PlaylistManager {
     );
 
     return new Map(newOrder.map((r) => [r.entityId, r]));
+  }
+
+  private async repairOrderRecordsInit(): Promise<void> {
+    const currentAllPlaylists = await this.playlistProvider.getAll();
+    const currentLandingOrder = await this.displayOrderManager.getOrderMap(
+      OrderableEntityType.Playlist,
+      PlaylistOrderContext.Landing
+    );
+    if (currentAllPlaylists.length === currentLandingOrder.size) {
+      return;
+    }
+    this.logger.log('On init order mismatch, repairing orders.');
+    await this.repairOrderRecords(
+      currentAllPlaylists,
+      new Map(),
+      PlaylistOrderContext.Landing
+    );
   }
 }

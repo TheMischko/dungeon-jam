@@ -136,6 +136,27 @@ export class DatabaseProvider<T> {
     });
   }
 
+  replaceMultiple(data: T[]): Promise<T[]> {
+    return new Promise<T[]>(async (resolve) => {
+      const allData = await this.getAll();
+      const updatesMap = new Map(
+        data.map((item) => [item[this.idColumn], item])
+      );
+      const updatedData = allData.map((item) => {
+        const update = updatesMap.get(item[this.idColumn]);
+        if (!update) {
+          return item;
+        }
+        return {
+          ...item,
+          ...update,
+        };
+      });
+      await this.database.updateTable(this.table, updatedData);
+      resolve(data);
+    });
+  }
+
   update<V>(column: keyof T, matchValue: V, newValue: T): Promise<T> {
     return new Promise<T>(async (resolve) => {
       const data = await this.getAll();

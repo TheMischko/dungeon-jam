@@ -6,6 +6,7 @@ import {
   Playlist,
   PlaylistAddTracksData,
   PlaylistInsertQuery,
+  PlaylistOrderContext,
   PlaylistUpdateQuery,
 } from '@shared/models/playlist.model';
 
@@ -85,5 +86,29 @@ export class PlaylistApiService {
       id: playlistId,
       tracksRemoved: trackIds,
     });
+  }
+
+  reorderPlaylist(
+    playlistId: string,
+    newOrder: number,
+    context: PlaylistOrderContext,
+    parentId?: string
+  ): Observable<void> {
+    const subject = new Subject<void>();
+    this.window.PLAYLIST_API.changePlaylistOrder({
+      playlistId,
+      newOrder,
+      contextType: context,
+      contextId: parentId,
+    })
+      .then(() => {
+        subject.next();
+        subject.complete();
+      })
+      .catch((err) => {
+        subject.error(err);
+        subject.complete();
+      });
+    return subject;
   }
 }

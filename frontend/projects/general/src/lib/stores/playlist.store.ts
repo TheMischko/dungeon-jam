@@ -16,6 +16,7 @@ import {
   Playlist,
   PlaylistAddTracksData,
   PlaylistInsertQuery,
+  PlaylistOrderContext,
   PlaylistUpdateQuery,
 } from '@shared/models/playlist.model';
 import { inject } from '@angular/core';
@@ -156,12 +157,25 @@ export const PlaylistStore = signalStore(
       return playlistMap[parentId] || null;
     };
 
+    const changeOrder = rxMethod<{ playlistId: string; newOrder: number }>(
+      pipe(
+        switchMap((query) => {
+          return playlistApiService.reorderPlaylist(
+            query.playlistId,
+            query.newOrder,
+            PlaylistOrderContext.Landing
+          );
+        })
+      )
+    );
+
     return {
       load,
       insertNew,
       addNewTracks,
       getParent,
       updatePlaylist,
+      changeOrder,
     };
   })
 );
