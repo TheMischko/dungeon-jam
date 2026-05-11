@@ -68,6 +68,29 @@ export class PlaybackService implements OnDestroy {
     });
   }
 
+  /**
+   * Adds the tracks to queue and plays either first one or random based on shuffle state.
+   * @param trackList
+   * @param playlistId
+   */
+  async playTracks(trackList: Track[], playlistId?: string) {
+    const shuffle = this.state.getValue().shuffle;
+    let track: Track;
+    let queue: Track[];
+    if (shuffle) {
+      const startingTrackIndex = Math.ceil(Math.random() * trackList.length);
+      track = trackList[startingTrackIndex];
+      queue = [
+        ...trackList.slice(startingTrackIndex + 1),
+        ...trackList.slice(0, startingTrackIndex),
+      ];
+    } else {
+      track = trackList[0];
+      queue = trackList.slice(1);
+    }
+    await this.play(track, queue, playlistId);
+  }
+
   async play(track?: Track, queue?: Track[], playlistId?: string) {
     const current = this.state.getValue();
     if (queue && track) {

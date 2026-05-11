@@ -13,7 +13,6 @@ import { PlaylistTracksQuery, Track } from '@shared/models/track.model';
 import { PlaylistTracksStore } from '../../../../../stores/playlist-tracks.store';
 import { PlaylistApiService } from '@general/services/playlist-api.service';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { map } from 'rxjs';
 import { Playlist, PlaylistUpdateQuery } from '@shared/models/playlist.model';
 import { PlaylistsDetailPageComponent } from '../playlists-detail-page.component';
 import { PlaybackService } from '../../../../../services/playback.service';
@@ -85,18 +84,16 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
   });
 
   readonly playbackState = toSignal<PlaybackState | null>(
-    this.playbackService.playback$.pipe(
-      map((state) => {
-        if (state.playlistId !== this.playlistId()) {
-          return null;
-        }
-        return state;
-      })
-    ),
+    this.playbackService.playback$,
     { initialValue: null }
   );
   readonly isPlaylistPlaying = computed<boolean>(() => {
-    return this.playbackState()?.isPlaying ?? false;
+    const playbackState = this.playbackState();
+    return (
+      (playbackState?.isPlaying &&
+        playbackState.playlistId === this.playlistId()) ??
+      false
+    );
   });
   readonly playlistImageUrl = signal<string | null>(null);
   readonly currentFilter = signal<string>('');
@@ -157,11 +154,7 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
 
   async playPlaylist() {
     const tracks = this.tracks();
-    await this.playbackService.play(
-      tracks[0],
-      tracks.slice(1),
-      this.playlistId()
-    );
+    await this.playbackService.playTracks(tracks, this.playlistId());
   }
 
   openAddTracksModal() {

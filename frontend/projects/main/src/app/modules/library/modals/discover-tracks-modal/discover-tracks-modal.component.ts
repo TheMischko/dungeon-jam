@@ -108,12 +108,12 @@ export class DiscoverTracksModalComponent implements OnDestroy {
   protected async playTrack(track: Track) {
     this.trackPlayingSubscription?.unsubscribe();
     this.trackIdPlaying.set(null);
-    console.log(track);
     await this.audioPlayerService.play({
       ...track,
-      duration: 60,
+      duration: track.duration,
     });
-    this.audioPlayerService.seek(30);
+    const previewPos = track.duration <= 45 ? 10 : track.duration * 0.72;
+    this.audioPlayerService.seek(previewPos);
     this.trackPlayingSubscription = this.audioPlayerService.state$
       .pipe(takeUntilDestroyed(this.destroyRef), debounceTime(100))
       .subscribe((state) => {

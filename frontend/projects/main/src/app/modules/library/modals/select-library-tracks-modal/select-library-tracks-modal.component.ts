@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  DestroyRef,
+  inject,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Track } from '@shared/models/track.model';
 import { TrackService } from '../../../../services/track.service';
@@ -38,7 +46,7 @@ export class SelectLibraryTracksModalComponent implements OnInit {
   readonly tracksLoading = this.trackStore.loading;
   readonly selection = signal<Track[]>([]);
   readonly selectAllState = signal<'checked' | 'unchecked' | 'indeterminate'>(
-    'unchecked',
+    'unchecked'
   );
   readonly tracksQuery = signal<QueryOptions>({});
   readonly trackIdPlaying = signal<string | null>(null);
@@ -75,13 +83,17 @@ export class SelectLibraryTracksModalComponent implements OnInit {
     this.trackPlayingSubscription?.unsubscribe();
     this.trackIdPlaying.set(null);
     await this.audioPlayerService.play(track);
-    this.trackPlayingSubscription = this.audioPlayerService.state$.pipe(takeUntilDestroyed(this.destroyRef), debounceTime(100)).subscribe((state) => {
-      if(state === PlayingTrackState.PLAYING){
-        this.trackIdPlaying.set(track.id);
-      } else {
-        this.trackIdPlaying.set(null);
-      }
-    })
+    const previewPos = track.duration <= 40 ? 10 : track.duration * 0.72;
+    this.audioPlayerService.seek(previewPos);
+    this.trackPlayingSubscription = this.audioPlayerService.state$
+      .pipe(takeUntilDestroyed(this.destroyRef), debounceTime(100))
+      .subscribe((state) => {
+        if (state === PlayingTrackState.PLAYING) {
+          this.trackIdPlaying.set(track.id);
+        } else {
+          this.trackIdPlaying.set(null);
+        }
+      });
   }
 
   protected pauseTrack() {
