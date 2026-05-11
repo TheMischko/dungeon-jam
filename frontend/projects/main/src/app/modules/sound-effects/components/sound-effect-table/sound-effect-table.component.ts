@@ -13,7 +13,6 @@ import { TrackDurationPipe } from '@general/pipes/track-duration.pipe';
 import { TagListSmartComponent } from '@general/components/display/tag-list/tag-list-smart/tag-list-smart.component';
 import { PlayPauseButtonComponent } from '@general/components/buttons/play-pause-button/play-pause-button.component';
 import { RepeatStateButtonComponent } from '../../../../player/player/repeat-state-button/repeat-state-button.component';
-import { RepeatState } from '../../../../models/playback.model';
 import {
   ActionsMenuBaseConfig,
   ActionsMenuComponent,
@@ -22,6 +21,7 @@ import { IconButtonComponent } from '@general/components/buttons/icon-button/ico
 import { MatMenu, MatMenuTrigger } from '@angular/material/menu';
 import { actionsIconSet } from '@general/icons/icons';
 import { VolumeControlComponent } from '../../../../player/player/volume-control/volume-control.component';
+import { RepeatState } from '@shared/models/track.model';
 
 @Component({
   selector: 'app-sound-effect-table',

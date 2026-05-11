@@ -24,6 +24,8 @@ export interface FileBase64 {
 
 export interface StoredPlayback {
   volume: number;
+  shuffle: boolean;
+  repeat: RepeatState;
 }
 
 export interface PlaylistTracksQuery extends QueryRequest {
@@ -33,4 +35,10 @@ export interface PlaylistTracksQuery extends QueryRequest {
 
 export interface TaggedTracksQuery extends QueryRequest {
   tagId: string;
+}
+
+export enum RepeatState {
+  NONE,
+  SINGLE,
+  ALL,
 }

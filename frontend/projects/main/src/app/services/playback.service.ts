@@ -6,9 +6,8 @@ import {
   PlaybackTrackPosition,
   PlayingTrackState,
   QueueItem,
-  RepeatState,
 } from '../models/playback.model';
-import { StoredPlayback, Track } from '@shared/models/track.model';
+import { RepeatState, StoredPlayback, Track } from '@shared/models/track.model';
 import { AudioPlayerService } from './audio-player.service';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AudioApiWindow } from '../models/window-api.model';
@@ -64,7 +63,9 @@ export class PlaybackService implements OnDestroy {
 
   loadInitState() {
     this.window.PLAYBACK_API.loadState().then((state) => {
-      this.changeVolume(state.volume);
+      this.changeVolume(state.volume, false);
+      this.shuffle(state.shuffle, false);
+      this.setRepeat(state.repeat);
     });
   }
 
@@ -235,7 +236,7 @@ export class PlaybackService implements OnDestroy {
     this.audioPlayerService.seek(newPos);
   }
 
-  changeVolume(volume: number) {
+  changeVolume(volume: number, storeUpdate = true) {
     const volumeNormalized = Math.max(0, Math.min(volume, 1));
     const current = this.state.getValue();
     const newState = {
@@ -245,7 +246,9 @@ export class PlaybackService implements OnDestroy {
     const isLocalMuted = volumeNormalized === 0;
     this.audioPlayerService.setVolume(volume);
     this.state.next(newState);
-    this.updateStoredState(newState);
+    if (storeUpdate) {
+      this.updateStoredState(newState);
+    }
     this.window.PLAYBACK_API.updateCaptureSettings(isLocalMuted);
   }
 
@@ -264,13 +267,23 @@ export class PlaybackService implements OnDestroy {
         nextRepeat = RepeatState.SINGLE;
         break;
     }
-    this.state.next({
+    const newState = {
       ...current,
       repeat: nextRepeat,
+    };
+    this.state.next(newState);
+    this.updateStoredState(newState);
+  }
+
+  private setRepeat(repeat: RepeatState): void {
+    const currentState = this.state.getValue();
+    this.state.next({
+      ...currentState,
+      repeat,
     });
   }
 
-  shuffle(enabled: boolean) {
+  shuffle(enabled: boolean, storeUpdate = true) {
     const state = this.state.getValue();
 
     let queue = [...state.queue];
@@ -281,7 +294,11 @@ export class PlaybackService implements OnDestroy {
       queue = [...injected, ...shuffleList(regular)];
     }
 
-    this.state.next({ ...state, shuffle: enabled, queue });
+    const newState = { ...state, shuffle: enabled, queue };
+    this.state.next(newState);
+    if (storeUpdate) {
+      this.updateStoredState(newState);
+    }
   }
 
   addToQueue(track: Track, playLast: boolean = false) {
@@ -304,6 +321,8 @@ export class PlaybackService implements OnDestroy {
   private getStoredStateFromState(state: PlaybackState): StoredPlayback {
     return {
       volume: state.volume,
+      shuffle: state.shuffle,
+      repeat: state.repeat,
     };
   }
 

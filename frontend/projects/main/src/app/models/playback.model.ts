@@ -1,10 +1,4 @@
-import { StoredPlayback, Track } from '@shared/models/track.model';
-
-export enum RepeatState {
-  NONE,
-  SINGLE,
-  ALL,
-}
+import { RepeatState, StoredPlayback, Track } from '@shared/models/track.model';
 
 export type QueueItem = {
   track: Track;

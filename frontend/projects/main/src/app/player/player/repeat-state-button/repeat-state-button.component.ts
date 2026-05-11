@@ -1,20 +1,15 @@
-import {Component, computed, input, output} from '@angular/core';
-import {iconSet} from '../../../../../../general/src/lib/icons/icons';
-import {
-  IconButtonComponent
-} from '../../../../../../general/src/lib/components/buttons/icon-button/icon-button.component';
-import {ButtonSize} from '../../../../../../general/models/button.model';
-import {RepeatState} from '../../../models/playback.model';
-import {NgClass} from '@angular/common';
+import { Component, computed, input, output } from '@angular/core';
+import { iconSet } from '@general/icons/icons';
+import { IconButtonComponent } from '@general/components/buttons/icon-button/icon-button.component';
+import { ButtonSize } from '../../../../../../general/models/button.model';
+import { NgClass } from '@angular/common';
+import { RepeatState } from '@shared/models/track.model';
 
 @Component({
   selector: 'app-repeat-state-button',
-  imports: [
-    IconButtonComponent,
-    NgClass
-  ],
+  imports: [IconButtonComponent, NgClass],
   templateUrl: './repeat-state-button.component.html',
-  styleUrl: './repeat-state-button.component.scss'
+  styleUrl: './repeat-state-button.component.scss',
 })
 export class RepeatStateButtonComponent {
   readonly repeatState = input<RepeatState>(RepeatState.NONE);
@@ -29,11 +24,12 @@ export class RepeatStateButtonComponent {
       case state === RepeatState.SINGLE:
         return 'single';
       default:
-        return 'none'
+        return 'none';
     }
-  })
-  readonly showSingleIndicator = computed(() => this.repeatState() === RepeatState.SINGLE);
-
+  });
+  readonly showSingleIndicator = computed(
+    () => this.repeatState() === RepeatState.SINGLE
+  );
 
   readonly RepeatIcon = iconSet.RepeatIcon;
 }

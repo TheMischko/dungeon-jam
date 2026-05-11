@@ -11,7 +11,6 @@ import { SoundEffect } from '@shared/models/sound-effect.model';
 import { GridSoundEffectSizeConfig } from '../../../../models/grid-item-size-config.model';
 import { PlayPauseButtonComponent } from '@general/components/buttons/play-pause-button/play-pause-button.component';
 import { RepeatStateButtonComponent } from '../../../../player/player/repeat-state-button/repeat-state-button.component';
-import { RepeatState } from '../../../../models/playback.model';
 import { VolumeControlComponent } from '../../../../player/player/volume-control/volume-control.component';
 import { NgStyle } from '@angular/common';
 import { actionsIconSet, iconSet } from '@general/icons/icons';
@@ -24,6 +23,7 @@ import { IconButtonComponent } from '@general/components/buttons/icon-button/ico
 import { MatMenu, MatMenuTrigger } from '@angular/material/menu';
 import { TagListSmartComponent } from '@general/components/display/tag-list/tag-list-smart/tag-list-smart.component';
 import { TagsStore } from '@general/stores/tags.store';
+import { RepeatState } from '@shared/models/track.model';
 
 @Component({
   selector: 'app-sound-effect-card',
