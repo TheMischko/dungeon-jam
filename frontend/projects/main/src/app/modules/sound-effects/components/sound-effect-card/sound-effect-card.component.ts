@@ -24,6 +24,7 @@ import { MatMenu, MatMenuTrigger } from '@angular/material/menu';
 import { TagListSmartComponent } from '@general/components/display/tag-list/tag-list-smart/tag-list-smart.component';
 import { TagsStore } from '@general/stores/tags.store';
 import { RepeatState } from '@shared/models/track.model';
+import { ScrollOverflowTextDirective } from '@general/directives/scroll-overflow-text.directive';
 
 @Component({
   selector: 'app-sound-effect-card',
@@ -38,6 +39,7 @@ import { RepeatState } from '@shared/models/track.model';
     MatMenu,
     MatMenuTrigger,
     TagListSmartComponent,
+    ScrollOverflowTextDirective,
   ],
   templateUrl: './sound-effect-card.component.html',
   styleUrl: './sound-effect-card.component.scss',

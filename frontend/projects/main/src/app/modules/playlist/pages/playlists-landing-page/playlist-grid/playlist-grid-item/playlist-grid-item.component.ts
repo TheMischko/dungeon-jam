@@ -12,10 +12,11 @@ import { LucideAngularModule, LucideIconData } from 'lucide-angular';
 import { PlaylistWithTagData } from '../../../../../../../../../general/models/playlist.model';
 import { PlaylistStore } from '@general/stores/playlist.store';
 import { GridPlaylistSizeConfig } from '../../../../../../models/grid-item-size-config.model';
+import { ScrollOverflowTextDirective } from '@general/directives/scroll-overflow-text.directive';
 
 @Component({
   selector: 'app-playlist-grid-item',
-  imports: [NgStyle, LucideAngularModule],
+  imports: [NgStyle, LucideAngularModule, ScrollOverflowTextDirective],
   templateUrl: './playlist-grid-item.component.html',
   styleUrl: './playlist-grid-item.component.scss',
 })
@@ -59,6 +60,7 @@ export class PlaylistGridItemComponent {
     return {
       'font-weight': sizeConfig.titleBold ? 'bold' : 'normal',
       'font-size': `${sizeConfig.fontSize}px`,
+      'max-width': `${(sizeConfig.imageSize ?? 250) - 10}px`,
     };
   });
   readonly tagsSizeStyle = computed<Record<string, unknown>>(() => {

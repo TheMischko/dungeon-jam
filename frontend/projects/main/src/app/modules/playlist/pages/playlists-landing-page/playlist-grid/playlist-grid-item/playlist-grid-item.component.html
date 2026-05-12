@@ -43,7 +43,7 @@
 
   </div>
   <div class="properties">
-    <div class="title" [ngStyle]="titleSizeStyle()">{{ playlist().name }}</div>
+    <div libScrollOverflowText class="title" [ngStyle]="titleSizeStyle()">{{ playlist().name }}</div>
     @if (!sizeConfig().hideTags) {
       <div class="tags" [ngStyle]="tagsSizeStyle()">
         @for (tag of playlist().tags; track tag) {

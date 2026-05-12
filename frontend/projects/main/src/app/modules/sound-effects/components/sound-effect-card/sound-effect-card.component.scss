@@ -54,9 +54,7 @@
 }
 
 .item-name {
-  flex: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  width: 150px;
   white-space: nowrap;
   transition: font-size 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
