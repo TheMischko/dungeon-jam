@@ -49,6 +49,9 @@ export class SidebarComponent implements OnInit {
             path: RedirectPath.PLAYLISTS,
             params: { playlistId: playlist.id },
           },
+          active:
+            activePath === RedirectPath.PLAYLISTS &&
+            activeRequest?.params?.['playlistId'] === playlist.id,
         })),
       },
       {

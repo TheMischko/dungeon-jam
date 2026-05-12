@@ -10,7 +10,7 @@ export class RedirectService {
 
   constructor() {
     (window as unknown as GeneralApiWindow).GENERAL_API.registerRedirect(
-      (request: RedirectRequest) => this.handleRedirect(request),
+      (request: RedirectRequest) => this.handleRedirect(request)
     );
   }
 
@@ -20,16 +20,11 @@ export class RedirectService {
 
   triggerRedirect(request: RedirectRequest): void {
     (window as unknown as GeneralApiWindow).GENERAL_API.triggerRedirect(
-      request,
+      request
     );
   }
 
   private handleRedirect(request: RedirectRequest): void {
-    console.log(
-      'redirecting to',
-      request.path,
-      request?.params ? new URLSearchParams(request.params).toString() : '',
-    );
     this.redirectSubject.next(request);
     // Reset to null after a short delay to allow effects to complete
     setTimeout(() => this.redirectSubject.next(null), 100);
@@ -39,7 +34,7 @@ export class RedirectService {
 type GeneralApiWindow = {
   GENERAL_API: {
     registerRedirect: (
-      callback: (request: RedirectRequest) => void | Promise<void>,
+      callback: (request: RedirectRequest) => void | Promise<void>
     ) => void;
     triggerRedirect: (request: RedirectRequest) => void;
   };

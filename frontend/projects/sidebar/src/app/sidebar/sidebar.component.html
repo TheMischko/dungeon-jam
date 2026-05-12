@@ -1,5 +1,5 @@
 <div class="sidebar-list">
-  @for(item of items(); track item){
+  @for(item of items(); track item.title){
     <app-sidebar-item
       [item]="item"
       [children]="item?.children"

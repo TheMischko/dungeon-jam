@@ -3,11 +3,14 @@
     {{ item().title }}
   </div>
   @if(hasChildren()){
-  <button class="toggle-button" (click)="toggleExpandState($event)">
-    <lucide-icon [img]="toggleIcon()" />
-  </button>
+    <button class="toggle-button" (click)="toggleExpandState($event)">
+      <lucide-icon [img]="toggleIcon()" />
+    </button>
   }
 </div>
-@if (expanded()) { @for (child of children(); track child.title){
-<div class="child-item" (click)="redirectChild(child)">{{ child.title }}</div>
-} }
+
+@if (expanded()) {
+  @for (child of children(); track child.title){
+    <div class="child-item" [class.active]="child.active" (click)="redirectChild(child)">{{ child.title }}</div>
+  }
+}

@@ -6,7 +6,10 @@ import { LUCIDE_ICONS, LucideIconProvider } from 'lucide-angular';
 import discordIconSvgson from '@general/icons/discord.json';
 
 // Transform the svgson data into the format expected by Lucide
-const discordIconData = discordIconSvgson.children.map((node: any) => [node.name, node.attributes]) as any;
+const discordIconData = discordIconSvgson.children.map((node: any) => [
+  node.name,
+  node.attributes,
+]) as any;
 
 const icons = {
   Discord: discordIconData,
@@ -24,4 +27,3 @@ export const appConfig: ApplicationConfig = {
     },
   ],
 };
-console.log(icons);
