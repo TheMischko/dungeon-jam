@@ -81,8 +81,7 @@ export class PlaylistGridSmartComponent implements OnInit {
   }));
   readonly playingPlaylistId = toSignal(
     this.playbackService.playback$.pipe(
-      map((state) => (state.isPlaying ? state.playlistId : undefined)),
-      tap((id) => console.log('Playing playlist', id))
+      map((state) => (state.isPlaying ? state.playlistId : undefined))
     )
   );
 

@@ -74,10 +74,7 @@ export class SidebarComponent implements OnInit {
 
   ngOnInit() {
     setTimeout(() => {
-      this.playlistStore.load({
-        sortBy: 'name',
-        sortDirection: SortDirection.ASC,
-      });
+      this.playlistStore.load({});
     }, 250);
   }
 

@@ -1,6 +1,7 @@
 import { Rectangle } from 'electron';
 
 const SIDEBAR_WIDTH = 0.3;
+const SIDEBAR_MAX_WIDTH = 400;
 const TOPBAR_HEIGHT_PX = 60;
 
 export const getTopBarRect = (windowWidth: number, _: number): Rectangle => {
@@ -20,7 +21,7 @@ export const getSideBarRect = (
   return {
     x: 0,
     y: topBar.height,
-    width: windowWidth * SIDEBAR_WIDTH,
+    width: Math.min(windowWidth * SIDEBAR_WIDTH, SIDEBAR_MAX_WIDTH),
     height: windowHeight - topBar.height,
   };
 };
