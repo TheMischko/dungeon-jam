@@ -177,3 +177,23 @@ a {
     transform: scale(0);
   }
 }
+
+.highlight-focus {
+  animation: highlight-flash 2s;
+  transition: background-color 0.4s linear;
+}
+
+@keyframes highlight-flash {
+  0% {
+    background-color: opacify(col.$primary, 0.5);
+  }
+  25% {
+    background-color: transparent;
+  }
+  50% {
+    background-color: opacify(col.$primary, 0.5);
+  }
+  75% {
+    background-color: transparent;
+  }
+}

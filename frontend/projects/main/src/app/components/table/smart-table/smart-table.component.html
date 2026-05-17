@@ -38,6 +38,8 @@
     [headerCellMenu]="columnsMenu"
     [visibleColumns]="enabledColumns()"
     [pagination]="pagination()"
+    [customRowAttributeName]="customRowAttributeName()"
+    [customRowAttributeValueFn]="customRowAttributeValueFn()"
     (selected)="selected.emit($event)"
     (hoverStart)="hoverStart.emit($event)"
     (hoverEnd)="hoverEnd.emit($event)"

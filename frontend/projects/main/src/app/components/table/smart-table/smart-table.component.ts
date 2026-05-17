@@ -47,13 +47,13 @@ import { PaginationConfig } from '../../../models/pagination.model';
   styleUrl: './smart-table.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SmartTableComponent<T> implements AfterViewInit{
+export class SmartTableComponent<T> implements AfterViewInit {
   private readonly columnStateManager = new ColumnStateManager<T>();
   readonly config = input.required<TableColumnConfiguration<T>>();
   readonly dataSet = input<T[]>([]);
   readonly selection = input<boolean>(false);
   readonly allSelectedState = input<'checked' | 'unchecked' | 'indeterminate'>(
-    'unchecked',
+    'unchecked'
   );
   readonly actionsFn = input<TableActionsConfigFn<T>>();
   readonly trackBy = input<TableTrackByFn<T>>((index: number, _: T) => index);
@@ -65,6 +65,10 @@ export class SmartTableComponent<T> implements AfterViewInit{
   readonly showControls = input<boolean>(true);
   readonly pagination = input<PaginationConfig | null>(null);
   readonly hiddenColumns = input<string[]>([]);
+  readonly customRowAttributeName = input<string | undefined>(undefined);
+  readonly customRowAttributeValueFn = input<((item: T) => string) | undefined>(
+    undefined
+  );
 
   readonly selected = output<T[]>();
   readonly menuClosed = output<{ row: T; reason: string }>();
@@ -84,13 +88,15 @@ export class SmartTableComponent<T> implements AfterViewInit{
       search: this.currentSearch(),
       sortBy: this.currentSortBy(),
       sortDirection: this.currentSortDirection(),
-      filters: this.currentFilters()
+      filters: this.currentFilters(),
     };
     return query;
   });
 
   readonly collapsibleColumns = this.columnStateManager.collapsibleColumns;
-  readonly collapsibleColumnNames = computed<string[]>(() => Object.keys(this.collapsibleColumns()));
+  readonly collapsibleColumnNames = computed<string[]>(() =>
+    Object.keys(this.collapsibleColumns())
+  );
   readonly enabledColumns = this.columnStateManager.enabledColumns;
 
   constructor() {
@@ -119,7 +125,7 @@ export class SmartTableComponent<T> implements AfterViewInit{
     const initHiddenEffect = effect(() => {
       const hiddenColumns = this.hiddenColumns();
       const enabledColumns = this.columnStateManager.enabledColumns();
-      if(!this.afterViewInit()) {
+      if (!this.afterViewInit()) {
         return;
       }
       hiddenColumns.forEach((col) => {
@@ -128,7 +134,7 @@ export class SmartTableComponent<T> implements AfterViewInit{
         }
       });
       initHiddenEffect.destroy();
-    })
+    });
   }
 
   ngAfterViewInit() {
@@ -142,19 +148,25 @@ export class SmartTableComponent<T> implements AfterViewInit{
 
   protected emitPlaylistFilters(playlists: Playlist[]) {
     this.currentFilters.update((filters) => {
-      if(!playlists.length){
+      if (!playlists.length) {
         return filters.removeFilter('playlist');
       }
-      return filters.updateFilter('playlist', playlists.map((p) => p.id));
+      return filters.updateFilter(
+        'playlist',
+        playlists.map((p) => p.id)
+      );
     });
   }
 
   protected emitTagFilters(tags: TagData[]) {
     this.currentFilters.update((filters) => {
-      if(!tags.length){
+      if (!tags.length) {
         return filters.removeFilter('tag');
       }
-      return filters.updateFilter('tag', tags.map((t) => t.id));
+      return filters.updateFilter(
+        'tag',
+        tags.map((t) => t.id)
+      );
     });
   }
 

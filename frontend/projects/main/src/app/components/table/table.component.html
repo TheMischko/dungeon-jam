@@ -88,6 +88,9 @@
       <!-- Row Declarations -->
       <mat-header-row *matHeaderRowDef="columnNames()"></mat-header-row>
       <mat-row
+        appCustomTableRowAttr
+        [customRowAttribute]="customRowAttributeName()"
+        [customRowAttributeValue]="customRowAttributeValueFn()?.(row)"
         *matRowDef="let row; columns: columnNames()"
         (mouseenter)="hoverStart.emit(row)"
         (mouseleave)="hoverEnd.emit(row)"

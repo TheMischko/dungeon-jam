@@ -48,6 +48,7 @@ import {
 import { SortDirection } from '@shared/models/common.model';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { PaginationConfig } from '../../models/pagination.model';
+import { CustomTableRowAttrDirective } from '../../directives/custom-table-row-attr.directive';
 
 @Component({
   selector: 'app-table',
@@ -73,6 +74,7 @@ import { PaginationConfig } from '../../models/pagination.model';
     MatSort,
     NgClass,
     MatPaginator,
+    CustomTableRowAttrDirective,
   ],
   templateUrl: './table.component.html',
   styleUrl: './table.component.scss',
@@ -83,7 +85,7 @@ export class TableComponent<T> {
   readonly dataSet = input<T[]>([]);
   readonly selection = input<boolean>(false);
   readonly allSelectedState = input<'checked' | 'unchecked' | 'indeterminate'>(
-    'unchecked',
+    'unchecked'
   );
   readonly actionsFn = input<TableActionsConfigFn<T>>();
   readonly trackBy = input<TableTrackByFn<T>>((index: number, _: T) => index);
@@ -91,6 +93,10 @@ export class TableComponent<T> {
   readonly headerCellMenu = input<MatMenu | null>(null);
   readonly visibleColumns = input<string[] | null>(null);
   readonly pagination = input<PaginationConfig | null>(null);
+  readonly customRowAttributeName = input<string | undefined>(undefined);
+  readonly customRowAttributeValueFn = input<((item: T) => string) | undefined>(
+    undefined
+  );
   readonly defaultSortBy = model<string>('');
   readonly defaultSortDirection = model<SortDirection>(SortDirection.ASC);
 
@@ -136,10 +142,10 @@ export class TableComponent<T> {
   });
 
   readonly isAllChecked = computed<boolean>(
-    () => this.allSelectedState() === 'checked',
+    () => this.allSelectedState() === 'checked'
   );
   readonly isAllIndeterminate = computed<boolean>(
-    () => this.allSelectedState() === 'indeterminate',
+    () => this.allSelectedState() === 'indeterminate'
   );
 
   readonly selectedItems = signal<T[]>([]);
@@ -159,7 +165,7 @@ export class TableComponent<T> {
 
   isSelected(row: T): boolean {
     return this.selectedItems().some((selectedItem) =>
-      this.uniquenessFn()(selectedItem, row),
+      this.uniquenessFn()(selectedItem, row)
     );
   }
 
@@ -168,7 +174,7 @@ export class TableComponent<T> {
       this.selectedItems.update((selection) => [...selection, row]);
     } else {
       this.selectedItems.update((selection) =>
-        selection.filter((item) => !this.uniquenessFn()(item, row)),
+        selection.filter((item) => !this.uniquenessFn()(item, row))
       );
     }
     this.selected.emit(this.selectedItems());
@@ -191,8 +197,12 @@ export class TableComponent<T> {
     });
   }
 
-  protected onHeaderCellClicked(event: MouseEvent, colName: string, trigger: MatMenuTrigger) {
-    if(!this.headerCellMenu()){
+  protected onHeaderCellClicked(
+    event: MouseEvent,
+    colName: string,
+    trigger: MatMenuTrigger
+  ) {
+    if (!this.headerCellMenu()) {
       return;
     }
 

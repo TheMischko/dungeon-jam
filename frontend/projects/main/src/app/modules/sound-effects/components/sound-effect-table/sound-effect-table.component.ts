@@ -102,6 +102,8 @@ export class SoundEffectTableComponent {
     },
   };
 
+  readonly idFunction = (soundEffect: SoundEffect) => soundEffect.id;
+
   emitPlayOrPause(soundEffect: SoundEffect): void {
     if (this.currentlyPlaying().includes(soundEffect.id)) {
       this.stopEffect.emit(soundEffect);

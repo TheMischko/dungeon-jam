@@ -17,10 +17,7 @@ import { SoundEffectDisplayModeSwitchComponent } from '../../components/sound-ef
 import { SearchBarComponent } from '@general/components/controls/search-bar/search-bar.component';
 import { QueryOptions } from '@shared/models/request.model';
 import { SortDirection } from '@shared/models/common.model';
-import {
-  ActionsMenuBaseConfig,
-  ActionsMenuConfig,
-} from '@general/components/display/actions-menu/actions-menu.component';
+import { ActionsMenuBaseConfig } from '@general/components/display/actions-menu/actions-menu.component';
 
 @Component({
   selector: 'app-sound-effects-library',
@@ -109,5 +106,6 @@ export class SoundEffectsLibraryComponent {
     element.scrollIntoView({
       block: 'center',
     });
+    element.classList.add('highlight-focus');
   }
 }

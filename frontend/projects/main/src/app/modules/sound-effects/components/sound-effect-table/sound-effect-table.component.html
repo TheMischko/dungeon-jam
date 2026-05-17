@@ -3,6 +3,8 @@
   [dataSet]="soundEffects()"
   [loading]="loading()"
   [showControls]="false"
+  customRowAttributeName="sound-effect-id"
+  [customRowAttributeValueFn]="idFunction"
 ></app-smart-table>
 
 <ng-template #playColumn let-row="$implicit">
