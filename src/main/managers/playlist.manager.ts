@@ -20,11 +20,7 @@ import { PlaylistHelper } from '../utils/playlist-helper';
 import { ImageEntityType, ImageManager } from './image.manager';
 import { Logger } from '../utils/logger';
 import { DisplayOrderManager } from './display-order.manager';
-import {
-  DisplayOrder,
-  DisplayOrderBase,
-  OrderableEntityType,
-} from '@shared/models/display-order.model';
+import { OrderableEntityType } from '@shared/models/display-order.model';
 
 export class PlaylistManager {
   private static _instance: PlaylistManager;
@@ -112,7 +108,6 @@ export class PlaylistManager {
     if (orderMap.size !== playlists.length) {
       orderMap = await this.repairOrderRecords(
         playlists,
-        orderMap,
         PlaylistOrderContext.Landing
       );
     }
@@ -151,6 +146,20 @@ export class PlaylistManager {
         query.parentPlaylistId ?? undefined,
         createdPlaylist.id
       );
+
+      await this.displayOrderManager.appendEntity(
+        createdPlaylist.id,
+        OrderableEntityType.Playlist,
+        PlaylistOrderContext.Landing
+      );
+      if (query.parentPlaylistId) {
+        await this.displayOrderManager.appendEntity(
+          createdPlaylist.id,
+          OrderableEntityType.Playlist,
+          PlaylistOrderContext.Parent,
+          query.parentPlaylistId
+        );
+      }
 
       return createdPlaylist;
     } catch (e) {
@@ -464,35 +473,21 @@ export class PlaylistManager {
 
   private async repairOrderRecords(
     playlists: Playlist[],
-    orderMap: Map<string, DisplayOrder>,
     contextType: string,
     contextId?: string
   ) {
-    const healedRecords: DisplayOrderBase[] = [];
-
-    playlists
-      .sort((a, b) => {
-        const orderA =
-          orderMap.get(a.id)?.order ?? a?.dateUpdated?.getTime?.() ?? 0;
-        const orderB =
-          orderMap.get(b.id)?.order ?? b?.dateUpdated?.getTime?.() ?? 0;
+    return await this.displayOrderManager.repairCollection(
+      playlists,
+      'id',
+      (a, mapOrderA, b, mapOrderB) => {
+        const orderA = mapOrderA ?? a?.dateUpdated?.getTime?.() ?? 0;
+        const orderB = mapOrderB ?? b?.dateUpdated?.getTime?.() ?? 0;
         return orderA - orderB;
-      })
-      .forEach((playlist, index) => {
-        healedRecords.push({
-          entityId: playlist.id,
-          order: index,
-        });
-      });
-
-    const newOrder = await this.displayOrderManager.replaceCollection(
-      healedRecords,
+      },
       OrderableEntityType.Playlist,
       contextType,
       contextId
     );
-
-    return new Map(newOrder.map((r) => [r.entityId, r]));
   }
 
   private async repairOrderRecordsInit(): Promise<void> {
@@ -507,7 +502,6 @@ export class PlaylistManager {
     this.logger.log('On init order mismatch, repairing orders.');
     await this.repairOrderRecords(
       currentAllPlaylists,
-      new Map(),
       PlaylistOrderContext.Landing
     );
   }

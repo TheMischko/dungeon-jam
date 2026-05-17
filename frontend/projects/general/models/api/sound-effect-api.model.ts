@@ -1,5 +1,10 @@
 import { QueryRequest } from '@shared/models/request.model';
-import { SoundEffect, SoundEffectCreateData, SoundEffectUpdateData } from '@shared/models/sound-effect.model';
+import {
+  SoundEffect,
+  SoundEffectCreateData,
+  SoundEffectReorderQuery,
+  SoundEffectUpdateData,
+} from '@shared/models/sound-effect.model';
 
 export type SoundEffectApiWindow = Window &
   typeof globalThis & {
@@ -9,5 +14,8 @@ export type SoundEffectApiWindow = Window &
       create: (data: SoundEffectCreateData) => Promise<SoundEffect>;
       update: (data: SoundEffectUpdateData) => Promise<SoundEffect | null>;
       deleteById: (id: string) => Promise<boolean>;
+      changeSoundEffectOrder: (
+        request: SoundEffectReorderQuery
+      ) => Promise<void>;
     };
   };

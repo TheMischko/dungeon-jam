@@ -72,11 +72,10 @@ export class SoundEffectsLibrarySmartComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.soundEffectStore.loadAll(this.currentQueryOptions);
+    this.soundEffectStore.loadAll();
   }
 
   createFromFiles(audioTracks?: AudioTrack[]): void {
-    console.log('Create sound effects', audioTracks);
     this.newSoundEffectUploadService
       .startUploadSequence(audioTracks)
       .pipe(take(1))

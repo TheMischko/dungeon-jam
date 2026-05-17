@@ -5,7 +5,9 @@ import {
 } from '../database/database-provider';
 import {
   SoundEffect,
+  SoundEffectContextType,
   SoundEffectCreateData,
+  SoundEffectReorderQuery,
   SoundEffectUpdateData,
 } from '@shared/models/sound-effect.model';
 import { DatabaseProviderCreator } from '../database/database-provider-creator';
@@ -16,13 +18,18 @@ import { Logger } from '../utils/logger';
 import { SortDirection } from '@shared/models/common.model';
 import { TagsManager } from './tags.manager';
 import { GetSomeMatch } from '../database/database-provider.model';
+import { DisplayOrderManager } from './display-order.manager';
+import { OrderableEntityType } from '@shared/models/display-order.model';
 
 export class SoundEffectManager {
   private static instance: SoundEffectManager;
 
   private logger: Logger;
 
-  constructor(private database: DatabaseProvider<SoundEffect>) {
+  constructor(
+    private database: DatabaseProvider<SoundEffect>,
+    private displayOrderManager: DisplayOrderManager
+  ) {
     this.logger = new Logger('SoundEffectManager', 'yellow');
   }
 
@@ -40,8 +47,10 @@ export class SoundEffectManager {
   public static async getInstance(): Promise<SoundEffectManager> {
     if (!this.instance) {
       const database = await this.prepareDatabase();
-      this.instance = new SoundEffectManager(database);
+      const orderManager = await DisplayOrderManager.getInstance();
+      this.instance = new SoundEffectManager(database, orderManager);
       this.instance.registerIpcHandlers();
+      await this.instance.repairOrderRecordsInit();
     }
     return this.instance;
   }
@@ -86,10 +95,13 @@ export class SoundEffectManager {
         return this.deleteById(id);
       }
     );
-  }
-
-  private async getAll(query: QueryRequest): Promise<SoundEffect[]> {
-    return await this.database.getAll(query);
+    ipcMain.handle(
+      SoundEffectChannel.CHANGE_ORDER,
+      async (_, query: SoundEffectReorderQuery): Promise<void> => {
+        this.logger.log('Changing order of a sound effect', { query });
+        return await this.changeSoundEffectOrder(query);
+      }
+    );
   }
 
   private async getById(id: string): Promise<SoundEffect | null> {
@@ -97,11 +109,45 @@ export class SoundEffectManager {
   }
 
   private async create(data: SoundEffectCreateData): Promise<SoundEffect> {
-    return this.database.create({
+    const soundEffect = await this.database.create({
       ...data,
       volume: 1,
       looping: false,
     });
+
+    await this.displayOrderManager.appendEntity(
+      soundEffect.id,
+      OrderableEntityType.SoundEffect,
+      SoundEffectContextType.Landing
+    );
+
+    return soundEffect;
+  }
+
+  public async getAll(query: QueryRequest): Promise<SoundEffect[]> {
+    const soundEffects = await this.database.getAll(query);
+
+    let orderMap = await this.displayOrderManager.getOrderMap(
+      OrderableEntityType.SoundEffect,
+      SoundEffectContextType.Landing
+    );
+    if (orderMap.size !== soundEffects.length) {
+      orderMap = await this.repairOrderRecords(
+        soundEffects,
+        SoundEffectContextType.Landing
+      );
+    }
+
+    if (!query?.sortBy) {
+      soundEffects.sort((a, b) => {
+        const orderA = orderMap.get(a.id);
+        const orderB = orderMap.get(b.id);
+
+        return (orderA?.order ?? 0) - (orderB?.order ?? 0);
+      });
+    }
+
+    return soundEffects;
   }
 
   private async update(
@@ -122,7 +168,59 @@ export class SoundEffectManager {
   }
 
   private async deleteById(id: string): Promise<boolean> {
+    await this.displayOrderManager.removeFromCollection(
+      id,
+      OrderableEntityType.SoundEffect,
+      SoundEffectContextType.Landing
+    );
     return await this.database.deleteOne('id', id);
+  }
+
+  private async changeSoundEffectOrder(
+    query: SoundEffectReorderQuery
+  ): Promise<void> {
+    return await this.displayOrderManager.setDisplayOrder(
+      query.soundEffectId,
+      query.newOrder,
+      OrderableEntityType.SoundEffect,
+      query.contextType,
+      query.contextId
+    );
+  }
+
+  private async repairOrderRecordsInit(): Promise<void> {
+    const currentAllSoundEffects = await this.database.getAll();
+    const currentLandingOrder = await this.displayOrderManager.getOrderMap(
+      OrderableEntityType.SoundEffect,
+      SoundEffectContextType.Landing
+    );
+    if (currentAllSoundEffects.length === currentLandingOrder.size) {
+      return;
+    }
+    this.logger.log('On init order mismatch, repairing orders.');
+    await this.repairOrderRecords(
+      currentAllSoundEffects,
+      SoundEffectContextType.Landing
+    );
+  }
+
+  private async repairOrderRecords(
+    soundEffects: SoundEffect[],
+    contextType: string,
+    contextId?: string
+  ) {
+    return this.displayOrderManager.repairCollection(
+      soundEffects,
+      'id',
+      (a, mapOrderA, b, mapOrderB) => {
+        const orderA = mapOrderA ?? 0;
+        const orderB = mapOrderB ?? 0;
+        return orderA - orderB;
+      },
+      OrderableEntityType.SoundEffect,
+      contextType,
+      contextId
+    );
   }
 
   // -- STATIC DB METHODS --

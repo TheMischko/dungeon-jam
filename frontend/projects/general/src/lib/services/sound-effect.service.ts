@@ -4,6 +4,7 @@ import { QueryOptions } from '@shared/models/request.model';
 import { Observable, Subject } from 'rxjs';
 import {
   SoundEffect,
+  SoundEffectContextType,
   SoundEffectCreateData,
   SoundEffectUpdateData,
 } from '@shared/models/sound-effect.model';
@@ -76,6 +77,30 @@ export class SoundEffectService {
         subject.error(err);
       })
       .finally(() => {
+        subject.complete();
+      });
+    return subject.asObservable();
+  }
+
+  public reorderSoundEffect(
+    soundEffectId: string,
+    newOrder: number,
+    contextType: SoundEffectContextType,
+    contextId?: string
+  ): Observable<void> {
+    const subject = new Subject<void>();
+    this.window.SOUND_EFFECT_API.changeSoundEffectOrder({
+      soundEffectId,
+      newOrder,
+      contextType,
+      contextId,
+    })
+      .then(() => {
+        subject.next();
+        subject.complete();
+      })
+      .catch((err) => {
+        subject.error(err);
         subject.complete();
       });
     return subject.asObservable();

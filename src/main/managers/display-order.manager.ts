@@ -181,6 +181,81 @@ export class DisplayOrderManager {
     );
   }
 
+  public async removeFromCollection(
+    entityId: string,
+    entityType: OrderableEntityType,
+    contextType: string,
+    contextId?: string
+  ): Promise<void> {
+    const orderedIds = await this.getOrderedEntityIds(
+      entityType,
+      contextType,
+      contextId
+    );
+    const filteredIds = orderedIds.filter((id) => id !== entityId);
+
+    if (!filteredIds.length) {
+      return;
+    }
+
+    const batch = filteredIds.map(
+      (val, index) =>
+        ({
+          entityId: val,
+          order: index,
+        }) as DisplayOrderBase
+    );
+
+    await this.replaceCollection(batch, entityType, contextType, contextId);
+  }
+
+  public async repairCollection<T>(
+    items: T[],
+    idField: keyof T,
+    sortFn: (
+      a: T,
+      orderA: number | undefined,
+      b: T,
+      orderB: number | undefined
+    ) => number,
+    entityType: OrderableEntityType,
+    contextType: string,
+    contextId?: string
+  ): Promise<Map<string, DisplayOrder>> {
+    const healedRecords: DisplayOrderBase[] = [];
+
+    const currentOrderMap = await this.getOrderMap(
+      entityType,
+      contextType,
+      contextId
+    );
+
+    items
+      .sort((a, b) =>
+        sortFn(
+          a,
+          currentOrderMap.get(a[idField] as string)?.order,
+          b,
+          currentOrderMap.get(b[idField] as string)?.order
+        )
+      )
+      .forEach((item, index) => {
+        healedRecords.push({
+          entityId: item[idField] as string,
+          order: index,
+        });
+      });
+
+    const newOrder = await this.replaceCollection(
+      healedRecords,
+      entityType,
+      contextType,
+      contextId
+    );
+
+    return new Map(newOrder.map((r) => [r.entityId, r]));
+  }
+
   private async getMatching(
     entityType: OrderableEntityType,
     contextType: string,

@@ -83,6 +83,7 @@ export enum SoundEffectChannel {
   DELETE = 'sound-effects/delete',
   GET_BY_ID = 'sound-effects/get-by-id',
   GET_ALL = 'sound-effects/get-all',
+  CHANGE_ORDER = 'sound-effect/change-order',
 }
 
 export enum ImageChannel {

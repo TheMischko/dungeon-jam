@@ -26,3 +26,14 @@ export interface SoundEffectUpdateData {
   looping?: boolean;
   volume?: number;
 }
+
+export enum SoundEffectContextType {
+  Landing = 'landing',
+}
+
+export interface SoundEffectReorderQuery {
+  soundEffectId: string;
+  newOrder: number;
+  contextType: SoundEffectContextType;
+  contextId?: string;
+}

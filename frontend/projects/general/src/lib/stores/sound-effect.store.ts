@@ -15,6 +15,7 @@ import {
 } from '@ngrx/signals/entities';
 import {
   SoundEffect,
+  SoundEffectContextType,
   SoundEffectCreateData,
   SoundEffectUpdateData,
 } from '@shared/models/sound-effect.model';
@@ -167,7 +168,11 @@ export const SoundEffectStore = signalStore(
     }>(
       pipe(
         switchMap((request) => {
-          return soundEffectService.getById(request.soundEffectId);
+          return soundEffectService.reorderSoundEffect(
+            request.soundEffectId,
+            request.newOrder,
+            SoundEffectContextType.Landing
+          );
         })
       )
     );
