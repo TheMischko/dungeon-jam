@@ -59,7 +59,7 @@ export class ViewManager {
         serverUrl
       );
 
-      if (config.env !== 'production') {
+      if (config.env !== 'production' && config.env !== 'test') {
         frontendTab.tab.webContents.openDevTools({
           mode: 'detach',
         });

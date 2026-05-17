@@ -40,7 +40,7 @@ export class StartupManager {
       return true;
     }
 
-    this.localServerUrl = await startLocalServer(this.buildPath);
+    this.localServerUrl = await startLocalServer(this.buildPath, this.env);
 
     const initConfigurations = getManagersInitConfig(this.buildPath);
 

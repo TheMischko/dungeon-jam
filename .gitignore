@@ -20,3 +20,5 @@ dist-electron
 
 #Coverage
 coverage
+
+tests/reports

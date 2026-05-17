@@ -4,18 +4,26 @@ import { Server } from 'node:net';
 
 let server: Server;
 
-export async function startLocalServer(appRoot: string): Promise<string> {
+export async function startLocalServer(
+  appRoot: string,
+  env: string | 'production' | 'test'
+): Promise<string> {
   const app = express();
+  console.log('APP ROOT', appRoot);
+  console.log('ENV', env);
 
-  const mainDir = path.join(appRoot, '../../', 'build', 'main', 'browser');
-  const sidebarDir = path.join(
-    appRoot,
-    '../../',
-    'build',
-    'sidebar',
-    'browser'
-  );
-  const topbarDir = path.join(appRoot, '../../', 'build', 'topbar', 'browser');
+  const mainDir =
+    env !== 'test'
+      ? path.join(appRoot, '../../', 'build', 'main', 'browser')
+      : path.join(appRoot, '../', 'main', 'browser');
+  const sidebarDir =
+    env !== 'test'
+      ? path.join(appRoot, '../../', 'build', 'sidebar', 'browser')
+      : path.join(appRoot, '../', 'sidebar', 'browser');
+  const topbarDir =
+    env !== 'test'
+      ? path.join(appRoot, '../../', 'build', 'topbar', 'browser')
+      : path.join(appRoot, '../', 'topbar', 'browser');
 
   app.use('/main', express.static(mainDir));
   app.use('/sidebar', express.static(sidebarDir));

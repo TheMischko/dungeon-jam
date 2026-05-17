@@ -1,8 +1,6 @@
 import { app } from 'electron';
 import { configDotenv } from 'dotenv';
 import { StartupManager } from './main/managers/startup.manager';
-import { ViewManager } from './main/managers/view.manager';
-import { GeneralChannels } from '@shared/models/channels.model';
 import { Logger } from './main/utils/logger';
 import path from 'path';
 import { AppInfoManager } from './main/managers/app-info.manager';
@@ -31,7 +29,7 @@ app.on('ready', async () => {
       return;
     } else {
       const appInfoManager = await AppInfoManager.getInstance();
-      await appInfoManager.sendAppReadySignal();
+      appInfoManager.sendAppReadySignal();
     }
     await startupManager.afterAllInitialized();
   } catch (e) {

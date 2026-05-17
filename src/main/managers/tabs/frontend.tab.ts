@@ -8,7 +8,7 @@ export class FrontendTab extends BaseTab {
   }
 
   async load(env: string, serverUrl: string): Promise<void> {
-    if (env === 'production') {
+    if (env === 'production' || env === 'test') {
       await this.tab.webContents.loadURL(`${serverUrl}/main/index.html`);
       return;
     }
