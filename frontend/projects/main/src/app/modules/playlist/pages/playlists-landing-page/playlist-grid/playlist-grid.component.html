@@ -30,30 +30,20 @@
       <lib-loader [center]="true" [size]="'large'"></lib-loader>
     } @else {
       @for (playlist of dataSet(); track trackPlaylist(playlist)) {
-        @if (reorderingEnabled()) {
-          <app-playlist-grid-item
-            cdkDrag
-            class="grid-item"
-            [cdkDragData]="playlist"
-            [playlist]="playlist"
-            [playlistImageUrl]="getPlaylistImageUrl(playlist)"
-            [sizeConfig]="sizeConfig()"
-            [isPlaying]="isPlaying(playlist.id)"
-            (playlistClick)="playlistClick.emit($event)"
-            (playPlaylist)="playPlaylist.emit($event)"
-            (pausePlaylist)="pausePlaylist.emit($event)"
-          ></app-playlist-grid-item>
-        } @else {
-          <app-playlist-grid-item
-            [playlist]="playlist"
-            [playlistImageUrl]="getPlaylistImageUrl(playlist)"
-            [sizeConfig]="sizeConfig()"
-            [isPlaying]="isPlaying(playlist.id)"
-            (playlistClick)="playlistClick.emit($event)"
-            (playPlaylist)="playPlaylist.emit($event)"
-            (pausePlaylist)="pausePlaylist.emit($event)"
-          ></app-playlist-grid-item>
-        }
+        <app-playlist-grid-item
+          cdkDrag
+          cdkDragPreviewClass="dragging"
+          [cdkDragData]="playlist"
+          [cdkDragDisabled]="!reorderingEnabled()"
+          class="grid-item"
+          [playlist]="playlist"
+          [playlistImageUrl]="getPlaylistImageUrl(playlist)"
+          [sizeConfig]="sizeConfig()"
+          [isPlaying]="isPlaying(playlist.id)"
+          (playlistClick)="playlistClick.emit($event)"
+          (playPlaylist)="playPlaylist.emit($event)"
+          (pausePlaylist)="pausePlaylist.emit($event)"
+        ></app-playlist-grid-item>
       }
     }
   </div>

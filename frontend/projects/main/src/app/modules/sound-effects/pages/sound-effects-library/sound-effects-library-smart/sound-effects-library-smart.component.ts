@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   inject,
   input,
   OnInit,
@@ -26,6 +27,7 @@ import {
   EditSoundEffectResult,
   SoundEffectEditModalComponent,
 } from '../../../modals/sound-effect-edit-modal/sound-effect-edit-modal.component';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-sound-effects-library-smart',
@@ -55,12 +57,19 @@ export class SoundEffectsLibrarySmartComponent implements OnInit {
     this.playingEffects().map((e) => e.id)
   );
 
+  readonly soundEffects = signal<SoundEffect[]>([]);
   readonly currentQueryOptions = signal<QueryOptions>({
     sortBy: 'name',
     sortDirection: SortDirection.ASC,
   });
-  readonly soundEffects = this.soundEffectStore.entities;
   readonly loading = this.soundEffectStore.loading;
+
+  constructor() {
+    effect(() => {
+      const soundEffects = this.soundEffectStore.entities();
+      this.soundEffects.set(soundEffects);
+    });
+  }
 
   ngOnInit(): void {
     this.soundEffectStore.loadAll(this.currentQueryOptions);
@@ -145,6 +154,22 @@ export class SoundEffectsLibrarySmartComponent implements OnInit {
         return;
       }
       this.soundEffectStore.deleteEffect(soundEffect.id);
+    });
+  }
+
+  protected reorderSoundEffects(event: CdkDragDrop<SoundEffect[]>) {
+    const soundEffect: SoundEffect | undefined = event.item.data;
+    if (!soundEffect) {
+      return;
+    }
+    this.soundEffects.update((soundEffects) => {
+      const newSoundEffects = [...soundEffects];
+      moveItemInArray(newSoundEffects, event.previousIndex, event.currentIndex);
+      return newSoundEffects;
+    });
+    this.soundEffectStore.reorderSoundEffects({
+      soundEffectId: soundEffect.id,
+      newOrder: event.currentIndex,
     });
   }
 }

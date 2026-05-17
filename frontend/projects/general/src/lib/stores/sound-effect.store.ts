@@ -161,11 +161,23 @@ export const SoundEffectStore = signalStore(
       )
     );
 
+    const reorderSoundEffects = rxMethod<{
+      soundEffectId: string;
+      newOrder: number;
+    }>(
+      pipe(
+        switchMap((request) => {
+          return soundEffectService.getById(request.soundEffectId);
+        })
+      )
+    );
+
     return {
       loadAll,
       createEffect,
       updateEffect,
       deleteEffect,
+      reorderSoundEffects,
     };
   })
 );

@@ -57,7 +57,6 @@ export class PlaylistGridComponent {
   }
 
   protected playlistDropped(event: CdkDragDrop<PlaylistWithTagData[]>) {
-    console.log(event);
     this.reorderDrop.emit(event);
   }
 }

@@ -18,6 +18,7 @@ import { SearchBarComponent } from '@general/components/controls/search-bar/sear
 import { QueryOptions } from '@shared/models/request.model';
 import { SortDirection } from '@shared/models/common.model';
 import { ActionsMenuBaseConfig } from '@general/components/display/actions-menu/actions-menu.component';
+import { CdkDragDrop } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-sound-effects-library',
@@ -46,6 +47,7 @@ export class SoundEffectsLibraryComponent {
   readonly queryOptions = output<QueryOptions>();
   readonly editSoundEffect = output<SoundEffect>();
   readonly deleteSoundEffect = output<SoundEffect>();
+  readonly reorderDrop = output<CdkDragDrop<SoundEffect[]>>();
 
   readonly showGrid = signal<boolean>(true);
   readonly currentSearch = signal<string | undefined>(undefined);

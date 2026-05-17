@@ -14,10 +14,17 @@ import { SoundEffectCardComponent } from '../sound-effect-card/sound-effect-card
 import { GridSoundEffectSizeConfig } from '../../../../models/grid-item-size-config.model';
 import { SoundEffectVolumeChange } from '../../pages/sound-effects-library/sound-effects-library-smart/sound-effects-library-smart.component';
 import { ActionsMenuBaseConfig } from '@general/components/display/actions-menu/actions-menu.component';
+import { CdkDrag, CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-sound-effect-card-grid',
-  imports: [RangeSliderComponent, LoaderComponent, SoundEffectCardComponent],
+  imports: [
+    RangeSliderComponent,
+    LoaderComponent,
+    SoundEffectCardComponent,
+    CdkDropList,
+    CdkDrag,
+  ],
   templateUrl: './sound-effect-card-grid.component.html',
   styleUrl: './sound-effect-card-grid.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -36,6 +43,7 @@ export class SoundEffectCardGridComponent {
   readonly stopEffect = output<SoundEffect>();
   readonly toggleEffectLoop = output<SoundEffect>();
   readonly effectVolumeChange = output<SoundEffectVolumeChange>();
+  readonly reorderDrop = output<CdkDragDrop<SoundEffect[]>>();
 
   readonly sizeConfig = computed<GridSoundEffectSizeConfig>(() => {
     return getSizeConfig(this.cardSize());
@@ -62,6 +70,10 @@ export class SoundEffectCardGridComponent {
       soundEffect: soundEffect,
       volume,
     });
+  }
+
+  protected soundEffectDropped(event: CdkDragDrop<SoundEffect[]>) {
+    this.reorderDrop.emit(event);
   }
 }
 

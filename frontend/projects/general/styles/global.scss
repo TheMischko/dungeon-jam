@@ -197,3 +197,9 @@ a {
     background-color: transparent;
   }
 }
+
+.dragging {
+  background: col.$background-deep;
+  color: col.$text-main;
+  opacity: 0.75;
+}

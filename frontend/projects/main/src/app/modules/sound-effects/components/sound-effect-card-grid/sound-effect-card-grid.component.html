@@ -12,12 +12,21 @@
     />
   </div>
 
-  <div class="grid-content">
+  <div
+    class="grid-content"
+    cdkDropList
+    cdkDropListOrientation="mixed"
+    [cdkDropListData]="soundEffects()"
+    (cdkDropListDropped)="soundEffectDropped($event)"
+  >
     @if (loading()) {
       <lib-loader [center]="true" [size]="'large'"></lib-loader>
     }
     @for (soundEffect of soundEffects(); track soundEffect.id) {
       <app-sound-effect-card
+        cdkDrag
+        cdkDragPreviewClass="dragging"
+        [cdkDragData]="soundEffect"
         [soundEffect]="soundEffect"
         [isPlaying]="isPlaying(soundEffect.id)"
         [sizeConfig]="sizeConfig()"

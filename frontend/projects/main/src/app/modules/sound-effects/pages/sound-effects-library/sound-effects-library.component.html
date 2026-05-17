@@ -1,10 +1,17 @@
 <h1>Sound Effects</h1>
-<app-sound-effect-display-mode-switch class="mode-switcher" [mode]="viewMode()" (modeChange)="toggleViewMode($event)" />
+<app-sound-effect-display-mode-switch
+  class="mode-switcher"
+  [mode]="viewMode()"
+  (modeChange)="toggleViewMode($event)"
+/>
 <div class="controls">
   <span class="empty"></span>
   <lib-search-bar (search)="currentSearch.set($event)" />
 </div>
-<app-songs-drop-in-zone class="content" (audioDropped)="uploadAudioFiles.emit($event)">
+<app-songs-drop-in-zone
+  class="content"
+  (audioDropped)="uploadAudioFiles.emit($event)"
+>
   @if (showGrid()) {
     <app-sound-effect-card-grid
       [soundEffects]="dataset()"
@@ -15,6 +22,7 @@
       (stopEffect)="stopEffect.emit($event)"
       (toggleEffectLoop)="toggleEffectLoop.emit($event)"
       (effectVolumeChange)="effectVolumeChange.emit($event)"
+      (reorderDrop)="reorderDrop.emit($event)"
     ></app-sound-effect-card-grid>
   } @else {
     <app-sound-effect-table
