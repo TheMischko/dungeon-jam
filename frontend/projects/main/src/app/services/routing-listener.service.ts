@@ -8,6 +8,7 @@ import { routesStrings } from '../routes-strings';
 import { libraryRouteStrings } from '../modules/library/library-route-strings';
 import { homeRouteStrings } from '../modules/home/home-route-strings';
 import { settingsRouteStrings } from '../modules/settings/settings-route-strings';
+import { soundEffectsRouteStrings } from '../modules/sound-effects/sound-effects-route-strings';
 
 @Injectable({
   providedIn: 'root',
@@ -75,7 +76,21 @@ export class RoutingListenerService {
           ]);
           break;
         case RedirectPath.SOUND_EFFECTS:
-          await this.router.navigate([routesStrings.soundEffects]);
+          const soundEffectId: string | undefined =
+            redirect.params?.['soundEffectId'];
+
+          if (soundEffectId) {
+            await this.router.navigate([
+              routesStrings.soundEffects,
+              soundEffectsRouteStrings.library,
+              soundEffectId,
+            ]);
+            break;
+          }
+          await this.router.navigate([
+            routesStrings.soundEffects,
+            soundEffectsRouteStrings.library,
+          ]);
           break;
         default:
           console.error(`Unknow redirect to: ${redirect.path}`);

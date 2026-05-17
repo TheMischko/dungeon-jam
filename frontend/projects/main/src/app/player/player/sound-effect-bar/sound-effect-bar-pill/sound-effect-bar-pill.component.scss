@@ -1,11 +1,14 @@
-@use "colors" as col;
-@use "typography" as typo;
+@use 'colors' as col;
+@use 'typography' as typo;
 
-:host{
+:host {
   background: col.$primary-dark;
   border-radius: 20px;
+  user-select: none;
+  -moz-user-select: none;
+  cursor: pointer;
 
-  .sound-effect-content{
+  .sound-effect-content {
     padding: 4px 8px;
     display: flex;
     align-items: center;
@@ -15,8 +18,7 @@
     border-radius: 20px;
     @include typo.body2();
 
-
-    .stop-button{
+    .stop-button {
       display: flex;
       align-items: center;
       justify-content: center;
@@ -30,12 +32,12 @@
       color: col.$text-main;
       cursor: pointer;
 
-      lucide-icon{
+      lucide-icon {
         margin-bottom: -3px;
       }
 
       &:hover {
-        background: col.$transparent-dark-medium
+        background: col.$transparent-dark-medium;
       }
     }
   }

@@ -6,6 +6,7 @@ import {
 } from '@angular/core';
 import { ActiveSoundEffect } from '../../../services/sound-effects-player.service';
 import { SoundEffectBarPillComponent } from './sound-effect-bar-pill/sound-effect-bar-pill.component';
+import { SoundEffect } from '@shared/models/sound-effect.model';
 
 @Component({
   selector: 'app-sound-effect-bar',
@@ -19,4 +20,5 @@ export class SoundEffectBarComponent {
   readonly playingEffectsPositions = input<Record<string, number>>();
 
   readonly stopSoundEffect = output<string>();
+  readonly showDetail = output<SoundEffect>();
 }

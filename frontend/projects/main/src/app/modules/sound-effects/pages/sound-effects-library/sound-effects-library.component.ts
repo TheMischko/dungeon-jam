@@ -39,6 +39,7 @@ export class SoundEffectsLibraryComponent {
   readonly dataset = input<SoundEffect[]>([]);
   readonly loading = input<boolean>(false);
   readonly playingEffectIds = input<string[]>([]);
+  readonly focusSoundEffectId = input<string>();
 
   readonly uploadAudioFiles = output<AudioTrack[]>();
   readonly playEffect = output<SoundEffect>();
@@ -74,6 +75,21 @@ export class SoundEffectsLibraryComponent {
       const queryOptions = this.currentQueryOptions();
       this.queryOptions.emit(queryOptions);
     });
+    effect(() => {
+      const focusId = this.focusSoundEffectId();
+      if (!focusId) {
+        return;
+      }
+      if (this.loading()) {
+        return;
+      }
+      if (!this.dataset()?.length) {
+        return;
+      }
+      requestAnimationFrame(() => {
+        this.focusElementWithId(focusId);
+      });
+    });
   }
 
   readonly viewMode = computed(() => {
@@ -82,5 +98,16 @@ export class SoundEffectsLibraryComponent {
 
   toggleViewMode(mode: 'table' | 'grid'): void {
     this.showGrid.set(mode === 'grid');
+  }
+
+  focusElementWithId(soundEffectId: string): void {
+    const selector = `[sound-effect-id="${soundEffectId}"]`;
+    const element = document.querySelector(selector);
+    if (!element) {
+      return;
+    }
+    element.scrollIntoView({
+      block: 'center',
+    });
   }
 }

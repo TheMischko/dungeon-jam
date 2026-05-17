@@ -22,6 +22,7 @@ export class SoundEffectBarPillComponent {
   readonly position = input<number>(0);
 
   readonly close = output<void>();
+  readonly click = output<SoundEffect>();
 
   readonly stopIcon = actionsIconSet.CrossIcon;
 
@@ -38,4 +39,16 @@ export class SoundEffectBarPillComponent {
       background: `linear-gradient(to right, ${lightBackground} ${positionPercentage}, transparent ${positionPercentage}, transparent)`,
     };
   });
+
+  protected handleClick(event: PointerEvent) {
+    event.stopPropagation();
+    event.preventDefault();
+    this.click.emit(this.soundEffect());
+  }
+
+  protected handleClose(event: PointerEvent) {
+    event.stopPropagation();
+    event.preventDefault();
+    this.close.emit();
+  }
 }

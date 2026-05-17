@@ -3,6 +3,7 @@ import {
   Component,
   computed,
   inject,
+  input,
   OnInit,
   signal,
 } from '@angular/core';
@@ -40,6 +41,11 @@ export class SoundEffectsLibrarySmartComponent implements OnInit {
   );
   private readonly soundEffectPlayerService = inject(SoundEffectsPlayerService);
   private readonly dialogService = inject(DialogService);
+
+  /**
+   * Value of a URL parameter for focusing a certain sound effect on page visit.
+   */
+  readonly soundEffectId = input<string>();
 
   private readonly playingEffects = toSignal(
     this.soundEffectPlayerService.playingEffects$,

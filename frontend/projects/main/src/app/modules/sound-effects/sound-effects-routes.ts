@@ -9,6 +9,10 @@ export const soundEffectsRoutes: Route[] = [
     pathMatch: 'full',
   },
   {
+    path: `${soundEffectsRouteStrings.library}/:soundEffectId`,
+    component: SoundEffectsLibrarySmartComponent,
+  },
+  {
     path: soundEffectsRouteStrings.library,
     component: SoundEffectsLibrarySmartComponent,
   },
