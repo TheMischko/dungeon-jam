@@ -7,7 +7,12 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "paths": {
+      "@shared/*": [
+        "../shared/*"
+      ]
+    }
   },
-  "include": ["**/*.ts"]
+  "include": ["**/*.ts"],
 }

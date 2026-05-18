@@ -4,8 +4,10 @@ import { findViewByUrl } from '../utils/find-view-by-url';
 import { waitForAppReadySignal } from '../utils/wait-for-app-ready';
 import { after, before, binding } from 'cucumber-tsflow';
 import { TestContext } from '../context/context';
+import * as fs from 'node:fs';
 
 const appPath = path.join(__dirname, '../../build/src/index.js');
+const dbPath = path.join(__dirname, '../../build/src/db_test.json');
 
 @binding([TestContext])
 export class BaseSteps {
@@ -18,14 +20,6 @@ export class BaseSteps {
     this.electronApp = await electron.launch({
       args: [appPath, '--remote-debugging-port=9222'],
       env: { ...process.env, NODE_ENV: 'test', ENV: 'test' },
-    });
-
-    const electronProcess = this.electronApp.process();
-    electronProcess.stdout?.on('data', (data) => {
-      console.log(data.toString().trim());
-    });
-    electronProcess.stderr?.on('error', (data) => {
-      console.error(data.toString().trim());
     });
 
     const window = await this.electronApp.firstWindow();
@@ -45,5 +39,8 @@ export class BaseSteps {
   @after()
   async cleanupEnvironment(): Promise<void> {
     await this.electronApp.close();
+
+    // Cleanup DB
+    if (fs.existsSync(dbPath)) await fs.promises.rm(dbPath);
   }
 }

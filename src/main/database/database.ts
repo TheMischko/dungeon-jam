@@ -7,9 +7,10 @@ import * as fs from 'node:fs';
 
 export class DatabaseWrapper {
   private static get DB_FILE(): string {
-    let fullPath: string;
-
-    fullPath = path.join(app.getPath('userData'), 'db.json');
+    let fullPath: string =
+      process.env.ENV !== 'test'
+        ? path.join(app.getPath('userData'), 'db.json')
+        : path.join(__dirname, 'db_test.json');
 
     const dir = path.dirname(fullPath);
     if (!fs.existsSync(dir)) {

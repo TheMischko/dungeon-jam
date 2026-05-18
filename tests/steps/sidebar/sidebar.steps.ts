@@ -15,5 +15,10 @@ export class SidebarSteps extends BaseSteps {
   @when('the user clicks on {string} in navigation menu')
   async clickOnMenu(menuText: string): Promise<void> {
     await this.sidebarNavigationPage.clickOnItem(menuText);
+    await this.waitForNavigationTimeout();
+  }
+
+  private async waitForNavigationTimeout(): Promise<void> {
+    await this.sidebarNavigationPage.page.waitForTimeout(250);
   }
 }

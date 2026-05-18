@@ -3,9 +3,9 @@ import { TestContext } from '../../context/context';
 import { Page } from 'playwright';
 
 export class BaseSidebarPage extends BasePage {
-  protected sidebarPage: Page;
+  public readonly page: Page;
   constructor(protected context: TestContext) {
     super(context);
-    this.sidebarPage = context.windows.sidebarWindow;
+    this.page = context.windows.sidebarWindow;
   }
 }

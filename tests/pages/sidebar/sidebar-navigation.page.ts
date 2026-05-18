@@ -8,8 +8,13 @@ export class SidebarNavigationPage extends BaseSidebarPage {
   }
 
   async clickOnItem(itemText: string): Promise<void> {
-    const items = this.sidebarPage.locator(SidebarSelectors.SIDEBAR_ITEM);
+    const items = this.page.locator(SidebarSelectors.SIDEBAR_ITEM);
     const item = items.getByText(itemText, { exact: false });
-    await item.click();
+    await item.click({
+      position: {
+        x: 15,
+        y: 15,
+      },
+    });
   }
 }
