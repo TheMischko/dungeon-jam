@@ -54,6 +54,13 @@ This project now has a **unified testing strategy** for both Angular frontend an
 - **Run**: `npm run test:electron`
 - **Instructions**: See `.github/instructions/electron_test.instructions.md`
 
+### Acceptance Tests (Cucumber + Playwright)
+- **Framework**: Cucumber.js 12 + cucumber-tsflow + Playwright
+- **Environment**: Real Electron instance
+- **Location**: `tests/`
+- **Run**: `npm run test:e2e` (or `npm run test:e2e-build` to rebuild first)
+- **Instructions**: See `.github/instructions/e2e_test.instructions.md`
+
 ### Unified Test Command
 ```bash
 npm run test              # Runs both frontend and backend once
