@@ -1,7 +1,7 @@
 import { Track } from '@shared/models/track.model';
 import { Page } from 'playwright';
 
-export interface TrackSeedData {
+export interface TrackTestData {
   name: string;
   url: string;
   duration: number;
@@ -11,7 +11,7 @@ export interface TrackSeedData {
 
 export async function createTrack(
   page: Page,
-  data: TrackSeedData
+  data: TrackTestData
 ): Promise<Track> {
   return await page.evaluate(
     ({ name, url, duration, author, tags }) =>

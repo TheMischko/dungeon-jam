@@ -5,7 +5,7 @@ import { BaseSteps } from '../base.steps';
 import { LibraryLandingPage } from '../../pages/main/library-landing.page';
 import { expect } from 'playwright/test';
 import { fetchAudioTrackData } from '../../apis/audio-files.api';
-import { createTrack, TrackSeedData } from '../../apis/tracks.api';
+import { createTrack, TrackTestData } from '../../apis/tracks.api';
 
 const FIXTURE_FILES = [
   path.join(__dirname, '../../fixtures/sounds/a-minor.mp3'),
@@ -35,7 +35,7 @@ export class LibraryUploadSteps extends BaseSteps {
 
   @given('there is a track prepared with name {string} and path {string}')
   async prepareTrack(name: string, filePath: string): Promise<void> {
-    const data: TrackSeedData = { name, url: filePath, duration: 0 };
+    const data: TrackTestData = { name, url: filePath, duration: 0 };
     await createTrack(this.page.page, data);
   }
 

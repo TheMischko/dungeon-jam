@@ -22,10 +22,11 @@ tests/
 ├── apis/             # Programmatic data seeding via IPC APIs
 ├── utils/            # App launch helpers (do not modify without good reason)
 ├── steps/            # Step definitions (cucumber-tsflow)
-│   ├── base.steps.ts         # App lifecycle — launch, teardown, DB cleanup
-│   ├── main/                 # Steps for the main window
-│   ├── sidebar/              # Steps for the sidebar window
-│   └── topbar/               # Steps for the topbar window
+│   ├── base.steps.ts               # App lifecycle — launch, teardown, DB cleanup
+│   ├── data-preparation.steps.ts   # General steps for seeding test data via APIs
+│   ├── main/                       # Steps for the main window
+│   ├── sidebar/                    # Steps for the sidebar window
+│   └── topbar/                     # Steps for the topbar window
 ├── pages/            # Page Object Model
 │   ├── _base/                # Base page classes (one per window)
 │   ├── main/
@@ -241,7 +242,7 @@ When asked to write acceptance tests for a new feature:
    - Add `@binding([TestContext])`
    - Use APIs in `@given` for data seeding, page objects for `@when`/`@then`
 7. **Add API helper if needed** — `tests/apis/<domain>.api.ts` for new IPC calls used in seeding
-8. **Run** `npm run test:e2e-build` for first verification
+8. **Run** `npm run test:e2e-build` for first verification or `npm run test:e2e` (agent should validate its output by this and make sure it hands over working tests)
 
 ---
 
