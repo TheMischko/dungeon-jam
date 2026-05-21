@@ -1,6 +1,11 @@
 @use 'colors' as col;
+@use 'typography' as typo;
 
-:host {
+.title {
+  @include typo.page-title();
+}
+
+.page-content {
   display: block;
   padding: 1rem;
 }

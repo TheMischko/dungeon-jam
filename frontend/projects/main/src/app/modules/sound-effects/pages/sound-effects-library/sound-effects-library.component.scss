@@ -1,8 +1,14 @@
+@use 'typography' as typo;
+
 :host {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: stretch;
+
+  .title{
+    @include typo.page-title();
+  }
 
   .mode-switcher {
     align-self: flex-end;

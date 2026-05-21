@@ -4,9 +4,9 @@
   }
   <div class="header-content">
     <div class="header-info">
-      <h1>{{ playlist()?.name }}</h1>
+      <h1 class="playlist-name">{{ playlist()?.name }}</h1>
       @if (playlist()?.description) {
-        <h2>{{ playlist()?.description }}</h2>
+        <h2 class="playlist-description">{{ playlist()?.description }}</h2>
       }
     </div>
 

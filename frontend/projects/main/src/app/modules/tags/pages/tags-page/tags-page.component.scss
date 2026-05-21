@@ -1,3 +1,9 @@
+@use 'typography' as typo;
+
+.title{
+  @include typo.page-title();
+}
+
 .tags-page {
   display: flex;
   flex-direction: column;
