@@ -28,6 +28,7 @@ import {
   SoundEffectEditModalComponent,
 } from '../../../modals/sound-effect-edit-modal/sound-effect-edit-modal.component';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { AudioFilesService } from '../../../../../services/audio-files.service';
 
 @Component({
   selector: 'app-sound-effects-library-smart',
@@ -43,6 +44,7 @@ export class SoundEffectsLibrarySmartComponent implements OnInit {
   );
   private readonly soundEffectPlayerService = inject(SoundEffectsPlayerService);
   private readonly dialogService = inject(DialogService);
+  private readonly audioFilesService = inject(AudioFilesService);
 
   /**
    * Value of a URL parameter for focusing a certain sound effect on page visit.
@@ -170,6 +172,14 @@ export class SoundEffectsLibrarySmartComponent implements OnInit {
       soundEffectId: soundEffect.id,
       newOrder: event.currentIndex,
     });
+  }
+
+  beginUploadWithDialogSelection(): void {
+    this.audioFilesService
+      .openAudioFileDialog()
+      .subscribe((audioFiles: AudioTrack[]) => {
+        this.createFromFiles(audioFiles);
+      });
   }
 }
 

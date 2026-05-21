@@ -19,6 +19,7 @@ import { QueryOptions } from '@shared/models/request.model';
 import { SortDirection } from '@shared/models/common.model';
 import { ActionsMenuBaseConfig } from '@general/components/display/actions-menu/actions-menu.component';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
+import { MatButton } from '@angular/material/button';
 
 @Component({
   selector: 'app-sound-effects-library',
@@ -28,6 +29,7 @@ import { CdkDragDrop } from '@angular/cdk/drag-drop';
     SoundEffectCardGridComponent,
     SoundEffectDisplayModeSwitchComponent,
     SearchBarComponent,
+    MatButton,
   ],
   templateUrl: './sound-effects-library.component.html',
   styleUrl: './sound-effects-library.component.scss',
@@ -48,6 +50,7 @@ export class SoundEffectsLibraryComponent {
   readonly editSoundEffect = output<SoundEffect>();
   readonly deleteSoundEffect = output<SoundEffect>();
   readonly reorderDrop = output<CdkDragDrop<SoundEffect[]>>();
+  readonly openAudioFilesDialog = output<void>();
 
   readonly showGrid = signal<boolean>(true);
   readonly currentSearch = signal<string | undefined>(undefined);
