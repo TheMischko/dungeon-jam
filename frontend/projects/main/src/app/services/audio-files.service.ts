@@ -30,4 +30,25 @@ export class AudioFilesService {
 
     return subject.asObservable();
   }
+
+  /**
+   * Opens a native OS file picker dialog for picking files.
+   *
+   * After submitting the paths are analyzed and audio track data is emitted
+   * into an observable result.
+   */
+  openAudioFileDialog(): Observable<AudioTrack[]> {
+    const subject = new Subject<AudioTrack[]>();
+
+    this.window.AUDIO_FILES_API.openAudioFileDialog()
+      .then((paths) => {
+        subject.next(paths);
+        subject.complete();
+      })
+      .catch((err) => {
+        subject.error(err);
+      });
+
+    return subject.asObservable();
+  }
 }

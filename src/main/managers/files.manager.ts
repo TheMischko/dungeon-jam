@@ -1,4 +1,4 @@
-import { ipcMain } from 'electron';
+import { dialog, ipcMain, OpenDialogOptions } from 'electron';
 import { AudioFileChannel } from '@shared/models/channels.model';
 import * as fs from 'node:fs';
 import { IAudioMetadata, parseFile } from 'music-metadata';
@@ -25,6 +25,23 @@ export class FilesManager {
     return FilesManager._instance;
   }
 
+  private registerChannels(): void {
+    ipcMain.handle(AudioFileChannel.FETCH_DATA, async (_, paths: string[]) => {
+      const data = paths
+        .filter((path) => fs.existsSync(path))
+        .map(async (path) => await this.readMetadata(path));
+      return await Promise.all(data);
+    });
+
+    ipcMain.handle(AudioFileChannel.LOAD_FILE, async (_, filePath: string) => {
+      return await this.loadFileBase64(filePath);
+    });
+
+    ipcMain.handle(AudioFileChannel.OPEN_AUDIO_FILES_PICKER, async () => {
+      return await this.openAudioFilesPicker();
+    });
+  }
+
   async updateTrackFile(track: Track): Promise<void> {
     const fileExists = await this.trackFileExists(track.url);
     if (!fileExists) {
@@ -38,17 +55,16 @@ export class FilesManager {
     });
   }
 
-  private registerChannels(): void {
-    ipcMain.handle(AudioFileChannel.FETCH_DATA, async (_, paths: string[]) => {
-      const data = paths
-        .filter((path) => fs.existsSync(path))
-        .map(async (path) => await this.readMetadata(path));
-      return await Promise.all(data);
-    });
-
-    ipcMain.handle(AudioFileChannel.LOAD_FILE, async (_, filePath: string) => {
-      return await this.loadFileBase64(filePath);
-    });
+  private get audioDialogOptions(): OpenDialogOptions {
+    return {
+      properties: ['openFile', 'multiSelections'],
+      filters: [
+        {
+          name: 'Audio files',
+          extensions: ['mp3', 'wav', 'flac', 'oga', 'aac'],
+        },
+      ],
+    };
   }
 
   private async readMetadata(path: string): Promise<AudioTrack> {
@@ -103,5 +119,20 @@ export class FilesManager {
         resolve(!err);
       });
     });
+  }
+
+  private async openAudioFilesPicker(): Promise<AudioTrack[]> {
+    const dialogResult = await dialog.showOpenDialog(this.audioDialogOptions);
+    if (!dialogResult || dialogResult.canceled) {
+      return [];
+    }
+    if (!dialogResult.filePaths?.length) {
+      return [];
+    }
+    return await Promise.all(
+      dialogResult.filePaths.map((filePath: string) =>
+        this.readMetadata(filePath)
+      )
+    );
   }
 }

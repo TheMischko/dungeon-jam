@@ -25,6 +25,7 @@ export enum AudioFileChannel {
   FETCH_DATA = 'audio/fetch-data',
   UPLOAD = 'audio/upload',
   LOAD_FILE = 'audio/load-file',
+  OPEN_AUDIO_FILES_PICKER = 'audio/open-audio-files',
 }
 
 export enum PlaybackChannel {

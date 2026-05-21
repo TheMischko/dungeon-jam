@@ -36,6 +36,11 @@ $font: 'Noto Sans', sans-serif;
   letter-spacing: 0.45px;
 }
 
+@mixin page-title() {
+  @include h1();
+  margin-bottom: 1rem;
+}
+
 @mixin h2() {
   @include default-font();
   margin: 0.5rem 0;

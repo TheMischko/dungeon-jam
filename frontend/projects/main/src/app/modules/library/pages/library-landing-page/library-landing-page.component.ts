@@ -29,10 +29,12 @@ import { NewTrackDropInService } from '../../services/new-track-drop-in.service'
 import { DialogService } from '../../../../services/dialog.service';
 import { DefaultTrackActionsService } from '../../../../services/default-track-actions.service';
 import { TagsStore } from '@general/stores/tags.store';
+import { AudioFilesService } from '../../../../services/audio-files.service';
+import { MatButton } from '@angular/material/button';
 
 @Component({
   selector: 'app-library-landing-page',
-  imports: [FilesDropInZoneComponent, SongsTableComponent],
+  imports: [FilesDropInZoneComponent, SongsTableComponent, MatButton],
   templateUrl: './library-landing-page.component.html',
   styleUrl: './library-landing-page.component.scss',
 })
@@ -46,6 +48,7 @@ export class LibraryLandingPageComponent implements OnInit {
   private readonly defaultTrackActionsService = inject(
     DefaultTrackActionsService
   );
+  private readonly audioFilesService = inject(AudioFilesService);
 
   readonly tracks = this.trackStore.entities;
   readonly tracksLoading = this.trackStore.loading;
@@ -208,5 +211,13 @@ export class LibraryLandingPageComponent implements OnInit {
 
   private updateTrack(_: string, data: Track) {
     this.trackStore.updateTrack(data);
+  }
+
+  protected beginUploadWithDialogSelection(): void {
+    this.audioFilesService
+      .openAudioFileDialog()
+      .subscribe((audioTracks: AudioTrack[]) => {
+        this.openUploadDialog(audioTracks);
+      });
   }
 }

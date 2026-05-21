@@ -43,10 +43,15 @@ const loadFileBase64 = async (filePath: string): Promise<FileBase64> => {
   return await ipcRenderer.invoke(AudioFileChannel.LOAD_FILE, filePath);
 };
 
+const openAudioFileDialog = async (): Promise<AudioTrack[]> => {
+  return await ipcRenderer.invoke(AudioFileChannel.OPEN_AUDIO_FILES_PICKER);
+};
+
 export default {
   fetchAudioData,
   registerAudioFileDrop,
   registerFileDrop,
   uploadTracks,
   loadFileBase64,
+  openAudioFileDialog,
 };

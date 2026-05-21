@@ -1,6 +1,19 @@
+@use 'typography' as typo;
+
 :host{
   margin-bottom: 50px;
+
+  ::ng-deep app-songs-drop-in-zone .content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
 }
+
+h1{
+  @include typo.page-title();
+}
+
 .upload-info{
   border: 1px solid white;
   padding: 1rem 0.5rem;
@@ -10,7 +23,13 @@
   flex-direction: column;
   gap: 0.5rem;
 
+  @include typo.body1();
+
   h3, p{
     margin: 0;
   }
+}
+
+.upload-button{
+  max-width: 175px;
 }

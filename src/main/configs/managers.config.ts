@@ -110,5 +110,11 @@ export function getManagersInitConfig(
         await PlaybackDestinationManager.getInstance();
       },
     },
+    {
+      name: 'Files',
+      initFunction: async () => {
+        await FilesManager.getInstance();
+      },
+    },
   ];
 }
