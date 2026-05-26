@@ -5,4 +5,6 @@ export const routesStrings = {
   tags: 'tags',
   settings: 'settings',
   soundEffects: 'sound-effects',
+  scenes: 'scenes',
+  sessions: 'sessions',
 };

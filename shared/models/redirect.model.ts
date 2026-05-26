@@ -10,4 +10,6 @@ export enum RedirectPath {
   TAGS = 'tags',
   SETTINGS = 'settings',
   SOUND_EFFECTS = 'sound-effects',
+  SCENES = 'scenes',
+  SESSIONS = 'sessions',
 }

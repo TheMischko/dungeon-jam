@@ -9,6 +9,8 @@ import { libraryRouteStrings } from '../modules/library/library-route-strings';
 import { homeRouteStrings } from '../modules/home/home-route-strings';
 import { settingsRouteStrings } from '../modules/settings/settings-route-strings';
 import { soundEffectsRouteStrings } from '../modules/sound-effects/sound-effects-route-strings';
+import { scenesRouteStrings } from '../modules/scenes/scenes-route-strings';
+import { sessionsRouteStrings } from '../modules/sessions/sessions-route-strings';
 
 @Injectable({
   providedIn: 'root',
@@ -90,6 +92,18 @@ export class RoutingListenerService {
           await this.router.navigate([
             routesStrings.soundEffects,
             soundEffectsRouteStrings.library,
+          ]);
+          break;
+        case RedirectPath.SCENES:
+          await this.router.navigate([
+            routesStrings.scenes,
+            scenesRouteStrings.scenesLanding,
+          ]);
+          break;
+        case RedirectPath.SESSIONS:
+          await this.router.navigate([
+            routesStrings.sessions,
+            sessionsRouteStrings.sessionsLanding,
           ]);
           break;
         default:

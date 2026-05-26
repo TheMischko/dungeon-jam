@@ -4,7 +4,6 @@ import { SidebarItem } from '../../models/sidebar.model';
 import { SidebarItemComponent } from './sidebar-item/sidebar-item.component';
 import { RedirectService } from '@general';
 import { PlaylistStore } from '@general/stores/playlist.store';
-import { SortDirection } from '@shared/models/common.model';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter } from 'rxjs';
 import { StreamSettingsComponent } from '../stream-settings/stream-settings.component';
@@ -58,6 +57,25 @@ export class SidebarComponent implements OnInit {
         title: 'Sound Effects',
         redirectRequest: { path: RedirectPath.SOUND_EFFECTS },
         active: activePath === RedirectPath.SOUND_EFFECTS,
+      },
+      {
+        title: 'Scenes',
+        redirectRequest: { path: RedirectPath.SCENES },
+        active:
+          activePath === RedirectPath.SCENES ||
+          activePath === RedirectPath.SESSIONS,
+        children: [
+          {
+            title: 'Scenes',
+            redirectRequest: { path: RedirectPath.SCENES },
+            active: activePath === RedirectPath.SCENES,
+          },
+          {
+            title: 'Sessions',
+            redirectRequest: { path: RedirectPath.SESSIONS },
+            active: activePath === RedirectPath.SESSIONS,
+          },
+        ],
       },
       {
         title: 'Tags',

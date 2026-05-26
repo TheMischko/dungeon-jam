@@ -1,1 +1,4 @@
-export const tagRouteStrings = {tags: 'tags', detail: 'detail'};
+export const tagRouteStrings = {
+  tags: 'tags',
+  detail: 'detail',
+};

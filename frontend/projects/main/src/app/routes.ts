@@ -45,4 +45,18 @@ export const routes: Routes = [
         (module) => module.soundEffectsRoutes
       ),
   },
+  {
+    path: routesStrings.scenes,
+    loadChildren: () =>
+      import('./modules/scenes/scenes-routes').then(
+        (module) => module.scenesRoutes
+      ),
+  },
+  {
+    path: routesStrings.sessions,
+    loadChildren: () =>
+      import('./modules/sessions/sessions-routes').then(
+        (module) => module.sessionsRoutes
+      ),
+  },
 ];
