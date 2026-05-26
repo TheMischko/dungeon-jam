@@ -13,6 +13,7 @@ import { SoundEffectManager } from '../managers/sound-effect.manager';
 import { ImageManager } from '../managers/image.manager';
 import { AppInfoManager } from '../managers/app-info.manager';
 import { DisplayOrderManager } from '../managers/display-order.manager';
+import { SceneManager } from '../managers/scene.manager';
 
 /**
  * Manager initialization configuration
@@ -114,6 +115,12 @@ export function getManagersInitConfig(
       name: 'Files',
       initFunction: async () => {
         await FilesManager.getInstance();
+      },
+    },
+    {
+      name: 'Scenes',
+      initFunction: async () => {
+        await SceneManager.getInstance();
       },
     },
   ];

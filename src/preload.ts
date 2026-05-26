@@ -11,13 +11,14 @@ import DiscordApi from './preload/discord-api';
 import DiscordTokenApi from './preload/discord-token-api';
 import SoundEffectApi from './preload/sound-effect-api';
 import ImageApi from './preload/image-api';
+import SceneApi from './preload/scene-api';
 
 const generalApi = {
   triggerRedirect(request: RedirectRequest) {
     ipcRenderer.send(GeneralChannels.REDIRECT, request);
   },
   registerRedirect(
-    callback: (request: RedirectRequest) => void | Promise<void>,
+    callback: (request: RedirectRequest) => void | Promise<void>
   ) {
     ipcRenderer.on(GeneralChannels.REDIRECT, (_, request) => {
       callback(request);
@@ -67,6 +68,7 @@ declare global {
     DISCORD_TOKEN_API: typeof DiscordTokenApi;
     SOUND_EFFECT_API: typeof SoundEffectApi;
     IMAGE_API: typeof ImageApi;
+    SCENE_API: typeof SceneApi;
   }
 }
 
@@ -80,3 +82,4 @@ contextBridge.exposeInMainWorld('DISCORD_API', DiscordApi);
 contextBridge.exposeInMainWorld('DISCORD_TOKEN_API', DiscordTokenApi);
 contextBridge.exposeInMainWorld('SOUND_EFFECT_API', SoundEffectApi);
 contextBridge.exposeInMainWorld('IMAGE_API', ImageApi);
+contextBridge.exposeInMainWorld('SCENE_API', SceneApi);

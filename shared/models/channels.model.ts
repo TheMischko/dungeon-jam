@@ -94,6 +94,23 @@ export enum ImageChannel {
   FETCH_IMAGE = 'image/fetch',
 }
 
+export enum SceneChannel {
+  GET_ALL = 'scene/get-all',
+  GET_BY_ID = 'scene/get-by-id',
+  INSERT = 'scene/insert',
+  UPDATE = 'scene/update',
+  DELETE = 'scene/delete',
+  CHANGE_ORDER = 'scene/change-order',
+}
+
+export enum SessionChannel {
+  GET_ALL = 'session/get-all',
+  GET_BY_ID = 'session/get-by-id',
+  INSERT = 'session/insert',
+  UPDATE = 'session/update',
+  DELETE = 'session/delete',
+}
+
 export type AppChannel =
   | GeneralChannels
   | TrackChannel
@@ -105,4 +122,6 @@ export type AppChannel =
   | DiscordChannel
   | DiscordTokenChannel
   | SoundEffectChannel
-  | ImageChannel;
+  | ImageChannel
+  | SceneChannel
+  | SessionChannel;

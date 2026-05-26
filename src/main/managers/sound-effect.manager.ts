@@ -150,6 +150,12 @@ export class SoundEffectManager {
     return soundEffects;
   }
 
+  public async getMultipleByIds(ids: string[]): Promise<SoundEffect[]> {
+    return await this.database.getSome('id', ids, {
+      match: GetSomeMatch.EXACT,
+    });
+  }
+
   private async update(
     data: SoundEffectUpdateData
   ): Promise<SoundEffect | null> {
