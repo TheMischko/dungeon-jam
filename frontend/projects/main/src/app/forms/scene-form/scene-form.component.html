@@ -1,0 +1,22 @@
+@if (form()) {
+  <lib-input
+    class="text-input"
+    label="Scene name"
+    [formField]="form()!.name"
+  ></lib-input>
+  <lib-input
+    class="text-input"
+    label="Description"
+    [formField]="form()!.description!"
+  ></lib-input>
+  <lib-tags-input [formField]="form()!.tags"></lib-tags-input>
+  <lib-playlist-select
+    label="Pick playlist (optional)"
+    [formField]="form()!.playlist"
+  ></lib-playlist-select>
+  <app-image-upload
+    label="Scene Image"
+    class="image-upload"
+    [formField]="form()!.imageUrl"
+  />
+}

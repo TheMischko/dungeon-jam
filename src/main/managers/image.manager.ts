@@ -167,5 +167,6 @@ export class ImageManager {
 export enum ImageEntityType {
   PLAYLIST = 'playlist',
   SOUND_EFFECT = 'soundEffect',
-  OTHER = 'OTHER',
+  SCENE = 'scene',
+  OTHER = 'other',
 }

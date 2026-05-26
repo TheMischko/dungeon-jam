@@ -10,6 +10,7 @@ import { SceneChannel } from '@shared/models/channels.model';
 import { QueryRequest } from '@shared/models/request.model';
 import { Logger } from '../utils/logger';
 import { SoundEffectManager } from './sound-effect.manager';
+import { ImageEntityType, ImageManager } from './image.manager';
 
 export class SceneManager {
   private static _instance: SceneManager;
@@ -17,7 +18,8 @@ export class SceneManager {
   private logger = new Logger('SceneManager');
   constructor(
     private databaseProvider: DatabaseProvider<Scene>,
-    private soundEffectManager: SoundEffectManager
+    private soundEffectManager: SoundEffectManager,
+    private imageManager: ImageManager
   ) {}
 
   public static async getInstance(): Promise<SceneManager> {
@@ -28,7 +30,12 @@ export class SceneManager {
         .setIdColumn('id')
         .complete();
       const soundEffectManager = await SoundEffectManager.getInstance();
-      this._instance = new SceneManager(database, soundEffectManager);
+      const imageManager = await ImageManager.getInstance();
+      this._instance = new SceneManager(
+        database,
+        soundEffectManager,
+        imageManager
+      );
       this._instance.registerChannels();
     }
     return this._instance;
@@ -73,8 +80,16 @@ export class SceneManager {
   }
 
   public async insert(scene: SceneInsertQuery): Promise<Scene> {
+    let imagePath = undefined;
+    if (scene.imageUrl) {
+      imagePath = await this.imageManager.processAndSaveImage(
+        scene.imageUrl,
+        ImageEntityType.SCENE
+      );
+    }
     return await this.databaseProvider.create({
       ...scene,
+      imagePath,
       dateCreated: new Date(),
       dateUpdated: new Date(),
     });
@@ -160,14 +175,25 @@ export class SceneManager {
       );
     }
 
+    let imagePath = updateData.imageUrl;
+    if (updateData.imageUrl) {
+      if (scene.imageUrl) {
+        await this.imageManager.deleteImage(scene.imageUrl);
+      }
+      imagePath = await this.imageManager.processAndSaveImage(
+        updateData.imageUrl,
+        ImageEntityType.SCENE
+      );
+    }
+
     return await this.databaseProvider.replaceRecord({
       ...scene,
       ...(updateData.name && { name: updateData.name }),
       ...(updateData.description !== undefined && {
         description: updateData.description ?? undefined,
       }),
-      ...(updateData.imageUrl !== undefined && {
-        imageUrl: updateData.imageUrl ?? undefined,
+      ...(imagePath !== undefined && {
+        imageUrl: imagePath ?? undefined,
       }),
       ...(updateData.playlistId !== undefined && {
         playlistId: updateData.playlistId,

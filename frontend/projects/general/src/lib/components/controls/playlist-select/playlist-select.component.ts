@@ -1,25 +1,38 @@
-import { ChangeDetectionStrategy, Component, forwardRef, inject, input, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  forwardRef,
+  inject,
+  input,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { PlaylistStore } from '@general/stores/playlist.store';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Playlist } from '@shared/models/playlist.model';
-import { MatFormField, MatLabel, MatOption, MatSelect, MatSelectChange } from '@angular/material/select';
+import {
+  MatFormField,
+  MatLabel,
+  MatOption,
+  MatSelect,
+  MatSelectChange,
+} from '@angular/material/select';
 
 @Component({
   selector: 'lib-playlist-select',
-  imports: [
-    MatSelect,
-    MatOption,
-    MatFormField,
-    MatLabel,
-  ],
+  imports: [MatSelect, MatOption, MatFormField, MatLabel],
   templateUrl: './playlist-select.component.html',
   styleUrl: './playlist-select.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
-    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => PlaylistSelectComponent), multi: true }
-  ]
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => PlaylistSelectComponent),
+      multi: true,
+    },
+  ],
 })
-export class PlaylistSelectComponent implements ControlValueAccessor{
+export class PlaylistSelectComponent implements OnInit, ControlValueAccessor {
   private readonly playlistStore = inject(PlaylistStore);
   readonly value = signal<Playlist | null>(null);
   readonly disabled = signal(false);
@@ -27,6 +40,12 @@ export class PlaylistSelectComponent implements ControlValueAccessor{
 
   readonly playlists = this.playlistStore.entities;
   readonly loading = this.playlistStore.loading;
+
+  ngOnInit() {
+    if (!this.playlists().length) {
+      this.playlistStore.load({});
+    }
+  }
 
   protected setValueFromSelect(event: MatSelectChange<Playlist>) {
     const newVal = event.value;
