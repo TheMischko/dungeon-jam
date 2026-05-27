@@ -1,113 +1,47 @@
-@if (false) {
-  <div
-    class="grid-item"
-    (click)="onPlaylistClick()"
-    (mouseenter)="onMouseEnter()"
-    (mouseleave)="onMouseLeave()"
-  >
-    <div class="image-wrapper" [ngStyle]="imageSizeStyle()">
-      @if (showTrackCount()) {
-        <div class="tracks-overlay small-overlay">
-          <lucide-icon
-            [img]="tracksIcon"
-            [size]="sizeConfig().trackCountSize"
-          />
-          <span [ngStyle]="trackCountSize()">{{
-            playlist().trackIds.length
-          }}</span>
-        </div>
-      }
-      @if (parentPlaylist()) {
-        <div class="parent-overlay small-overlay">
-          {{ parentPlaylist()!.name }}
-        </div>
-      }
-      @if (isHovering() && playlist().trackIds.length > 0) {
-        <div
-          class="image-overlay"
-          [ngStyle]="overlaySizeStyle()"
-          (click)="onOverlayButtonClick($event)"
-        >
-          <lucide-icon class="icon" [img]="overlayIcon()"></lucide-icon>
-        </div>
-      }
-      @if (isPlaying()) {
-        <div class="is-playing-overlay small-overlay">
-          <lucide-icon
-            [img]="playingIcon"
-            [size]="sizeConfig().trackCountSize ?? 14"
-          ></lucide-icon>
-        </div>
-      }
-      @if (playlistImageUrl()) {
-        <img [src]="imageSrc()" alt="{{ playlist().name }}" />
-      } @else {
+@let playlistItem = playlist();
+<app-grid-item
+  [title]="playlistItem.name"
+  [tags]="playlistItem.tags"
+  [images]="imageSrc()"
+  [noImageIcon]="PlaylistIcon"
+  [sizeConfig]="sizeConfig()"
+  (clicked)="onPlaylistClick()"
+>
+  <div ngProjectAs="content" style="display: contents">
+    @if (showTrackCount()) {
+      <div class="tracks-overlay small-overlay">
         <lucide-icon
-          class="playlist-icon"
-          [img]="PlaylistIcon"
-          [size]="defaultIconSize()"
+          [img]="tracksIcon"
+          [size]="sizeConfig().trackCountSize"
         />
-      }
-    </div>
-    <div class="properties">
-      <div libScrollOverflowText class="title" [ngStyle]="titleSizeStyle()">
-        {{ playlist().name }}
+        <span [ngStyle]="trackCountSize()">{{
+          playlist().trackIds.length
+        }}</span>
       </div>
-      @if (!sizeConfig().showTags) {
-        <div class="tags" [ngStyle]="tagsSizeStyle()">
-          @for (tag of playlist().tags; track tag) {
-            <span class="tag">{{ tag.title }}</span>
-          }
-        </div>
-      }
-    </div>
+    }
+    @if (parentPlaylist()) {
+      <div class="parent-overlay small-overlay">
+        {{ parentPlaylist()!.name }}
+      </div>
+    }
+    @if (isPlaying()) {
+      <div class="is-playing-overlay small-overlay">
+        <lucide-icon
+          [img]="playingIcon"
+          [size]="sizeConfig().trackCountSize ?? 14"
+        ></lucide-icon>
+      </div>
+    }
   </div>
-} @else {
-  @let playlistItem = playlist();
-  <app-grid-item
-    [title]="playlistItem.name"
-    [tags]="playlistItem.tags"
-    [images]="[imageSrc()]"
-    [noImageIcon]="PlaylistIcon"
-    [sizeConfig]="sizeConfig()"
-    (clicked)="onPlaylistClick()"
-  >
-    <div ngProjectAs="content" style="display: contents">
-      @if (showTrackCount()) {
-        <div class="tracks-overlay small-overlay">
-          <lucide-icon
-            [img]="tracksIcon"
-            [size]="sizeConfig().trackCountSize"
-          />
-          <span [ngStyle]="trackCountSize()">{{
-            playlist().trackIds.length
-          }}</span>
-        </div>
-      }
-      @if (parentPlaylist()) {
-        <div class="parent-overlay small-overlay">
-          {{ parentPlaylist()!.name }}
-        </div>
-      }
-      @if (isPlaying()) {
-        <div class="is-playing-overlay small-overlay">
-          <lucide-icon
-            [img]="playingIcon"
-            [size]="sizeConfig().trackCountSize ?? 14"
-          ></lucide-icon>
-        </div>
-      }
-    </div>
-    <div ngProjectAs="hovering-content" style="display: contents">
-      @if (playlist().trackIds.length > 0) {
-        <div class="hover-overlay">
-          <lucide-icon
-            class="icon"
-            [img]="overlayIcon()"
-            (click)="onOverlayButtonClick($event)"
-          ></lucide-icon>
-        </div>
-      }
-    </div>
-  </app-grid-item>
-}
+  <div ngProjectAs="hovering-content" style="display: contents">
+    @if (playlist().trackIds.length > 0) {
+      <div class="hover-overlay">
+        <lucide-icon
+          class="icon"
+          [img]="overlayIcon()"
+          (click)="onOverlayButtonClick($event)"
+        ></lucide-icon>
+      </div>
+    }
+  </div>
+</app-grid-item>

@@ -191,7 +191,6 @@ function getSizeConfig(sliderVal: number): GridPlaylistSizeConfig {
     return {
       imageSize: 100,
       titleSize: 12,
-      overlaySize: 30,
       hideTracks: true,
       showTags: false,
       titleBold: false,
@@ -202,7 +201,6 @@ function getSizeConfig(sliderVal: number): GridPlaylistSizeConfig {
     return {
       imageSize: 150,
       titleSize: 14,
-      overlaySize: 35,
       trackCountSize: 14,
       hideTracks: true,
       showTags: false,
@@ -214,7 +212,6 @@ function getSizeConfig(sliderVal: number): GridPlaylistSizeConfig {
     return {
       imageSize: 175,
       titleSize: 16,
-      overlaySize: 40,
       trackCountSize: 16,
       showTags: true,
       hideTracks: false,
@@ -225,7 +222,6 @@ function getSizeConfig(sliderVal: number): GridPlaylistSizeConfig {
   return {
     imageSize: 250,
     titleSize: 18,
-    overlaySize: 50,
     trackCountSize: 18,
     showTags: true,
     hideTracks: false,

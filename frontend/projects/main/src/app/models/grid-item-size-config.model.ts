@@ -1,7 +1,6 @@
 import { GridItemSizeConfig } from './grid.model';
 
 export interface GridPlaylistSizeConfig extends GridItemSizeConfig {
-  overlaySize: number;
   trackCountSize?: number;
   titleBold?: boolean;
   hideTracks?: boolean;

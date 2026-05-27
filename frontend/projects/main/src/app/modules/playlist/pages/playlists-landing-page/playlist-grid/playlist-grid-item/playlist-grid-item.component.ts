@@ -1,28 +1,15 @@
-import {
-  Component,
-  computed,
-  inject,
-  input,
-  output,
-  signal,
-} from '@angular/core';
+import { Component, computed, inject, input, output } from '@angular/core';
 import { NgStyle } from '@angular/common';
 import { iconSet, volumeIconSet } from '@general/icons/icons';
 import { LucideAngularModule, LucideIconData } from 'lucide-angular';
 import { PlaylistWithTagData } from '../../../../../../../../../general/models/playlist.model';
 import { PlaylistStore } from '@general/stores/playlist.store';
 import { GridPlaylistSizeConfig } from '../../../../../../models/grid-item-size-config.model';
-import { ScrollOverflowTextDirective } from '@general/directives/scroll-overflow-text.directive';
 import { GridItemComponent } from '../../../../../../components/grid/grid-item/grid-item.component';
 
 @Component({
   selector: 'app-playlist-grid-item',
-  imports: [
-    NgStyle,
-    LucideAngularModule,
-    ScrollOverflowTextDirective,
-    GridItemComponent,
-  ],
+  imports: [NgStyle, LucideAngularModule, GridItemComponent],
   templateUrl: './playlist-grid-item.component.html',
   styleUrl: './playlist-grid-item.component.scss',
 })
@@ -37,7 +24,6 @@ export class PlaylistGridItemComponent {
   readonly playPlaylist = output<string>();
   readonly pausePlaylist = output<string>();
 
-  readonly isHovering = signal(false);
   readonly parentPlaylist = computed(() => {
     return this.playlistStore.getParent(this.playlist().id);
   });
@@ -48,42 +34,9 @@ export class PlaylistGridItemComponent {
   readonly tracksIcon = iconSet.TracksIcon;
   readonly playingIcon = volumeIconSet.NormalIcon;
 
-  readonly imageSrc = computed<string>(() => {
-    return this.playlistImageUrl() ?? '';
-  });
-  readonly imageSizeStyle = computed<Record<string, string>>(() => {
-    const size = `${this.sizeConfig().imageSize ?? 250}px`;
-    return {
-      width: size,
-      height: size,
-    };
-  });
-  readonly defaultIconSize = computed<number>(() => {
-    return this.sizeConfig().imageSize / 2;
-  });
-  readonly titleSizeStyle = computed<Record<string, unknown>>(() => {
-    const sizeConfig = this.sizeConfig();
-    return {
-      'font-weight': sizeConfig.titleBold ? 'bold' : 'normal',
-      'font-size': `${sizeConfig.titleSize}px`,
-      'max-width': `${(sizeConfig.imageSize ?? 250) - 10}px`,
-    };
-  });
-  readonly tagsSizeStyle = computed<Record<string, unknown>>(() => {
-    const sizeConfig = this.sizeConfig();
-    const fontSize = sizeConfig.titleSize - 4;
-    return {
-      'font-size': `${fontSize}px`,
-      'max-width': `${sizeConfig.imageSize}px`,
-    };
-  });
-  readonly overlaySizeStyle = computed<Record<string, string>>(() => {
-    const sizeConfig = this.sizeConfig();
-    return {
-      width: `${sizeConfig.overlaySize}px`,
-      height: `${sizeConfig.overlaySize}px`,
-      padding: `${sizeConfig.overlaySize / 4}px`,
-    };
+  readonly imageSrc = computed<string[]>(() => {
+    const imageUrl = this.playlistImageUrl();
+    return imageUrl ? [imageUrl] : [];
   });
   readonly overlayIcon = computed<LucideIconData>(() => {
     if (this.isPlaying()) {
@@ -101,13 +54,6 @@ export class PlaylistGridItemComponent {
     };
   });
 
-  onMouseEnter() {
-    this.isHovering.set(true);
-  }
-
-  onMouseLeave() {
-    this.isHovering.set(false);
-  }
   onOverlayButtonClick(event: Event) {
     event.stopPropagation();
     const playlist = this.playlist();
