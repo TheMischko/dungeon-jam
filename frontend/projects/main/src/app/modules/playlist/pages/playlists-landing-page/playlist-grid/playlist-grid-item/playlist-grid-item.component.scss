@@ -101,7 +101,7 @@
       transition: transform 0.5s ease-out;
     }
 
-    .playlist-icon{
+    .playlist-icon {
       margin: auto;
       transition:
         width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
@@ -141,5 +141,56 @@
         background: rgba(#000, 0.15);
       }
     }
+  }
+}
+
+:host ::ng-deep {
+  .tracks-overlay {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+  }
+
+  .parent-overlay {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+  }
+
+  .is-playing-overlay {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    color: col.$primary-light;
+    &.small-overlay {
+      padding: 6px;
+    }
+  }
+
+  .small-overlay {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    border-radius: 8px;
+    background: rgba(#000, 0.5);
+
+    lucide-icon {
+      margin-bottom: -4px;
+    }
+  }
+
+  .hover-overlay {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+    background: rgba(#000, 0.4);
+    transition:
+      width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+      height 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   }
 }

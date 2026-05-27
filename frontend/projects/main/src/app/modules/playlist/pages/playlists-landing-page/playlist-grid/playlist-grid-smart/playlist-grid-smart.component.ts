@@ -186,14 +186,14 @@ export class PlaylistGridSmartComponent implements OnInit {
   }
 }
 
-function getSizeConfig(sliderVal: number) {
+function getSizeConfig(sliderVal: number): GridPlaylistSizeConfig {
   if (sliderVal <= 0.25) {
     return {
       imageSize: 100,
-      fontSize: 12,
+      titleSize: 12,
       overlaySize: 30,
       hideTracks: true,
-      hideTags: true,
+      showTags: false,
       titleBold: false,
     };
   }
@@ -201,11 +201,11 @@ function getSizeConfig(sliderVal: number) {
   if (sliderVal <= 0.5 && sliderVal > 0.25) {
     return {
       imageSize: 150,
-      fontSize: 14,
+      titleSize: 14,
       overlaySize: 35,
       trackCountSize: 14,
       hideTracks: true,
-      hideTags: true,
+      showTags: false,
       titleBold: true,
     };
   }
@@ -213,10 +213,10 @@ function getSizeConfig(sliderVal: number) {
   if (sliderVal <= 0.75 && sliderVal > 0.5) {
     return {
       imageSize: 175,
-      fontSize: 16,
+      titleSize: 16,
       overlaySize: 40,
       trackCountSize: 16,
-      hideTags: false,
+      showTags: true,
       hideTracks: false,
       titleBold: true,
     };
@@ -224,10 +224,10 @@ function getSizeConfig(sliderVal: number) {
 
   return {
     imageSize: 250,
-    fontSize: 18,
+    titleSize: 18,
     overlaySize: 50,
     trackCountSize: 18,
-    hideTags: false,
+    showTags: true,
     hideTracks: false,
     titleBold: true,
   };

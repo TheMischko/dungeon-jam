@@ -1,0 +1,40 @@
+<div
+  class="grid-item"
+  (click)="clicked.emit()"
+  (mouseenter)="onMouseEnter()"
+  (mouseleave)="onMouseLeave()"
+>
+  <div class="image-wrapper" [ngStyle]="imageSizeStyle()">
+    @if (images().length > 0) {
+      <div class="images-container">
+        @for (imageUrl of images(); track imageUrl) {
+          <img [src]="imageUrl" [alt]="title()" />
+        }
+      </div>
+    } @else {
+      <lucide-icon
+        class="no-image-icon"
+        [img]="noImageIcon()"
+        [size]="fallbackIconSize()"
+      />
+    }
+
+    <ng-content select="content" />
+
+    @if (isHovering()) {
+      <ng-content select="hovering-content" />
+    }
+  </div>
+  <div class="properties">
+    <div libScrollOverflowText class="title" [ngStyle]="titleSizeStyle()">
+      {{ title() }}
+    </div>
+    @if (tags(); as tags) {
+      <div class="tags">
+        @for (tag of tags; track tag.title) {
+          <span class="tag">{{ tag.title }}</span>
+        }
+      </div>
+    }
+  </div>
+</div>

@@ -13,10 +13,16 @@ import { PlaylistWithTagData } from '../../../../../../../../../general/models/p
 import { PlaylistStore } from '@general/stores/playlist.store';
 import { GridPlaylistSizeConfig } from '../../../../../../models/grid-item-size-config.model';
 import { ScrollOverflowTextDirective } from '@general/directives/scroll-overflow-text.directive';
+import { GridItemComponent } from '../../../../../../components/grid/grid-item/grid-item.component';
 
 @Component({
   selector: 'app-playlist-grid-item',
-  imports: [NgStyle, LucideAngularModule, ScrollOverflowTextDirective],
+  imports: [
+    NgStyle,
+    LucideAngularModule,
+    ScrollOverflowTextDirective,
+    GridItemComponent,
+  ],
   templateUrl: './playlist-grid-item.component.html',
   styleUrl: './playlist-grid-item.component.scss',
 })
@@ -59,13 +65,13 @@ export class PlaylistGridItemComponent {
     const sizeConfig = this.sizeConfig();
     return {
       'font-weight': sizeConfig.titleBold ? 'bold' : 'normal',
-      'font-size': `${sizeConfig.fontSize}px`,
+      'font-size': `${sizeConfig.titleSize}px`,
       'max-width': `${(sizeConfig.imageSize ?? 250) - 10}px`,
     };
   });
   readonly tagsSizeStyle = computed<Record<string, unknown>>(() => {
     const sizeConfig = this.sizeConfig();
-    const fontSize = sizeConfig.fontSize - 4;
+    const fontSize = sizeConfig.titleSize - 4;
     return {
       'font-size': `${fontSize}px`,
       'max-width': `${sizeConfig.imageSize}px`,

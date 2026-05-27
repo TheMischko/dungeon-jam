@@ -82,37 +82,37 @@ function getSizeConfig(size: number): GridSoundEffectSizeConfig {
     case size > 0.75:
       return {
         imageSize: 80,
-        fontSize: 24,
+        titleSize: 24,
         volumeSize: 1.25,
         tagFontSize: 14,
       };
     case size > 0.5:
       return {
         imageSize: 60,
-        fontSize: 18,
+        titleSize: 18,
         volumeSize: 1,
         tagFontSize: 13,
       };
     case size > 0.25:
       return {
         imageSize: 50,
-        fontSize: 16,
+        titleSize: 16,
         hideLoop: true,
         volumeSize: 0.75,
-        hideTags: true,
+        showTags: true,
       };
     case size >= 0:
       return {
         imageSize: 40,
-        fontSize: 14,
+        titleSize: 14,
         hideVolume: true,
         hideLoop: true,
-        hideTags: true,
+        showTags: true,
       };
     default:
       return {
         imageSize: 50,
-        fontSize: 16,
+        titleSize: 16,
         volumeSize: 1,
         tagFontSize: 13,
       };

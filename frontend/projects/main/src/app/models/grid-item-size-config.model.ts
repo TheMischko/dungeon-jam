@@ -1,21 +1,17 @@
-export type GridPlaylistSizeConfig = {
-  imageSize: number;
-  fontSize: number;
+import { GridItemSizeConfig } from './grid.model';
+
+export interface GridPlaylistSizeConfig extends GridItemSizeConfig {
   overlaySize: number;
   trackCountSize?: number;
   titleBold?: boolean;
-  hideTags?: boolean;
   hideTracks?: boolean;
-};
+}
 
-export type GridSoundEffectSizeConfig = {
-  imageSize: number;
-  fontSize: number;
+export interface GridSoundEffectSizeConfig extends GridItemSizeConfig {
   tagFontSize?: number;
   volumeSize?: number;
   titleBold?: boolean;
   hideVolume?: boolean;
   hideLoop?: boolean;
   hidePlay?: boolean;
-  hideTags?: boolean;
-};
+}

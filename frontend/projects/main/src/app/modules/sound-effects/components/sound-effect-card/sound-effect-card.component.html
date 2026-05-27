@@ -8,7 +8,11 @@
   <div class="card-content">
     @if (isSingleRow()) {
       <div class="card-row card-row--centered" animate.enter="">
-        <div libScrollOverflowText class="item-name" [ngStyle]="titleSizeStyle()">
+        <div
+          libScrollOverflowText
+          class="item-name"
+          [ngStyle]="titleSizeStyle()"
+        >
           {{ effect.name }}
         </div>
 
@@ -23,16 +27,24 @@
       <div class="card-row">
         @if (showTags()) {
           <div class="name-and-tags">
-            <div libScrollOverflowText class="item-name" [ngStyle]="titleSizeStyle()">
+            <div
+              libScrollOverflowText
+              class="item-name"
+              [ngStyle]="titleSizeStyle()"
+            >
               {{ effect.name }}
             </div>
             <lib-tag-list-smart
-              [tagIds]="soundEffect()?.tags ?? []"
+              [tagIds]="soundEffect().tags ?? []"
               [fontSize]="tagFontSize()"
             />
           </div>
         } @else {
-          <div libScrollOverflowText class="item-name" [ngStyle]="titleSizeStyle()">
+          <div
+            libScrollOverflowText
+            class="item-name"
+            [ngStyle]="titleSizeStyle()"
+          >
             {{ effect.name }}
           </div>
         }

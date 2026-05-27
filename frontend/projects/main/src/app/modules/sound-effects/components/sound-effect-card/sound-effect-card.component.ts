@@ -80,7 +80,7 @@ export class SoundEffectCardComponent {
     const sizeConfig = this.sizeConfig();
     return {
       'font-weight': sizeConfig.titleBold ? 'bold' : 'normal',
-      'font-size': `${sizeConfig.fontSize}px`,
+      'font-size': `${sizeConfig.titleSize}px`,
     };
   });
   readonly iconSize = computed<number>(() => {
@@ -95,7 +95,7 @@ export class SoundEffectCardComponent {
   readonly showVolume = computed<boolean>(() => !this.sizeConfig()?.hideVolume);
   readonly showLoop = computed<boolean>(() => !this.sizeConfig()?.hideLoop);
   readonly showPlay = computed<boolean>(() => !this.sizeConfig()?.hidePlay);
-  readonly showTags = computed<boolean>(() => !this.sizeConfig()?.hideTags);
+  readonly showTags = computed<boolean>(() => !this.sizeConfig()?.showTags);
   readonly isSingleRow = computed<boolean>(
     () => !this.showVolume() && !this.showLoop() && this.showPlay()
   );
