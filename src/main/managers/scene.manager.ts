@@ -89,7 +89,7 @@ export class SceneManager {
     }
     return await this.databaseProvider.create({
       ...scene,
-      imagePath,
+      imageUrl: imagePath,
       dateCreated: new Date(),
       dateUpdated: new Date(),
     });

@@ -1,0 +1,13 @@
+<div class="scenes-grid">
+  @for (scene of scenes(); track scene.id) {
+    @let images = getSceneImages(scene);
+    @let tags = getSceneTags(scene);
+    <app-grid-item
+      [title]="scene.name"
+      [images]="images"
+      [noImageIcon]="SceneIcon"
+      [tags]="tags"
+      (clicked)="showDetail.emit(scene)"
+    ></app-grid-item>
+  }
+</div>

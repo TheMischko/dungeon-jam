@@ -6,10 +6,11 @@ import {
 } from '@angular/core';
 import { MatButton } from '@angular/material/button';
 import { Scene } from '@shared/models/scene.model';
+import { ScenesGridSmartComponent } from '../../components/scenes-grid-smart/scenes-grid-smart.component';
 
 @Component({
   selector: 'app-scenes-landing',
-  imports: [MatButton],
+  imports: [MatButton, ScenesGridSmartComponent],
   templateUrl: './scenes-landing.component.html',
   styleUrl: './scenes-landing.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

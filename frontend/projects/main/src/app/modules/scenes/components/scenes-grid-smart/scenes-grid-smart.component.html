@@ -1,0 +1,7 @@
+<app-scenes-grid
+  [scenes]="scenes()"
+  [loading]="scenesLoading()"
+  [sceneImageMap]="imageMap()"
+  [tagsMap]="tagMap()"
+  (showDetail)="navigateToDetail($event)"
+></app-scenes-grid>
