@@ -14,6 +14,9 @@ import { ImageApiService } from '@general/services/image-api.service';
 import { Scene } from '@shared/models/scene.model';
 import { forkJoin, map, Observable, of, tap } from 'rxjs';
 import { TagsStore } from '@general/stores/tags.store';
+import { Router } from '@angular/router';
+import { routesStrings } from '../../../../routes-strings';
+import { scenesRouteStrings } from '../../scenes-route-strings';
 
 @Component({
   selector: 'app-scenes-grid-smart',
@@ -26,6 +29,7 @@ export class ScenesGridSmartComponent implements OnInit {
   private readonly scenesStore = inject(ScenesStore);
   private readonly imageApiService = inject(ImageApiService);
   private readonly tagsStore = inject(TagsStore);
+  private readonly router = inject(Router);
 
   readonly scenesLoading = this.scenesStore.loading;
   readonly scenes = signal<Scene[]>([]);
@@ -57,8 +61,12 @@ export class ScenesGridSmartComponent implements OnInit {
     }
   }
 
-  navigateToDetail(scene: Scene): void {
-    console.log('Navigate to scene', scene);
+  async navigateToDetail(scene: Scene): Promise<void> {
+    await this.router.navigate([
+      routesStrings.scenes,
+      scenesRouteStrings.sceneDetail,
+      scene.id,
+    ]);
   }
 
   private updateImageMap(scenes: Scene[]): Observable<void> {

@@ -1,0 +1,45 @@
+@if (loading()) {
+  <lib-loader class="loader"></lib-loader>
+} @else {
+  <div class="console-header">
+    @if (sceneImageUrl(); as image) {
+      <img [src]="image" alt="Scene image" class="scene-image" />
+    }
+    <div class="header-content">
+      <div class="header-properties">
+        <h1 class="scene-title">{{ scene()?.name }}</h1>
+        <lib-tag-list-smart [tagIds]="scene()?.tags ?? []"></lib-tag-list-smart>
+      </div>
+      <div class="header-actions">
+        <lib-play-pause-button
+          [state]="'play'"
+          [type]="ButtonType.Flat"
+          [size]="'large'"
+        />
+      </div>
+    </div>
+  </div>
+  <div class="console-content">
+    <div class="music-sector">
+      <h2 class="section-header">Music</h2>
+      <div>Playlist: {{ playlist()?.name }}</div>
+      <app-songs-table
+        [tracks]="tracks()"
+        [loading]="false"
+        [hiddenColumns]="excludedColumns"
+        [showFilters]="false"
+      ></app-songs-table>
+    </div>
+    <div class="sound-effects-sector">
+      <div class="ambience sound-effects-sector-item">
+        <h2 class="section-header">Ambience</h2>
+        <p>This scene has {{ ambience().length }} ambience.</p>
+      </div>
+
+      <div class="stingers sound-effects-sector-item">
+        <h2 class="section-header">Stingers</h2>
+        <p>This scene has {{ stingers().length }} ambience.</p>
+      </div>
+    </div>
+  </div>
+}

@@ -1,6 +1,7 @@
 import { Route } from '@angular/router';
 import { scenesRouteStrings } from './scenes-route-strings';
 import { ScenesLandingSmartComponent } from './pages/scenes-landing-smart/scenes-landing-smart.component';
+import { SceneDetailSmartComponent } from './pages/scene-detail-smart/scene-detail-smart.component';
 
 export const scenesRoutes: Route[] = [
   {
@@ -11,5 +12,9 @@ export const scenesRoutes: Route[] = [
   {
     path: scenesRouteStrings.scenesLanding,
     component: ScenesLandingSmartComponent,
+  },
+  {
+    path: `${scenesRouteStrings.sceneDetail}/:sceneId`,
+    component: SceneDetailSmartComponent,
   },
 ];

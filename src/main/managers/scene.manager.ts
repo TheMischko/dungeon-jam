@@ -72,11 +72,15 @@ export class SceneManager {
   public async getAll(query: QueryRequest): Promise<Scene[]> {
     const scenes = await this.databaseProvider.getAll(query);
     this.logger.log(`Fetched ${scenes.length} scenes from database`);
-    return scenes;
+    return scenes.map((scene) => this.parseScene(scene));
   }
 
   public async getById(id: string): Promise<Scene | undefined> {
-    return (await this.databaseProvider.getBy('id', id)) ?? undefined;
+    const result = (await this.databaseProvider.getBy('id', id)) ?? undefined;
+    if (result) {
+      this.parseScene(result);
+    }
+    return result;
   }
 
   public async insert(scene: SceneInsertQuery): Promise<Scene> {
@@ -87,12 +91,18 @@ export class SceneManager {
         ImageEntityType.SCENE
       );
     }
-    return await this.databaseProvider.create({
+    const scenes = await this.getAll({});
+    const result = await this.databaseProvider.create({
       ...scene,
+      ambience: [],
+      stingers: [],
+      introTrackIds: [],
+      order: scenes.length,
       imageUrl: imagePath,
       dateCreated: new Date(),
       dateUpdated: new Date(),
     });
+    return this.parseScene(result);
   }
 
   public async update(
@@ -207,5 +217,16 @@ export class SceneManager {
 
   public async deleteById(id: string): Promise<boolean> {
     return this.databaseProvider.deleteOne('id', id);
+  }
+
+  private parseScene(scene: Scene): Scene {
+    return {
+      ...scene,
+      ambience: scene.ambience ?? [],
+      stingers: scene.stingers ?? [],
+      tags: scene.tags ?? [],
+      playlistId: scene.playlistId ?? null,
+      introTrackIds: scene.introTrackIds ?? [],
+    };
   }
 }
