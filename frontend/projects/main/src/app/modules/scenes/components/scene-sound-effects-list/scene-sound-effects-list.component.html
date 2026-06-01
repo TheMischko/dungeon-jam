@@ -1,0 +1,12 @@
+<div class="controls">
+  <lib-play-pause-button
+    [state]="playingAllState()"
+    [size]="'large'"
+    (toggle)="emitPlayAllOrPauseAll()"
+  />
+</div>
+<div class="sound-effects">
+  @for (soundEffect of soundEffects(); track soundEffect.id) {
+    <app-sound-effect-card [soundEffect]="soundEffect" [sizeConfig]="config" />
+  }
+</div>

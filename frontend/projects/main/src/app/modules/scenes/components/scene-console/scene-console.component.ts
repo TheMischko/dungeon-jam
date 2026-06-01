@@ -14,6 +14,8 @@ import { SongsTableComponent } from '../../../library/pages/library-landing-page
 import { PlayPauseButtonComponent } from '@general/components/buttons/play-pause-button/play-pause-button.component';
 import { TagListSmartComponent } from '@general/components/display/tag-list/tag-list-smart/tag-list-smart.component';
 import { ButtonType } from '../../../../../../../general/models/button.model';
+import { SceneSoundEffectsListComponent } from '../scene-sound-effects-list/scene-sound-effects-list.component';
+import { AddSoundEffectsSectionComponent } from '../add-sound-effects-section/add-sound-effects-section.component';
 
 @Component({
   selector: 'app-scene-console',
@@ -22,6 +24,8 @@ import { ButtonType } from '../../../../../../../general/models/button.model';
     SongsTableComponent,
     PlayPauseButtonComponent,
     TagListSmartComponent,
+    SceneSoundEffectsListComponent,
+    AddSoundEffectsSectionComponent,
   ],
   templateUrl: './scene-console.component.html',
   styleUrl: './scene-console.component.scss',
@@ -44,4 +48,8 @@ export class SceneConsoleComponent {
 
   readonly excludedColumns: (keyof Track)[] = ['author', 'tags'];
   protected readonly ButtonType = ButtonType;
+
+  protected addToAmbience(soundEffects: SoundEffect[]) {}
+
+  protected addToStingers(soundEffects: SoundEffect[]) {}
 }

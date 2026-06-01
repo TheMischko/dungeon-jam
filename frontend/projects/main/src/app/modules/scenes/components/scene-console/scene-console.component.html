@@ -33,12 +33,30 @@
     <div class="sound-effects-sector">
       <div class="ambience sound-effects-sector-item">
         <h2 class="section-header">Ambience</h2>
-        <p>This scene has {{ ambience().length }} ambience.</p>
+        @if (ambience().length) {
+          <app-scene-sound-effects-list
+            [soundEffects]="ambience()"
+          ></app-scene-sound-effects-list>
+        } @else {
+          <app-add-sound-effects-section
+            soundEffectType="ambience"
+            (soundEffectsAdd)="addToAmbience($event)"
+          ></app-add-sound-effects-section>
+        }
       </div>
 
       <div class="stingers sound-effects-sector-item">
         <h2 class="section-header">Stingers</h2>
-        <p>This scene has {{ stingers().length }} ambience.</p>
+        @if (stingers().length) {
+          <app-scene-sound-effects-list
+            [soundEffects]="stingers()"
+          ></app-scene-sound-effects-list>
+        } @else {
+          <app-add-sound-effects-section
+            soundEffectType="ambience"
+            (soundEffectsAdd)="addToStingers($event)"
+          ></app-add-sound-effects-section>
+        }
       </div>
     </div>
   </div>

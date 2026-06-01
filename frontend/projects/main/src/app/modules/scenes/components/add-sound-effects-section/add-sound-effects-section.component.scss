@@ -1,0 +1,23 @@
+@use 'typography' as typo;
+@use 'colors' as col;
+
+.wrapper {
+  @include typo.body1();
+  color: col.$text-main;
+
+  cursor: pointer;
+  background: none;
+  border: 2px dashed col.$text-main;
+  margin: 0.5rem;
+  padding: 0.5rem;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  text-wrap: wrap;
+  white-space: wrap;
+  align-self: stretch;
+  justify-self: stretch;
+}

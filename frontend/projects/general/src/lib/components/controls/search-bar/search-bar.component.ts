@@ -6,7 +6,7 @@ import { actionsIconSet } from '../../../icons/icons';
   selector: 'lib-search-bar',
   imports: [InputComponent],
   templateUrl: './search-bar.component.html',
-  styleUrl: './search-bar.component.css',
+  styleUrl: './search-bar.component.scss',
 })
 export class SearchBarComponent {
   readonly search = output<string>();
