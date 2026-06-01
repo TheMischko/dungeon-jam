@@ -1,0 +1,31 @@
+<div class="wrapper">
+  <div class="header">
+    <h1>Select sound effects</h1>
+  </div>
+
+  <div class="content">
+    <app-sound-effect-table
+      class="table"
+      [soundEffects]="soundEffects()"
+      [selection]="true"
+      [allSelectedState]="selectAllState()"
+      [loading]="loading()"
+      [currentlyPlaying]="currentlyPlayingList()"
+      [hiddenColumns]="['actions', 'looping', 'volume']"
+      (selectionChange)="selectionChanged($event)"
+      (playEffect)="playEffect($event)"
+      (stopEffect)="stopEffect()"
+    ></app-sound-effect-table>
+  </div>
+
+  <div class="footer">
+    <div class="footer-button">
+      <button mat-flat-button color="neutral" (click)="cancelClick()">
+        Cancel
+      </button>
+      <button mat-flat-button color="primary" (click)="saveSelection()">
+        Save
+      </button>
+    </div>
+  </div>
+</div>

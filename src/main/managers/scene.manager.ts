@@ -116,7 +116,7 @@ export class SceneManager {
     // Ambience
     if (updateData.ambienceAdded?.length) {
       const toAddIds = updateData.ambienceAdded.filter(
-        (id) => !scene.ambience.some((a) => a.soundEffectId === id)
+        (id) => !scene.ambience?.some((a) => a.soundEffectId === id)
       );
       const soundEffects =
         await this.soundEffectManager.getMultipleByIds(toAddIds);
@@ -145,7 +145,7 @@ export class SceneManager {
     // Stingers
     if (updateData.stingersAdded?.length) {
       const toAddIds = updateData.stingersAdded.filter(
-        (id) => !scene.stingers.some((a) => a.soundEffectId === id)
+        (id) => !scene.stingers?.some((a) => a.soundEffectId === id)
       );
       const soundEffects =
         await this.soundEffectManager.getMultipleByIds(toAddIds);

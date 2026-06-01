@@ -9,9 +9,14 @@ import {
   addEntity,
   entityConfig,
   setAllEntities,
+  setEntity,
   withEntities,
 } from '@ngrx/signals/entities';
-import { Scene, SceneInsertQuery } from '@shared/models/scene.model';
+import {
+  Scene,
+  SceneInsertQuery,
+  SceneUpdateQuery,
+} from '@shared/models/scene.model';
 import { inject } from '@angular/core';
 import { SceneApiService } from '@general/services/scene-api.service';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
@@ -69,9 +74,22 @@ export const ScenesStore = signalStore(
       )
     );
 
+    const update = rxMethod<SceneUpdateQuery>(
+      pipe(
+        switchMap((data) => {
+          return sceneApiService.update(data).pipe(
+            tap((scene) => {
+              patchState(store, setEntity(scene));
+            })
+          );
+        })
+      )
+    );
+
     return {
       loadAll,
       insert,
+      update,
     };
   })
 );

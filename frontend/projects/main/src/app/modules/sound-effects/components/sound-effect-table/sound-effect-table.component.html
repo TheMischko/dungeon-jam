@@ -3,6 +3,10 @@
   [dataSet]="soundEffects()"
   [loading]="loading()"
   [showControls]="false"
+  [selection]="selection()"
+  [allSelectedState]="allSelectedState()"
+  [hiddenColumns]="hiddenColumns()"
+  (selected)="selectionChange.emit($event)"
   customRowAttributeName="sound-effect-id"
   [customRowAttributeValueFn]="idFunction"
 ></app-smart-table>

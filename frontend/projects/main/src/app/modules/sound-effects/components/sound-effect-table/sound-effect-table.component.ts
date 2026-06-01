@@ -51,9 +51,16 @@ export class SoundEffectTableComponent {
    */
   readonly currentlyPlaying = input<string[]>([]);
 
+  readonly selection = input<boolean>(false);
+  readonly allSelectedState = input<'checked' | 'unchecked' | 'indeterminate'>(
+    'unchecked'
+  );
+  readonly hiddenColumns = input<string[]>([]);
+
   readonly playEffect = output<SoundEffect>();
   readonly stopEffect = output<SoundEffect>();
   readonly toggleEffectLoop = output<SoundEffect>();
+  readonly selectionChange = output<SoundEffect[]>();
 
   readonly tagColumn = viewChild.required('tagColumn', { read: TemplateRef });
   readonly playColumnTemplate = viewChild.required('playColumn', {
@@ -73,11 +80,13 @@ export class SoundEffectTableComponent {
       title: '',
       template: () => this.playColumnTemplate(),
       width: '65px',
+      canCollapse: true,
     },
     looping: {
       title: '',
       template: () => this.loopColumn(),
       width: '65px',
+      canCollapse: true,
     },
     name: {
       title: 'Name',
@@ -85,20 +94,24 @@ export class SoundEffectTableComponent {
     volume: {
       title: 'Volume',
       template: () => this.volumeColumn(),
+      canCollapse: true,
     },
     tags: {
       title: 'Tags',
       template: () => this.tagColumn(),
+      canCollapse: true,
     },
     duration: {
       title: 'Length',
       customValueFn: (entity) => this.durationPipe.transform(entity.duration),
       width: '80px',
+      canCollapse: true,
     },
     actions: {
       title: '',
       template: () => this.actionsColumn(),
       width: '65px',
+      canCollapse: true,
     },
   };
 

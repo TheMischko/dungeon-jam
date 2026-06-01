@@ -14,4 +14,5 @@ Obviously the project is WIP, so there is just a list of small missing features 
 - [ ] On multiple track upload (Autoresolve) or maybe in general upload lacks loading spinner
 - [x] Autoresolve upload does not auto-assign tags from genres
 - [ ] Upload does not show tags immediately
-- [ ] Sound Effect volume bar does not reflect the real value (small change sets the correct value)
+- [x] Sound Effect volume bar does not reflect the real value (small change sets the correct value)
+- [ ] Tables with collapsible columns have issue with initially hidden column cannot be shown (Scene detail Tracks table f.e.)

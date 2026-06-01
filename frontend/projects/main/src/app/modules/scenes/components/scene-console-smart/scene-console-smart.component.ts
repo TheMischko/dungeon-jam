@@ -17,6 +17,8 @@ import { SoundEffect } from '@shared/models/sound-effect.model';
 import { TagsStore } from '@general/stores/tags.store';
 import { SceneConsoleComponent } from '../scene-console/scene-console.component';
 import { ImageApiService } from '@general/services/image-api.service';
+import { ListChanged } from '../../../../../../../general/models/list-changed.model';
+import { ScenesStore } from '@general/stores/scenes.store';
 
 @Component({
   selector: 'app-scene-console-smart',
@@ -31,6 +33,7 @@ export class SceneConsoleSmartComponent implements OnInit {
   readonly soundEffectStore = inject(SoundEffectStore);
   readonly tagsStore = inject(TagsStore);
   readonly imageApiService = inject(ImageApiService);
+  readonly scenesStore = inject(ScenesStore);
 
   readonly scene = input.required<Scene>();
 
@@ -87,8 +90,6 @@ export class SceneConsoleSmartComponent implements OnInit {
       if (!scene || !soundEffects) {
         return;
       }
-
-      console.log(scene);
 
       const ambience = scene.ambience
         .map((soundEffectRef) => {
@@ -155,5 +156,29 @@ export class SceneConsoleSmartComponent implements OnInit {
     if (!this.tagsStore.entities().length && !this.tagsStore.loading()) {
       this.tagsStore.loadAll({});
     }
+  }
+
+  updateAmbience(changes: ListChanged<SoundEffect>): void {
+    this.scenesStore.update({
+      id: this.scene().id,
+      ...(changes.added && {
+        ambienceAdded: changes.added.map((soundEffect) => soundEffect.id),
+      }),
+      ...(changes.removed && {
+        ambienceRemoved: changes.removed.map((soundEffect) => soundEffect.id),
+      }),
+    });
+  }
+
+  updateStingers(changes: ListChanged<SoundEffect>): void {
+    this.scenesStore.update({
+      id: this.scene().id,
+      ...(changes.added && {
+        stingersAdded: changes.added.map((soundEffect) => soundEffect.id),
+      }),
+      ...(changes.removed && {
+        stingersRemoved: changes.removed.map((soundEffect) => soundEffect.id),
+      }),
+    });
   }
 }

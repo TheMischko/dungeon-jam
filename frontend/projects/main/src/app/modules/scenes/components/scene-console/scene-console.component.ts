@@ -3,6 +3,7 @@ import {
   Component,
   computed,
   input,
+  output,
 } from '@angular/core';
 import { Scene } from '@shared/models/scene.model';
 import { Playlist } from '@shared/models/playlist.model';
@@ -16,6 +17,7 @@ import { TagListSmartComponent } from '@general/components/display/tag-list/tag-
 import { ButtonType } from '../../../../../../../general/models/button.model';
 import { SceneSoundEffectsListComponent } from '../scene-sound-effects-list/scene-sound-effects-list.component';
 import { AddSoundEffectsSectionComponent } from '../add-sound-effects-section/add-sound-effects-section.component';
+import { ListChanged } from '../../../../../../../general/models/list-changed.model';
 
 @Component({
   selector: 'app-scene-console',
@@ -40,6 +42,9 @@ export class SceneConsoleComponent {
   readonly tagsMap = input<Record<string, Tag>>({});
   readonly sceneImageUrl = input<string>();
 
+  readonly ambienceChanged = output<ListChanged<SoundEffect>>();
+  readonly stingersChanged = output<ListChanged<SoundEffect>>();
+
   readonly loading = computed(() => {
     return (
       !this.scene() || !this.playlist() || !Object.keys(this.tagsMap()).length
@@ -49,7 +54,45 @@ export class SceneConsoleComponent {
   readonly excludedColumns: (keyof Track)[] = ['author', 'tags'];
   protected readonly ButtonType = ButtonType;
 
-  protected addToAmbience(soundEffects: SoundEffect[]) {}
+  protected addToAmbience(soundEffects: SoundEffect[]) {
+    this.ambienceChanged.emit({
+      added: soundEffects,
+    });
+  }
 
-  protected addToStingers(soundEffects: SoundEffect[]) {}
+  protected changeAmbienceList(newAmbience: SoundEffect[]) {
+    const current = this.ambience();
+    const added = newAmbience.filter(
+      (soundEffect) => !current.includes(soundEffect)
+    );
+    const removed = current.filter(
+      (soundEffect) => !newAmbience.includes(soundEffect)
+    );
+
+    this.ambienceChanged.emit({
+      added,
+      removed,
+    });
+  }
+
+  protected addToStingers(soundEffects: SoundEffect[]) {
+    this.stingersChanged.emit({
+      added: soundEffects,
+    });
+  }
+
+  protected changeStingersList(newStingers: SoundEffect[]) {
+    const current = this.ambience();
+    const added = newStingers.filter(
+      (soundEffect) => !current.includes(soundEffect)
+    );
+    const removed = current.filter(
+      (soundEffect) => !newStingers.includes(soundEffect)
+    );
+
+    this.ambienceChanged.emit({
+      added,
+      removed,
+    });
+  }
 }

@@ -9,14 +9,16 @@ export class ColumnStateManager<T> {
     const config = this.config();
     return Object.entries(config)
       .filter(([_, columnConfig]) => !!columnConfig?.canCollapse)
-      .reduce((map, [colName, colConfig]) => ({ ...map, [colName]: colConfig! }),
-        {});
+      .reduce(
+        (map, [colName, colConfig]) => ({ ...map, [colName]: colConfig! }),
+        {}
+      );
   });
 
   readonly enabledColumns = computed<string[]>(() => {
     const config = this.config();
     const columnNames = Object.keys(config);
-    return columnNames.filter(columnName => {
+    return columnNames.filter((columnName) => {
       const isCollapsible = !!config[columnName]?.canCollapse;
       if (!isCollapsible) {
         return true;
@@ -25,7 +27,6 @@ export class ColumnStateManager<T> {
     });
   });
 
-
   constructor() {
     effect(() => {
       const config = this.collapsibleColumns();
@@ -33,19 +34,20 @@ export class ColumnStateManager<T> {
         const oldColumns = Object.keys(oldMap);
         const newColumns = Object.keys(config);
 
-        const newColumnsMap = newColumns.filter(column => !oldColumns.includes(column))
+        const newColumnsMap = newColumns
+          .filter((column) => !oldColumns.includes(column))
           .reduce((map, column) => ({ ...map, [column]: true }), {});
 
         return {
           ...oldMap,
-          ...newColumnsMap
-        }
-      })
+          ...newColumnsMap,
+        };
+      });
     });
   }
 
   toggleColumn(columnName: string) {
-    if(this.enabledMap()[columnName] === undefined) {
+    if (this.enabledMap()[columnName] === undefined) {
       return;
     }
     this.enabledMap.update((map) => ({

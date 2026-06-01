@@ -94,9 +94,12 @@ export class SmartTableComponent<T> implements AfterViewInit {
   });
 
   readonly collapsibleColumns = this.columnStateManager.collapsibleColumns;
-  readonly collapsibleColumnNames = computed<string[]>(() =>
-    Object.keys(this.collapsibleColumns())
-  );
+  readonly collapsibleColumnNames = computed<string[]>(() => {
+    const columns = this.collapsibleColumns();
+    return Object.keys(this.collapsibleColumns()).filter((col) => {
+      return !!columns[col]?.title?.length;
+    });
+  });
   readonly enabledColumns = this.columnStateManager.enabledColumns;
 
   constructor() {
@@ -133,7 +136,7 @@ export class SmartTableComponent<T> implements AfterViewInit {
           this.columnStateManager.toggleColumn(col);
         }
       });
-      initHiddenEffect.destroy();
+      return () => initHiddenEffect.destroy();
     });
   }
 
