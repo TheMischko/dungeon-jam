@@ -10,10 +10,7 @@ import { SoundEffectStore } from '@general/stores/sound-effect.store';
 import { QueryRequest } from '@shared/models/request.model';
 import { SoundEffect } from '@shared/models/sound-effect.model';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import {
-  SelectSoundEffectsModalData,
-  SelectSoundEffectsSelection,
-} from './select-sound-effects-modal.types';
+import { SelectSoundEffectsSelection } from './select-sound-effects-modal.types';
 import { FormsModule } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
 import { SoundEffectTableComponent } from '../../components/sound-effect-table/sound-effect-table.component';
@@ -33,14 +30,11 @@ export class SelectSoundEffectsModalComponent implements OnDestroy {
   readonly audioPlayerService = inject(AudioPlayerService);
   readonly dialogRef =
     inject<MatDialogRef<SelectSoundEffectsSelection>>(MatDialogRef);
-  readonly data = inject<SelectSoundEffectsModalData>(MAT_DIALOG_DATA);
+  readonly data = inject<SelectSoundEffectsSelection>(MAT_DIALOG_DATA);
 
   readonly soundEffects = computed(() => {
     return this.soundEffectStore
       .entities()
-      .filter((effect) => {
-        return !this.data?.excludedSoundEffectIds?.includes(effect.id);
-      })
       .sort((a, b) => a.name.localeCompare(b.name));
   });
 
@@ -63,6 +57,9 @@ export class SelectSoundEffectsModalComponent implements OnDestroy {
 
   constructor() {
     this.soundEffectStore.loadAll(this.currentQuery);
+    if (this.data.selectedSoundEffects) {
+      this.selection.set(this.data.selectedSoundEffects);
+    }
   }
 
   ngOnDestroy() {

@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   input,
   model,
   output,
@@ -84,6 +85,7 @@ export class TableComponent<T> {
   readonly config = input.required<TableColumnConfiguration<T>>();
   readonly dataSet = input<T[]>([]);
   readonly selection = input<boolean>(false);
+  readonly initialSelection = input<T[]>();
   readonly allSelectedState = input<'checked' | 'unchecked' | 'indeterminate'>(
     'unchecked'
   );
@@ -149,6 +151,15 @@ export class TableComponent<T> {
   );
 
   readonly selectedItems = signal<T[]>([]);
+
+  constructor() {
+    effect(() => {
+      const initialSelection = this.initialSelection();
+      if (initialSelection) {
+        this.selectedItems.set(initialSelection);
+      }
+    });
+  }
 
   getColumnNameKeyOf(column: string): keyof T {
     return column as keyof T;

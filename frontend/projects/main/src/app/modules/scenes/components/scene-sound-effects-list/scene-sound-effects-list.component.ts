@@ -9,10 +9,11 @@ import { SoundEffect } from '@shared/models/sound-effect.model';
 import { PlayPauseButtonComponent } from '@general/components/buttons/play-pause-button/play-pause-button.component';
 import { SoundEffectCardComponent } from '../../../sound-effects/components/sound-effect-card/sound-effect-card.component';
 import { GridSoundEffectSizeConfig } from '../../../../models/grid-item-size-config.model';
+import { MatButton } from '@angular/material/button';
 
 @Component({
   selector: 'app-scene-sound-effects-list',
-  imports: [PlayPauseButtonComponent, SoundEffectCardComponent],
+  imports: [PlayPauseButtonComponent, SoundEffectCardComponent, MatButton],
   templateUrl: './scene-sound-effects-list.component.html',
   styleUrl: './scene-sound-effects-list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -26,6 +27,7 @@ export class SceneSoundEffectsListComponent {
   readonly playSoundEffect = output<SoundEffect>();
   readonly pauseSoundEffect = output<SoundEffect>();
   readonly changeVolume = output<SoundEffectVolumeChange>();
+  readonly changeSelection = output<void>();
 
   readonly config: GridSoundEffectSizeConfig = {
     hideLoop: true,

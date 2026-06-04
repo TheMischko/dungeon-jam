@@ -6,6 +6,6 @@
   [stingers]="stingers()"
   [tagsMap]="tagsMap()"
   [sceneImageUrl]="sceneImageUrl()"
-  (ambienceChanged)="updateAmbience($event)"
-  (stingersChanged)="updateStingers($event)"
+  (changeAmbience)="changeAmbienceSelection()"
+  (changeStingers)="changeStingerSelection()"
 ></app-scene-console>

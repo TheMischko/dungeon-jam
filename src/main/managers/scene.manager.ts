@@ -114,6 +114,7 @@ export class SceneManager {
     }
 
     // Ambience
+    scene.ambience = scene?.ambience ?? [];
     if (updateData.ambienceAdded?.length) {
       const toAddIds = updateData.ambienceAdded.filter(
         (id) => !scene.ambience?.some((a) => a.soundEffectId === id)
@@ -143,6 +144,7 @@ export class SceneManager {
     }
 
     // Stingers
+    scene.stingers = scene?.stingers ?? [];
     if (updateData.stingersAdded?.length) {
       const toAddIds = updateData.stingersAdded.filter(
         (id) => !scene.stingers?.some((a) => a.soundEffectId === id)
@@ -157,7 +159,7 @@ export class SceneManager {
       });
     }
     if (updateData.stingersRemoved?.length) {
-      scene.ambience = scene.stingers.filter(
+      scene.stingers = scene.stingers.filter(
         (ref) => !updateData.stingersRemoved!.includes(ref.soundEffectId)
       );
     }

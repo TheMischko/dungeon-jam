@@ -8,7 +8,10 @@ import {
 } from '@angular/core';
 import { SoundEffect } from '@shared/models/sound-effect.model';
 import { SmartTableComponent } from '../../../../components/table/smart-table/smart-table.component';
-import { TableColumnConfiguration } from '../../../../models/table.model';
+import {
+  TableColumnConfiguration,
+  TableUniquenessFn,
+} from '../../../../models/table.model';
 import { TrackDurationPipe } from '@general/pipes/track-duration.pipe';
 import { TagListSmartComponent } from '@general/components/display/tag-list/tag-list-smart/tag-list-smart.component';
 import { PlayPauseButtonComponent } from '@general/components/buttons/play-pause-button/play-pause-button.component';
@@ -52,6 +55,7 @@ export class SoundEffectTableComponent {
   readonly currentlyPlaying = input<string[]>([]);
 
   readonly selection = input<boolean>(false);
+  readonly initialSelection = input<SoundEffect[]>();
   readonly allSelectedState = input<'checked' | 'unchecked' | 'indeterminate'>(
     'unchecked'
   );
@@ -116,6 +120,8 @@ export class SoundEffectTableComponent {
   };
 
   readonly idFunction = (soundEffect: SoundEffect) => soundEffect.id;
+  readonly uniquenessFunction: TableUniquenessFn<SoundEffect> = (a, b) =>
+    a.id === b.id;
 
   emitPlayOrPause(soundEffect: SoundEffect): void {
     if (this.currentlyPlaying().includes(soundEffect.id)) {

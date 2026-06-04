@@ -36,11 +36,12 @@
         @if (ambience().length) {
           <app-scene-sound-effects-list
             [soundEffects]="ambience()"
+            (changeSelection)="changeAmbience.emit()"
           ></app-scene-sound-effects-list>
         } @else {
           <app-add-sound-effects-section
             soundEffectType="ambience"
-            (soundEffectsAdd)="addToAmbience($event)"
+            (addSoundEffects)="changeAmbience.emit()"
           ></app-add-sound-effects-section>
         }
       </div>
@@ -50,11 +51,12 @@
         @if (stingers().length) {
           <app-scene-sound-effects-list
             [soundEffects]="stingers()"
+            (changeSelection)="changeStingers.emit()"
           ></app-scene-sound-effects-list>
         } @else {
           <app-add-sound-effects-section
             soundEffectType="ambience"
-            (soundEffectsAdd)="addToStingers($event)"
+            (addSoundEffects)="changeStingers.emit()"
           ></app-add-sound-effects-section>
         }
       </div>

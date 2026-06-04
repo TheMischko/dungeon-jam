@@ -4,6 +4,7 @@
     [size]="'large'"
     (toggle)="emitPlayAllOrPauseAll()"
   />
+  <button mat-flat-button (click)="changeSelection.emit()">Change selection</button>
 </div>
 <div class="sound-effects">
   @for (soundEffect of soundEffects(); track soundEffect.id) {

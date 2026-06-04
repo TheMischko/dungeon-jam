@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   effect,
   inject,
   input,
@@ -19,6 +20,11 @@ import { SceneConsoleComponent } from '../scene-console/scene-console.component'
 import { ImageApiService } from '@general/services/image-api.service';
 import { ListChanged } from '../../../../../../../general/models/list-changed.model';
 import { ScenesStore } from '@general/stores/scenes.store';
+import { DialogService } from '../../../../services/dialog.service';
+import { SelectSoundEffectsModalComponent } from '../../../sound-effects/modals/select-sound-effects-modal/select-sound-effects-modal.component';
+import { SelectSoundEffectsSelection } from '../../../sound-effects/modals/select-sound-effects-modal/select-sound-effects-modal.types';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { map, Observable } from 'rxjs';
 
 @Component({
   selector: 'app-scene-console-smart',
@@ -34,6 +40,8 @@ export class SceneConsoleSmartComponent implements OnInit {
   readonly tagsStore = inject(TagsStore);
   readonly imageApiService = inject(ImageApiService);
   readonly scenesStore = inject(ScenesStore);
+  readonly dialogService = inject(DialogService);
+  readonly destroyRef = inject(DestroyRef);
 
   readonly scene = input.required<Scene>();
 
@@ -158,7 +166,29 @@ export class SceneConsoleSmartComponent implements OnInit {
     }
   }
 
-  updateAmbience(changes: ListChanged<SoundEffect>): void {
+  changeAmbienceSelection(): void {
+    const ambience = this.ambience();
+    this.changeSelectionInModal(ambience).subscribe((selection) => {
+      if (!selection) {
+        return;
+      }
+      const changes = this.getSelectionChanges(ambience, selection);
+      this.updateAmbience(changes);
+    });
+  }
+
+  changeStingerSelection(): void {
+    const stingers = this.stingers();
+    this.changeSelectionInModal(stingers).subscribe((selection) => {
+      if (!selection) {
+        return;
+      }
+      const changes = this.getSelectionChanges(stingers, selection);
+      this.updateStingers(changes);
+    });
+  }
+
+  protected updateAmbience(changes: ListChanged<SoundEffect>): void {
     this.scenesStore.update({
       id: this.scene().id,
       ...(changes.added && {
@@ -170,7 +200,7 @@ export class SceneConsoleSmartComponent implements OnInit {
     });
   }
 
-  updateStingers(changes: ListChanged<SoundEffect>): void {
+  protected updateStingers(changes: ListChanged<SoundEffect>): void {
     this.scenesStore.update({
       id: this.scene().id,
       ...(changes.added && {
@@ -180,5 +210,42 @@ export class SceneConsoleSmartComponent implements OnInit {
         stingersRemoved: changes.removed.map((soundEffect) => soundEffect.id),
       }),
     });
+  }
+
+  protected getSelectionChanges(
+    originals: SoundEffect[],
+    updated: SoundEffect[]
+  ): ListChanged<SoundEffect> {
+    const added = updated.filter(
+      (soundEffect) => !originals.includes(soundEffect)
+    );
+    const removed = originals.filter(
+      (soundEffect) => !updated.includes(soundEffect)
+    );
+
+    return {
+      added,
+      removed,
+    };
+  }
+
+  protected changeSelectionInModal(
+    selection: SoundEffect[] = []
+  ): Observable<SoundEffect[] | undefined> {
+    const dialog = this.dialogService.open<
+      SelectSoundEffectsModalComponent,
+      SelectSoundEffectsSelection
+    >(SelectSoundEffectsModalComponent, {
+      data: {
+        selectedSoundEffects: selection,
+      },
+    });
+
+    return dialog.afterClosed$.pipe(
+      takeUntilDestroyed(this.destroyRef),
+      map((response: SelectSoundEffectsSelection | undefined) => {
+        return response?.selectedSoundEffects;
+      })
+    );
   }
 }

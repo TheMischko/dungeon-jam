@@ -52,6 +52,7 @@ export class SmartTableComponent<T> implements AfterViewInit {
   readonly config = input.required<TableColumnConfiguration<T>>();
   readonly dataSet = input<T[]>([]);
   readonly selection = input<boolean>(false);
+  readonly initialSelection = input<T[]>();
   readonly allSelectedState = input<'checked' | 'unchecked' | 'indeterminate'>(
     'unchecked'
   );
