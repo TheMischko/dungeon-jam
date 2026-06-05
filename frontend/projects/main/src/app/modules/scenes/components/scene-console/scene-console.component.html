@@ -32,10 +32,10 @@
     </div>
     <div class="sound-effects-sector">
       <div class="ambience sound-effects-sector-item">
-        <h2 class="section-header">Ambience</h2>
         @if (ambience().length) {
           <app-scene-sound-effects-list
             [soundEffects]="ambience()"
+            title="Ambience"
             (changeSelection)="changeAmbience.emit()"
           ></app-scene-sound-effects-list>
         } @else {
@@ -47,10 +47,10 @@
       </div>
 
       <div class="stingers sound-effects-sector-item">
-        <h2 class="section-header">Stingers</h2>
         @if (stingers().length) {
           <app-scene-sound-effects-list
             [soundEffects]="stingers()"
+            title="Stingers"
             (changeSelection)="changeStingers.emit()"
           ></app-scene-sound-effects-list>
         } @else {

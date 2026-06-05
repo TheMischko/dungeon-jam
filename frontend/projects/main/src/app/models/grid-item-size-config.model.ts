@@ -13,4 +13,6 @@ export interface GridSoundEffectSizeConfig extends GridItemSizeConfig {
   hideVolume?: boolean;
   hideLoop?: boolean;
   hidePlay?: boolean;
+  hideIcon?: boolean;
+  hideActions?: boolean;
 }

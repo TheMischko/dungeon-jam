@@ -1,13 +1,26 @@
-<div class="controls">
-  <lib-play-pause-button
-    [state]="playingAllState()"
-    [size]="'large'"
-    (toggle)="emitPlayAllOrPauseAll()"
-  />
-  <button mat-flat-button (click)="changeSelection.emit()">Change selection</button>
+<div class="header">
+  <div class="title-section">
+    <h2 class="list-header">{{ title() }}</h2>
+    <lib-icon-button
+      [icon]="EditIcon"
+      size="small"
+      (clicked)="changeSelection.emit()"
+    ></lib-icon-button>
+  </div>
+  <div class="controls">
+    <lib-play-pause-button
+      [state]="playingAllState()"
+      size="regular"
+      [type]="ButtonType.Flat"
+      (toggle)="emitPlayAllOrPauseAll()"
+    />
+  </div>
 </div>
+
 <div class="sound-effects">
   @for (soundEffect of soundEffects(); track soundEffect.id) {
-    <app-sound-effect-card [soundEffect]="soundEffect" [sizeConfig]="config" />
+    <app-scene-sound-effect-card
+      [soundEffect]="soundEffect"
+    ></app-scene-sound-effect-card>
   }
 </div>

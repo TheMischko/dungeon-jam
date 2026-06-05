@@ -82,10 +82,6 @@
   }
 }
 
-.section-header {
-  @include typo.h3();
-}
-
 .sound-effects-sector {
   display: flex;
   flex-direction: column;

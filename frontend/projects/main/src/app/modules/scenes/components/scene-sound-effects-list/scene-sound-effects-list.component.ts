@@ -7,13 +7,19 @@ import {
 } from '@angular/core';
 import { SoundEffect } from '@shared/models/sound-effect.model';
 import { PlayPauseButtonComponent } from '@general/components/buttons/play-pause-button/play-pause-button.component';
-import { SoundEffectCardComponent } from '../../../sound-effects/components/sound-effect-card/sound-effect-card.component';
 import { GridSoundEffectSizeConfig } from '../../../../models/grid-item-size-config.model';
-import { MatButton } from '@angular/material/button';
+import { actionsIconSet } from '@general/icons/icons';
+import { IconButtonComponent } from '@general/components/buttons/icon-button/icon-button.component';
+import { SceneSoundEffectCardComponent } from '../scene-sound-effect-card/scene-sound-effect-card.component';
+import { ButtonType } from '../../../../../../../general/models/button.model';
 
 @Component({
   selector: 'app-scene-sound-effects-list',
-  imports: [PlayPauseButtonComponent, SoundEffectCardComponent, MatButton],
+  imports: [
+    PlayPauseButtonComponent,
+    IconButtonComponent,
+    SceneSoundEffectCardComponent,
+  ],
   templateUrl: './scene-sound-effects-list.component.html',
   styleUrl: './scene-sound-effects-list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -21,6 +27,7 @@ import { MatButton } from '@angular/material/button';
 export class SceneSoundEffectsListComponent {
   readonly soundEffects = input.required<SoundEffect[]>();
   readonly playMap = input<Record<string, boolean>>({});
+  readonly title = input<string>('Sound effects');
 
   readonly playAll = output<SoundEffect[]>();
   readonly pauseAll = output<SoundEffect[]>();
@@ -36,6 +43,7 @@ export class SceneSoundEffectsListComponent {
     titleBold: false,
     titleSize: 16,
   };
+  readonly EditIcon = actionsIconSet.EditIcon;
 
   readonly playingAll = computed(() => {
     const soundEffects = this.soundEffects();
@@ -67,6 +75,8 @@ export class SceneSoundEffectsListComponent {
     }
     this.playAll.emit(this.soundEffects());
   }
+
+  protected readonly ButtonType = ButtonType;
 }
 
 export type SoundEffectVolumeChange = {

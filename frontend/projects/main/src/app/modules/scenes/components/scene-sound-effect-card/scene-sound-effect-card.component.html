@@ -1,0 +1,8 @@
+<div class="main-content">
+  <div class="title" libScrollOverflowText>{{ title() }}</div>
+  <app-volume-control [volume]="volume()"></app-volume-control>
+</div>
+<lib-play-pause-button
+  [state]="playPauseState()"
+  size="small"
+></lib-play-pause-button>
