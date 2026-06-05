@@ -94,9 +94,15 @@
     flex-direction: column;
     align-self: stretch;
     justify-content: stretch;
-    height: 50%;
-    min-height: 200px;
-    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
     padding-right: 1rem;
+
+    app-scene-sound-effects-list,
+    app-add-sound-effects-section {
+      flex: 1;
+      min-height: 0;
+    }
   }
 }

@@ -4,21 +4,28 @@
 :host {
   display: flex;
   flex-direction: column;
+  height: 100%;
+  overflow: hidden;
 }
 
 .sound-effects {
+  flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   align-items: stretch;
   justify-content: flex-start;
   gap: 0.25rem;
+  overflow-y: auto;
 }
 
 .header {
+  flex-shrink: 0;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
+  padding-bottom: 0.5rem;
 
   .title-section {
     display: flex;

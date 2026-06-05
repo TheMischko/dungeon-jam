@@ -8,12 +8,14 @@
     ></lib-icon-button>
   </div>
   <div class="controls">
-    <lib-play-pause-button
-      [state]="playingAllState()"
-      size="regular"
-      [type]="ButtonType.Flat"
-      (toggle)="emitPlayAllOrPauseAll()"
-    />
+    @if (showPlayAll()) {
+      <lib-play-pause-button
+        [state]="playingAllState()"
+        size="regular"
+        [type]="ButtonType.Flat"
+        (toggle)="emitPlayAllOrPauseAll()"
+      />
+    }
   </div>
 </div>
 
@@ -21,6 +23,11 @@
   @for (soundEffect of soundEffects(); track soundEffect.id) {
     <app-scene-sound-effect-card
       [soundEffect]="soundEffect"
+      [isPlaying]="isSoundEffectPlaying(soundEffect)"
+      [volume]="getSoundEffectVolume(soundEffect)"
+      (playSoundEffect)="playSoundEffect.emit(soundEffect)"
+      (pauseSoundEffect)="pauseSoundEffect.emit(soundEffect)"
+      (updateVolume)="emitVolumeChange(soundEffect, $event)"
     ></app-scene-sound-effect-card>
   }
 </div>

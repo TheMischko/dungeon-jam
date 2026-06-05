@@ -25,6 +25,7 @@ import { SelectSoundEffectsModalComponent } from '../../../sound-effects/modals/
 import { SelectSoundEffectsSelection } from '../../../sound-effects/modals/select-sound-effects-modal/select-sound-effects-modal.types';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { map, Observable } from 'rxjs';
+import { SoundEffectVolumeChange } from '../../../../models/sound-effect.model';
 
 @Component({
   selector: 'app-scene-console-smart',
@@ -247,5 +248,25 @@ export class SceneConsoleSmartComponent implements OnInit {
         return response?.selectedSoundEffects;
       })
     );
+  }
+
+  protected playAmbience() {
+    console.log('Play Ambience');
+  }
+
+  protected pauseAmbience() {
+    console.log('Pause Ambience');
+  }
+
+  protected playSoundEffect(soundEffect: SoundEffect) {
+    console.log('Play sfx', soundEffect);
+  }
+
+  protected pauseSoundEffect(soundEffect: SoundEffect) {
+    console.log('Pause sfx', soundEffect);
+  }
+
+  protected changeSoundEffectVolume(event: SoundEffectVolumeChange) {
+    console.log('Update sfx volume', event);
   }
 }

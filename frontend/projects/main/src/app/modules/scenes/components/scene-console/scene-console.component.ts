@@ -17,6 +17,7 @@ import { TagListSmartComponent } from '@general/components/display/tag-list/tag-
 import { ButtonType } from '../../../../../../../general/models/button.model';
 import { SceneSoundEffectsListComponent } from '../scene-sound-effects-list/scene-sound-effects-list.component';
 import { AddSoundEffectsSectionComponent } from '../add-sound-effects-section/add-sound-effects-section.component';
+import { SoundEffectVolumeChange } from '../../../../models/sound-effect.model';
 
 @Component({
   selector: 'app-scene-console',
@@ -43,6 +44,11 @@ export class SceneConsoleComponent {
 
   readonly changeAmbience = output<void>();
   readonly changeStingers = output<void>();
+  readonly playAmbience = output<void>();
+  readonly pauseAmbience = output<void>();
+  readonly playSoundEffect = output<SoundEffect>();
+  readonly pauseSoundEffect = output<SoundEffect>();
+  readonly changeSoundEffectVolume = output<SoundEffectVolumeChange>();
 
   readonly loading = computed(() => {
     return (

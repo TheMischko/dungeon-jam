@@ -12,6 +12,7 @@ import { actionsIconSet } from '@general/icons/icons';
 import { IconButtonComponent } from '@general/components/buttons/icon-button/icon-button.component';
 import { SceneSoundEffectCardComponent } from '../scene-sound-effect-card/scene-sound-effect-card.component';
 import { ButtonType } from '../../../../../../../general/models/button.model';
+import { SoundEffectVolumeChange } from '../../../../models/sound-effect.model';
 
 @Component({
   selector: 'app-scene-sound-effects-list',
@@ -27,7 +28,9 @@ import { ButtonType } from '../../../../../../../general/models/button.model';
 export class SceneSoundEffectsListComponent {
   readonly soundEffects = input.required<SoundEffect[]>();
   readonly playMap = input<Record<string, boolean>>({});
+  readonly volumeMap = input<Record<string, number>>({});
   readonly title = input<string>('Sound effects');
+  readonly showPlayAll = input<boolean>(true);
 
   readonly playAll = output<SoundEffect[]>();
   readonly pauseAll = output<SoundEffect[]>();
@@ -44,6 +47,7 @@ export class SceneSoundEffectsListComponent {
     titleSize: 16,
   };
   readonly EditIcon = actionsIconSet.EditIcon;
+  protected readonly ButtonType = ButtonType;
 
   readonly playingAll = computed(() => {
     const soundEffects = this.soundEffects();
@@ -62,24 +66,27 @@ export class SceneSoundEffectsListComponent {
     this.playingAll() ? 'pause' : 'play'
   );
 
-  emitVolumeChange(soundEffect: SoundEffect, volume: number): void {
+  protected emitVolumeChange(soundEffect: SoundEffect, volume: number): void {
     this.changeVolume.emit({
       soundEffect,
       volume,
     });
   }
 
-  emitPlayAllOrPauseAll() {
+  protected emitPlayAllOrPauseAll() {
     if (this.playingAll()) {
       this.pauseAll.emit(this.soundEffects());
     }
     this.playAll.emit(this.soundEffects());
   }
 
-  protected readonly ButtonType = ButtonType;
-}
+  protected isSoundEffectPlaying(soundEffect: SoundEffect) {
+    const playingMap = this.playMap();
+    return playingMap[soundEffect.id] ?? false;
+  }
 
-export type SoundEffectVolumeChange = {
-  soundEffect: SoundEffect;
-  volume: number;
-};
+  protected getSoundEffectVolume(soundEffect: SoundEffect) {
+    const volumeMap = this.volumeMap();
+    return volumeMap[soundEffect.id] ?? 0.5;
+  }
+}

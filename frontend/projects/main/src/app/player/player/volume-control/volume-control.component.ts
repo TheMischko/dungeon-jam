@@ -4,6 +4,7 @@ import { volumeIconSet } from '@general/icons/icons';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { RangeSliderComponent } from '@general/components/controls/range-slider/range-slider.component';
+import { debounceTime } from 'rxjs';
 
 @Component({
   selector: 'app-volume-control',
@@ -20,6 +21,7 @@ export class VolumeControlComponent {
    */
   size = input<number>(1);
   showIcon = input<boolean>(true);
+  changeDebounceTime = input<number>(50);
 
   volumeNormalized = computed(() => {
     return Math.max(0, Math.min(this.volume(), 1));
@@ -52,9 +54,12 @@ export class VolumeControlComponent {
   changed = output<number>();
 
   control = new FormControl(1);
-  controlValueChanged = toSignal(this.control.valueChanges, {
-    initialValue: null,
-  });
+  controlValueChanged = toSignal(
+    this.control.valueChanges.pipe(debounceTime(this.changeDebounceTime())),
+    {
+      initialValue: null,
+    }
+  );
 
   private readonly ICON_BASE_SIZE = 24;
   private readonly KNOB_BASE_SIZE = 16;
@@ -65,6 +70,7 @@ export class VolumeControlComponent {
       if (valueChanged === null) {
         return;
       }
+
       const remappedValue = Math.pow(valueChanged, 2);
       this.changed.emit(remappedValue);
     });

@@ -37,6 +37,11 @@
             [soundEffects]="ambience()"
             title="Ambience"
             (changeSelection)="changeAmbience.emit()"
+            (playAll)="playAmbience.emit()"
+            (pauseAll)="pauseAmbience.emit()"
+            (playSoundEffect)="playSoundEffect.emit($event)"
+            (pauseSoundEffect)="pauseSoundEffect.emit($event)"
+            (changeVolume)="changeSoundEffectVolume.emit($event)"
           ></app-scene-sound-effects-list>
         } @else {
           <app-add-sound-effects-section
@@ -50,8 +55,12 @@
         @if (stingers().length) {
           <app-scene-sound-effects-list
             [soundEffects]="stingers()"
+            [showPlayAll]="false"
             title="Stingers"
             (changeSelection)="changeStingers.emit()"
+            (playSoundEffect)="playSoundEffect.emit($event)"
+            (pauseSoundEffect)="pauseSoundEffect.emit($event)"
+            (changeVolume)="changeSoundEffectVolume.emit($event)"
           ></app-scene-sound-effects-list>
         } @else {
           <app-add-sound-effects-section

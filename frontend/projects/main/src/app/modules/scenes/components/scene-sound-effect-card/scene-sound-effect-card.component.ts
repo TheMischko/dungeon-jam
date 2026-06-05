@@ -3,6 +3,7 @@ import {
   Component,
   computed,
   input,
+  output,
 } from '@angular/core';
 import { SoundEffect } from '@shared/models/sound-effect.model';
 import { VolumeControlComponent } from '../../../../player/player/volume-control/volume-control.component';
@@ -25,10 +26,22 @@ export class SceneSoundEffectCardComponent {
   readonly isPlaying = input<boolean>(false);
   readonly volume = input<number>(0.5);
 
+  readonly playSoundEffect = output<void>();
+  readonly pauseSoundEffect = output<void>();
+  readonly updateVolume = output<number>();
+
   readonly title = computed(() => {
     return this.soundEffect().name;
   });
   readonly playPauseState = computed(() => {
     return this.isPlaying() ? 'pause' : 'play';
   });
+
+  playPauseClicked(): void {
+    if (this.isPlaying()) {
+      this.pauseSoundEffect.emit();
+      return;
+    }
+    this.playSoundEffect.emit();
+  }
 }
