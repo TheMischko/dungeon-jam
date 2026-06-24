@@ -89,4 +89,11 @@ export class SceneSoundEffectsListComponent {
     const volumeMap = this.volumeMap();
     return volumeMap[soundEffect.id] ?? 0.5;
   }
+
+  protected emitPlaySoundEffect(soundEffect: SoundEffect) {
+    this.playSoundEffect.emit({
+      ...soundEffect,
+      volume: this.volumeMap()[soundEffect.id] ?? soundEffect.volume,
+    });
+  }
 }

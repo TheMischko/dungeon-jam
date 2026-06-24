@@ -12,19 +12,24 @@
       </div>
       <div class="header-actions">
         <lib-play-pause-button
-          [state]="'play'"
+          [state]="scenePlayButtonState()"
           [type]="ButtonType.Flat"
           [size]="'large'"
+          (toggle)="toggleScenePlaying($event)"
         />
       </div>
     </div>
   </div>
   <div class="console-content">
     <div class="music-sector">
-      <h2 class="section-header">Music</h2>
-      <div>Playlist: {{ playlist()?.name }}</div>
+      <h2 class="section-header">
+        Music
+        <span class="playlist-name">Playlist: {{ playlist()?.name }}</span>
+      </h2>
+
       <app-songs-table
         [tracks]="tracks()"
+        [playingTrackId]="playingTrackId()"
         [loading]="false"
         [hiddenColumns]="excludedColumns"
         [showFilters]="false"
@@ -35,11 +40,12 @@
         @if (ambience().length) {
           <app-scene-sound-effects-list
             [soundEffects]="ambience()"
+            [playMap]="ambiencePlayMap()"
             title="Ambience"
             (changeSelection)="changeAmbience.emit()"
             (playAll)="playAmbience.emit()"
             (pauseAll)="pauseAmbience.emit()"
-            (playSoundEffect)="playSoundEffect.emit($event)"
+            (playSoundEffect)="playAmbienceSoundEffect.emit($event)"
             (pauseSoundEffect)="pauseSoundEffect.emit($event)"
             (changeVolume)="changeSoundEffectVolume.emit($event)"
           ></app-scene-sound-effects-list>
@@ -55,10 +61,11 @@
         @if (stingers().length) {
           <app-scene-sound-effects-list
             [soundEffects]="stingers()"
+            [playMap]="stingersPlayMap()"
             [showPlayAll]="false"
             title="Stingers"
             (changeSelection)="changeStingers.emit()"
-            (playSoundEffect)="playSoundEffect.emit($event)"
+            (playSoundEffect)="playStingerSoundEffect.emit($event)"
             (pauseSoundEffect)="pauseSoundEffect.emit($event)"
             (changeVolume)="changeSoundEffectVolume.emit($event)"
           ></app-scene-sound-effects-list>

@@ -33,9 +33,11 @@ type SoundEffectInternalState = {
 export class SoundEffectsPlayerService {
   private readonly loadSoundService = inject(LoadSoundService);
 
+  // Maps Sound effect ID to a player state
   private readonly stateRecord = new BehaviorSubject<
     Record<string, SoundEffectInternalState>
   >({});
+  // Maps Sound effect ID to a playback position
   private readonly positionRecord = new BehaviorSubject<Record<string, number>>(
     {}
   );

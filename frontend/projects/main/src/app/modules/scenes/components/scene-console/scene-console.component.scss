@@ -76,6 +76,11 @@
   overflow: hidden;
   padding-right: 1rem;
 
+  .playlist-name {
+    float: right;
+    @include typo.body1();
+  }
+
   app-songs-table {
     flex: 1;
     min-height: 0;

@@ -35,18 +35,25 @@ import { SoundEffectVolumeChange } from '../../../../models/sound-effect.model';
 })
 export class SceneConsoleComponent {
   readonly scene = input<Scene>();
+  readonly scenePlaying = input<boolean>();
   readonly playlist = input<Playlist>();
   readonly tracks = input<Track[]>([]);
   readonly ambience = input<SoundEffect[]>([]);
   readonly stingers = input<SoundEffect[]>([]);
   readonly tagsMap = input<Record<string, Tag>>({});
   readonly sceneImageUrl = input<string>();
+  readonly ambiencePlayMap = input<Record<string, boolean>>({});
+  readonly stingersPlayMap = input<Record<string, boolean>>({});
+  readonly playingTrack = input<Track | null>();
 
+  readonly playScene = output<void>();
+  readonly pauseScene = output<void>();
   readonly changeAmbience = output<void>();
   readonly changeStingers = output<void>();
   readonly playAmbience = output<void>();
   readonly pauseAmbience = output<void>();
-  readonly playSoundEffect = output<SoundEffect>();
+  readonly playAmbienceSoundEffect = output<SoundEffect>();
+  readonly playStingerSoundEffect = output<SoundEffect>();
   readonly pauseSoundEffect = output<SoundEffect>();
   readonly changeSoundEffectVolume = output<SoundEffectVolumeChange>();
 
@@ -55,7 +62,26 @@ export class SceneConsoleComponent {
       !this.scene() || !this.playlist() || !Object.keys(this.tagsMap()).length
     );
   });
+  readonly playingTrackId = computed(() => {
+    const track = this.playingTrack();
+    if (!track) {
+      return null;
+    }
+    return track.id;
+  });
+
+  readonly scenePlayButtonState = computed(() => {
+    return this.scenePlaying() ? 'pause' : 'play';
+  });
 
   readonly excludedColumns: (keyof Track)[] = ['author', 'tags'];
   protected readonly ButtonType = ButtonType;
+
+  protected toggleScenePlaying(newState: 'play' | 'pause') {
+    if (newState === 'play') {
+      this.playScene.emit();
+      return;
+    }
+    this.pauseScene.emit();
+  }
 }

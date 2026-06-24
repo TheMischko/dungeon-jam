@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   DestroyRef,
   effect,
   inject,
@@ -23,9 +24,11 @@ import { ScenesStore } from '@general/stores/scenes.store';
 import { DialogService } from '../../../../services/dialog.service';
 import { SelectSoundEffectsModalComponent } from '../../../sound-effects/modals/select-sound-effects-modal/select-sound-effects-modal.component';
 import { SelectSoundEffectsSelection } from '../../../sound-effects/modals/select-sound-effects-modal/select-sound-effects-modal.types';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { map, Observable } from 'rxjs';
 import { SoundEffectVolumeChange } from '../../../../models/sound-effect.model';
+import { PlaybackService } from '../../../../services/playback.service';
+import { SoundEffectsPlayerService } from '../../../../services/sound-effects-player.service';
 
 @Component({
   selector: 'app-scene-console-smart',
@@ -43,6 +46,8 @@ export class SceneConsoleSmartComponent implements OnInit {
   readonly scenesStore = inject(ScenesStore);
   readonly dialogService = inject(DialogService);
   readonly destroyRef = inject(DestroyRef);
+  readonly playbackService = inject(PlaybackService);
+  readonly soundEffectsPlayerService = inject(SoundEffectsPlayerService);
 
   readonly scene = input.required<Scene>();
 
@@ -52,8 +57,40 @@ export class SceneConsoleSmartComponent implements OnInit {
   readonly ambience = signal<SoundEffect[]>([]);
   readonly stingers = signal<SoundEffect[]>([]);
   readonly sceneImageUrl = signal<string | undefined>(undefined);
+  readonly playingSoundEffects = toSignal(
+    this.soundEffectsPlayerService.playingEffects$,
+    { initialValue: [] }
+  );
+  readonly playingTrack = toSignal(
+    this.playbackService.playback$.pipe(map((state) => state.currentTrack)),
+    { initialValue: null }
+  );
 
   private trackLoadTimeout: number | undefined = undefined;
+
+  readonly ambiencePlaying = computed(() => {
+    const ambience = this.ambience();
+    const playingSoundEffectIds = this.playingSoundEffects().map((r) => r.id);
+    return ambience.some((soundEffect) =>
+      playingSoundEffectIds.includes(soundEffect.id)
+    );
+  });
+
+  readonly scenePlaying = computed(() => {
+    return this.ambiencePlaying();
+  });
+
+  readonly playMap = computed(() => {
+    return this.playingSoundEffects().reduce(
+      (playMap, soundEffect) => {
+        return {
+          [soundEffect.id]: true,
+          ...playMap,
+        };
+      },
+      {} as Record<string, boolean>
+    );
+  });
 
   constructor() {
     effect(() => {
@@ -250,23 +287,77 @@ export class SceneConsoleSmartComponent implements OnInit {
     );
   }
 
-  protected playAmbience() {
-    console.log('Play Ambience');
+  protected async playScene() {
+    await this.playMusic();
+    await this.playAmbience();
+  }
+
+  protected stopScene() {
+    this.pauseMusic();
+    this.pauseAmbience();
+    this.stopStingers();
+  }
+
+  protected async playMusic() {
+    const tracks = this.tracks();
+    if (!tracks.length) {
+      return;
+    }
+
+    await this.playbackService.play(tracks[0], tracks.slice(1));
+  }
+
+  protected pauseMusic() {
+    this.playbackService.pause();
+  }
+
+  protected async playAmbience() {
+    const ambience = this.ambience();
+    if (!ambience.length) {
+      return;
+    }
+    for (const soundEffect of ambience) {
+      await this.soundEffectsPlayerService.playEffect(soundEffect, true);
+    }
   }
 
   protected pauseAmbience() {
-    console.log('Pause Ambience');
+    const ambience = this.ambience();
+    if (!ambience.length) {
+      return;
+    }
+    for (const soundEffect of ambience) {
+      this.soundEffectsPlayerService.stopEffect(soundEffect.id);
+    }
   }
 
-  protected playSoundEffect(soundEffect: SoundEffect) {
-    console.log('Play sfx', soundEffect);
+  protected async playSoundEffect(
+    soundEffect: SoundEffect,
+    loop: boolean = false
+  ) {
+    await this.soundEffectsPlayerService.playEffect(
+      {
+        ...soundEffect,
+        looping: loop,
+      },
+      loop
+    );
   }
 
   protected pauseSoundEffect(soundEffect: SoundEffect) {
-    console.log('Pause sfx', soundEffect);
+    this.soundEffectsPlayerService.stopEffect(soundEffect.id);
   }
 
   protected changeSoundEffectVolume(event: SoundEffectVolumeChange) {
-    console.log('Update sfx volume', event);
+    this.soundEffectsPlayerService.setEffectVolume(
+      event.soundEffect.id,
+      event.volume
+    );
+  }
+
+  protected stopStingers() {
+    this.stingers().forEach((soundEffect) => {
+      this.soundEffectsPlayerService.stopEffect(soundEffect.id);
+    });
   }
 }

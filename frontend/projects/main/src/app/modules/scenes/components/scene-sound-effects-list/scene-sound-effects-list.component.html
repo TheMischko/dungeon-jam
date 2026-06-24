@@ -25,7 +25,7 @@
       [soundEffect]="soundEffect"
       [isPlaying]="isSoundEffectPlaying(soundEffect)"
       [volume]="getSoundEffectVolume(soundEffect)"
-      (playSoundEffect)="playSoundEffect.emit(soundEffect)"
+      (playSoundEffect)="emitPlaySoundEffect(soundEffect)"
       (pauseSoundEffect)="pauseSoundEffect.emit(soundEffect)"
       (updateVolume)="emitVolumeChange(soundEffect, $event)"
     ></app-scene-sound-effect-card>
