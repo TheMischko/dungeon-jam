@@ -5,6 +5,7 @@ import {
   PlaybackState,
   PlaybackTrackPosition,
   PlayingTrackState,
+  PlayMetadata,
   QueueItem,
 } from '../models/playback.model';
 import { RepeatState, StoredPlayback, Track } from '@shared/models/track.model';
@@ -72,9 +73,9 @@ export class PlaybackService implements OnDestroy {
   /**
    * Adds the tracks to queue and plays either first one or random based on shuffle state.
    * @param trackList
-   * @param playlistId
+   * @param metadata
    */
-  async playTracks(trackList: Track[], playlistId?: string) {
+  async playTracks(trackList: Track[], metadata?: PlayMetadata) {
     const shuffle = this.state.getValue().shuffle;
     let track: Track;
     let queue: Track[];
@@ -89,10 +90,10 @@ export class PlaybackService implements OnDestroy {
       track = trackList[0];
       queue = trackList.slice(1);
     }
-    await this.play(track, queue, playlistId);
+    await this.play(track, queue, metadata);
   }
 
-  async play(track?: Track, queue?: Track[], playlistId?: string) {
+  async play(track?: Track, queue?: Track[], metadata?: PlayMetadata) {
     const current = this.state.getValue();
     if (queue && track) {
       let newQueue: QueueItem[] = queue.map((t) => ({
@@ -109,7 +110,8 @@ export class PlaybackService implements OnDestroy {
         currentTrackIsInjected: false,
         queue: newQueue,
         isPlaying: true,
-        playlistId,
+        playlistId: metadata?.playlistId,
+        sceneId: metadata?.sceneId,
       });
       this.trackPosition.next({ position: 0, duration: track.duration });
       await this.audioPlayerService.play(track);

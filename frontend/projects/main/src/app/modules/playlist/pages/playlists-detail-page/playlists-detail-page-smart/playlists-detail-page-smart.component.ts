@@ -154,7 +154,9 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
 
   async playPlaylist() {
     const tracks = this.tracks();
-    await this.playbackService.playTracks(tracks, this.playlistId());
+    await this.playbackService.playTracks(tracks, {
+      playlistId: this.playlistId(),
+    });
   }
 
   openAddTracksModal() {
@@ -228,7 +230,7 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
     await this.playbackService.play(
       tracks[trackIndex],
       [...tracks.slice(trackIndex + 1), ...tracks.slice(0, trackIndex)],
-      this.playlistId()
+      { playlistId: this.playlistId() }
     );
   }
 

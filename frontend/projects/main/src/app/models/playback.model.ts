@@ -14,6 +14,7 @@ export type PlaybackState = {
   repeat: RepeatState;
   shuffle: boolean;
   playlistId?: string;
+  sceneId?: string;
 } & StoredPlayback;
 
 export type PlaybackTrackPosition = {
@@ -39,3 +40,8 @@ export enum PlayingTrackState {
   ENDING_SOON = 'ENDING_SOON',
   ENDED = 'ENDED',
 }
+
+export type PlayMetadata = {
+  playlistId?: string;
+  sceneId?: string;
+};

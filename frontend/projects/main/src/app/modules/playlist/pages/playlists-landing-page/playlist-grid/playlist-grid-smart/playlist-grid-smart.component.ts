@@ -123,7 +123,7 @@ export class PlaylistGridSmartComponent implements OnInit {
         if (!tracks?.length) {
           return;
         }
-        await this.playbackService.playTracks(tracks, playlistId);
+        await this.playbackService.playTracks(tracks, { playlistId });
       });
   }
 

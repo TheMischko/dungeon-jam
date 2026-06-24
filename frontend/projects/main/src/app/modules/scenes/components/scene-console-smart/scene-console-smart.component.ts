@@ -61,10 +61,10 @@ export class SceneConsoleSmartComponent implements OnInit {
     this.soundEffectsPlayerService.playingEffects$,
     { initialValue: [] }
   );
-  readonly playingTrack = toSignal(
-    this.playbackService.playback$.pipe(map((state) => state.currentTrack)),
-    { initialValue: null }
-  );
+  private readonly playbackState = toSignal(this.playbackService.playback$);
+  readonly playingTrack = computed(() => {
+    return this.playbackState()?.currentTrack ?? null;
+  });
 
   private trackLoadTimeout: number | undefined = undefined;
 
@@ -77,7 +77,16 @@ export class SceneConsoleSmartComponent implements OnInit {
   });
 
   readonly scenePlaying = computed(() => {
-    return this.ambiencePlaying();
+    const playbackState = this.playbackState();
+    if (!playbackState) {
+      return false;
+    }
+    const playingSceneId = playbackState.sceneId;
+    const musicPlaying = playbackState.isPlaying;
+    return (
+      this.ambiencePlaying() ||
+      (musicPlaying && playingSceneId === this.scene().id)
+    );
   });
 
   readonly playMap = computed(() => {
@@ -304,7 +313,7 @@ export class SceneConsoleSmartComponent implements OnInit {
       return;
     }
 
-    await this.playbackService.play(tracks[0], tracks.slice(1));
+    await this.playbackService.playTracks(tracks, { sceneId: this.scene().id });
   }
 
   protected pauseMusic() {
