@@ -41,6 +41,7 @@
           <app-scene-sound-effects-list
             [soundEffects]="ambience()"
             [playMap]="ambiencePlayMap()"
+            [volumeMap]="soundEffectsVolumeMap()"
             title="Ambience"
             (changeSelection)="changeAmbience.emit()"
             (playAll)="playAmbience.emit()"
@@ -63,6 +64,7 @@
             [soundEffects]="stingers()"
             [playMap]="stingersPlayMap()"
             [showPlayAll]="false"
+            [volumeMap]="soundEffectsVolumeMap()"
             title="Stingers"
             (changeSelection)="changeStingers.emit()"
             (playSoundEffect)="playStingerSoundEffect.emit($event)"

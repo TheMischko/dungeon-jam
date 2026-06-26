@@ -15,16 +15,22 @@ import {
 import {
   Scene,
   SceneInsertQuery,
+  SceneSoundEffectRef,
   SceneUpdateQuery,
 } from '@shared/models/scene.model';
 import { inject } from '@angular/core';
 import { SceneApiService } from '@general/services/scene-api.service';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { QueryOptions } from '@shared/models/request.model';
-import { catchError, finalize, of, pipe, switchMap, tap } from 'rxjs';
+import { catchError, EMPTY, finalize, of, pipe, switchMap, tap } from 'rxjs';
 
 export type ScenesStoreState = {
   loading: boolean;
+};
+
+export type SceneSoundEffectVolumeUpdate = {
+  sceneId: string;
+  updatedReference: SceneSoundEffectRef;
 };
 
 const initialState: ScenesStoreState = {
@@ -86,10 +92,50 @@ export const ScenesStore = signalStore(
       )
     );
 
+    const updateSoundEffectVolume = rxMethod<SceneSoundEffectVolumeUpdate>(
+      pipe(
+        switchMap((updateData) => {
+          const scene = store.entityMap()[updateData.sceneId];
+          if (!scene) {
+            return EMPTY;
+          }
+
+          const isAmbience = !!scene.ambience.find(
+            (ref) =>
+              ref.soundEffectId === updateData.updatedReference.soundEffectId
+          );
+          const isStinger = !!scene.stingers.find(
+            (ref) =>
+              ref.soundEffectId === updateData.updatedReference.soundEffectId
+          );
+          if (!isAmbience && !isStinger) {
+            return EMPTY;
+          }
+
+          const updateRequest: SceneUpdateQuery = {
+            id: updateData.sceneId,
+            ...(isAmbience && {
+              ambienceVolumeUpdate: updateData.updatedReference,
+            }),
+            ...(isStinger && {
+              stingerVolumeUpdate: updateData.updatedReference,
+            }),
+          };
+
+          return sceneApiService.update(updateRequest).pipe(
+            tap((scene) => {
+              patchState(store, setEntity(scene));
+            })
+          );
+        })
+      )
+    );
+
     return {
       loadAll,
       insert,
       update,
+      updateSoundEffectVolume,
     };
   })
 );

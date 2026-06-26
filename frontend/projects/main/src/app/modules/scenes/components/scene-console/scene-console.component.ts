@@ -45,6 +45,7 @@ export class SceneConsoleComponent {
   readonly ambiencePlayMap = input<Record<string, boolean>>({});
   readonly stingersPlayMap = input<Record<string, boolean>>({});
   readonly playingTrack = input<Track | null>();
+  readonly soundEffectsVolumeMap = input<Record<string, number>>({});
 
   readonly playScene = output<void>();
   readonly pauseScene = output<void>();

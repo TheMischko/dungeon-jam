@@ -57,6 +57,7 @@ export class SceneConsoleSmartComponent implements OnInit {
   readonly ambience = signal<SoundEffect[]>([]);
   readonly stingers = signal<SoundEffect[]>([]);
   readonly sceneImageUrl = signal<string | undefined>(undefined);
+  readonly soundEffectsVolumeMap = signal<Record<string, number>>({});
   readonly playingSoundEffects = toSignal(
     this.soundEffectsPlayerService.playingEffects$,
     { initialValue: [] }
@@ -173,6 +174,22 @@ export class SceneConsoleSmartComponent implements OnInit {
         })
         .filter((sfx) => !!sfx);
       this.stingers.set(stingers);
+
+      this.soundEffectsVolumeMap.update((volumeMap) => {
+        const ambienceMap = ambience.reduce(
+          (sfxMap, sfx) => ({ [sfx.id]: sfx?.volume ?? 0.5, ...sfxMap }),
+          {} as Record<string, number>
+        );
+        const stingersMap = stingers.reduce(
+          (sfxMap, sfx) => ({ [sfx.id]: sfx?.volume ?? 0.5, ...sfxMap }),
+          {} as Record<string, number>
+        );
+        return {
+          ...ambienceMap,
+          ...stingersMap,
+          ...volumeMap,
+        };
+      });
     });
 
     effect(() => {
@@ -358,10 +375,21 @@ export class SceneConsoleSmartComponent implements OnInit {
   }
 
   protected changeSoundEffectVolume(event: SoundEffectVolumeChange) {
+    this.scenesStore.updateSoundEffectVolume({
+      sceneId: this.scene().id,
+      updatedReference: {
+        soundEffectId: event.soundEffect.id,
+        volume: event.volume,
+      },
+    });
     this.soundEffectsPlayerService.setEffectVolume(
       event.soundEffect.id,
       event.volume
     );
+    this.soundEffectsVolumeMap.update((volumeMap) => ({
+      ...volumeMap,
+      [event.soundEffect.id]: event.volume,
+    }));
   }
 
   protected stopStingers() {
