@@ -1,3 +1,14 @@
 {
-  "COMMON.TEST": "Test"
+  "COMMON": {
+    "ERROR": "Error"
+  },
+  "ERRORS": {
+    "COMMON": {
+      "GENERIC_ERROR": "Unknown application error."
+    },
+    "PLAYLIST": {
+      "ID_REQUIRED": "Playlist ID is required for update.",
+      "ID_NOT_FOUND": "Playlist with ID {{playlistId}} not found."
+    }
+  }
 }

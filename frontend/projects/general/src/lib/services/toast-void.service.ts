@@ -9,4 +9,8 @@ export class ToastVoidService extends ToastService {
   ): void {
     return;
   }
+
+  override createAppErrorToast(): void {
+    return;
+  }
 }

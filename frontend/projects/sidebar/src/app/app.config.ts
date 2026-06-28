@@ -6,6 +6,8 @@ import { LUCIDE_ICONS, LucideIconProvider } from 'lucide-angular';
 import discordIconSvgson from '@general/icons/discord.json';
 import { ToastService } from '@general/services/toast.service';
 import { ToastVoidService } from '@general/services/toast-void.service';
+import { provideTranslateService } from '@ngx-translate/core';
+import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 
 // Transform the svgson data into the format expected by Lucide
 const discordIconData = discordIconSvgson.children.map((node: any) => [
@@ -31,5 +33,14 @@ export const appConfig: ApplicationConfig = {
       provide: ToastService,
       useClass: ToastVoidService,
     },
+
+    provideTranslateService({
+      loader: provideTranslateHttpLoader({
+        prefix: '/assets/i18n/',
+        suffix: '.json',
+      }),
+      fallbackLang: 'en',
+      lang: 'en',
+    }),
   ],
 };

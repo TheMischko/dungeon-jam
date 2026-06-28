@@ -21,6 +21,8 @@ import { ImageEntityType, ImageManager } from './image.manager';
 import { Logger } from '../utils/logger';
 import { DisplayOrderManager } from './display-order.manager';
 import { OrderableEntityType } from '@shared/models/display-order.model';
+import { createAppError } from '../utils/create-app-error';
+import { ErrorCode } from '@shared/models/error.model';
 
 export class PlaylistManager {
   private static _instance: PlaylistManager;
@@ -213,11 +215,20 @@ export class PlaylistManager {
 
   async update(query: PlaylistUpdateQuery): Promise<Playlist> {
     if (!query.id) {
-      throw new Error('Playlist ID is required for update.');
+      throw createAppError(
+        ErrorCode.PlaylistIdRequired,
+        'Playlist ID is required for update.'
+      );
     }
     const playlist = await this.playlistProvider.getBy('id', query.id);
     if (!playlist) {
-      throw new Error(`Playlist with ID ${query.id} not found`);
+      throw createAppError(
+        ErrorCode.PlaylistIdNotFound,
+        'Playlist with ID ${query.id} not found',
+        {
+          playlistId: query.id,
+        }
+      );
     }
     const playlistTags = [
       ...(playlist?.tags ?? []),
@@ -274,7 +285,10 @@ export class PlaylistManager {
 
       const finalizedPlaylist = await this.getById(playlist.id);
       if (!finalizedPlaylist) {
-        throw new Error('Failed to retrieve updated playlist.');
+        throw createAppError(
+          ErrorCode.GenericError,
+          'Could not find the updated playlist.'
+        );
       }
       return finalizedPlaylist;
     } catch (e) {
