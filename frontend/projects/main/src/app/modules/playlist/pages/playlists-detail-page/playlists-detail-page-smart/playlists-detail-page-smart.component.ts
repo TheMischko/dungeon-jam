@@ -25,8 +25,6 @@ import {
   SelectLibraryTracksModalConfig,
 } from '../../../../library/modals/select-library-tracks-modal/select-library-tracks-modal.component';
 import { SelectLibraryTracksSelection } from '../../../../library/modals/select-library-tracks-modal/select-library-tracks-modal.types';
-import { ToastService } from '../../../../../services/toast.service';
-import { ToastType } from '../../../../../models/toast.model';
 import { QueryOptions } from '@shared/models/request.model';
 import { PlaylistStore } from '@general/stores/playlist.store';
 import { DefaultTrackActionsService } from '../../../../../services/default-track-actions.service';
@@ -40,6 +38,8 @@ import {
   DiscoverTracksModalComponent,
   DiscoverTracksModalData,
 } from '../../../../library/modals/discover-tracks-modal/discover-tracks-modal.component';
+import { ToastType } from '../../../../../../../../general/models/toast.model';
+import { ToastService } from '@general/services/toast.service';
 
 @Component({
   selector: 'app-playlists-detail-page-smart',

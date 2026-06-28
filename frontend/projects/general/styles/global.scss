@@ -178,6 +178,28 @@ a {
   }
 }
 
+@keyframes lean-in {
+  from {
+    transform: translateX(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes lean-out {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(50px);
+    opacity: 0;
+  }
+}
+
 .highlight-focus {
   animation: highlight-flash 2s;
   transition: background-color 0.4s linear;
@@ -202,4 +224,13 @@ a {
   background: col.$background-deep;
   color: col.$text-main;
   opacity: 0.75;
+}
+
+.mat-mdc-snack-bar-container.notification-animation {
+  animation: lean-in 0.4s cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
+
+  &.mdc-snackbar--closing,
+  &.mat-mdc-snack-bar-closing {
+    animation: lean-out 0.3s ease-in forwards !important;
+  }
 }

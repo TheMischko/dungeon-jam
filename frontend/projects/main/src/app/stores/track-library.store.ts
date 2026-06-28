@@ -19,8 +19,8 @@ import { QueryRequest } from '@shared/models/request.model';
 import { inject } from '@angular/core';
 import { TrackService } from '../services/track.service';
 import { catchError, finalize, of, pipe, switchMap, tap } from 'rxjs';
-import { ToastService } from '../services/toast.service';
-import { ToastType } from '../models/toast.model';
+import { ToastService } from '@general/services/toast.service';
+import { ToastType } from '../../../../general/models/toast.model';
 
 type TrackLibraryStoreState = {
   loading: boolean;

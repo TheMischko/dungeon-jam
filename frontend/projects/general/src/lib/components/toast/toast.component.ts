@@ -3,10 +3,10 @@ import {
   MAT_SNACK_BAR_DATA,
   MatSnackBarRef,
 } from '@angular/material/snack-bar';
-import { ToastData, ToastType } from '../../models/toast.model';
 import { IconButtonComponent } from '@general/components/buttons/icon-button/icon-button.component';
 import { actionsIconSet } from '@general/icons/icons';
 import { NgClass } from '@angular/common';
+import { ToastData, ToastType } from '../../../../models/toast.model';
 
 @Component({
   selector: 'app-toast',

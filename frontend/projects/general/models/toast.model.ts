@@ -1,6 +1,6 @@
 export interface ToastData {
   title: string;
-  description: string;
+  description?: string;
   type: ToastType;
 }
 

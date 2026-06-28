@@ -16,8 +16,8 @@ import { catchError, EMPTY, finalize, pipe, switchMap, tap } from 'rxjs';
 import { inject } from '@angular/core';
 import { TrackService } from '../services/track.service';
 import { PlaylistApiService } from '@general/services/playlist-api.service';
-import { ToastService } from '../services/toast.service';
-import { ToastType } from '../models/toast.model';
+import { ToastService } from '@general/services/toast.service';
+import { ToastType } from '../../../../general/models/toast.model';
 
 type PlaylistTracksStoreState = {
   loading: boolean;
@@ -42,7 +42,7 @@ export const PlaylistTracksStore = signalStore(
       store,
       trackService = inject(TrackService),
       playlistService = inject(PlaylistApiService),
-      toastService = inject(ToastService),
+      toastService = inject(ToastService)
     ) => {
       const load = rxMethod<PlaylistTracksQuery>(
         pipe(
@@ -60,10 +60,10 @@ export const PlaylistTracksStore = signalStore(
               }),
               finalize(() => {
                 patchState(store, { loading: false, lastLoadOptions: query });
-              }),
+              })
             );
-          }),
-        ),
+          })
+        )
       );
 
       const removeTrackFromPlaylist = rxMethod<{
@@ -83,16 +83,16 @@ export const PlaylistTracksStore = signalStore(
               catchError((err) => {
                 toastService.createToast('Save error', err, ToastType.Error);
                 return EMPTY;
-              }),
+              })
             );
-          }),
-        ),
+          })
+        )
       );
 
       return {
         load,
         removeTrackFromPlaylist,
       };
-    },
-  ),
+    }
+  )
 );
