@@ -22,9 +22,7 @@
             "outputPath": "../build/main",
             "index": "projects/main/src/index.html",
             "browser": "projects/main/src/main.ts",
-            "polyfills": [
-              "zone.js"
-            ],
+            "polyfills": ["zone.js", "@angular/localize/init"],
             "tsConfig": "projects/main/tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
@@ -35,6 +33,11 @@
               {
                 "glob": "**/*",
                 "input": "projects/general/assets"
+              },
+              {
+                "glob": "**/*",
+                "input": "i18n",
+                "output": "/assets/i18n"
               }
             ],
             "styles": [
@@ -93,7 +96,8 @@
           "options": {
             "polyfills": [
               "zone.js",
-              "zone.js/testing"
+              "zone.js/testing",
+              "@angular/localize/init"
             ],
             "tsConfig": "projects/main/tsconfig.spec.json",
             "inlineStyleLanguage": "scss",
@@ -138,9 +142,7 @@
             "outputPath": "../build/sidebar",
             "index": "projects/sidebar/src/index.html",
             "browser": "projects/sidebar/src/main.ts",
-            "polyfills": [
-              "zone.js"
-            ],
+            "polyfills": ["zone.js", "@angular/localize/init"],
             "tsConfig": "projects/sidebar/tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
@@ -151,6 +153,11 @@
               {
                 "glob": "**/*",
                 "input": "projects/general/assets"
+              },
+              {
+                "glob": "**/*",
+                "input": "i18n",
+                "output": "/assets/i18n"
               }
             ],
             "styles": [
@@ -209,7 +216,8 @@
           "options": {
             "polyfills": [
               "zone.js",
-              "zone.js/testing"
+              "zone.js/testing",
+              "@angular/localize/init"
             ],
             "tsConfig": "projects/sidebar/tsconfig.spec.json",
             "inlineStyleLanguage": "scss",
@@ -221,6 +229,11 @@
               {
                 "glob": "**/*",
                 "input": "projects/general/assets"
+              },
+              {
+                "glob": "**/*",
+                "input": "i18n",
+                "output": "/assets/i18n"
               }
             ],
             "styles": [
@@ -255,9 +268,7 @@
             "outputPath": "../build/topbar",
             "index": "projects/topbar/src/index.html",
             "browser": "projects/topbar/src/main.ts",
-            "polyfills": [
-              "zone.js"
-            ],
+            "polyfills": ["zone.js", "@angular/localize/init"],
 
             "tsConfig": "projects/topbar/tsconfig.app.json",
             "inlineStyleLanguage": "scss",
@@ -269,6 +280,11 @@
               {
                 "glob": "**/*",
                 "input": "projects/general/assets"
+              },
+              {
+                "glob": "**/*",
+                "input": "i18n",
+                "output": "/assets/i18n"
               }
             ],
             "styles": [
@@ -327,7 +343,8 @@
           "options": {
             "polyfills": [
               "zone.js",
-              "zone.js/testing"
+              "zone.js/testing",
+              "@angular/localize/init"
             ],
             "tsConfig": "projects/topbar/tsconfig.spec.json",
             "inlineStyleLanguage": "scss",
@@ -339,6 +356,11 @@
               {
                 "glob": "**/*",
                 "input": "projects/general/assets"
+              },
+              {
+                "glob": "**/*",
+                "input": "i18n",
+                "output": "/assets/i18n"
               }
             ],
             "styles": [
@@ -387,7 +409,8 @@
             "tsConfig": "projects/general/tsconfig.spec.json",
             "polyfills": [
               "zone.js",
-              "zone.js/testing"
+              "zone.js/testing",
+              "@angular/localize/init"
             ],
             "scripts": [],
             "stylePreprocessorOptions": {
