@@ -6,6 +6,7 @@ import { ImageChannel } from '@shared/models/channels.model';
 import sharp from 'sharp';
 import { v4 as uuid } from 'uuid';
 import { LRUCache } from '../../../frontend/projects/general/src/lib/utils/lru-cache';
+import { withAppError } from '../utils/ipc-handler';
 
 export class ImageManager {
   private static instance: ImageManager;
@@ -22,20 +23,20 @@ export class ImageManager {
   }
 
   protected registerChannels(): void {
-    ipcMain.handle(ImageChannel.FETCH_IMAGE, async (_, imagePath: string) => {
+    ipcMain.handle(ImageChannel.FETCH_IMAGE, withAppError(async (_, imagePath: string) => {
       return await this.fetchImage(imagePath);
-    });
-    ipcMain.handle(ImageChannel.OPEN_PICKER, async () => {
+    }));
+    ipcMain.handle(ImageChannel.OPEN_PICKER, withAppError(async () => {
       return await this.openImagePicker();
-    });
-    ipcMain.handle(ImageChannel.DELETE, async (_, imagePath: string) => {
+    }));
+    ipcMain.handle(ImageChannel.DELETE, withAppError(async (_, imagePath: string) => {
       return await this.deleteImage(imagePath);
-    });
+    }));
     ipcMain.handle(
       ImageChannel.PROCESS_AND_SAVE,
-      async (_, imagePath: string, entityType: string) => {
+      withAppError(async (_, imagePath: string, entityType: string) => {
         return await this.processAndSaveImage(imagePath, entityType);
-      }
+      })
     );
   }
 

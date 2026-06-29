@@ -9,6 +9,9 @@ import {
   GetSomeOptions,
 } from './database-provider.model';
 import { FilterQuery } from '@shared/models/filter.model';
+import { ErrorCode } from '@shared/models/error.model';
+import { createAppError } from '../utils/create-app-error';
+import { isAppError } from '../utils/ipc-handler';
 
 export class DatabaseProvider<T> {
   private readonly table: DatabaseTable;
@@ -38,62 +41,64 @@ export class DatabaseProvider<T> {
   async getAll(query?: QueryOptions): Promise<T[]> {
     let data: T[] = [...(this.database.readTable<T[]>(this.table) ?? [])];
 
-    if (query?.search) {
-      const searchResults = await Promise.all(
-        data.map((item: T) => this.search(item, query.search!.toLowerCase()))
-      );
-      data = data.filter((_, index) => searchResults[index]);
-    }
+    try {
+      if (query?.search) {
+        const searchResults = await Promise.all(
+          data.map((item: T) => this.search(item, query.search!.toLowerCase()))
+        );
+        data = data.filter((_, index) => searchResults[index]);
+      }
 
-    if (query?.filters) {
-      const filters = new FilterQuery(
-        query.filters['_matchType'],
-        query.filters['_filters']
-      );
-      const filterResults = await Promise.all(
-        data.map((item: T) => this.filter(item, filters))
-      );
-      data = data.filter((_, index) => filterResults[index]);
-    }
+      if (query?.filters) {
+        const filters = new FilterQuery(
+          query.filters['_matchType'],
+          query.filters['_filters']
+        );
+        const filterResults = await Promise.all(
+          data.map((item: T) => this.filter(item, filters))
+        );
+        data = data.filter((_, index) => filterResults[index]);
+      }
 
-    if (query?.sortBy && query?.sortDirection) {
-      data = data.sort((a, b) =>
-        this.sort(a, b, query.sortBy!, query.sortDirection!)
+      if (query?.sortBy && query?.sortDirection) {
+        data = data.sort((a, b) =>
+          this.sort(a, b, query.sortBy!, query.sortDirection!)
+        );
+      }
+    } catch (error) {
+      if (isAppError(error)) throw error;
+      throw createAppError(
+        ErrorCode.DatabaseQueryFailed,
+        'Query operation failed.'
       );
     }
 
     return data;
   }
 
-  getBy<V>(column: keyof T, value: V): Promise<T | null> {
-    return new Promise(async (resolve) => {
-      const data: T[] = await this.getAll();
-      const result =
-        data.find((item) => {
-          const itemValue = item[column] as V;
-          return itemValue === value;
-        }) ?? null;
-      resolve(result);
-    });
+  async getBy<V>(column: keyof T, value: V): Promise<T | null> {
+    const data: T[] = await this.getAll();
+    return (
+      data.find((item) => {
+        const itemValue = item[column] as V;
+        return itemValue === value;
+      }) ?? null
+    );
   }
 
-  getSome<V>(
+  async getSome<V>(
     column: keyof T,
     values: V[],
     options: GetSomeOptions = DefaultGetSomeOptions
   ): Promise<T[]> {
-    return new Promise<T[]>(async (resolve) => {
-      const data: T[] = await this.getAll();
-      if (data.length === 0) {
-        resolve([]);
-        return;
-      }
-      const result = data.filter((item) =>
-        this.getSomeFilter(item, column, values, options)
-      );
-
-      resolve(result.slice(0, options.limit ?? undefined));
-    });
+    const data: T[] = await this.getAll();
+    if (data.length === 0) {
+      return [];
+    }
+    const result = data.filter((item) =>
+      this.getSomeFilter(item, column, values, options)
+    );
+    return result.slice(0, options.limit ?? undefined);
   }
 
   async getMatching<V>(
@@ -104,13 +109,12 @@ export class DatabaseProvider<T> {
     return data.filter(matchingFn);
   }
 
-  create<V = Partial<T>>(data: V, id?: string): Promise<T> {
-    return new Promise(async (resolve) => {
+  async create<V = Partial<T>>(data: V, id?: string): Promise<T> {
+    try {
       if (id) {
         const matching = await this.getBy(this.idColumn, id);
         if (matching) {
-          resolve(matching);
-          return;
+          return matching;
         }
       }
       const newItem: T = {
@@ -119,25 +123,36 @@ export class DatabaseProvider<T> {
       } as T;
       const allData = await this.getAll();
       await this.database.updateTable(this.table, [...allData, newItem]);
-      resolve(newItem);
-    });
+      return newItem;
+    } catch (error) {
+      if (isAppError(error)) throw error;
+      throw createAppError(
+        ErrorCode.DatabaseInsertFailed,
+        'Insert operation failed.'
+      );
+    }
   }
 
-  createMultiple(data: T[]): Promise<T[]> {
-    return new Promise(async (resolve) => {
+  async createMultiple(data: T[]): Promise<T[]> {
+    try {
       const createData = data.map((item) => ({
         [this.idColumn]: item[this.idColumn] ? item[this.idColumn] : uuid(),
         ...item,
-      }));
-
+      })) as T[];
       const allData = await this.getAll();
       await this.database.updateTable(this.table, [...allData, ...createData]);
-      resolve(createData);
-    });
+      return createData;
+    } catch (error) {
+      if (isAppError(error)) throw error;
+      throw createAppError(
+        ErrorCode.DatabaseInsertFailed,
+        'Insert operation failed.'
+      );
+    }
   }
 
-  replaceMultiple(data: T[]): Promise<T[]> {
-    return new Promise<T[]>(async (resolve) => {
+  async replaceMultiple(data: T[]): Promise<T[]> {
+    try {
       const allData = await this.getAll();
       const updatesMap = new Map(
         data.map((item) => [item[this.idColumn], item])
@@ -153,12 +168,18 @@ export class DatabaseProvider<T> {
         };
       });
       await this.database.updateTable(this.table, updatedData);
-      resolve(data);
-    });
+      return data;
+    } catch (error) {
+      if (isAppError(error)) throw error;
+      throw createAppError(
+        ErrorCode.DatabaseUpdateFailed,
+        'Update operation failed.'
+      );
+    }
   }
 
-  update<V>(column: keyof T, matchValue: V, newValue: T): Promise<T> {
-    return new Promise<T>(async (resolve) => {
+  async update<V>(column: keyof T, matchValue: V, newValue: T): Promise<T> {
+    try {
       const data = await this.getAll();
       const existingIndex = data.findIndex(
         (item: T) => matchValue === (item[column] as V)
@@ -166,45 +187,61 @@ export class DatabaseProvider<T> {
 
       if (existingIndex === -1) {
         // Pass the ID from newValue so create() never generates a UUID
-        resolve(await this.create(newValue, String(newValue[this.idColumn])));
-        return;
+        return await this.create(newValue, String(newValue[this.idColumn]));
       }
 
       data[existingIndex] = newValue;
       await this.database.updateTable(this.table, data);
-      resolve(newValue);
-    });
+      return newValue;
+    } catch (error) {
+      if (isAppError(error)) throw error;
+      throw createAppError(
+        ErrorCode.DatabaseUpdateFailed,
+        'Update operation failed.'
+      );
+    }
   }
 
-  deleteOne<V>(column: keyof T, matchValue: V): Promise<boolean> {
-    return new Promise<boolean>(async (resolve) => {
+  async deleteOne<V>(column: keyof T, matchValue: V): Promise<boolean> {
+    try {
       const data = await this.getAll();
       const deleteIndex = data.findIndex(
         (item: T) => matchValue === (item[column] as V)
       );
 
       if (deleteIndex === -1) {
-        resolve(true);
-        return;
+        return true;
       }
 
       data.splice(deleteIndex, 1);
       await this.database.updateTable(this.table, data);
-      resolve(true);
-    });
+      return true;
+    } catch (error) {
+      if (isAppError(error)) throw error;
+      throw createAppError(
+        ErrorCode.DatabaseDeleteFailed,
+        'Delete operation failed.'
+      );
+    }
   }
 
-  deleteMultiple(matchingFn: (item: T) => boolean): Promise<boolean> {
-    return new Promise<boolean>(async (resolve) => {
+  async deleteMultiple(matchingFn: (item: T) => boolean): Promise<boolean> {
+    try {
       const data = await this.getAll();
       const filtered = data.filter((item) => !matchingFn(item));
       await this.database.updateTable(this.table, filtered);
-      resolve(true);
-    });
+      return true;
+    } catch (error) {
+      if (isAppError(error)) throw error;
+      throw createAppError(
+        ErrorCode.DatabaseDeleteFailed,
+        'Delete operation failed.'
+      );
+    }
   }
 
-  replaceRecord(newRecord: T): Promise<T> {
-    return new Promise<T>(async (resolve, reject) => {
+  async replaceRecord(newRecord: T): Promise<T> {
+    try {
       const data = await this.getAll();
       const recordId = newRecord[this.idColumn];
       const existingIndex = data.findIndex(
@@ -212,16 +249,21 @@ export class DatabaseProvider<T> {
       );
 
       if (existingIndex === -1) {
-        reject(
-          `Record with id ${recordId} does not exist and cannot be replaced.`
-        );
-        return;
+        throw createAppError(ErrorCode.DatabaseNotFound, `Record not found.`, {
+          id: recordId,
+        });
       }
 
       data[existingIndex] = newRecord;
       await this.database.updateTable(this.table, data);
-      resolve(newRecord);
-    });
+      return newRecord;
+    } catch (error) {
+      if (isAppError(error)) throw error;
+      throw createAppError(
+        ErrorCode.DatabaseUpdateFailed,
+        'Update operation failed.'
+      );
+    }
   }
 
   private getSomeFilter<V>(

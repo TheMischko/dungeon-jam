@@ -12,6 +12,7 @@ import DiscordTokenApi from './preload/discord-token-api';
 import SoundEffectApi from './preload/sound-effect-api';
 import ImageApi from './preload/image-api';
 import SceneApi from './preload/scene-api';
+import NotificationApi from './preload/notification-api';
 
 const generalApi = {
   triggerRedirect(request: RedirectRequest) {
@@ -69,6 +70,7 @@ declare global {
     SOUND_EFFECT_API: typeof SoundEffectApi;
     IMAGE_API: typeof ImageApi;
     SCENE_API: typeof SceneApi;
+    NOTIFICATION_API: typeof NotificationApi;
   }
 }
 
@@ -83,3 +85,4 @@ contextBridge.exposeInMainWorld('DISCORD_TOKEN_API', DiscordTokenApi);
 contextBridge.exposeInMainWorld('SOUND_EFFECT_API', SoundEffectApi);
 contextBridge.exposeInMainWorld('IMAGE_API', ImageApi);
 contextBridge.exposeInMainWorld('SCENE_API', SceneApi);
+contextBridge.exposeInMainWorld('NOTIFICATION_API', NotificationApi);

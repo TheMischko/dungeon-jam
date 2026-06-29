@@ -3,6 +3,7 @@ import { ipcMain } from 'electron';
 import { PlaybackChannel } from '@shared/models/channels.model';
 import { StoredPlayback } from '@shared/models/track.model';
 import { Logger } from '../utils/logger';
+import { withAppError } from '../utils/ipc-handler';
 
 export class StoredPlaybackManager {
   private static _instance: StoredPlaybackManager;
@@ -22,9 +23,9 @@ export class StoredPlaybackManager {
   }
 
   private registerChannels() {
-    ipcMain.handle(PlaybackChannel.LOAD, () => {
+    ipcMain.handle(PlaybackChannel.LOAD, withAppError(() => {
       return this.load();
-    });
+    }));
     ipcMain.on(PlaybackChannel.UPDATE, async (_, newState: StoredPlayback) => {
       await this.update(newState);
     });

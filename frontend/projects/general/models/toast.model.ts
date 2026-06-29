@@ -7,4 +7,5 @@ export interface ToastData {
 export enum ToastType {
   Error,
   Success,
+  Info,
 }

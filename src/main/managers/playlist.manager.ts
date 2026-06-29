@@ -23,6 +23,7 @@ import { DisplayOrderManager } from './display-order.manager';
 import { OrderableEntityType } from '@shared/models/display-order.model';
 import { createAppError } from '../utils/create-app-error';
 import { ErrorCode } from '@shared/models/error.model';
+import { withAppError } from '../utils/ipc-handler';
 
 export class PlaylistManager {
   private static _instance: PlaylistManager;
@@ -62,41 +63,41 @@ export class PlaylistManager {
   }
 
   private registerChannels(): void {
-    ipcMain.handle(PlaylistChannel.GET_ALL, async (_, query?: QueryRequest) => {
+    ipcMain.handle(PlaylistChannel.GET_ALL, withAppError(async (_, query?: QueryRequest) => {
       this.logger.log('Getting playlist channels', { query });
       return await this.getAllPlaylists(query);
-    });
-    ipcMain.handle(PlaylistChannel.GET_BY_ID, async (_, id: string) => {
+    }));
+    ipcMain.handle(PlaylistChannel.GET_BY_ID, withAppError(async (_, id: string) => {
       this.logger.log('Getting playlist by id', { id });
       return await this.getById(id);
-    });
+    }));
     ipcMain.handle(
       PlaylistChannel.INSERT,
-      async (_, query: PlaylistInsertQuery) => {
+      withAppError(async (_, query: PlaylistInsertQuery) => {
         this.logger.log('Inserting playlist', { query });
         return await this.insert(query);
-      }
+      })
     );
     ipcMain.handle(
       PlaylistChannel.ADD_TRACKS,
-      async (_, data: PlaylistAddTracksData) => {
+      withAppError(async (_, data: PlaylistAddTracksData) => {
         this.logger.log('Adding playlist', { data });
         return await this.addTracks(data);
-      }
+      })
     );
     ipcMain.handle(
       PlaylistChannel.UPDATE,
-      async (_, query: PlaylistUpdateQuery) => {
+      withAppError(async (_, query: PlaylistUpdateQuery) => {
         this.logger.log('Update playlist', { query });
         return await this.update(query);
-      }
+      })
     );
     ipcMain.handle(
       PlaylistChannel.CHANGE_ORDER,
-      async (_, query: PlaylistReorderQuery) => {
+      withAppError(async (_, query: PlaylistReorderQuery) => {
         this.logger.log('Changing order of a playlist', { query });
         return await this.changePlaylistOrder(query);
-      }
+      })
     );
   }
 

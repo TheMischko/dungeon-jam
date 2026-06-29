@@ -8,6 +8,9 @@ import { DatabaseProvider } from '../database/database-provider';
 import { DatabaseProviderCreator } from '../database/database-provider-creator';
 import { Logger } from '../utils/logger';
 import { DiscordManager } from './discord.manager';
+import { withAppError } from '../utils/ipc-handler';
+import { createAppError } from '../utils/create-app-error';
+import { ErrorCode } from '@shared/models/error.model';
 
 export class DiscordTokenManager {
   private static instance: DiscordTokenManager;
@@ -41,8 +44,7 @@ export class DiscordTokenManager {
       this.logger.log('No existing token found, creating new one', data);
       return await this.db.create(tokenData, id);
     } catch (error) {
-      console.error('[DiscordTokenManager] Failed to save token', error);
-      throw error;
+      throw createAppError(ErrorCode.DatabaseUpdateFailed, 'Failed to save token.');
     }
   }
 
@@ -59,8 +61,7 @@ export class DiscordTokenManager {
     try {
       return await this.db.deleteOne('id', id);
     } catch (error) {
-      console.error('[DiscordTokenManager] Failed to delete token', error);
-      throw error;
+      throw createAppError(ErrorCode.DatabaseDeleteFailed, 'Failed to delete token.');
     }
   }
 
@@ -88,29 +89,29 @@ export class DiscordTokenManager {
   private registerIpcHandlers(): void {
     ipcMain.handle(
       DiscordTokenChannel.CREATE,
-      async (_, data: DiscordTokenUpdateData) => {
+      withAppError(async (_, data: DiscordTokenUpdateData) => {
         return await this.saveToken(data);
-      }
+      })
     );
 
     ipcMain.handle(
       DiscordTokenChannel.UPDATE,
-      async (_, payload: { id: string; newData: DiscordTokenUpdateData }) => {
+      withAppError(async (_, payload: { id: string; newData: DiscordTokenUpdateData }) => {
         const result = await this.saveToken(payload.newData, payload.id);
         this.logger.log(`Token updated. Result:`, result);
         return result;
-      }
+      })
     );
 
-    ipcMain.handle(DiscordTokenChannel.GET_ALL, async () => {
+    ipcMain.handle(DiscordTokenChannel.GET_ALL, withAppError(async () => {
       const resp = await this.getTokens();
       this.logger.log(`Request for tokens resulted in ${resp.length} records`);
       return resp;
-    });
+    }));
 
-    ipcMain.handle(DiscordTokenChannel.DELETE, async (_, id: string) => {
+    ipcMain.handle(DiscordTokenChannel.DELETE, withAppError(async (_, id: string) => {
       return await this.deleteToken(id);
-    });
+    }));
   }
 
   private static async prepareDatabase(): Promise<

@@ -111,6 +111,10 @@ export enum SessionChannel {
   DELETE = 'session/delete',
 }
 
+export enum NotificationChannel {
+  PUSH = 'notification/push',
+}
+
 export type AppChannel =
   | GeneralChannels
   | TrackChannel
@@ -124,4 +128,5 @@ export type AppChannel =
   | SoundEffectChannel
   | ImageChannel
   | SceneChannel
-  | SessionChannel;
+  | SessionChannel
+  | NotificationChannel;

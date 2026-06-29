@@ -23,6 +23,7 @@ import { Playlist } from '@shared/models/playlist.model';
 import { resolveAudioTrack } from '../utils/resolve-audio-track';
 import { FilterQuery } from '@shared/models/filter.model';
 import { shuffleList } from '../../../frontend/projects/main/src/app/utils/shuffle-list';
+import { withAppError } from '../utils/ipc-handler';
 
 export class TrackManager {
   private static _instance: TrackManager;
@@ -50,45 +51,45 @@ export class TrackManager {
   }
 
   private registerChannels(): void {
-    ipcMain.handle(TrackChannel.GET_ALL, async (_, query?: QueryRequest) => {
+    ipcMain.handle(TrackChannel.GET_ALL, withAppError(async (_, query?: QueryRequest) => {
       this.logger.log('Fetching playlist tracks', { query });
       const result = await this.getAll(query);
       this.logger.log(`Found ${result.length} matching tracks`);
       return result;
-    });
+    }));
 
-    ipcMain.handle(TrackChannel.GET_BY_ID, async (_, id: string) => {
+    ipcMain.handle(TrackChannel.GET_BY_ID, withAppError(async (_, id: string) => {
       this.logger.log('Fetching playlist tracks', { id });
       const result = await this.get(id);
       this.logger.log('Found:', { track: result });
       return result;
-    });
+    }));
 
     ipcMain.handle(
       TrackChannel.GET_PLAYLIST_TRACKS,
-      async (_, query: PlaylistTracksQuery) => {
+      withAppError(async (_, query: PlaylistTracksQuery) => {
         this.logger.log('Fetching playlist tracks', { query });
         const result = await this.getByPlaylist(query);
         this.logger.log(`Found ${result.length} matching tracks`);
         return result;
-      }
+      })
     );
 
     ipcMain.handle(
       TrackChannel.PLAYLIST_DISCOVER,
-      async (_, query: PlaylistDiscoverBatchRequest) => {
+      withAppError(async (_, query: PlaylistDiscoverBatchRequest) => {
         this.logger.log(`Fetching discover tracks for playlist.`, { query });
         const result = await this.discoverTracks(query);
         this.logger.log(`Tracks discovered.`, {
           result: result.map((r) => ({ id: r.id, name: r.name })),
         });
         return result;
-      }
+      })
     );
 
     ipcMain.handle(
       TrackChannel.INSERT,
-      async (
+      withAppError(async (
         _,
         name: string,
         url: string,
@@ -97,10 +98,10 @@ export class TrackManager {
         tags?: string[]
       ) => {
         return await this.insert(name, url, duration, author, tags);
-      }
+      })
     );
 
-    ipcMain.handle(AudioFileChannel.UPLOAD, async (_, tracks: AudioTrack[]) => {
+    ipcMain.handle(AudioFileChannel.UPLOAD, withAppError(async (_, tracks: AudioTrack[]) => {
       for (const track of tracks) {
         const resolved = resolveAudioTrack(track);
         this.logger.log('Uploading track', {
@@ -118,21 +119,21 @@ export class TrackManager {
           resolved.tags
         );
       }
-    });
+    }));
 
-    ipcMain.handle(TrackChannel.UPDATE, async (_, track: Track) => {
+    ipcMain.handle(TrackChannel.UPDATE, withAppError(async (_, track: Track) => {
       return await this.update(track);
-    });
+    }));
 
-    ipcMain.handle(TrackChannel.DELETE, async (_, id: string) => {
+    ipcMain.handle(TrackChannel.DELETE, withAppError(async (_, id: string) => {
       return await this.deleteById(id);
-    });
+    }));
 
     ipcMain.handle(
       TrackChannel.GET_TAGGED_TRACKS,
-      async (_, query: TaggedTracksQuery) => {
+      withAppError(async (_, query: TaggedTracksQuery) => {
         return await this.getTaggedTracks(query.tagId, query);
-      }
+      })
     );
   }
 

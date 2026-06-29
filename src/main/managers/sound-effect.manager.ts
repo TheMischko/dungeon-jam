@@ -20,6 +20,7 @@ import { TagsManager } from './tags.manager';
 import { GetSomeMatch } from '../database/database-provider.model';
 import { DisplayOrderManager } from './display-order.manager';
 import { OrderableEntityType } from '@shared/models/display-order.model';
+import { withAppError } from '../utils/ipc-handler';
 
 export class SoundEffectManager {
   private static instance: SoundEffectManager;
@@ -58,49 +59,49 @@ export class SoundEffectManager {
   private registerIpcHandlers(): void {
     ipcMain.handle(
       SoundEffectChannel.GET_ALL,
-      async (_, query: QueryRequest): Promise<SoundEffect[]> => {
+      withAppError(async (_, query: QueryRequest): Promise<SoundEffect[]> => {
         this.logger.log(`Fetching all sound effects.`, query);
         const data = await this.getAll(query);
         this.logger.log(`Found ${data.length} sound effects.`);
         return data;
-      }
+      })
     );
     ipcMain.handle(
       SoundEffectChannel.GET_BY_ID,
-      async (_, id: string): Promise<SoundEffect | null> => {
+      withAppError(async (_, id: string): Promise<SoundEffect | null> => {
         this.logger.log(`Fetching record with ID: ${id}.`);
         const record = await this.getById(id);
         this.logger.log(`Record found: ${record ? 'yes' : 'no'}.`);
         return record;
-      }
+      })
     );
     ipcMain.handle(
       SoundEffectChannel.CREATE,
-      async (_, data: SoundEffectCreateData): Promise<SoundEffect> => {
+      withAppError(async (_, data: SoundEffectCreateData): Promise<SoundEffect> => {
         this.logger.log('Creating new sound effect', data);
         return this.create(data);
-      }
+      })
     );
     ipcMain.handle(
       SoundEffectChannel.UPDATE,
-      async (_, data: SoundEffectUpdateData): Promise<SoundEffect | null> => {
+      withAppError(async (_, data: SoundEffectUpdateData): Promise<SoundEffect | null> => {
         this.logger.log('Updating record.', data);
         return this.update(data);
-      }
+      })
     );
     ipcMain.handle(
       SoundEffectChannel.DELETE,
-      async (_, id: string): Promise<boolean> => {
+      withAppError(async (_, id: string): Promise<boolean> => {
         this.logger.log(`Deleting record with ID: ${id}.`);
         return this.deleteById(id);
-      }
+      })
     );
     ipcMain.handle(
       SoundEffectChannel.CHANGE_ORDER,
-      async (_, query: SoundEffectReorderQuery): Promise<void> => {
+      withAppError(async (_, query: SoundEffectReorderQuery): Promise<void> => {
         this.logger.log('Changing order of a sound effect', { query });
         return await this.changeSoundEffectOrder(query);
-      }
+      })
     );
   }
 

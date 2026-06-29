@@ -9,6 +9,7 @@ import { TagsManager } from './tags.manager';
 import { Logger } from '../utils/logger';
 import { getTitleFromFileName } from '../utils/resolve-audio-track';
 import path from 'path';
+import { withAppError } from '../utils/ipc-handler';
 
 export class FilesManager {
   private static _instance: FilesManager;
@@ -26,20 +27,20 @@ export class FilesManager {
   }
 
   private registerChannels(): void {
-    ipcMain.handle(AudioFileChannel.FETCH_DATA, async (_, paths: string[]) => {
+    ipcMain.handle(AudioFileChannel.FETCH_DATA, withAppError(async (_, paths: string[]) => {
       const data = paths
         .filter((path) => fs.existsSync(path))
         .map(async (path) => await this.readMetadata(path));
       return await Promise.all(data);
-    });
+    }));
 
-    ipcMain.handle(AudioFileChannel.LOAD_FILE, async (_, filePath: string) => {
+    ipcMain.handle(AudioFileChannel.LOAD_FILE, withAppError(async (_, filePath: string) => {
       return await this.loadFileBase64(filePath);
-    });
+    }));
 
-    ipcMain.handle(AudioFileChannel.OPEN_AUDIO_FILES_PICKER, async () => {
+    ipcMain.handle(AudioFileChannel.OPEN_AUDIO_FILES_PICKER, withAppError(async () => {
       return await this.openAudioFilesPicker();
-    });
+    }));
   }
 
   async updateTrackFile(track: Track): Promise<void> {

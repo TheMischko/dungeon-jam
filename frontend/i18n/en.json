@@ -6,9 +6,28 @@
     "COMMON": {
       "GENERIC_ERROR": "Unknown application error."
     },
+    "DATABASE": {
+      "INSERT_FAILED": "Failed to create record.",
+      "UPDATE_FAILED": "Failed to update record.",
+      "DELETE_FAILED": "Failed to delete record.",
+      "NOT_FOUND": "Record not found.",
+      "QUERY_FAILED": "Failed to process query."
+    },
+    "DISCORD": {
+      "TOKEN_CONNECTION_FAILED": "Failed to connect Discord bot.",
+      "CHANNEL_JOIN_FAILED": "Failed to join voice channel.",
+      "CONNECTION_LOST": "Discord voice connection was lost.",
+      "API_ERROR": "A Discord API error occurred."
+    },
     "PLAYLIST": {
       "ID_REQUIRED": "Playlist ID is required for update.",
       "ID_NOT_FOUND": "Playlist with ID {{playlistId}} not found."
+    }
+  },
+  "NOTIFICATIONS": {
+    "DISCORD": {
+      "TOKEN_CONNECTED": "Discord bot connected successfully.",
+      "CHANNEL_JOINED": "Joined Discord voice channel."
     }
   }
 }

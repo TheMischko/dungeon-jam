@@ -11,6 +11,7 @@ import { QueryRequest } from '@shared/models/request.model';
 import { Logger } from '../utils/logger';
 import { SoundEffectManager } from './sound-effect.manager';
 import { ImageEntityType, ImageManager } from './image.manager';
+import { withAppError } from '../utils/ipc-handler';
 
 export class SceneManager {
   private static _instance: SceneManager;
@@ -42,31 +43,31 @@ export class SceneManager {
   }
 
   private registerChannels(): void {
-    ipcMain.handle(SceneChannel.GET_ALL, (_, query: QueryRequest) => {
+    ipcMain.handle(SceneChannel.GET_ALL, withAppError((_, query: QueryRequest) => {
       this.logger.log('Received request to get all scenes', { query });
       return this.getAll(query);
-    });
-    ipcMain.handle(SceneChannel.GET_BY_ID, (_, id: string) => {
+    }));
+    ipcMain.handle(SceneChannel.GET_BY_ID, withAppError((_, id: string) => {
       this.logger.log('Received request to get by id', { id });
       return this.getById(id);
-    });
-    ipcMain.handle(SceneChannel.INSERT, (_, data: SceneInsertQuery) => {
+    }));
+    ipcMain.handle(SceneChannel.INSERT, withAppError((_, data: SceneInsertQuery) => {
       this.logger.log('Received request to insert scene', { data });
       return this.insert(data);
-    });
-    ipcMain.handle(SceneChannel.UPDATE, (_, data: SceneUpdateQuery) => {
+    }));
+    ipcMain.handle(SceneChannel.UPDATE, withAppError((_, data: SceneUpdateQuery) => {
       this.logger.log('Received request to update scene', { data });
       return this.update(data);
-    });
-    ipcMain.handle(SceneChannel.DELETE, (_, id: string) => {
+    }));
+    ipcMain.handle(SceneChannel.DELETE, withAppError((_, id: string) => {
       this.logger.log('Received request to delete scene', { id });
       return this.deleteById(id);
-    });
-    ipcMain.handle(SceneChannel.CHANGE_ORDER, (_, sceneIds: string[]) => {
+    }));
+    ipcMain.handle(SceneChannel.CHANGE_ORDER, withAppError((_, sceneIds: string[]) => {
       this.logger.log('Received request to change order', { sceneIds });
       this.logger.logWarning('Change order is not implemented');
       return this.getAll({});
-    });
+    }));
   }
 
   public async getAll(query: QueryRequest): Promise<Scene[]> {

@@ -18,6 +18,7 @@ import { DatabaseTable } from '../database/init-database';
 import { DatabaseWrapper } from '../database/database';
 import { Track } from '@shared/models/track.model';
 import { Playlist } from '@shared/models/playlist.model';
+import { withAppError } from '../utils/ipc-handler';
 
 export class TagsManager {
   private static _instance: TagsManager;
@@ -34,36 +35,36 @@ export class TagsManager {
   }
 
   private registerChannels(): void {
-    ipcMain.handle(TagChannel.GET_ALL, async (_, query?: QueryRequest) => {
+    ipcMain.handle(TagChannel.GET_ALL, withAppError(async (_, query?: QueryRequest) => {
       return await this.getAll(query);
-    });
+    }));
     ipcMain.handle(
       TagChannel.GET_SUBSET,
-      async (_, column: keyof TagData, values: []) => {
+      withAppError(async (_, column: keyof TagData, values: []) => {
         return await this.getSubset(column, values);
-      },
+      }),
     );
-    ipcMain.handle(TagChannel.GET_TRACKS_COUNT, async () => {
+    ipcMain.handle(TagChannel.GET_TRACKS_COUNT, withAppError(async () => {
       return await this.getTrackCounts();
-    });
-    ipcMain.handle(TagChannel.GET_DETAILS, async (_, query?: QueryRequest) => {
+    }));
+    ipcMain.handle(TagChannel.GET_DETAILS, withAppError(async (_, query?: QueryRequest) => {
       return await this.getDetailsList(query);
-    })
-    ipcMain.handle(TagChannel.INSERT, async (_, data: Tag) => {
+    }))
+    ipcMain.handle(TagChannel.INSERT, withAppError(async (_, data: Tag) => {
       return await this.insert(data);
-    });
-    ipcMain.handle(TagChannel.SUGGESTION, async (_, titlePart: string) => {
+    }));
+    ipcMain.handle(TagChannel.SUGGESTION, withAppError(async (_, titlePart: string) => {
       return await this.getSuggestion(titlePart);
-    });
-    ipcMain.handle(TagChannel.DELETE_ONE, async (_, tagId: string) => {
+    }));
+    ipcMain.handle(TagChannel.DELETE_ONE, withAppError(async (_, tagId: string) => {
       return await this.delete(tagId);
-    });
-    ipcMain.handle(TagChannel.CLEAR_ORPHANS, async () => {
+    }));
+    ipcMain.handle(TagChannel.CLEAR_ORPHANS, withAppError(async () => {
       return await this.clearOrphanedTags();
-    });
-    ipcMain.handle(TagChannel.UPDATE, async (_, tag: TagData) => {
+    }));
+    ipcMain.handle(TagChannel.UPDATE, withAppError(async (_, tag: TagData) => {
       return await this.updateTag(tag);
-    });
+    }));
   }
 
   /**

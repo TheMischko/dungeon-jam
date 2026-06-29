@@ -1,9 +1,14 @@
-import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import {
+  APP_INITIALIZER,
+  ApplicationConfig,
+  provideZoneChangeDetection,
+} from '@angular/core';
 import { provideRouter, withComponentInputBinding } from '@angular/router';
 import { routes } from './routes';
 import { provideStore } from '@ngrx/store';
 import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 import { provideTranslateService } from '@ngx-translate/core';
+import { AppNotificationService } from '@general/services/app-notification.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -18,5 +23,13 @@ export const appConfig: ApplicationConfig = {
       fallbackLang: 'en',
       lang: 'en',
     }),
+    {
+      provide: APP_INITIALIZER,
+      useFactory: (service: AppNotificationService) => () => {
+        service;
+      },
+      deps: [AppNotificationService],
+      multi: true,
+    },
   ],
 };
