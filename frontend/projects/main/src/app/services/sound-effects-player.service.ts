@@ -100,7 +100,7 @@ export class SoundEffectsPlayerService {
           soundEffect,
           howl,
           loop: shouldLoop,
-          volume: 0.1,
+          volume: soundEffect.volume ?? 0.1,
         },
       });
       this.positionRecord.next({

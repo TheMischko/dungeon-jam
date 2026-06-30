@@ -188,6 +188,20 @@ export class PlaybackService implements OnDestroy {
     this.pause();
   }
 
+  clearState() {
+    const current = this.state.getValue();
+    this.state.next({
+      ...current,
+      queue: [],
+      history: [],
+      isPlaying: false,
+      currentTrack: null,
+      sceneId: undefined,
+      playlistId: undefined,
+    });
+    this.audioPlayerService.pause();
+  }
+
   async playPrev(): Promise<void> {
     const current = this.state.getValue();
     const trackPosition = this.trackPosition.getValue();

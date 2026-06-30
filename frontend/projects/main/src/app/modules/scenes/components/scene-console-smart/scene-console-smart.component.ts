@@ -29,6 +29,7 @@ import { map, Observable } from 'rxjs';
 import { SoundEffectVolumeChange } from '../../../../models/sound-effect.model';
 import { PlaybackService } from '../../../../services/playback.service';
 import { SoundEffectsPlayerService } from '../../../../services/sound-effects-player.service';
+import { ScenePlayerService } from '../../../../services/scene-player.service';
 
 @Component({
   selector: 'app-scene-console-smart',
@@ -48,6 +49,7 @@ export class SceneConsoleSmartComponent implements OnInit {
   readonly destroyRef = inject(DestroyRef);
   readonly playbackService = inject(PlaybackService);
   readonly soundEffectsPlayerService = inject(SoundEffectsPlayerService);
+  readonly scenePlayerService = inject(ScenePlayerService);
 
   readonly scene = input.required<Scene>();
 
@@ -313,28 +315,15 @@ export class SceneConsoleSmartComponent implements OnInit {
     );
   }
 
-  protected async playScene() {
-    await this.playMusic();
-    await this.playAmbience();
+  protected playScene() {
+    this.scenePlayerService
+      .playSceneWithData(this.scene().id, this.tracks(), this.ambience())
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe();
   }
 
   protected stopScene() {
-    this.pauseMusic();
-    this.pauseAmbience();
-    this.stopStingers();
-  }
-
-  protected async playMusic() {
-    const tracks = this.tracks();
-    if (!tracks.length) {
-      return;
-    }
-
-    await this.playbackService.playTracks(tracks, { sceneId: this.scene().id });
-  }
-
-  protected pauseMusic() {
-    this.playbackService.pause();
+    this.scenePlayerService.stopScene(this.scene());
   }
 
   protected async playAmbience() {
@@ -390,11 +379,5 @@ export class SceneConsoleSmartComponent implements OnInit {
       ...volumeMap,
       [event.soundEffect.id]: event.volume,
     }));
-  }
-
-  protected stopStingers() {
-    this.stingers().forEach((soundEffect) => {
-      this.soundEffectsPlayerService.stopEffect(soundEffect.id);
-    });
   }
 }
