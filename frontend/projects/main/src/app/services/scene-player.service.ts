@@ -67,12 +67,12 @@ export class ScenePlayerService {
     ambience: SoundEffect[]
   ): Observable<void> {
     return from(
-      tracks.length
+      tracks.length > 0
         ? this.playbackService.playTracks(tracks, { sceneId })
         : of(void 0)
     ).pipe(
       switchMap(() =>
-        ambience?.length ? from(this.playAmbience(ambience)) : of(void 0)
+        !!ambience?.length ? from(this.playAmbience(ambience)) : of(void 0)
       )
     );
   }

@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  DestroyRef,
   effect,
   inject,
   OnInit,
@@ -17,6 +18,9 @@ import { TagsStore } from '@general/stores/tags.store';
 import { Router } from '@angular/router';
 import { routesStrings } from '../../../../routes-strings';
 import { scenesRouteStrings } from '../../scenes-route-strings';
+import { PlaybackService } from '../../../../services/playback.service';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { ScenePlayerService } from '../../../../services/scene-player.service';
 
 @Component({
   selector: 'app-scenes-grid-smart',
@@ -30,6 +34,9 @@ export class ScenesGridSmartComponent implements OnInit {
   private readonly imageApiService = inject(ImageApiService);
   private readonly tagsStore = inject(TagsStore);
   private readonly router = inject(Router);
+  private readonly playbackService = inject(PlaybackService);
+  private readonly scenePlayerService = inject(ScenePlayerService);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly scenesLoading = this.scenesStore.loading;
   readonly scenes = signal<Scene[]>([]);
@@ -38,6 +45,11 @@ export class ScenesGridSmartComponent implements OnInit {
   readonly currentQuery = computed<QueryOptions>(() => {
     return {};
   });
+  readonly playingSceneId = toSignal(
+    this.playbackService.playback$.pipe(
+      map((playback) => (playback.isPlaying ? playback.sceneId : undefined))
+    )
+  );
 
   constructor() {
     effect(() => {
@@ -101,5 +113,16 @@ export class ScenesGridSmartComponent implements OnInit {
       }),
       map(() => void 0)
     );
+  }
+
+  protected playScene(scene: Scene) {
+    this.scenePlayerService
+      .playScene(scene.id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe();
+  }
+
+  protected stopScene(scene: Scene) {
+    this.scenePlayerService.stopScene(scene);
   }
 }

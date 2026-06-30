@@ -60,7 +60,7 @@ export class ViewManager {
       );
 
       if (config.env !== 'production' && config.env !== 'test') {
-        sideBarTab.tab.webContents.openDevTools({
+        frontendTab.tab.webContents.openDevTools({
           mode: 'detach',
         });
       }

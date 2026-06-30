@@ -60,6 +60,9 @@ export class PlaylistGridItemComponent {
     if (this.isPlaying()) {
       return this.pausePlaylist.emit(playlist.id);
     }
+    if (!playlist.trackIds.length) {
+      return;
+    }
     this.playPlaylist.emit(playlist.id);
   }
 

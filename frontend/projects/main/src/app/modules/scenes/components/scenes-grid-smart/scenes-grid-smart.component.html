@@ -3,5 +3,8 @@
   [loading]="scenesLoading()"
   [sceneImageMap]="imageMap()"
   [tagsMap]="tagMap()"
+  [playingSceneId]="playingSceneId()"
   (showDetail)="navigateToDetail($event)"
+  (playScene)="playScene($event)"
+  (pauseScene)="stopScene($event)"
 ></app-scenes-grid>

@@ -34,14 +34,12 @@
     }
   </div>
   <div ngProjectAs="hovering-content" style="display: contents">
-    @if (playlist().trackIds.length > 0) {
-      <div class="hover-overlay">
-        <lucide-icon
-          class="icon"
-          [img]="overlayIcon()"
-          (click)="onOverlayButtonClick($event)"
-        ></lucide-icon>
-      </div>
-    }
+    <div class="hover-overlay">
+      <lucide-icon
+        class="icon"
+        [img]="overlayIcon()"
+        (click)="onOverlayButtonClick($event)"
+      ></lucide-icon>
+    </div>
   </div>
 </app-grid-item>

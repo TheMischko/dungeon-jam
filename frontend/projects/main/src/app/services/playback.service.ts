@@ -189,6 +189,7 @@ export class PlaybackService implements OnDestroy {
   }
 
   clearState() {
+    this.audioPlayerService.pause();
     const current = this.state.getValue();
     this.state.next({
       ...current,
@@ -199,7 +200,7 @@ export class PlaybackService implements OnDestroy {
       sceneId: undefined,
       playlistId: undefined,
     });
-    this.audioPlayerService.pause();
+    this.trackPosition.next({ position: 0, duration: 0 });
   }
 
   async playPrev(): Promise<void> {

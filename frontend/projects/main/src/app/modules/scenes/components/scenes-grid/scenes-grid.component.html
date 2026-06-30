@@ -2,12 +2,34 @@
   @for (scene of scenes(); track scene.id) {
     @let images = getSceneImages(scene);
     @let tags = getSceneTags(scene);
+    @let isPlaying = playingSceneId() === scene.id;
     <app-grid-item
       [title]="scene.name"
       [images]="images"
       [noImageIcon]="SceneIcon"
       [tags]="tags"
       (clicked)="showDetail.emit(scene)"
-    ></app-grid-item>
+    >
+      <div ngProjectAs="content" style="display: contents">
+        @if (isPlaying){
+          <div class="is-playing-overlay small-overlay">
+            <lucide-icon
+              [img]="PlayingIcon"
+              [size]="16"
+            ></lucide-icon>
+          </div>
+        }
+      </div>
+
+      <div ngProjectAs="hovering-content" style="display: contents">
+          <div class="hover-overlay">
+            <lucide-icon
+              class="icon"
+              [img]="isPlaying ? PauseIcon : PlayIcon"
+              (click)="onOverlayButtonClick($event, scene)"
+            ></lucide-icon>
+          </div>
+      </div>
+    </app-grid-item>
   }
 </div>
