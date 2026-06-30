@@ -1,7 +1,7 @@
 <div class="player-content">
   <div class="info">
-    <p libScrollOverflowText>{{ currentTrack()?.name || '' }}</p>
-    <p libScrollOverflowText>{{ currentTrack()?.author || '' }}</p>
+    <p libScrollOverflowText (click)="navigateToActiveTrack.emit()">{{ currentTrack()?.name || '' }}</p>
+    <p libScrollOverflowText (click)="navigateToActiveTrack.emit()">{{ currentTrack()?.author || '' }}</p>
   </div>
   <div class="controls">
     <!-- Prev -->

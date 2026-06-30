@@ -43,6 +43,10 @@
       text-wrap: nowrap;
       white-space: nowrap;
       width: 100%;
+      cursor: pointer;
+      &:hover{
+        color: col.$primary-light;
+      }
     }
   }
 

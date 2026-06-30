@@ -52,6 +52,7 @@ export class PlayerComponent {
   volumeChange = output<number>();
   repeatChange = output<void>();
   shuffleChange = output<void>();
+  navigateToActiveTrack = output<void>();
 
   readonly prevIcon = iconSet.PrevIcon;
   readonly nextIcon = iconSet.NextIcon;

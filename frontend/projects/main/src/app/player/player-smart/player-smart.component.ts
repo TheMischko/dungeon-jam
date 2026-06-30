@@ -3,6 +3,8 @@ import { PlayerComponent } from '../player/player.component';
 import { PlaybackService } from '../../services/playback.service';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { initialPlaybackState } from '../../models/playback.model';
+import { RedirectService } from '@general';
+import { RedirectPath } from '@shared/models/redirect.model';
 
 @Component({
   selector: 'app-player-smart',
@@ -11,11 +13,13 @@ import { initialPlaybackState } from '../../models/playback.model';
   styles: ':host{ display: contents }',
 })
 export class PlayerSmartComponent {
-  playbackService = inject(PlaybackService);
-  playBackState = toSignal(this.playbackService.playback$, {
+  readonly playbackService = inject(PlaybackService);
+  readonly redirectService = inject(RedirectService);
+
+  readonly playBackState = toSignal(this.playbackService.playback$, {
     initialValue: initialPlaybackState,
   });
-  trackPosition = toSignal(this.playbackService.position$, {
+  readonly trackPosition = toSignal(this.playbackService.position$, {
     initialValue: undefined,
   });
 
@@ -56,5 +60,32 @@ export class PlayerSmartComponent {
 
   shuffle() {
     this.playbackService.shuffle(!this.playBackState().shuffle);
+  }
+
+  protected navigateToActiveTrack() {
+    const state = this.playBackState();
+    if (state.sceneId) {
+      this.redirectService.triggerRedirect({
+        path: RedirectPath.SCENES,
+        params: {
+          sceneId: state.sceneId,
+        },
+      });
+      return;
+    }
+
+    if (state.playlistId) {
+      this.redirectService.triggerRedirect({
+        path: RedirectPath.PLAYLISTS,
+        params: {
+          playlistId: state.playlistId,
+        },
+      });
+      return;
+    }
+
+    this.redirectService.triggerRedirect({
+      path: RedirectPath.LIBRARY,
+    });
   }
 }

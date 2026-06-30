@@ -95,6 +95,16 @@ export class RoutingListenerService {
           ]);
           break;
         case RedirectPath.SCENES:
+          const sceneId: string | undefined = redirect.params?.['sceneId'];
+          if (sceneId) {
+            await this.router.navigate([
+              routesStrings.scenes,
+              scenesRouteStrings.sceneDetail,
+              sceneId,
+            ]);
+            return;
+          }
+
           await this.router.navigate([
             routesStrings.scenes,
             scenesRouteStrings.scenesLanding,
