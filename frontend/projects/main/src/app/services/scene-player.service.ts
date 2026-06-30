@@ -8,6 +8,8 @@ import { Scene, SceneSoundEffectRef } from '@shared/models/scene.model';
 import { SoundEffect } from '@shared/models/sound-effect.model';
 import { EMPTY, from, map, Observable, of, switchMap } from 'rxjs';
 import { Track } from '@shared/models/track.model';
+import { ToastService } from '@general/services/toast.service';
+import { ToastType } from '../../../../general/models/toast.model';
 
 @Injectable({
   providedIn: 'root',
@@ -20,6 +22,7 @@ export class ScenePlayerService {
   private readonly scenesStore = inject(ScenesStore);
   private readonly trackService = inject(TrackService);
   private readonly soundEffectStore = inject(SoundEffectStore);
+  private readonly toastService = inject(ToastService);
 
   constructor() {
     if (!this.scenesStore.entities().length && !this.scenesStore.loading()) {
@@ -37,6 +40,11 @@ export class ScenePlayerService {
     const scene = this.scenesStore.entityMap()[sceneId];
     if (!scene) {
       console.error(`Scene with ID ${sceneId} not found.`);
+      this.toastService.createToast(
+        'Play error',
+        'Scene not found.',
+        ToastType.Error
+      );
       return EMPTY;
     }
 
@@ -47,6 +55,11 @@ export class ScenePlayerService {
         console.warn(`Scene with ID ${sceneId} has no tracks.`);
         return from(this.playAmbience(ambience));
       }
+      this.toastService.createToast(
+        'Play error',
+        'Scene has nothing to play.',
+        ToastType.Error
+      );
       console.error(`Scene with ID ${sceneId} has nothing to play.`);
       return EMPTY;
     }
