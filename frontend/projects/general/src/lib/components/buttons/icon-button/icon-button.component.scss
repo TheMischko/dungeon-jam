@@ -24,3 +24,16 @@
 .neutral-button lucide-icon {
   color: inherit;
 }
+
+:host ::ng-deep button.pill-button {
+  .mdc-button__label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .button-label {
+    white-space: nowrap;
+  }
+}
+

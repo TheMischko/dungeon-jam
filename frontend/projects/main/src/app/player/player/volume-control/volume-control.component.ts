@@ -62,7 +62,7 @@ export class VolumeControlComponent {
   );
 
   private readonly ICON_BASE_SIZE = 24;
-  private readonly KNOB_BASE_SIZE = 16;
+  private readonly KNOB_BASE_SIZE = 14;
 
   constructor() {
     effect(() => {

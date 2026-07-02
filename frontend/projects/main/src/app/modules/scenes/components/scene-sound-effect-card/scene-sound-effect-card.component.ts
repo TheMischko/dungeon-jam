@@ -9,6 +9,7 @@ import { SoundEffect } from '@shared/models/sound-effect.model';
 import { VolumeControlComponent } from '../../../../player/player/volume-control/volume-control.component';
 import { ScrollOverflowTextDirective } from '@general/directives/scroll-overflow-text.directive';
 import { PlayPauseButtonComponent } from '@general/components/buttons/play-pause-button/play-pause-button.component';
+import { NgClass } from '@angular/common';
 
 @Component({
   selector: 'app-scene-sound-effect-card',
@@ -16,6 +17,7 @@ import { PlayPauseButtonComponent } from '@general/components/buttons/play-pause
     VolumeControlComponent,
     ScrollOverflowTextDirective,
     PlayPauseButtonComponent,
+    NgClass,
   ],
   templateUrl: './scene-sound-effect-card.component.html',
   styleUrl: './scene-sound-effect-card.component.scss',
@@ -35,6 +37,9 @@ export class SceneSoundEffectCardComponent {
   });
   readonly playPauseState = computed(() => {
     return this.isPlaying() ? 'pause' : 'play';
+  });
+  readonly wrapperClasses = computed(() => {
+    return !this.isPlaying() ? [] : ['playing'];
   });
 
   playPauseClicked(): void {

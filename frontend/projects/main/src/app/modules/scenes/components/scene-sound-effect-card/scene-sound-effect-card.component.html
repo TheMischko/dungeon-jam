@@ -1,13 +1,17 @@
-<div class="main-content">
-  <div class="title" libScrollOverflowText>{{ title() }}</div>
-  <app-volume-control
-    [volume]="volume()"
-    [changeDebounceTime]="250"
-    (changed)="updateVolume.emit($event)"
-  ></app-volume-control>
+<div class="card-wrapper" [ngClass]="wrapperClasses()">
+  <div class="main-content">
+    <div class="title" libScrollOverflowText>{{ title() }}</div>
+    <app-volume-control
+      [volume]="volume()"
+      [changeDebounceTime]="250"
+      [size]="0.8"
+      (changed)="updateVolume.emit($event)"
+    ></app-volume-control>
+  </div>
+  <lib-play-pause-button
+    [state]="playPauseState()"
+    size="small"
+    class="card-play-pause-button"
+    (toggle)="playPauseClicked()"
+  ></lib-play-pause-button>
 </div>
-<lib-play-pause-button
-  [state]="playPauseState()"
-  size="small"
-  (toggle)="playPauseClicked()"
-></lib-play-pause-button>

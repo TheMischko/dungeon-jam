@@ -12,6 +12,7 @@ import { LucideAngularModule, LucideIconData } from 'lucide-angular';
 })
 export class IconButtonComponent {
   readonly icon = input.required<LucideIconData>();
+  readonly label = input<string>();
   readonly color = input<string>('primary');
   readonly disabled = input<boolean>(false);
   readonly type = input<ButtonType>(ButtonType.Default);
@@ -33,13 +34,18 @@ export class IconButtonComponent {
     if (this.color() === 'neutral') {
       classes.push('neutral-button');
     }
+    if (this.label()) {
+      classes.push('pill-button');
+    } else {
+      classes.push('icon-only-button');
+    }
     return classes;
   });
   readonly iconSize = computed(() => {
     const size = this.size();
     switch (size) {
       case 'small':
-        return 16;
+        return 20;
       case 'large':
         return 32;
       default:

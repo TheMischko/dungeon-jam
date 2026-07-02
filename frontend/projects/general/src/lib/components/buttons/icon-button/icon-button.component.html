@@ -46,4 +46,7 @@
     [img]="icon()"
     [ngClass]="iconClass()"
   ></lucide-icon>
+  @if (label()) {
+    <span class="button-label">{{ label() }}</span>
+  }
 </ng-template>

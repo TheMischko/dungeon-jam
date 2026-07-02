@@ -75,6 +75,14 @@ export class SceneConsoleComponent {
     return this.scenePlaying() ? 'pause' : 'play';
   });
 
+  readonly scenePlayButtonText = computed(() => {
+    const playing = this.scenePlaying();
+    if (!playing) {
+      return 'Play scene';
+    }
+    return 'Pause scene';
+  });
+
   readonly excludedColumns: (keyof Track)[] = ['author', 'tags'];
   protected readonly ButtonType = ButtonType;
 

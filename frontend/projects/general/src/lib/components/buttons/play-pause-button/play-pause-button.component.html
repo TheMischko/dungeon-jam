@@ -2,14 +2,16 @@
 <lib-icon-button
   [icon]="pauseIcon"
   [type]="type()"
+  [size]="size()"
+  [label]="label()"
   (click)="clicked()"
-  size="regular"
 ></lib-icon-button>
 } @else {
 <lib-icon-button
   [icon]="playIcon"
   [type]="type()"
+  [size]="size()"
+  [label]="label()"
   (click)="clicked()"
-  size="regular"
 ></lib-icon-button>
 }

@@ -13,6 +13,7 @@ export class PlayPauseButtonComponent {
   readonly size = input<ButtonSize>('regular');
   readonly state = input.required<'play' | 'pause'>();
   readonly type = input<ButtonType>(ButtonType.Default);
+  readonly label = input<string>();
   readonly toggle = output<'play' | 'pause'>();
 
   clicked() {
@@ -21,5 +22,4 @@ export class PlayPauseButtonComponent {
 
   readonly playIcon = iconSet.PlayIcon;
   readonly pauseIcon = iconSet.PauseIcon;
-  protected readonly ButtonType = ButtonType;
 }

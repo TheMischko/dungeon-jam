@@ -115,6 +115,40 @@ button.mdc-button.button-large {
   padding-top: 3px;
 }
 
+/* Circular icon-only buttons */
+button.mdc-button.icon-only-button {
+  border-radius: 50%;
+  padding: 0;
+  aspect-ratio: 1 / 1;
+}
+
+/* Pill buttons (icon + label) */
+button.mdc-button.button-small.pill-button {
+  width: auto;
+  min-width: fit-content;
+  border-radius: 13px;
+  padding: 4px 12px;
+
+  .button-label { font-size: 12px; }
+}
+button.mdc-button.button-regular.pill-button {
+  width: auto;
+  min-width: fit-content;
+  border-radius: 21px;
+  padding: 4px 16px;
+
+  .button-label { font-size: 14px; }
+}
+button.mdc-button.button-large.pill-button {
+  height: 48px;
+  width: auto;
+  min-width: fit-content;
+  border-radius: 24px;
+  padding: 0 18px;
+
+  .button-label { font-size: 15px; }
+}
+
 /**
  * Flat buttons Color overrides
  */
@@ -131,7 +165,7 @@ button.mdc-button.mat-mdc-unelevated-button.mat-neutral {
 button.mdc-button {
   lucide-icon svg {
     display: inline-block;
-    margin-bottom: -3px;
+    margin-bottom: -5px;
   }
 }
 a {

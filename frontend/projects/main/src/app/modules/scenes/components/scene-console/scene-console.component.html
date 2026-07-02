@@ -15,8 +15,9 @@
           [state]="scenePlayButtonState()"
           [type]="ButtonType.Flat"
           [size]="'large'"
+          [label]="scenePlayButtonText()"
           (toggle)="toggleScenePlaying($event)"
-        />
+        ></lib-play-pause-button>
       </div>
     </div>
   </div>
@@ -33,6 +34,7 @@
         [loading]="false"
         [hiddenColumns]="excludedColumns"
         [showFilters]="false"
+        [showActionsColumn]="false"
       ></app-songs-table>
     </div>
     <div class="sound-effects-sector">
