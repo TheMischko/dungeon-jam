@@ -80,7 +80,7 @@ export class PlaybackService implements OnDestroy {
     let track: Track;
     let queue: Track[];
     if (shuffle) {
-      const startingTrackIndex = Math.ceil(Math.random() * trackList.length);
+      const startingTrackIndex = Math.floor(Math.random() * trackList.length);
       track = trackList[startingTrackIndex];
       queue = [
         ...trackList.slice(startingTrackIndex + 1),
@@ -90,6 +90,7 @@ export class PlaybackService implements OnDestroy {
       track = trackList[0];
       queue = trackList.slice(1);
     }
+    console.log('Playing', track, 'Queue', queue);
     await this.play(track, queue, metadata);
   }
 

@@ -68,6 +68,7 @@ export class ScenePlayerService {
       .getTracksByPlaylist({ playlistId: scene.playlistId })
       .pipe(
         switchMap((tracks) => {
+          console.log('Scene tracks', tracks);
           return this.playSceneWithData(sceneId, tracks, ambience);
         }),
         map(() => void 0)

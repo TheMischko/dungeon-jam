@@ -35,6 +35,9 @@
         [hiddenColumns]="excludedColumns"
         [showFilters]="false"
         [showActionsColumn]="false"
+        (queryChange)="trackQueryChange.emit($event)"
+        (playTrack)="playTrack.emit($event)"
+        (pauseTrack)="pauseTrack.emit()"
       ></app-songs-table>
     </div>
     <div class="sound-effects-sector">

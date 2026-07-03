@@ -14,7 +14,7 @@ import { PlaylistStore } from '@general/stores/playlist.store';
 import { PlaylistTracksStore } from '../../../../stores/playlist-tracks.store';
 import { SoundEffectStore } from '@general/stores/sound-effect.store';
 import { Playlist } from '@shared/models/playlist.model';
-import { Track } from '@shared/models/track.model';
+import { PlaylistTracksQuery, Track } from '@shared/models/track.model';
 import { SoundEffect } from '@shared/models/sound-effect.model';
 import { TagsStore } from '@general/stores/tags.store';
 import { SceneConsoleComponent } from '../scene-console/scene-console.component';
@@ -24,12 +24,17 @@ import { ScenesStore } from '@general/stores/scenes.store';
 import { DialogService } from '../../../../services/dialog.service';
 import { SelectSoundEffectsModalComponent } from '../../../sound-effects/modals/select-sound-effects-modal/select-sound-effects-modal.component';
 import { SelectSoundEffectsSelection } from '../../../sound-effects/modals/select-sound-effects-modal/select-sound-effects-modal.types';
-import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { map, Observable } from 'rxjs';
+import {
+  takeUntilDestroyed,
+  toObservable,
+  toSignal,
+} from '@angular/core/rxjs-interop';
+import { debounceTime, map, Observable } from 'rxjs';
 import { SoundEffectVolumeChange } from '../../../../models/sound-effect.model';
 import { PlaybackService } from '../../../../services/playback.service';
 import { SoundEffectsPlayerService } from '../../../../services/sound-effects-player.service';
 import { ScenePlayerService } from '../../../../services/scene-player.service';
+import { QueryOptions } from '@shared/models/request.model';
 
 @Component({
   selector: 'app-scene-console-smart',
@@ -60,16 +65,23 @@ export class SceneConsoleSmartComponent implements OnInit {
   readonly stingers = signal<SoundEffect[]>([]);
   readonly sceneImageUrl = signal<string | undefined>(undefined);
   readonly soundEffectsVolumeMap = signal<Record<string, number>>({});
+  readonly tracksQuery = signal<QueryOptions>({});
   readonly playingSoundEffects = toSignal(
     this.soundEffectsPlayerService.playingEffects$,
     { initialValue: [] }
   );
   private readonly playbackState = toSignal(this.playbackService.playback$);
   readonly playingTrack = computed(() => {
-    return this.playbackState()?.currentTrack ?? null;
+    const playbackState = this.playbackState();
+    if (
+      !playbackState ||
+      !playbackState.isPlaying ||
+      playbackState.sceneId !== this.scene().id
+    ) {
+      return null;
+    }
+    return playbackState.currentTrack ?? null;
   });
-
-  private trackLoadTimeout: number | undefined = undefined;
 
   readonly ambiencePlaying = computed(() => {
     const ambience = this.ambience();
@@ -104,7 +116,19 @@ export class SceneConsoleSmartComponent implements OnInit {
     );
   });
 
+  readonly playlistTracksQuery = computed<PlaylistTracksQuery>(() => ({
+    playlistId: this.playlist()?.id ?? '',
+    ...this.tracksQuery(),
+  }));
+  readonly playlistTracksQuery$ = toObservable(this.playlistTracksQuery).pipe(
+    debounceTime(500)
+  );
+
   constructor() {
+    this.playlistTracksStore.load(
+      toSignal(this.playlistTracksQuery$, { initialValue: { playlistId: '' } })
+    );
+
     effect(() => {
       const scene = this.scene();
       const playlists = this.playlistStore.entityMap();
@@ -116,24 +140,6 @@ export class SceneConsoleSmartComponent implements OnInit {
         return;
       }
       this.playlist.set(playlist);
-
-      if (this.trackLoadTimeout) {
-        clearTimeout(this.trackLoadTimeout);
-      }
-
-      this.trackLoadTimeout = setTimeout(() => {
-        this.playlistTracksStore.load({
-          playlistId: playlist.id,
-        });
-        this.trackLoadTimeout = undefined;
-      }, 250);
-
-      return () => {
-        if (this.trackLoadTimeout) {
-          clearTimeout(this.trackLoadTimeout);
-          this.trackLoadTimeout = undefined;
-        }
-      };
     });
 
     effect(() => {
@@ -379,5 +385,21 @@ export class SceneConsoleSmartComponent implements OnInit {
       ...volumeMap,
       [event.soundEffect.id]: event.volume,
     }));
+  }
+
+  protected updateTracksQuery(event: QueryOptions) {
+    this.tracksQuery.set(event);
+  }
+
+  protected async playSceneTrack(track: Track) {
+    const restOfSceneTracks = this.tracks().filter((t) => t.id !== track.id);
+    this.playbackService.pause();
+    await this.playbackService.play(track, restOfSceneTracks, {
+      sceneId: this.scene().id,
+    });
+  }
+
+  protected pauseSceneTrack() {
+    this.playbackService.pause();
   }
 }

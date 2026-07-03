@@ -12,7 +12,15 @@ import {
 } from '@ngrx/signals/entities';
 import { PlaylistTracksQuery, Track } from '@shared/models/track.model';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { catchError, EMPTY, finalize, pipe, switchMap, tap } from 'rxjs';
+import {
+  catchError,
+  EMPTY,
+  filter,
+  finalize,
+  pipe,
+  switchMap,
+  tap,
+} from 'rxjs';
 import { inject } from '@angular/core';
 import { TrackService } from '../services/track.service';
 import { PlaylistApiService } from '@general/services/playlist-api.service';
@@ -46,6 +54,7 @@ export const PlaylistTracksStore = signalStore(
     ) => {
       const load = rxMethod<PlaylistTracksQuery>(
         pipe(
+          filter((query) => !!query.playlistId),
           tap(() => {
             patchState(store, { loading: true });
           }),
