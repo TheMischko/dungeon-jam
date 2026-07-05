@@ -21,6 +21,8 @@ export const ErrorCode = {
   DiscordChannelJoinFailed: 'ERRORS.DISCORD.CHANNEL_JOIN_FAILED',
   DiscordConnectionLost: 'ERRORS.DISCORD.CONNECTION_LOST',
   DiscordApiError: 'ERRORS.DISCORD.API_ERROR',
+  // Session
+  SessionIdRequired: 'ERRORS.SESSION.NAME_REQUIRED',
 };
 
 export type ErrorCodeType = (typeof ErrorCode)[keyof typeof ErrorCode];

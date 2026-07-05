@@ -109,6 +109,7 @@ export enum SessionChannel {
   INSERT = 'session/insert',
   UPDATE = 'session/update',
   DELETE = 'session/delete',
+  GET_SESSION_SCENES = 'session/get-scenes',
 }
 
 export enum NotificationChannel {

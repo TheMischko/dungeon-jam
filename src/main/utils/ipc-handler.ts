@@ -17,6 +17,11 @@ export function isAppError(error: unknown): error is AppError {
   );
 }
 
+/**
+ * Maps any TypeScript `Error` to `AppError`.
+ * If `Error` is already `AppError`, throw it without changes.
+ * @param fn Handler function for IPC request
+ */
 export function withAppError<T>(fn: IpcHandlerFn<T>): IpcHandlerFn<T> {
   return async (event, ...args) => {
     try {

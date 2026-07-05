@@ -1,9 +1,11 @@
-export interface Session {
+import { QueryOptions } from '@shared/models/request.model';
+
+export interface SessionData {
   id: string;
   name: string;
   description?: string;
   dateOfSession?: Date;
-  sceneIds: string[];
+  scenes: SessionSceneRef[];
   order: number;
   dateCreated: Date;
   dateUpdated: Date;
@@ -17,10 +19,21 @@ export interface SessionInsertQuery {
 
 export interface SessionUpdateQuery {
   id: string;
+  name?: string;
   description?: string | null;
   dateOfSession?: Date | null;
-  scenesAdded?: string[];
+  scenesAdded?: SessionSceneRef[];
   scenesRemoved?: string[];
-  // Overrides current scenes
-  sceneIds?: string[];
+  // IDs of scenes in new correct order
+  scenesReordered?: string[];
+}
+
+export interface SessionScenesQuery {
+  sessionId: string;
+  query: QueryOptions;
+}
+
+export interface SessionSceneRef {
+  sceneId: string;
+  order: number;
 }

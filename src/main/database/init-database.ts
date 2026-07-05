@@ -5,7 +5,7 @@ import { DiscordTokenData } from '@shared/models/discord.model';
 import { SoundEffect } from '@shared/models/sound-effect.model';
 import { DisplayOrder } from '@shared/models/display-order.model';
 import { Scene } from '@shared/models/scene.model';
-import { Session } from '@shared/models/session.model';
+import { SessionData } from '@shared/models/session.model';
 
 export function initDatabase() {
   return {
@@ -59,6 +59,6 @@ function initScenes(): Scene[] {
   return [];
 }
 
-function initSessions(): Session[] {
+function initSessions(): SessionData[] {
   return [];
 }

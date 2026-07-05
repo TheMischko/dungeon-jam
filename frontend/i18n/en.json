@@ -22,6 +22,9 @@
     "PLAYLIST": {
       "ID_REQUIRED": "Playlist ID is required for update.",
       "ID_NOT_FOUND": "Playlist with ID {{playlistId}} not found."
+    },
+    "SESSION": {
+      "NAME_REQUIRED": "Session name is required."
     }
   },
   "NOTIFICATIONS": {

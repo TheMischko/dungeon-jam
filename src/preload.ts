@@ -13,6 +13,7 @@ import SoundEffectApi from './preload/sound-effect-api';
 import ImageApi from './preload/image-api';
 import SceneApi from './preload/scene-api';
 import NotificationApi from './preload/notification-api';
+import SessionApi from './preload/session-api';
 
 const generalApi = {
   triggerRedirect(request: RedirectRequest) {
@@ -71,6 +72,7 @@ declare global {
     IMAGE_API: typeof ImageApi;
     SCENE_API: typeof SceneApi;
     NOTIFICATION_API: typeof NotificationApi;
+    SESSION_API: typeof SessionApi;
   }
 }
 
@@ -86,3 +88,4 @@ contextBridge.exposeInMainWorld('SOUND_EFFECT_API', SoundEffectApi);
 contextBridge.exposeInMainWorld('IMAGE_API', ImageApi);
 contextBridge.exposeInMainWorld('SCENE_API', SceneApi);
 contextBridge.exposeInMainWorld('NOTIFICATION_API', NotificationApi);
+contextBridge.exposeInMainWorld('SESSION_API', SessionApi);

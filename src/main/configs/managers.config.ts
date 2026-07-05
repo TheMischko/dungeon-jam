@@ -14,6 +14,7 @@ import { ImageManager } from '../managers/image.manager';
 import { AppInfoManager } from '../managers/app-info.manager';
 import { DisplayOrderManager } from '../managers/display-order.manager';
 import { SceneManager } from '../managers/scene.manager';
+import { SessionManager } from '../managers/session.manager';
 
 /**
  * Manager initialization configuration
@@ -121,6 +122,12 @@ export function getManagersInitConfig(
       name: 'Scenes',
       initFunction: async () => {
         await SceneManager.getInstance();
+      },
+    },
+    {
+      name: 'Sessions',
+      initFunction: async () => {
+        await SessionManager.getInstance();
       },
     },
   ];
