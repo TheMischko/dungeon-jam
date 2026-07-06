@@ -31,6 +31,19 @@
     "DISCORD": {
       "TOKEN_CONNECTED": "Discord bot connected successfully.",
       "CHANNEL_JOINED": "Joined Discord voice channel."
+    },
+    "SESSION": {
+      "LOAD_ALL_ERROR_TITLE": "Loading sessions error",
+      "INSERT_ERROR_TITLE": "Creating session error",
+      "INSERT_SUCCESS_TITLE": "Session created",
+      "INSERT_SUCCESS_MESSAGE": "Session {{name}} was created",
+      "UPDATE_ERROR_TITLE": "Updating session error",
+      "UPDATE_SUCCESS_TITLE": "Session updated",
+      "UPDATE_SUCCESS_MESSAGE": "Session {{name}} was updated",
+      "DELETE_ERROR_TITLE": "Deleting session error",
+      "DELETE_SUCCESS_TITLE": "Session deleted",
+      "DELETE_SUCCESS_MESSAGE": "Session was successfully deleted.",
+      "GENERIC_ERROR_MESSAGE": "An unknown error occurred."
     }
   }
 }
