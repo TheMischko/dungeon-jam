@@ -4,6 +4,7 @@ import {
   Component,
   computed,
   inject,
+  isDevMode,
   OnInit,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -140,9 +141,9 @@ export class StreamSettingsComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    setTimeout(() => {
-      this.switchToLocalPlayback();
-    }, 5000);
+    if (isDevMode()) {
+      setTimeout(() => this.switchToLocalPlayback(), 5000);
+    }
   }
 
   isStringIcon(icon: any): boolean {

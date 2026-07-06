@@ -261,13 +261,11 @@ export class PlaybackService implements OnDestroy {
       ...current,
       volume: volumeNormalized,
     };
-    const isLocalMuted = volumeNormalized === 0;
     this.audioPlayerService.setVolume(volume);
     this.state.next(newState);
     if (storeUpdate) {
       this.updateStoredState(newState);
     }
-    this.window.PLAYBACK_API.updateCaptureSettings(isLocalMuted);
   }
 
   changeRepeat() {
