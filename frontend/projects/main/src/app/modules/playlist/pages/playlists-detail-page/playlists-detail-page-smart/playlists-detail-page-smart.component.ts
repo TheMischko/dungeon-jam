@@ -9,7 +9,7 @@ import {
   signal,
 } from '@angular/core';
 import { SortDirection } from '@shared/models/common.model';
-import { PlaylistTracksQuery, Track } from '@shared/models/track.model';
+import { AudioTrack, PlaylistTracksQuery, Track } from '@shared/models/track.model';
 import { PlaylistTracksStore } from '../../../../../stores/playlist-tracks.store';
 import { PlaylistApiService } from '@general/services/playlist-api.service';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
@@ -40,6 +40,9 @@ import {
 } from '../../../../library/modals/discover-tracks-modal/discover-tracks-modal.component';
 import { ToastType } from '../../../../../../../../general/models/toast.model';
 import { ToastService } from '@general/services/toast.service';
+import { NewTrackDropInService } from '../../../../library/services/new-track-drop-in.service';
+import { PlaylistToastService } from '@general/services/toast/playlist-toast.service';
+import { TagsStore } from '@general/stores/tags.store';
 
 @Component({
   selector: 'app-playlists-detail-page-smart',
@@ -56,6 +59,9 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
   readonly defaultActionsService = inject(DefaultTrackActionsService);
   readonly imageApiService = inject(ImageApiService);
   readonly destroyRef = inject(DestroyRef);
+  private readonly newTrackDropInService = inject(NewTrackDropInService);
+  private readonly playlistToastService = inject(PlaylistToastService);
+  private readonly tagsStore = inject(TagsStore);
 
   readonly playlistId = input<string>('', { alias: 'id' });
 
@@ -218,6 +224,16 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
             ToastType.Error
           );
         },
+      });
+  }
+
+  onTracksDropped(audioTracks: AudioTrack[]): void {
+    this.newTrackDropInService
+      .startUploadSequence(audioTracks)
+      .subscribe((uploadedTracks) => {
+        this.addTracksToPlaylist(uploadedTracks);
+        this.playlistToastService.showTracksAddedSuccess();
+        this.tagsStore.loadAll();
       });
   }
 

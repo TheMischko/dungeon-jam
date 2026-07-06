@@ -1,6 +1,6 @@
 import { ipcRenderer, webUtils } from 'electron';
 import { AudioFileChannel } from '@shared/models/channels.model';
-import { AudioTrack, FileBase64 } from '@shared/models/track.model';
+import { AudioTrack, FileBase64, Track } from '@shared/models/track.model';
 
 const audioRegExp = new RegExp('audio/.*');
 
@@ -35,7 +35,7 @@ const registerFileDrop = (
   window.addEventListener('dragover', (e) => e.preventDefault());
 };
 
-const uploadTracks = async (tracks: AudioTrack[]) => {
+const uploadTracks = async (tracks: AudioTrack[]): Promise<Track[]> => {
   return await ipcRenderer.invoke(AudioFileChannel.UPLOAD, tracks);
 };
 

@@ -1,5 +1,5 @@
 <h1>Library</h1>
-<app-songs-drop-in-zone (audioDropped)="openUploadDialog($event)">
+<app-files-drop-in-zone (audioDropped)="openUploadDialog($event)">
   <div class="upload-info">
     <h3>Adding new tracks</h3>
     <p>To add new tracks just drop the audio files onto the Library table or click the button below.</p>
@@ -15,4 +15,4 @@
     (queryChange)="currentQuery.set($event)"
     (actionMenuClosed)="actionsClosed($event)"
   ></app-songs-table>
-</app-songs-drop-in-zone>
+  </app-files-drop-in-zone>

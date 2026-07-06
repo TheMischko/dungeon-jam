@@ -102,6 +102,7 @@ export class TrackManager {
     );
 
     ipcMain.handle(AudioFileChannel.UPLOAD, withAppError(async (_, tracks: AudioTrack[]) => {
+      const inserted: Track[] = [];
       for (const track of tracks) {
         const resolved = resolveAudioTrack(track);
         this.logger.log('Uploading track', {
@@ -111,14 +112,17 @@ export class TrackManager {
           duration: resolved.duration,
         });
 
-        await this.insert(
-          resolved.name,
-          resolved.url,
-          resolved.duration,
-          resolved.author,
-          resolved.tags
+        inserted.push(
+          await this.insert(
+            resolved.name,
+            resolved.url,
+            resolved.duration,
+            resolved.author,
+            resolved.tags
+          )
         );
       }
+      return inserted;
     }));
 
     ipcMain.handle(TrackChannel.UPDATE, withAppError(async (_, track: Track) => {

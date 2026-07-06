@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { AudioTrack } from '@shared/models/track.model';
+import { AudioTrack, Track } from '@shared/models/track.model';
 import { Observable, Subject } from 'rxjs';
 import { AudioApiWindow } from '../models/window-api.model';
 
@@ -16,12 +16,12 @@ export class AudioFilesService {
     );
   }
 
-  uploadAudioTracks(tracks: AudioTrack[]): Observable<void> {
-    const subject = new Subject<void>();
+  uploadAudioTracks(tracks: AudioTrack[]): Observable<Track[]> {
+    const subject = new Subject<Track[]>();
 
     this.window.AUDIO_FILES_API.uploadTracks(tracks)
-      .then(() => {
-        subject.next();
+      .then((result) => {
+        subject.next(result);
         subject.complete();
       })
       .catch((err) => {

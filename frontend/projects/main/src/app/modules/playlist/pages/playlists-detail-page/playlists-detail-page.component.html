@@ -51,27 +51,29 @@
 
 <h3 class="tracks-header">Tracks</h3>
 
-<div class="actions">
-  <button mat-flat-button (click)="openAddTracks.emit()">
-    <lucide-icon [img]="addTracksIcon"></lucide-icon>
-    <span>Add tracks from library</span>
-  </button>
-  <lib-switch
-    label="Include tracks from children playlists"
-    (toggled)="toggleIncludeChildren($event)"
-  />
-</div>
+<app-files-drop-in-zone (audioDropped)="audioDropped.emit($event)">
+  <div class="actions">
+    <button mat-flat-button (click)="openAddTracks.emit()">
+      <lucide-icon [img]="addTracksIcon"></lucide-icon>
+      <span>Add tracks from library</span>
+    </button>
+    <lib-switch
+      label="Include tracks from children playlists"
+      (toggled)="toggleIncludeChildren($event)"
+    />
+  </div>
 
-<div class="content">
-  <app-songs-table
-    [tracks]="tracks()"
-    [playingTrackId]="playingTrackId()"
-    [actionsMenuConfig]="songActionsMenuConfig()"
-    (playTrack)="playTrack.emit($event)"
-    (pauseTrack)="pause.emit()"
-    (queryChange)="queryChange.emit($event)"
-  ></app-songs-table>
-</div>
+  <div class="content">
+    <app-songs-table
+      [tracks]="tracks()"
+      [playingTrackId]="playingTrackId()"
+      [actionsMenuConfig]="songActionsMenuConfig()"
+      (playTrack)="playTrack.emit($event)"
+      (pauseTrack)="pause.emit()"
+      (queryChange)="queryChange.emit($event)"
+    ></app-songs-table>
+  </div>
+</app-files-drop-in-zone>
 
 <ng-template #childrenTemplate>
   <div class="child-playlists-section">

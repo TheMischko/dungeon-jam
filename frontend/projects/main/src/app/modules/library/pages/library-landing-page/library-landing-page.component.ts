@@ -1,5 +1,5 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import { FilesDropInZoneComponent } from './songs-drop-in-zone/files-drop-in-zone.component';
+import { FilesDropInZoneComponent } from '../../../../components/drag-and-drop/files-drop-in-zone.component';
 import { AudioTrack, Track } from '@shared/models/track.model';
 import { SongsTableComponent } from './songs-table/songs-table.component';
 import { PlaybackService } from '../../../../services/playback.service';

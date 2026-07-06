@@ -6,7 +6,6 @@ import {
   combineLatest,
   EMPTY,
   finalize,
-  forkJoin,
   map,
   Observable,
   of,
@@ -41,7 +40,7 @@ export class NewTrackDropInService {
 
   private duplicateMap: Map<string, Track> = new Map();
 
-  public startUploadSequence(audioTracks?: AudioTrack[]): Observable<void> {
+  public startUploadSequence(audioTracks?: AudioTrack[]): Observable<Track[]> {
     if (!audioTracks?.length) {
       return EMPTY;
     }
@@ -75,7 +74,7 @@ export class NewTrackDropInService {
    */
   private openCorrectUploadDialog(
     tracksToUpload: AudioTrack[]
-  ): Observable<void> {
+  ): Observable<Track[]> {
     return this.resolveTrackTags(tracksToUpload).pipe(
       switchMap((tagsMap) => {
         if (tracksToUpload.length >= BULK_UPLOAD_THRESHOLD) {
@@ -146,7 +145,7 @@ export class NewTrackDropInService {
   private openBulkConfirmationDialog(
     audioTracks: AudioTrack[],
     tagsMap: Map<string, TagData>
-  ): Observable<void> {
+  ): Observable<Track[]> {
     const dialogRef = this.dialogService.open<
       BulkUploadConfirmationModalComponent,
       BulkUploadConfirmationModalResult
@@ -173,10 +172,13 @@ export class NewTrackDropInService {
         const newTracks = tracksWithTags.filter(
           (t) => !this.duplicateMap.has(t.fullPath)
         );
-        return forkJoin([
-          this.audioFilesService.uploadAudioTracks(newTracks),
-          this.overrideTracks(tracksWithTags),
-        ]).pipe(switchMap(() => EMPTY));
+        const upload$ = newTracks.length
+          ? this.audioFilesService.uploadAudioTracks(newTracks)
+          : of<Track[]>([]);
+        const override$ = this.overrideTracks(tracksWithTags);
+        return combineLatest([upload$, override$]).pipe(
+          map(([uploaded, overridden]) => [...uploaded, ...overridden])
+        );
       })
     );
   }
@@ -186,7 +188,7 @@ export class NewTrackDropInService {
   private openUploadDialog(
     audioTracks: AudioTrack[],
     tagsMap: Map<string, TagData>
-  ): Observable<void> {
+  ): Observable<Track[]> {
     const dialog = this.dialogService.open<
       TracksUploadModalComponent,
       AudioTrack[] | null
@@ -209,13 +211,15 @@ export class NewTrackDropInService {
 
         const override$ = duplicateTracks.length
           ? this.overrideTracks(duplicateTracks)
-          : of(undefined);
+          : of<Track[]>([]);
 
         const upload$ = newTracks.length
           ? this.audioFilesService.uploadAudioTracks(newTracks)
-          : of(undefined);
+          : of<Track[]>([]);
 
-        return combineLatest([override$, upload$]).pipe(map(() => void 0));
+        return combineLatest([override$, upload$]).pipe(
+          map(([overridden, uploaded]) => [...overridden, ...uploaded])
+        );
       })
     );
   }
@@ -224,7 +228,7 @@ export class NewTrackDropInService {
    * Overrides existing tracks with the provided audio tracks. It updates the track details based on the new audio track information.
    * Uses the duplicateMap to find existing tracks and updates them with new details before sending update requests to the API.
    */
-  private overrideTracks(tracks: AudioTrack[]): Observable<void> {
+  private overrideTracks(tracks: AudioTrack[]): Observable<Track[]> {
     const updates = tracks
       .filter((t) => this.duplicateMap.has(t.fullPath))
       .map((t) => {
@@ -239,7 +243,13 @@ export class NewTrackDropInService {
         } as Track;
       });
 
-    return this.trackApiService.updateMultiple(updates).pipe(map(() => void 0));
+    if (!updates.length) {
+      return of([]);
+    }
+
+    return this.trackApiService.updateMultiple(updates).pipe(
+      map(() => updates.map((u) => this.duplicateMap.get(u.url) ?? u))
+    );
   }
 
   /**

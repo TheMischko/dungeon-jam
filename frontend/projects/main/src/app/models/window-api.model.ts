@@ -20,7 +20,7 @@ export type AudioApiWindow = Window &
         callback: (paths: string[]) => void
       ) => void;
       registerAudioFileDrop: (callback: (tracks: AudioTrack[]) => void) => void;
-      uploadTracks: (tracks: AudioTrack[]) => Promise<void>;
+      uploadTracks: (tracks: AudioTrack[]) => Promise<Track[]>;
       loadFileBase64: (filePath: string) => Promise<FileBase64>;
       openAudioFileDialog: () => Promise<AudioTrack[]>;
     };

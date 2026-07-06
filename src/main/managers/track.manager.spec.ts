@@ -120,10 +120,14 @@ describe('TrackManager', () => {
         mockTrackResult,
       );
 
-      await triggerIpcMainHandle<Track[]>(AudioFileChannel.UPLOAD, tracks);
+      const result = await triggerIpcMainHandle<Track[]>(AudioFileChannel.UPLOAD, tracks);
 
       expect(mockDatabaseProviderInstance.create).toHaveBeenCalledTimes(
         tracks.length,
+      );
+      expect(result).toHaveLength(tracks.length);
+      expect(result).toEqual(
+        Array(tracks.length).fill(mockTrackResult),
       );
     });
   });

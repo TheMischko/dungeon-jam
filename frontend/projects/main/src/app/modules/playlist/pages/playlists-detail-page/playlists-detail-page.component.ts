@@ -7,7 +7,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { Playlist } from '@shared/models/playlist.model';
-import { Track } from '@shared/models/track.model';
+import { AudioTrack, Track } from '@shared/models/track.model';
 import { SongsTableComponent } from '../../../library/pages/library-landing-page/songs-table/songs-table.component';
 import { PlayPauseButtonComponent } from '@general/components/buttons/play-pause-button/play-pause-button.component';
 import {
@@ -25,6 +25,7 @@ import { CollapsibleSectionComponent } from '@general/components/display/collaps
 import { ChildPlaylistBoxComponent } from './child-playlist-box/child-playlist-box.component';
 import { ChildPlaylistActionsSmartComponent } from './child-playlist-actions/child-playlist-actions-smart/child-playlist-actions-smart.component';
 import { TagListSmartComponent } from '@general/components/display/tag-list/tag-list-smart/tag-list-smart.component';
+import { FilesDropInZoneComponent } from '../../../../components/drag-and-drop/files-drop-in-zone.component';
 
 @Component({
   selector: 'app-playlists-detail-page',
@@ -39,6 +40,7 @@ import { TagListSmartComponent } from '@general/components/display/tag-list/tag-
     ChildPlaylistBoxComponent,
     ChildPlaylistActionsSmartComponent,
     TagListSmartComponent,
+    FilesDropInZoneComponent,
   ],
   templateUrl: './playlists-detail-page.component.html',
   styleUrl: './playlists-detail-page.component.scss',
@@ -64,6 +66,7 @@ export class PlaylistsDetailPageComponent {
   readonly editPlaylist = output<void>();
   readonly deletePlaylist = output<void>();
   readonly openDiscover = output<void>();
+  readonly audioDropped = output<AudioTrack[]>();
 
   readonly parentDetailRoute = computed(() => {
     const parent = this.parentPlaylist();
