@@ -1,0 +1,17 @@
+@if (form(); as form) {
+  <lib-input
+    class="text-input"
+    label="Session name"
+    [formField]="form.name"
+  ></lib-input>
+  <lib-input
+    class="text-input"
+    label="Session description"
+    [formField]="form.description"
+  ></lib-input>
+  <lib-date-picker
+    class="text-input"
+    label="Session date"
+    [formField]="form.dateOfSession"
+  ></lib-date-picker>
+}

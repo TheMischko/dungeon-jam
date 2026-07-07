@@ -1,0 +1,9 @@
+<h1 class="title">Sessions</h1>
+<button mat-flat-button (click)="createSession.emit()">
+  Create new session
+</button>
+<ul>
+  @for (session of sessions(); track session.id) {
+    <li>{{ session.name }}</li>
+  }
+</ul>

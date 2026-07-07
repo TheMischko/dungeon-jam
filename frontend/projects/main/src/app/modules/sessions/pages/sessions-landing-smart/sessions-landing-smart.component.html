@@ -1,1 +1,5 @@
-<p>sessions-landing-smart works!</p>
+<app-sessions-landing
+  [sessions]="sessions()"
+  [loading]="loading()"
+  (createSession)="openNewSessionDialog()"
+></app-sessions-landing>
