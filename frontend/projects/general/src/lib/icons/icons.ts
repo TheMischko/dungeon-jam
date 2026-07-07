@@ -7,6 +7,7 @@ import {
   Grid2x2Icon,
   Grid3x3Icon,
   ImageUpIcon,
+  LayersIcon,
   ListFilterIcon,
   ListMusicIcon,
   ListStartIcon,
@@ -45,6 +46,7 @@ export const iconSet = {
   LoadingIcon: LoaderCircleIcon,
   PlaylistIco: ListMusicIcon,
   AudioWaveIcon: AudioLinesIcon,
+  SessionIcon: LayersIcon,
 };
 
 export const actionsIconSet = {

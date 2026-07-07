@@ -1,0 +1,5 @@
+@if (loading()) {
+  <lib-loader size="large" />
+} @else {
+  <h1 class="title">{{ session()?.name }}</h1>
+}

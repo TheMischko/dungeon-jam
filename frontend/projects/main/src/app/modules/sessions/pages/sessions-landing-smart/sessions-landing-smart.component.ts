@@ -14,7 +14,10 @@ import {
   EditSessionModalResult,
 } from '../../modals/edit-session-modal/edit-session-modal.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { SessionInsertQuery } from '@shared/models/session.model';
+import { SessionData, SessionInsertQuery } from '@shared/models/session.model';
+import { Router } from '@angular/router';
+import { sessionsRouteStrings } from '../../sessions-route-strings';
+import { routesStrings } from '../../../../routes-strings';
 
 @Component({
   selector: 'app-sessions-landing-smart',
@@ -27,6 +30,7 @@ export class SessionsLandingSmartComponent {
   private readonly sessionStore = inject(SessionStore);
   private readonly dialogService = inject(DialogService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly router = inject(Router);
 
   readonly loading = this.sessionStore.loading;
   readonly sessions = this.sessionStore.entities;
@@ -35,6 +39,14 @@ export class SessionsLandingSmartComponent {
 
   constructor() {
     this.sessionStore.load(this.queryParams);
+  }
+
+  async navigateToDetail(session: SessionData): Promise<void> {
+    await this.router.navigate([
+      routesStrings.sessions,
+      sessionsRouteStrings.sessionDetail,
+      session.id,
+    ]);
   }
 
   openNewSessionDialog(): void {

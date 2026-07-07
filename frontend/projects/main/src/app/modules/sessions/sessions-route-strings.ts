@@ -1,4 +1,4 @@
 export const sessionsRouteStrings = {
   sessionsLanding: 'landing',
-  sessionDetail: 'landing',
+  sessionDetail: 'detail',
 };
