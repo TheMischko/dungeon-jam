@@ -1,0 +1,20 @@
+<div class="content">
+  <div class="available-scenes">
+    @for (scene of allScenes(); track scene.id){
+      <div>{{ scene.name }}</div>
+    }
+    <app-table
+      [dataSet]="allScenes()"
+      [config]="config"
+      [selection]="true"
+      [initialSelection]="assignedScenes()"
+      [uniquenessFn]="uniqueSceneFn"
+      (selected)="selectionChanged.emit($event)"
+    ></app-table>
+  </div>
+  <div class="assigned-scenes">
+    @for (scene of currentSelection(); track scene.id){
+      <div>{{ scene.name }}</div>
+    }
+  </div>
+</div>

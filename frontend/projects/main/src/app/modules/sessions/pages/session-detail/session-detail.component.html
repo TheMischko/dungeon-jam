@@ -2,4 +2,12 @@
   <lib-loader size="large" />
 } @else {
   <h1 class="title">{{ session()?.name }}</h1>
+  <button mat-flat-button (click)="changeScenes.emit()">Assign scenes</button>
+  <div class="scenes-wrapper">
+  @for (scene of (session()?.scenes ?? []); track scene.sceneId) {
+    @if(scenesMap()[scene.sceneId]; as scene){
+      <app-scene-console-smart [scene]="scene"></app-scene-console-smart>
+    }
+  }
+  </div>
 }

@@ -42,6 +42,7 @@ import { QueryOptions } from '@shared/models/request.model';
   templateUrl: './scene-console-smart.component.html',
   styleUrl: './scene-console-smart.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [PlaylistTracksStore],
 })
 export class SceneConsoleSmartComponent implements OnInit {
   readonly playlistStore = inject(PlaylistStore);
@@ -133,10 +134,12 @@ export class SceneConsoleSmartComponent implements OnInit {
       const scene = this.scene();
       const playlists = this.playlistStore.entityMap();
       if (!scene.playlistId) {
+        console.warn(`Scene ${scene.name} has no playlistId`);
         return;
       }
       const playlist = playlists[scene.playlistId];
       if (!playlist) {
+        console.warn(`Playlist ${scene.playlistId} not found`);
         return;
       }
       this.playlist.set(playlist);
