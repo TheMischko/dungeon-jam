@@ -70,6 +70,7 @@ export class SmartTableComponent<T> implements AfterViewInit {
   readonly customRowAttributeValueFn = input<((item: T) => string) | undefined>(
     undefined
   );
+  readonly initialQuery = input<QueryOptions>({});
 
   readonly selected = output<T[]>();
   readonly menuClosed = output<{ row: T; reason: string }>();
@@ -93,6 +94,28 @@ export class SmartTableComponent<T> implements AfterViewInit {
     };
     return query;
   });
+  readonly currentTagFilterIds = computed(() => {
+    const filters = this.currentFilters();
+    const tagFilter = filters.filters.find((f) => f.property === 'tag');
+    if (!tagFilter) {
+      return [];
+    }
+    return tagFilter.values;
+  });
+  readonly currentPlaylistFilterIds = computed(() => {
+    const filters = this.currentFilters();
+    const playlistFilter = filters.filters.find(
+      (f) => f.property === 'playlist'
+    );
+    if (!playlistFilter) {
+      return [];
+    }
+    return playlistFilter.values;
+  });
+  readonly currentFilterMatchingMethod = computed(() => {
+    const filters = this.currentFilters();
+    return filters.matchType;
+  });
 
   readonly collapsibleColumns = this.columnStateManager.collapsibleColumns;
   readonly collapsibleColumnNames = computed<string[]>(() => {
@@ -106,6 +129,22 @@ export class SmartTableComponent<T> implements AfterViewInit {
   constructor() {
     effect(() => {
       this.queryChange.emit(this.currentQuery());
+    });
+
+    effect(() => {
+      const initialQuery = this.initialQuery();
+      if (initialQuery.search) {
+        this.currentSearch.set(initialQuery.search);
+      }
+      if (initialQuery.sortBy) {
+        this.currentSortBy.set(initialQuery.sortBy);
+      }
+      if (initialQuery.sortDirection) {
+        this.currentSortDirection.set(initialQuery.sortDirection);
+      }
+      if (initialQuery.filters) {
+        this.currentFilters.set(initialQuery.filters);
+      }
     });
 
     effect(() => {

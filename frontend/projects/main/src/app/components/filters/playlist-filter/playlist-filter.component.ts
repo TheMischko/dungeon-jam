@@ -1,14 +1,18 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
+  DestroyRef,
   inject,
+  input,
   OnInit,
   output,
+  signal,
 } from '@angular/core';
-import { PlaylistStore } from '@general/stores/playlist.store';
 import { Playlist } from '@shared/models/playlist.model';
 import { FilterBoxComponent } from '../filter-box/filter-box.component';
-import { SortDirection } from '@shared/models/common.model';
+import { PlaylistApiService } from '@general/services/playlist-api.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-playlist-filter',
@@ -18,17 +22,29 @@ import { SortDirection } from '@shared/models/common.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PlaylistFilterComponent implements OnInit {
-  readonly playlistStore = inject(PlaylistStore);
-  readonly playlists = this.playlistStore.entities;
-  readonly displayField: keyof Playlist = 'name';
-  readonly trackById = (_: number, item: Playlist) => item.id;
+  readonly playlistService = inject(PlaylistApiService);
+  readonly destroyRef = inject(DestroyRef);
+
+  readonly initialIds = input<string[]>([]);
+
   readonly selectionChange = output<Playlist[]>();
 
+  readonly playlists = signal<Playlist[]>([]);
+  readonly displayField: keyof Playlist = 'name';
+  readonly trackById = (_: number, item: Playlist) => item.id;
+
+  readonly initialSelection = computed(() => {
+    const initialIds = this.initialIds();
+    return this.playlists().filter((p) => initialIds.includes(p.id));
+  });
+
   ngOnInit() {
-    this.playlistStore.load({
-      sortBy: 'name',
-      sortDirection: SortDirection.ASC,
-    });
+    this.playlistService
+      .getAllPlaylists({})
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((playlists: Playlist[]) => {
+        this.playlists.set(playlists);
+      });
   }
 
   emitSelection(selection: Playlist[]) {

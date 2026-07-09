@@ -73,6 +73,7 @@ export class SongsTableComponent {
   readonly hiddenColumns = input<(keyof Track)[]>([]);
   readonly paginationPages = input<number[] | undefined>(undefined);
   readonly initialPageSize = input<number>(DEFAULT_PAGE_SIZE);
+  readonly initialQuery = input<QueryOptions>({});
 
   readonly queryChange = output<QueryOptions>();
   readonly playTrack = output<Track>();

@@ -2,17 +2,19 @@
   <div class="controls">
     @if (filterEnabled()) {
       <app-filter-settings
+        [value]="currentFilterMatchingMethod()"
         (matchingChange)="updateFilterMatchingType($event)"
       />
       <div class="filters">
-        <app-tags-filter (selectionChange)="emitTagFilters($event)" />
-        <app-playlist-filter (selectionChange)="emitPlaylistFilters($event)" />
+        <app-tags-filter [initialIds]="currentTagFilterIds()" (selectionChange)="emitTagFilters($event)" />
+        <app-playlist-filter [initialIds]="currentPlaylistFilterIds()" (selectionChange)="emitPlaylistFilters($event)" />
       </div>
     } @else {
       <div></div>
     }
     <lib-search-bar
       class="search-bar"
+      [value]="currentSearch()"
       (search)="currentSearch.set($event)"
     ></lib-search-bar>
   </div>

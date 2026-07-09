@@ -41,7 +41,7 @@ export class DiscoverTracksModalComponent implements OnDestroy {
 
   readonly tracks = signal<Track[]>([]);
   readonly tracksLoading = signal<boolean>(false);
-  readonly tracksQuery = signal<QueryOptions>({});
+  readonly tracksQuery = signal<QueryOptions>(this.data?.query ?? {});
   readonly selection = signal<Track[]>([]);
   readonly selectAllState = signal<'checked' | 'unchecked' | 'indeterminate'>(
     'unchecked'
@@ -102,7 +102,8 @@ export class DiscoverTracksModalComponent implements OnDestroy {
     this.dialogRef.close({
       selectedTracks: this.selection(),
       again,
-    });
+      query: this.tracksQuery(),
+    } as DiscoverTracksModalResult);
   }
 
   protected async playTrack(track: Track) {
@@ -134,4 +135,11 @@ export class DiscoverTracksModalComponent implements OnDestroy {
 
 export type DiscoverTracksModalData = {
   playlist: Playlist;
+  query?: QueryOptions;
+};
+
+export type DiscoverTracksModalResult = {
+  selectedTracks: Track[];
+  again: boolean;
+  query?: QueryOptions;
 };

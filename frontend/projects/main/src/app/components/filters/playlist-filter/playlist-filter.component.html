@@ -2,6 +2,7 @@
   [options]="playlists()"
   [optionDisplayField]="displayField"
   [trackBy]="trackById"
+  [selection]="initialSelection()"
   (selectionChange)="emitSelection($event)"
   placeholder="Playlist filters"
   label="Playlists"

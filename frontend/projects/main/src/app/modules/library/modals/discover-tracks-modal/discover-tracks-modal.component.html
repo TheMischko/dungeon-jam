@@ -18,6 +18,7 @@
       [hiddenColumns]="['duration']"
       [paginationPages]="PAGE_SIZES"
       [initialPageSize]="batchSize()"
+      [initialQuery]="tracksQuery()"
       (queryChange)="tracksQuery.set($event)"
       (selectionChange)="selectionChanged($event)"
       (playTrack)="playTrack($event)"

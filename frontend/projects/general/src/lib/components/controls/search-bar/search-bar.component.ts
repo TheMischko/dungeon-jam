@@ -1,4 +1,4 @@
-import { Component, output } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { InputComponent } from '../input/input.component';
 import { actionsIconSet } from '../../../icons/icons';
 
@@ -9,6 +9,7 @@ import { actionsIconSet } from '../../../icons/icons';
   styleUrl: './search-bar.component.scss',
 })
 export class SearchBarComponent {
+  readonly value = input<string>();
   readonly search = output<string>();
   readonly searchIcon = actionsIconSet.SearchIcon;
 }

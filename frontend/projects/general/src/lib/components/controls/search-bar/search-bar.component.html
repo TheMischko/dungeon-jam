@@ -1,5 +1,6 @@
 <lib-input
   label="Search"
   [iconPrefix]="searchIcon"
+  [value]="value() || ''"
   (inputChange)="search.emit($event)"
 ></lib-input>

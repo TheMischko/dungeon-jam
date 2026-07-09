@@ -9,7 +9,11 @@ import {
   signal,
 } from '@angular/core';
 import { SortDirection } from '@shared/models/common.model';
-import { AudioTrack, PlaylistTracksQuery, Track } from '@shared/models/track.model';
+import {
+  AudioTrack,
+  PlaylistTracksQuery,
+  Track,
+} from '@shared/models/track.model';
 import { PlaylistTracksStore } from '../../../../../stores/playlist-tracks.store';
 import { PlaylistApiService } from '@general/services/playlist-api.service';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
@@ -37,6 +41,7 @@ import { FilterQuery } from '@shared/models/filter.model';
 import {
   DiscoverTracksModalComponent,
   DiscoverTracksModalData,
+  DiscoverTracksModalResult,
 } from '../../../../library/modals/discover-tracks-modal/discover-tracks-modal.component';
 import { ToastType } from '../../../../../../../../general/models/toast.model';
 import { ToastService } from '@general/services/toast.service';
@@ -287,29 +292,28 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
     this.currentIncludeChildren.set(include);
   }
 
-  protected openDiscoverModal() {
+  protected openDiscoverModal(query: QueryOptions | undefined) {
     const dialog = this.dialogService.open<
       DiscoverTracksModalComponent,
-      { selectedTracks: Track[]; again: boolean }
+      DiscoverTracksModalResult
     >(DiscoverTracksModalComponent, {
       data: {
         playlist: this.playlist(),
+        query,
       } as DiscoverTracksModalData,
     });
 
     dialog.afterClosed$
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(
-        (result: { selectedTracks: Track[]; again: boolean } | undefined) => {
-          const triggerRepeat = result?.again
-            ? () => setTimeout(() => this.openDiscoverModal(), 1000)
-            : () => {};
-          if (!result || result.selectedTracks.length === 0) {
-            return triggerRepeat();
-          }
-          this.addTracksToPlaylist(result.selectedTracks);
+      .subscribe((result) => {
+        const triggerRepeat = result?.again
+          ? () => setTimeout(() => this.openDiscoverModal(result?.query), 500)
+          : () => {};
+        if (!result || result.selectedTracks.length === 0) {
           return triggerRepeat();
         }
-      );
+        this.addTracksToPlaylist(result.selectedTracks);
+        return triggerRepeat();
+      });
   }
 }
