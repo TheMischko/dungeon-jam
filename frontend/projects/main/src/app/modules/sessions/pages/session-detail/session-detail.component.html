@@ -4,10 +4,15 @@
   <h1 class="title">{{ session()?.name }}</h1>
   <button mat-flat-button (click)="changeScenes.emit()">Edit scenes</button>
   <div class="scenes-wrapper">
-  @for (scene of (session()?.scenes ?? []); track scene.sceneId) {
-    @if(scenesMap()[scene.sceneId]; as scene){
-      <app-scene-console-smart class="scene-console" [scene]="scene" [viewMode]="true"></app-scene-console-smart>
+    @for (sceneRef of session()?.scenes ?? []; track sceneRef.sceneId) {
+      @if (scenesMap()[sceneRef.sceneId]; as scene) {
+        <app-scene-console-smart
+          class="scene-console"
+          [scene]="scene"
+          [viewMode]="true"
+          [initContentHidden]="isSceneContentHidden(scene)"
+        ></app-scene-console-smart>
+      }
     }
-  }
   </div>
 }

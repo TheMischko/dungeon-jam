@@ -40,6 +40,7 @@ export class SessionDetailSmartComponent {
   readonly scenesMap = this.sceneStore.entityMap;
   readonly session = signal<SessionData | null>(null);
   readonly loading = signal<boolean>(false);
+  readonly scenesContentHiddenMap = signal<Record<string, boolean>>({});
 
   constructor() {
     effect(() => {
@@ -55,6 +56,9 @@ export class SessionDetailSmartComponent {
         .subscribe((session) => {
           this.loading.set(false);
           this.session.set(session);
+          if (session) {
+            this.setScenesContentHiddenMap(session);
+          }
         });
 
       return () => sub.unsubscribe();
@@ -97,5 +101,19 @@ export class SessionDetailSmartComponent {
       .subscribe((updatedSession) => {
         this.session.set(updatedSession);
       });
+  }
+
+  setScenesContentHiddenMap(session: SessionData): void {
+    const scenes = session.scenes;
+    const hiddenMap = scenes.reduce(
+      (map, sceneRef, index) => {
+        return {
+          ...map,
+          [sceneRef.sceneId]: index !== 0,
+        };
+      },
+      {} as Record<string, boolean>
+    );
+    this.scenesContentHiddenMap.set(hiddenMap);
   }
 }

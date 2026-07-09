@@ -2,8 +2,10 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   input,
   output,
+  signal,
 } from '@angular/core';
 import { Scene } from '@shared/models/scene.model';
 import { Playlist } from '@shared/models/playlist.model';
@@ -19,6 +21,9 @@ import { SceneSoundEffectsListComponent } from '../scene-sound-effects-list/scen
 import { AddSoundEffectsSectionComponent } from '../add-sound-effects-section/add-sound-effects-section.component';
 import { SoundEffectVolumeChange } from '../../../../models/sound-effect.model';
 import { QueryOptions } from '@shared/models/request.model';
+import { actionsIconSet } from '@general/icons/icons';
+import { IconButtonComponent } from '@general/components/buttons/icon-button/icon-button.component';
+import { LucideIconData } from 'lucide-angular';
 
 @Component({
   selector: 'app-scene-console',
@@ -29,6 +34,7 @@ import { QueryOptions } from '@shared/models/request.model';
     TagListSmartComponent,
     SceneSoundEffectsListComponent,
     AddSoundEffectsSectionComponent,
+    IconButtonComponent,
   ],
   templateUrl: './scene-console.component.html',
   styleUrl: './scene-console.component.scss',
@@ -48,6 +54,7 @@ export class SceneConsoleComponent {
   readonly playingTrack = input<Track | null>();
   readonly soundEffectsVolumeMap = input<Record<string, number>>({});
   readonly viewMode = input<boolean>(false);
+  readonly initContentHidden = input<boolean>(false);
 
   readonly playScene = output<void>();
   readonly pauseScene = output<void>();
@@ -62,6 +69,13 @@ export class SceneConsoleComponent {
   readonly pauseSoundEffect = output<SoundEffect>();
   readonly changeSoundEffectVolume = output<SoundEffectVolumeChange>();
   readonly trackQueryChange = output<QueryOptions>();
+
+  readonly hiddenContent = signal<boolean>(false);
+
+  readonly excludedColumns: (keyof Track)[] = ['author', 'tags'];
+  readonly ButtonType = ButtonType;
+  readonly CollapsedIcon = actionsIconSet.CollapsedArrowIcon;
+  readonly ExpandedIcon = actionsIconSet.ExpandedArrowIcon;
 
   readonly loading = computed(() => {
     return (
@@ -88,8 +102,20 @@ export class SceneConsoleComponent {
     return 'Pause scene';
   });
 
-  readonly excludedColumns: (keyof Track)[] = ['author', 'tags'];
-  protected readonly ButtonType = ButtonType;
+  readonly collapsable = computed(() => {
+    return this.viewMode();
+  });
+
+  readonly toggleIcon = computed<LucideIconData>(() => {
+    return this.hiddenContent() ? this.CollapsedIcon : this.ExpandedIcon;
+  });
+
+  constructor() {
+    effect(() => {
+      const hidden = this.initContentHidden();
+      this.hiddenContent.set(hidden);
+    });
+  }
 
   protected toggleScenePlaying(newState: 'play' | 'pause') {
     if (newState === 'play') {
@@ -97,5 +123,9 @@ export class SceneConsoleComponent {
       return;
     }
     this.pauseScene.emit();
+  }
+
+  protected toggleHideContent(): void {
+    this.hiddenContent.update((current) => !current);
   }
 }

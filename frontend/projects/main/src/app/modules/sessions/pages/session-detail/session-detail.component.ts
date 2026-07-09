@@ -21,6 +21,11 @@ export class SessionDetailComponent {
   readonly session = input<SessionData | null>(null);
   readonly loading = input<boolean>(false);
   readonly scenesMap = input<Record<string, Scene>>({});
+  readonly scenesContentHiddenMap = input<Record<string, boolean>>();
 
   readonly changeScenes = output<void>();
+
+  isSceneContentHidden(scene: Scene): boolean {
+    return this.scenesContentHiddenMap()?.[scene.id] ?? false;
+  }
 }

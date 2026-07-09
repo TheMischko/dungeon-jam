@@ -129,7 +129,9 @@ button.mdc-button.button-small.pill-button {
   border-radius: 13px;
   padding: 4px 12px;
 
-  .button-label { font-size: 12px; }
+  .button-label {
+    font-size: 12px;
+  }
 }
 button.mdc-button.button-regular.pill-button {
   width: auto;
@@ -137,7 +139,9 @@ button.mdc-button.button-regular.pill-button {
   border-radius: 21px;
   padding: 4px 16px;
 
-  .button-label { font-size: 14px; }
+  .button-label {
+    font-size: 14px;
+  }
 }
 button.mdc-button.button-large.pill-button {
   height: 48px;
@@ -146,7 +150,9 @@ button.mdc-button.button-large.pill-button {
   border-radius: 24px;
   padding: 0 18px;
 
-  .button-label { font-size: 15px; }
+  .button-label {
+    font-size: 15px;
+  }
 }
 
 /**
@@ -230,6 +236,36 @@ a {
   }
   to {
     transform: translateX(50px);
+    opacity: 0;
+  }
+}
+
+.slide-in-animation {
+  animation: slide-in 0.15s;
+}
+
+.slide-out-animation {
+  animation: slide-out 0.1s;
+}
+
+@keyframes slide-in {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-out {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-25px);
     opacity: 0;
   }
 }

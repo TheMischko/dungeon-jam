@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { PlaybackService } from './playback.service';
 import { SoundEffectsPlayerService } from './sound-effects-player.service';
 import { ScenesStore } from '@general/stores/scenes.store';
@@ -23,6 +23,8 @@ export class ScenePlayerService {
   private readonly trackService = inject(TrackService);
   private readonly soundEffectStore = inject(SoundEffectStore);
   private readonly toastService = inject(ToastService);
+
+  private readonly playingScene = signal<Scene | undefined>(undefined);
 
   constructor() {
     if (!this.scenesStore.entities().length && !this.scenesStore.loading()) {
@@ -68,21 +70,27 @@ export class ScenePlayerService {
       .getTracksByPlaylist({ playlistId: scene.playlistId })
       .pipe(
         switchMap((tracks) => {
-          console.log('Scene tracks', tracks);
-          return this.playSceneWithData(sceneId, tracks, ambience);
+          return this.playSceneWithData(scene, tracks, ambience);
         }),
         map(() => void 0)
       );
   }
 
   public playSceneWithData(
-    sceneId: string,
+    scene: Scene,
     tracks: Track[],
     ambience: SoundEffect[]
   ): Observable<void> {
+    const currentlyPlayingScene = this.playingScene();
+    if (currentlyPlayingScene) {
+      this.stopScene(currentlyPlayingScene);
+    }
+
+    this.playingScene.set(scene);
+
     return from(
       tracks.length > 0
-        ? this.playbackService.playTracks(tracks, { sceneId })
+        ? this.playbackService.playTracks(tracks, { sceneId: scene.id })
         : of(void 0)
     ).pipe(
       switchMap(() =>
@@ -93,6 +101,7 @@ export class ScenePlayerService {
 
   public stopScene(scene: Scene): void {
     this.playbackService.clearState();
+    this.playingScene.set(undefined);
     [...scene.ambience, ...scene.stingers].forEach((soundEffectRef) => {
       this.soundEffectsPlayerService.stopEffect(soundEffectRef.soundEffectId);
     });
