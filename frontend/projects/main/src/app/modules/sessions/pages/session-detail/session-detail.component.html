@@ -6,7 +6,7 @@
   <div class="scenes-wrapper">
   @for (scene of (session()?.scenes ?? []); track scene.sceneId) {
     @if(scenesMap()[scene.sceneId]; as scene){
-      <app-scene-console-smart [scene]="scene"></app-scene-console-smart>
+      <app-scene-console-smart class="scene-console" [scene]="scene" [viewMode]="true"></app-scene-console-smart>
     }
   }
   </div>

@@ -111,3 +111,10 @@
     }
   }
 }
+
+.scene-title{
+  @include typo.h2();
+  padding: 6px;
+  background: rgba(0,0,0,0.35);
+  width: fit-content;
+}

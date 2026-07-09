@@ -58,6 +58,7 @@ export class SceneConsoleSmartComponent implements OnInit {
   readonly scenePlayerService = inject(ScenePlayerService);
 
   readonly scene = input.required<Scene>();
+  readonly viewMode = input<boolean>(false);
 
   readonly tagsMap = this.tagsStore.entityMap;
   readonly playlist = signal<Playlist | undefined>(undefined);

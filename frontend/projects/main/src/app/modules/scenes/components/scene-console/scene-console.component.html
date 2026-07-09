@@ -42,7 +42,7 @@
     </div>
     <div class="sound-effects-sector">
       <div class="ambience sound-effects-sector-item">
-        @if (ambience().length) {
+        @if (viewMode() || ambience().length) {
           <app-scene-sound-effects-list
             [soundEffects]="ambience()"
             [playMap]="ambiencePlayMap()"
@@ -64,7 +64,7 @@
       </div>
 
       <div class="stingers sound-effects-sector-item">
-        @if (stingers().length) {
+        @if (viewMode() || stingers().length) {
           <app-scene-sound-effects-list
             [soundEffects]="stingers()"
             [playMap]="stingersPlayMap()"
