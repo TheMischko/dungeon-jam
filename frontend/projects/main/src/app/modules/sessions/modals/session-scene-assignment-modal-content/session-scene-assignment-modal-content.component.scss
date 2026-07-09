@@ -1,8 +1,13 @@
 .content{
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 2fr 1fr;
   padding: 1rem;
   column-gap: 0.5rem;
+}
+
+.available-scenes,
+.assigned-scenes {
+  min-width: 0;
 }
 
 .assigned-scene{

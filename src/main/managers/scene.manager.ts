@@ -12,6 +12,8 @@ import { Logger } from '../utils/logger';
 import { SoundEffectManager } from './sound-effect.manager';
 import { ImageEntityType, ImageManager } from './image.manager';
 import { withAppError } from '../utils/ipc-handler';
+import { TagsManager } from './tags.manager';
+import { GetSomeMatch } from '../database/database-provider.model';
 
 export class SceneManager {
   private static _instance: SceneManager;
@@ -29,6 +31,7 @@ export class SceneManager {
       const database = await databaseBuilder
         .setTable('scenes')
         .setIdColumn('id')
+        .setSearch(SceneManager.searchScenes)
         .complete();
       const soundEffectManager = await SoundEffectManager.getInstance();
       const imageManager = await ImageManager.getInstance();
@@ -43,37 +46,87 @@ export class SceneManager {
   }
 
   private registerChannels(): void {
-    ipcMain.handle(SceneChannel.GET_ALL, withAppError((_, query: QueryRequest) => {
-      this.logger.log('Received request to get all scenes', { query });
-      return this.getAll(query);
-    }));
-    ipcMain.handle(SceneChannel.GET_BY_ID, withAppError((_, id: string) => {
-      this.logger.log('Received request to get by id', { id });
-      return this.getById(id);
-    }));
-    ipcMain.handle(SceneChannel.INSERT, withAppError((_, data: SceneInsertQuery) => {
-      this.logger.log('Received request to insert scene', { data });
-      return this.insert(data);
-    }));
-    ipcMain.handle(SceneChannel.UPDATE, withAppError((_, data: SceneUpdateQuery) => {
-      this.logger.log('Received request to update scene', { data });
-      return this.update(data);
-    }));
-    ipcMain.handle(SceneChannel.DELETE, withAppError((_, id: string) => {
-      this.logger.log('Received request to delete scene', { id });
-      return this.deleteById(id);
-    }));
-    ipcMain.handle(SceneChannel.CHANGE_ORDER, withAppError((_, sceneIds: string[]) => {
-      this.logger.log('Received request to change order', { sceneIds });
-      this.logger.logWarning('Change order is not implemented');
-      return this.getAll({});
-    }));
+    ipcMain.handle(
+      SceneChannel.GET_ALL,
+      withAppError((_, query: QueryRequest) => {
+        this.logger.log('Received request to get all scenes', { query });
+        return this.getAll(query);
+      })
+    );
+    ipcMain.handle(
+      SceneChannel.GET_BY_ID,
+      withAppError((_, id: string) => {
+        this.logger.log('Received request to get by id', { id });
+        return this.getById(id);
+      })
+    );
+    ipcMain.handle(
+      SceneChannel.INSERT,
+      withAppError((_, data: SceneInsertQuery) => {
+        this.logger.log('Received request to insert scene', { data });
+        return this.insert(data);
+      })
+    );
+    ipcMain.handle(
+      SceneChannel.UPDATE,
+      withAppError((_, data: SceneUpdateQuery) => {
+        this.logger.log('Received request to update scene', { data });
+        return this.update(data);
+      })
+    );
+    ipcMain.handle(
+      SceneChannel.DELETE,
+      withAppError((_, id: string) => {
+        this.logger.log('Received request to delete scene', { id });
+        return this.deleteById(id);
+      })
+    );
+    ipcMain.handle(
+      SceneChannel.CHANGE_ORDER,
+      withAppError((_, sceneIds: string[]) => {
+        this.logger.log('Received request to change order', { sceneIds });
+        this.logger.logWarning('Change order is not implemented');
+        return this.getAll({});
+      })
+    );
   }
 
   public async getAll(query: QueryRequest): Promise<Scene[]> {
     const scenes = await this.databaseProvider.getAll(query);
     this.logger.log(`Fetched ${scenes.length} scenes from database`);
     return scenes.map((scene) => this.parseScene(scene));
+  }
+
+  private static async searchScenes(
+    scene: Scene,
+    filter?: string
+  ): Promise<boolean> {
+    if (!filter) {
+      return true;
+    }
+    const filterLower = filter.toLowerCase();
+    if (scene.name && scene.name.toLowerCase().includes(filterLower)) {
+      return true;
+    }
+    if (
+      scene.description &&
+      scene.description.toLowerCase().includes(filterLower)
+    ) {
+      return true;
+    }
+    if (scene.tags?.length) {
+      const tags = await (
+        await TagsManager.getInstance()
+      ).getSubset('id', scene.tags, {
+        match: GetSomeMatch.EXACT,
+      });
+      for (const tag of tags) {
+        if (tag.title.toLowerCase().includes(filterLower)) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   public async getById(id: string): Promise<Scene | undefined> {

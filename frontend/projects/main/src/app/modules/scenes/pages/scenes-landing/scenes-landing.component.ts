@@ -7,6 +7,7 @@ import {
 import { MatButton } from '@angular/material/button';
 import { Scene } from '@shared/models/scene.model';
 import { ScenesGridSmartComponent } from '../../components/scenes-grid-smart/scenes-grid-smart.component';
+import { GridSizePreset } from '../../../../models/grid.model';
 
 @Component({
   selector: 'app-scenes-landing',
@@ -20,4 +21,6 @@ export class ScenesLandingComponent {
   readonly loading = input<boolean>(false);
 
   readonly insertNew = output<void>();
+
+  readonly defaultSizeIndex = GridSizePreset.Big;
 }

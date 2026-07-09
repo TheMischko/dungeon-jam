@@ -74,6 +74,8 @@ export class SessionDetailSmartComponent {
       SessionSceneAssignmentModalComponent,
       SessionSceneAssignmentResult
     >(SessionSceneAssignmentModalComponent, {
+      width: '765px',
+      maxWidth: '95vw',
       data: {
         session: session,
       } as SessionSceneAssignmentData,

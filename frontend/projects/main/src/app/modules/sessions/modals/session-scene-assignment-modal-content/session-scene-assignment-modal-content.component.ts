@@ -13,6 +13,11 @@ import {
 import { AssignedSceneBoxComponent } from '../../components/assigned-scene-box/assigned-scene-box.component';
 import { CdkDrag, CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop';
 import { ScenesGridSmartComponent } from '../../../scenes/components/scenes-grid-smart/scenes-grid-smart.component';
+import {
+  GridItemSizeConfig,
+  MediumSizeGridItemConfig,
+  SmallSizeGridItemConfig,
+} from '../../../../models/grid.model';
 
 @Component({
   selector: 'app-session-scene-assignment-modal-content',
@@ -35,6 +40,11 @@ export class SessionSceneAssignmentModalContentComponent {
   readonly selectionChanged = output<Scene[]>();
   readonly unselectScene = output<Scene>();
   readonly sceneMoved = output<{ prevIndex: number; currentIndex: number }>();
+
+  readonly availableSceneSizes: GridItemSizeConfig[] = [
+    SmallSizeGridItemConfig,
+    MediumSizeGridItemConfig,
+  ];
 
   readonly uniqueSceneFn: TableUniquenessFn<Scene> = (a: Scene, b: Scene) =>
     a.id === b.id;

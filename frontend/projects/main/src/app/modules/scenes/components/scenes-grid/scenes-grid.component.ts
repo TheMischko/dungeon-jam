@@ -2,19 +2,33 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   input,
   output,
+  signal,
 } from '@angular/core';
 import { Scene } from '@shared/models/scene.model';
 import { GridItemComponent } from '../../../../components/grid/grid-item/grid-item.component';
 import { iconSet, volumeIconSet } from '@general/icons/icons';
 import { Tag } from '@shared/models/tag.model';
 import { LucideAngularModule } from 'lucide-angular';
-import { MatCheckbox } from '@angular/material/checkbox';
+import { MatCheckbox, MatCheckboxChange } from '@angular/material/checkbox';
+import { SearchBarComponent } from '@general/components/controls/search-bar/search-bar.component';
+import { RangeSliderComponent } from '@general/components/controls/range-slider/range-slider.component';
+import {
+  AllSizeGridItemConfigs,
+  GridItemSizeConfig,
+} from '../../../../models/grid.model';
 
 @Component({
   selector: 'app-scenes-grid',
-  imports: [GridItemComponent, LucideAngularModule, MatCheckbox],
+  imports: [
+    GridItemComponent,
+    LucideAngularModule,
+    MatCheckbox,
+    SearchBarComponent,
+    RangeSliderComponent,
+  ],
   templateUrl: './scenes-grid.component.html',
   styleUrl: './scenes-grid.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -28,10 +42,55 @@ export class ScenesGridComponent {
   readonly itemPlayable = input<boolean>(true);
   readonly itemSelectable = input<boolean>(false);
   readonly itemDetailNavigation = input<boolean>(true);
+  readonly showControls = input<boolean>(true);
+  readonly sizeConfig = input.required<GridItemSizeConfig>();
+  readonly availableSizes = input<GridItemSizeConfig[]>(AllSizeGridItemConfigs);
+  readonly currentSizeIndex = input<number>(0);
+  readonly initialSelection = input<Scene[]>();
 
   readonly showDetail = output<Scene>();
   readonly playScene = output<Scene>();
   readonly pauseScene = output<Scene>();
+  readonly sizeChange = output<number>();
+  readonly search = output<string>();
+  readonly selected = output<Scene[]>();
+
+  readonly gridBigIcon = iconSet.GridBigIcon;
+  readonly gridSmallIcon = iconSet.GridSmallIcon;
+
+  readonly maxSizeIndex = computed<number>(() => {
+    return Math.max(this.availableSizes().length - 1, 0);
+  });
+
+  readonly selectedItems = signal<Scene[]>([]);
+
+  constructor() {
+    effect(() => {
+      const initialSelection = this.initialSelection();
+      if (initialSelection) {
+        this.selectedItems.set(initialSelection);
+      }
+    });
+  }
+
+  protected sizeInput(index: number) {
+    this.sizeChange.emit(index);
+  }
+
+  isSelected(scene: Scene): boolean {
+    return this.selectedItems().some((selected) => selected.id === scene.id);
+  }
+
+  protected itemSelected(scene: Scene, event: MatCheckboxChange) {
+    if (event.checked) {
+      this.selectedItems.update((selection) => [...selection, scene]);
+    } else {
+      this.selectedItems.update((selection) =>
+        selection.filter((item) => item.id !== scene.id)
+      );
+    }
+    this.selected.emit(this.selectedItems());
+  }
 
   tagsNameMap = computed(() => {
     const tagsMap = this.tagsMap();

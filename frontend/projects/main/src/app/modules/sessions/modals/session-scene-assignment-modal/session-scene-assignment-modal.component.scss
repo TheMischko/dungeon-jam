@@ -3,4 +3,9 @@
 :host {
   @include mix.base-dialog();
   display: flex;
+
+  .wrapper {
+    width: 765px;
+    max-width: 100%;
+  }
 }

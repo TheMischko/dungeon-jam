@@ -1,6 +1,13 @@
 <div class="content">
   <div class="available-scenes">
-    <app-scenes-grid-smart [itemPlayable]="false" [itemSelectable]="true" [itemDetailNavigation]="false"/>
+    <app-scenes-grid-smart
+      [itemPlayable]="false"
+      [itemSelectable]="true"
+      [itemDetailNavigation]="false"
+      [availableSizes]="availableSceneSizes"
+      [initialSelection]="currentSelection()"
+      (selected)="selectionChanged.emit($event)"
+    />
   </div>
   <div class="assigned-scenes" cdkDropList (cdkDropListDropped)="emitSceneMoved($event)">
     @for (scene of currentSelection(); track scene.id){

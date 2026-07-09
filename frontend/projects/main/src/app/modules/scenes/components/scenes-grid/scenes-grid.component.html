@@ -1,44 +1,72 @@
-<div class="scenes-grid">
-  @for (scene of scenes(); track scene.id) {
-    @let images = getSceneImages(scene);
-    @let tags = getSceneTags(scene);
-    @let isPlaying = playingSceneId() === scene.id;
-    @let playable = itemPlayable();
-    @let selectable = itemSelectable();
-    <app-grid-item
-      [title]="scene.name"
-      [images]="images"
-      [noImageIcon]="SceneIcon"
-      [tags]="tags"
-      (clicked)="navigateToDetail(scene)"
-    >
-      <div ngProjectAs="content" style="display: contents">
-        @if (playable && isPlaying){
-          <div class="is-playing-overlay small-overlay">
-            <lucide-icon
-              [img]="PlayingIcon"
-              [size]="16"
-            ></lucide-icon>
-          </div>
-        }
-        @if (selectable){
-          <div class="selection-overlay small-overlay {{playable ? 'selection-alternative' : ''}}">
-            <mat-checkbox></mat-checkbox>
-          </div>
-        }
+<div class="wrapper">
+  @if (showControls()) {
+    <div class="controls">
+      <div class="search">
+        <lib-search-bar (search)="search.emit($event)"></lib-search-bar>
       </div>
-
-      @if (playable){
-      <div ngProjectAs="hovering-content" style="display: contents">
-          <div class="hover-overlay">
-            <lucide-icon
-              class="icon"
-              [img]="isPlaying ? PauseIcon : PlayIcon"
-              (click)="onOverlayButtonClick($event, scene)"
-            ></lucide-icon>
-          </div>
+      <div class="size-control">
+        <lib-range-slider
+          [minValue]="0"
+          [maxValue]="maxSizeIndex()"
+          [stepSize]="1"
+          [value]="currentSizeIndex()"
+          [prefix]="gridSmallIcon"
+          [suffix]="gridBigIcon"
+          (inputChange)="sizeInput($event)"
+        />
       </div>
-      }
-    </app-grid-item>
+    </div>
   }
+
+  <div class="scenes-grid">
+    @for (scene of scenes(); track scene.id) {
+      @let images = getSceneImages(scene);
+      @let tags = getSceneTags(scene);
+      @let isPlaying = playingSceneId() === scene.id;
+      @let playable = itemPlayable();
+      @let selectable = itemSelectable();
+      <app-grid-item
+        [title]="scene.name"
+        [images]="images"
+        [noImageIcon]="SceneIcon"
+        [tags]="tags"
+        [sizeConfig]="sizeConfig()"
+        (clicked)="navigateToDetail(scene)"
+      >
+        <div ngProjectAs="content" style="display: contents">
+          @if (playable && isPlaying){
+            <div class="is-playing-overlay small-overlay">
+              <lucide-icon
+                [img]="PlayingIcon"
+                [size]="16"
+              ></lucide-icon>
+            </div>
+          }
+          @if (selectable){
+            <div
+              class="selection-overlay small-overlay {{playable ? 'selection-alternative' : ''}}"
+              (click)="$event.stopPropagation()"
+            >
+              <mat-checkbox
+                [checked]="isSelected(scene)"
+                (change)="itemSelected(scene, $event)"
+              ></mat-checkbox>
+            </div>
+          }
+        </div>
+
+        @if (playable){
+        <div ngProjectAs="hovering-content" style="display: contents">
+            <div class="hover-overlay">
+              <lucide-icon
+                class="icon"
+                [img]="isPlaying ? PauseIcon : PlayIcon"
+                (click)="onOverlayButtonClick($event, scene)"
+              ></lucide-icon>
+            </div>
+        </div>
+        }
+      </app-grid-item>
+    }
+  </div>
 </div>

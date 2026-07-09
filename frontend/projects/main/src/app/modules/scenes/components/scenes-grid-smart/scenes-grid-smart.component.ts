@@ -7,6 +7,7 @@ import {
   inject,
   input,
   OnInit,
+  output,
   signal,
 } from '@angular/core';
 import { ScenesStore } from '@general/stores/scenes.store';
@@ -22,6 +23,10 @@ import { scenesRouteStrings } from '../../scenes-route-strings';
 import { PlaybackService } from '../../../../services/playback.service';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ScenePlayerService } from '../../../../services/scene-player.service';
+import {
+  AllSizeGridItemConfigs,
+  GridItemSizeConfig,
+} from '../../../../models/grid.model';
 
 @Component({
   selector: 'app-scenes-grid-smart',
@@ -42,13 +47,28 @@ export class ScenesGridSmartComponent implements OnInit {
   readonly itemPlayable = input<boolean>(true);
   readonly itemSelectable = input<boolean>(false);
   readonly itemDetailNavigation = input<boolean>(true);
+  readonly showControls = input<boolean>(true);
+  readonly availableSizes = input<GridItemSizeConfig[]>(AllSizeGridItemConfigs);
+  readonly initialSizeIndex = input<number>(0);
+  readonly initialSelection = input<Scene[]>();
+
+  readonly selected = output<Scene[]>();
 
   readonly scenesLoading = this.scenesStore.loading;
   readonly scenes = signal<Scene[]>([]);
   readonly imageMap = signal<Record<string, string | null>>({});
   readonly tagMap = this.tagsStore.entityMap;
+  readonly searchFilter = signal<string>('');
+  readonly currentSizeIndex = signal<number>(0);
   readonly currentQuery = computed<QueryOptions>(() => {
-    return {};
+    return {
+      search: this.searchFilter(),
+    };
+  });
+  readonly sizeConfig = computed<GridItemSizeConfig>(() => {
+    const sizes = this.availableSizes();
+    const index = this.currentSizeIndex();
+    return sizes[index] ?? sizes[0];
   });
   readonly playingSceneId = toSignal(
     this.playbackService.playback$.pipe(
@@ -57,6 +77,10 @@ export class ScenesGridSmartComponent implements OnInit {
   );
 
   constructor() {
+    effect(() => {
+      this.currentSizeIndex.set(this.initialSizeIndex());
+    });
+
     effect(() => {
       const scenes = this.scenesStore.entities();
       this.scenes.set(scenes);
@@ -76,6 +100,14 @@ export class ScenesGridSmartComponent implements OnInit {
     if (!this.tagsStore.initialized) {
       this.tagsStore.loadAll({});
     }
+  }
+
+  handleSizeChange(newIndex: number) {
+    const maxIndex = this.availableSizes().length - 1;
+    if (newIndex < 0 || newIndex > maxIndex) {
+      return;
+    }
+    this.currentSizeIndex.set(newIndex);
   }
 
   async navigateToDetail(scene: Scene): Promise<void> {

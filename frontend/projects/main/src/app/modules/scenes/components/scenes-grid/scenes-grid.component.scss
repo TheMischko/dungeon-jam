@@ -2,7 +2,55 @@
 
 :host {
   margin-top: 1rem;
+  container-type: inline-size;
+  container-name: scenes-grid;
 }
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 100%;
+  height: 100%;
+}
+
+.controls {
+  max-width: 1024px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin: 0.5rem 0;
+  padding: 0.125rem 1rem;
+  box-sizing: border-box;
+
+  .search {
+    flex: 1;
+    max-width: 400px;
+  }
+
+  .size-control {
+    flex: none;
+  }
+}
+
+@container scenes-grid (max-width: 600px) {
+  .controls {
+    flex-direction: column;
+    align-items: stretch;
+
+    .search {
+      max-width: 100%;
+    }
+
+    .size-control {
+      width: 100%;
+    }
+  }
+}
+
 .scenes-grid {
   display: flex;
   flex-wrap: wrap;
@@ -20,8 +68,22 @@
 
 .selection-overlay {
   position: absolute;
-  top: 6px;
-  left: 6px;
+  top: 0;
+  left: 0;
+
+  &:before{
+    content: '';
+    background: rgba(113, 113, 113, 0.25);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+  }
+
+
   &.selection-alternative{
     top: 6px;
     right: 6px;

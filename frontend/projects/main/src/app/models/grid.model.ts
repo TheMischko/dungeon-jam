@@ -32,3 +32,17 @@ export const SmallSizeGridItemConfig: GridItemSizeConfig = {
   titleBold: false,
   showTags: false,
 };
+
+export enum GridSizePreset {
+  Small = 0,
+  Medium = 1,
+  Big = 2,
+  Huge = 3,
+}
+
+export const AllSizeGridItemConfigs: GridItemSizeConfig[] = [
+  SmallSizeGridItemConfig,
+  MediumSizeGridItemConfig,
+  BigSizeGridItemConfig,
+  HugeSizeGridItemConfig,
+];
