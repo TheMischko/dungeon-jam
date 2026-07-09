@@ -218,6 +218,14 @@ a {
   }
 }
 
+.lean-in-animation {
+  animation: lean-in 0.4s;
+}
+
+.lean-out-animation {
+  animation: lean-out 0.4s;
+}
+
 @keyframes lean-in {
   from {
     transform: translateX(-50px);
