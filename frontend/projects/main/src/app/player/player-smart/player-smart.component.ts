@@ -64,6 +64,17 @@ export class PlayerSmartComponent {
 
   protected navigateToActiveTrack() {
     const state = this.playBackState();
+
+    if (state.sessionId) {
+      this.redirectService.triggerRedirect({
+        path: RedirectPath.SESSIONS,
+        params: {
+          sessionId: state.sessionId,
+        },
+      });
+      return;
+    }
+
     if (state.sceneId) {
       this.redirectService.triggerRedirect({
         path: RedirectPath.SCENES,

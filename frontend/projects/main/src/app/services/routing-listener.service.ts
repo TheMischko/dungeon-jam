@@ -43,6 +43,7 @@ export class RoutingListenerService {
             homeRouteStrings.home,
           ]);
           break;
+
         // Playlists
         case RedirectPath.PLAYLISTS:
           const playlistId = redirect.params?.['playlistId'];
@@ -59,6 +60,7 @@ export class RoutingListenerService {
             ]);
           }
           break;
+
         // Library
         case RedirectPath.LIBRARY:
           await this.router.navigate([
@@ -66,10 +68,12 @@ export class RoutingListenerService {
             libraryRouteStrings.library,
           ]);
           break;
+
         // Tags
         case RedirectPath.TAGS:
           await this.router.navigate([routesStrings.tags]);
           break;
+
         // Settings
         case RedirectPath.SETTINGS:
           await this.router.navigate([
@@ -77,6 +81,8 @@ export class RoutingListenerService {
             settingsRouteStrings.general,
           ]);
           break;
+
+        // Sound Effects
         case RedirectPath.SOUND_EFFECTS:
           const soundEffectId: string | undefined =
             redirect.params?.['soundEffectId'];
@@ -94,6 +100,8 @@ export class RoutingListenerService {
             soundEffectsRouteStrings.library,
           ]);
           break;
+
+        // Scenes
         case RedirectPath.SCENES:
           const sceneId: string | undefined = redirect.params?.['sceneId'];
           if (sceneId) {
@@ -102,7 +110,7 @@ export class RoutingListenerService {
               scenesRouteStrings.sceneDetail,
               sceneId,
             ]);
-            return;
+            break;
           }
 
           await this.router.navigate([
@@ -110,7 +118,18 @@ export class RoutingListenerService {
             scenesRouteStrings.scenesLanding,
           ]);
           break;
+
+        // Sessions
         case RedirectPath.SESSIONS:
+          const sessionId: string | undefined = redirect.params?.['sessionId'];
+          if (sessionId) {
+            await this.router.navigate([
+              routesStrings.sessions,
+              sessionsRouteStrings.sessionDetail,
+              sessionId,
+            ]);
+            break;
+          }
           await this.router.navigate([
             routesStrings.sessions,
             sessionsRouteStrings.sessionsLanding,

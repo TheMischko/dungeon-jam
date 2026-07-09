@@ -15,6 +15,7 @@ export type PlaybackState = {
   shuffle: boolean;
   playlistId?: string;
   sceneId?: string;
+  sessionId?: string;
 } & StoredPlayback;
 
 export type PlaybackTrackPosition = {
@@ -44,4 +45,5 @@ export enum PlayingTrackState {
 export type PlayMetadata = {
   playlistId?: string;
   sceneId?: string;
+  sessionId?: string;
 };

@@ -60,6 +60,7 @@ export class SceneConsoleSmartComponent implements OnInit {
   readonly scene = input.required<Scene>();
   readonly viewMode = input<boolean>(false);
   readonly initContentHidden = input<boolean>(false);
+  readonly sessionId = input<string>();
 
   readonly tagsMap = this.tagsStore.entityMap;
   readonly playlist = signal<Playlist | undefined>(undefined);
@@ -328,7 +329,12 @@ export class SceneConsoleSmartComponent implements OnInit {
 
   protected playScene() {
     this.scenePlayerService
-      .playSceneWithData(this.scene(), this.tracks(), this.ambience())
+      .playSceneWithData(
+        this.scene(),
+        this.tracks(),
+        this.ambience(),
+        this.sessionId()
+      )
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe();
   }

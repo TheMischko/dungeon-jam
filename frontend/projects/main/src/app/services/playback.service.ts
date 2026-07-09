@@ -113,6 +113,7 @@ export class PlaybackService implements OnDestroy {
         isPlaying: true,
         playlistId: metadata?.playlistId,
         sceneId: metadata?.sceneId,
+        sessionId: metadata?.sessionId,
       });
       this.trackPosition.next({ position: 0, duration: track.duration });
       await this.audioPlayerService.play(track);

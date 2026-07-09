@@ -10,6 +10,7 @@ import { EMPTY, from, map, Observable, of, switchMap } from 'rxjs';
 import { Track } from '@shared/models/track.model';
 import { ToastService } from '@general/services/toast.service';
 import { ToastType } from '../../../../general/models/toast.model';
+import { PlayMetadata } from '../models/playback.model';
 
 @Injectable({
   providedIn: 'root',
@@ -38,7 +39,7 @@ export class ScenePlayerService {
     }
   }
 
-  public playScene(sceneId: string): Observable<void> {
+  public playScene(sceneId: string, sessionId?: string): Observable<void> {
     const scene = this.scenesStore.entityMap()[sceneId];
     if (!scene) {
       console.error(`Scene with ID ${sceneId} not found.`);
@@ -70,7 +71,7 @@ export class ScenePlayerService {
       .getTracksByPlaylist({ playlistId: scene.playlistId })
       .pipe(
         switchMap((tracks) => {
-          return this.playSceneWithData(scene, tracks, ambience);
+          return this.playSceneWithData(scene, tracks, ambience, sessionId);
         }),
         map(() => void 0)
       );
@@ -79,18 +80,22 @@ export class ScenePlayerService {
   public playSceneWithData(
     scene: Scene,
     tracks: Track[],
-    ambience: SoundEffect[]
+    ambience: SoundEffect[],
+    sessionId?: string
   ): Observable<void> {
     const currentlyPlayingScene = this.playingScene();
     if (currentlyPlayingScene) {
-      this.stopScene(currentlyPlayingScene);
+      this.stopScene(currentlyPlayingScene, ambience);
     }
 
     this.playingScene.set(scene);
 
     return from(
       tracks.length > 0
-        ? this.playbackService.playTracks(tracks, { sceneId: scene.id })
+        ? this.playbackService.playTracks(
+            tracks,
+            this.getPlayMetadata(scene, sessionId)
+          )
         : of(void 0)
     ).pipe(
       switchMap(() =>
@@ -99,10 +104,20 @@ export class ScenePlayerService {
     );
   }
 
-  public stopScene(scene: Scene): void {
+  /**
+   * Stop the playing scene; its music and sound effects.
+   * @param scene Scene to stop playing.
+   * @param omitAmbience List of ambience to keep playing.
+   */
+  public stopScene(scene: Scene, omitAmbience: SoundEffect[] = []): void {
     this.playbackService.clearState();
     this.playingScene.set(undefined);
-    [...scene.ambience, ...scene.stingers].forEach((soundEffectRef) => {
+    const omitAmbienceIds = omitAmbience.map((a) => a.id);
+    const ambienceToStop = scene.ambience.filter(
+      (a) => !omitAmbienceIds.includes(a.soundEffectId)
+    );
+
+    ambienceToStop.forEach((soundEffectRef) => {
       this.soundEffectsPlayerService.stopEffect(soundEffectRef.soundEffectId);
     });
   }
@@ -126,5 +141,12 @@ export class ScenePlayerService {
     for (const ambienceTrack of ambience) {
       await this.soundEffectsPlayerService.playEffect(ambienceTrack, true);
     }
+  }
+
+  private getPlayMetadata(scene: Scene, sessionId?: string): PlayMetadata {
+    return {
+      sceneId: scene.id,
+      ...(sessionId && { sessionId }),
+    };
   }
 }
