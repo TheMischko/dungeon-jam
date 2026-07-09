@@ -1,27 +1,17 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  input,
-  output,
-} from '@angular/core';
-import { SessionData } from '@shared/models/session.model';
+import { ChangeDetectionStrategy, Component, output } from '@angular/core';
 import { MatButton } from '@angular/material/button';
-import { GridItemComponent } from '../../../../components/grid/grid-item/grid-item.component';
-import { iconSet } from '@general/icons/icons';
+import { SessionsGridSmartComponent } from '../../components/sessions-grid-smart/sessions-grid-smart.component';
+import { GridSizePreset } from '../../../../models/grid.model';
 
 @Component({
   selector: 'app-sessions-landing',
-  imports: [MatButton, GridItemComponent],
+  imports: [MatButton, SessionsGridSmartComponent],
   templateUrl: './sessions-landing.component.html',
   styleUrl: './sessions-landing.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SessionsLandingComponent {
-  readonly loading = input<boolean>(false);
-  readonly sessions = input<SessionData[]>([]);
-
-  readonly sessionClick = output<SessionData>();
   readonly createSession = output<void>();
 
-  readonly SessionIcon = iconSet.SessionIcon;
+  readonly defaultSizeIndex = GridSizePreset.Big;
 }

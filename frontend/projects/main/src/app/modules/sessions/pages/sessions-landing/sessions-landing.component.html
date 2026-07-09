@@ -2,12 +2,5 @@
 <button mat-flat-button (click)="createSession.emit()">
   Create new session
 </button>
-<div class="sessions-wrapper">
-  @for (session of sessions(); track session.id) {
-    <app-grid-item
-      [title]="session.name"
-      [noImageIcon]="SessionIcon"
-      (clicked)="sessionClick.emit(session)"
-    ></app-grid-item>
-  }
-</div>
+
+<app-sessions-grid-smart [initialSizeIndex]="defaultSizeIndex" />

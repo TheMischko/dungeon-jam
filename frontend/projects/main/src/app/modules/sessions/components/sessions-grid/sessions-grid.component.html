@@ -1,0 +1,31 @@
+<div class="wrapper">
+  @if (showControls()) {
+    <div class="controls">
+      <div class="search">
+        <lib-search-bar (search)="search.emit($event)"></lib-search-bar>
+      </div>
+      <div class="size-control">
+        <lib-range-slider
+          [minValue]="0"
+          [maxValue]="maxSizeIndex()"
+          [stepSize]="1"
+          [value]="currentSizeIndex()"
+          [prefix]="gridSmallIcon"
+          [suffix]="gridBigIcon"
+          (inputChange)="sizeInput($event)"
+        />
+      </div>
+    </div>
+  }
+
+  <div class="sessions-grid">
+    @for (session of sessions(); track session.id) {
+      <app-grid-item
+        [title]="session.name"
+        [noImageIcon]="SessionIcon"
+        [sizeConfig]="sizeConfig()"
+        (clicked)="sessionClick.emit(session)"
+      ></app-grid-item>
+    }
+  </div>
+</div>
