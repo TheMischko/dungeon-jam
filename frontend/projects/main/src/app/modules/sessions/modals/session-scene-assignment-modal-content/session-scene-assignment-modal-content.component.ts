@@ -6,15 +6,22 @@ import {
 } from '@angular/core';
 import { SessionData } from '@shared/models/session.model';
 import { Scene } from '@shared/models/scene.model';
-import { TableComponent } from '../../../../components/table/table.component';
 import {
   TableColumnConfiguration,
   TableUniquenessFn,
 } from '../../../../models/table.model';
+import { AssignedSceneBoxComponent } from '../../components/assigned-scene-box/assigned-scene-box.component';
+import { CdkDrag, CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop';
+import { ScenesGridSmartComponent } from '../../../scenes/components/scenes-grid-smart/scenes-grid-smart.component';
 
 @Component({
   selector: 'app-session-scene-assignment-modal-content',
-  imports: [TableComponent],
+  imports: [
+    AssignedSceneBoxComponent,
+    CdkDropList,
+    CdkDrag,
+    ScenesGridSmartComponent,
+  ],
   templateUrl: './session-scene-assignment-modal-content.component.html',
   styleUrl: './session-scene-assignment-modal-content.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -26,6 +33,8 @@ export class SessionSceneAssignmentModalContentComponent {
   readonly currentSelection = input<Scene[]>([]);
 
   readonly selectionChanged = output<Scene[]>();
+  readonly unselectScene = output<Scene>();
+  readonly sceneMoved = output<{ prevIndex: number; currentIndex: number }>();
 
   readonly uniqueSceneFn: TableUniquenessFn<Scene> = (a: Scene, b: Scene) =>
     a.id === b.id;
@@ -46,4 +55,11 @@ export class SessionSceneAssignmentModalContentComponent {
         scene?.dateCreated?.toDateString?.() ?? '',
     },
   };
+
+  protected emitSceneMoved(event: CdkDragDrop<Scene, unknown>) {
+    this.sceneMoved.emit({
+      prevIndex: event.previousIndex,
+      currentIndex: event.currentIndex,
+    });
+  }
 }

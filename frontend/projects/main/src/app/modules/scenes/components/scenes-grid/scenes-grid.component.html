@@ -3,15 +3,17 @@
     @let images = getSceneImages(scene);
     @let tags = getSceneTags(scene);
     @let isPlaying = playingSceneId() === scene.id;
+    @let playable = itemPlayable();
+    @let selectable = itemSelectable();
     <app-grid-item
       [title]="scene.name"
       [images]="images"
       [noImageIcon]="SceneIcon"
       [tags]="tags"
-      (clicked)="showDetail.emit(scene)"
+      (clicked)="navigateToDetail(scene)"
     >
       <div ngProjectAs="content" style="display: contents">
-        @if (isPlaying){
+        @if (playable && isPlaying){
           <div class="is-playing-overlay small-overlay">
             <lucide-icon
               [img]="PlayingIcon"
@@ -19,8 +21,14 @@
             ></lucide-icon>
           </div>
         }
+        @if (selectable){
+          <div class="selection-overlay small-overlay {{playable ? 'selection-alternative' : ''}}">
+            <mat-checkbox></mat-checkbox>
+          </div>
+        }
       </div>
 
+      @if (playable){
       <div ngProjectAs="hovering-content" style="display: contents">
           <div class="hover-overlay">
             <lucide-icon
@@ -30,6 +38,7 @@
             ></lucide-icon>
           </div>
       </div>
+      }
     </app-grid-item>
   }
 </div>

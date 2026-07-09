@@ -15,6 +15,7 @@ import { Scene } from '@shared/models/scene.model';
 import { MatButton } from '@angular/material/button';
 import { SessionSceneAssignmentModalContentComponent } from '../session-scene-assignment-modal-content/session-scene-assignment-modal-content.component';
 import { SceneApiService } from '@general/services/scene-api.service';
+import { moveItemInArray } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-session-scene-assignment-modal',
@@ -88,6 +89,20 @@ export class SessionSceneAssignmentModalComponent {
 
   updateSelection(scenes: Scene[]): void {
     this.currentSelection.set(scenes);
+  }
+
+  unassignScene(scene: Scene): void {
+    this.currentSelection.update((current) =>
+      current.filter((s) => s.id !== scene.id)
+    );
+  }
+
+  reorderScene(change: { prevIndex: number; currentIndex: number }): void {
+    this.currentSelection.update((selection) => {
+      const selectionCopy = [...selection];
+      moveItemInArray(selectionCopy, change.prevIndex, change.currentIndex);
+      return selectionCopy;
+    });
   }
 }
 

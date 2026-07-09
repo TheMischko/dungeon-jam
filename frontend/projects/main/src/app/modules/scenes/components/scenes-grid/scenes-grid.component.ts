@@ -10,10 +10,11 @@ import { GridItemComponent } from '../../../../components/grid/grid-item/grid-it
 import { iconSet, volumeIconSet } from '@general/icons/icons';
 import { Tag } from '@shared/models/tag.model';
 import { LucideAngularModule } from 'lucide-angular';
+import { MatCheckbox } from '@angular/material/checkbox';
 
 @Component({
   selector: 'app-scenes-grid',
-  imports: [GridItemComponent, LucideAngularModule],
+  imports: [GridItemComponent, LucideAngularModule, MatCheckbox],
   templateUrl: './scenes-grid.component.html',
   styleUrl: './scenes-grid.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -24,6 +25,9 @@ export class ScenesGridComponent {
   readonly sceneImageMap = input<Record<string, string | null>>();
   readonly tagsMap = input<Record<string, Tag>>({});
   readonly playingSceneId = input<string>();
+  readonly itemPlayable = input<boolean>(true);
+  readonly itemSelectable = input<boolean>(false);
+  readonly itemDetailNavigation = input<boolean>(true);
 
   readonly showDetail = output<Scene>();
   readonly playScene = output<Scene>();
@@ -66,6 +70,9 @@ export class ScenesGridComponent {
   }
 
   protected onOverlayButtonClick(event: PointerEvent, scene: Scene) {
+    if (!this.itemPlayable()) {
+      return;
+    }
     event.stopPropagation();
     const playingId = this.playingSceneId();
     if (playingId && playingId === scene.id) {
@@ -76,5 +83,12 @@ export class ScenesGridComponent {
       return;
     }
     this.playScene.emit(scene);
+  }
+
+  navigateToDetail(scene: Scene): void {
+    if (!this.itemDetailNavigation()) {
+      return;
+    }
+    this.showDetail.emit(scene);
   }
 }

@@ -18,6 +18,19 @@
   }
 }
 
+.selection-overlay {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  &.selection-alternative{
+    top: 6px;
+    right: 6px;
+  }
+  &.small-overlay {
+    padding: 6px;
+  }
+}
+
 .hover-overlay {
   position: absolute;
   display: flex;

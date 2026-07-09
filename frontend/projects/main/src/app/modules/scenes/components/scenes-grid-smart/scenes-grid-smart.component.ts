@@ -5,6 +5,7 @@ import {
   DestroyRef,
   effect,
   inject,
+  input,
   OnInit,
   signal,
 } from '@angular/core';
@@ -37,6 +38,10 @@ export class ScenesGridSmartComponent implements OnInit {
   private readonly playbackService = inject(PlaybackService);
   private readonly scenePlayerService = inject(ScenePlayerService);
   private readonly destroyRef = inject(DestroyRef);
+
+  readonly itemPlayable = input<boolean>(true);
+  readonly itemSelectable = input<boolean>(false);
+  readonly itemDetailNavigation = input<boolean>(true);
 
   readonly scenesLoading = this.scenesStore.loading;
   readonly scenes = signal<Scene[]>([]);

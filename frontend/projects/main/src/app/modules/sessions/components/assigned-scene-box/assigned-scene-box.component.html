@@ -1,0 +1,4 @@
+<lucide-icon [img]="DragIcon" cdkDragHandle></lucide-icon>
+<mat-checkbox class="checkbox" [checked]="true" (change)="unselected.emit()" />
+<div class="order-number">{{ order() }}</div>
+<div class="scene-name">{{ scene().name }}</div>

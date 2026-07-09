@@ -9,6 +9,8 @@
     [allScenes]="allScenes()"
     [currentSelection]="currentSelection()"
     (selectionChanged)="updateSelection($event)"
+    (unselectScene)="unassignScene($event)"
+    (sceneMoved)="reorderScene($event)"
   ></app-session-scene-assignment-modal-content>
 
   <div class="footer">

@@ -6,6 +6,7 @@ import {
   EllipsisVerticalIcon,
   Grid2x2Icon,
   Grid3x3Icon,
+  GripVerticalIcon,
   ImageUpIcon,
   LayersIcon,
   ListFilterIcon,
@@ -66,6 +67,7 @@ export const actionsIconSet = {
   MinimizeIcon: MinusIcon,
   MaximizeIcon: SquareIcon,
   UnmaximizeIcon: CopyIcon,
+  DragIcon: GripVerticalIcon,
 };
 
 export const volumeIconSet = {
