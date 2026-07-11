@@ -9,7 +9,7 @@ import { ScenesLandingComponent } from '../scenes-landing/scenes-landing.compone
 import { ScenesStore } from '@general/stores/scenes.store';
 import { QueryOptions } from '@shared/models/request.model';
 import { DialogService } from '../../../../services/dialog.service';
-import { CreateSceneModalComponent } from '../../modals/create-scene-modal/create-scene-modal.component';
+import { EditSceneModalComponent } from '../../modals/edit-scene-modal/edit-scene-modal.component';
 import { SceneInsertQuery } from '@shared/models/scene.model';
 
 @Component({
@@ -35,9 +35,9 @@ export class ScenesLandingSmartComponent implements OnInit {
 
   openInsertSceneModal(): void {
     const dialogRef = this.dialogService.open<
-      CreateSceneModalComponent,
+      EditSceneModalComponent,
       SceneInsertQuery
-    >(CreateSceneModalComponent);
+    >(EditSceneModalComponent);
 
     dialogRef.afterClosed$.subscribe((result) => {
       if (result) {

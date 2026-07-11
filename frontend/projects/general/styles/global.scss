@@ -31,7 +31,10 @@ html {
     )
   );
 
-  scrollbar-width: thin;
+  scrollbar-width: none;
+  -webkit-scrollbar {
+    display: none;
+  }
   scrollbar-color: col.$primary transparent;
   scrollbar-arrow-color: transparent;
   -ms-scrollbar-track-color: transparent;

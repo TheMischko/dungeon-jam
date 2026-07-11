@@ -9,7 +9,7 @@ import {
   OnInit,
   signal,
 } from '@angular/core';
-import { Scene } from '@shared/models/scene.model';
+import { Scene, SceneInsertQuery } from '@shared/models/scene.model';
 import { PlaylistStore } from '@general/stores/playlist.store';
 import { PlaylistTracksStore } from '../../../../stores/playlist-tracks.store';
 import { SoundEffectStore } from '@general/stores/sound-effect.store';
@@ -35,6 +35,11 @@ import { PlaybackService } from '../../../../services/playback.service';
 import { SoundEffectsPlayerService } from '../../../../services/sound-effects-player.service';
 import { ScenePlayerService } from '../../../../services/scene-player.service';
 import { QueryOptions } from '@shared/models/request.model';
+import {
+  EditSceneModalComponent,
+  EditSceneModalData,
+} from '../../modals/edit-scene-modal/edit-scene-modal.component';
+import { sceneInsertQueryToUpdateQuery } from '../../utils/scene-insert-query-to-update-query';
 
 @Component({
   selector: 'app-scene-console-smart',
@@ -412,5 +417,38 @@ export class SceneConsoleSmartComponent implements OnInit {
 
   protected pauseSceneTrack() {
     this.playbackService.pause();
+  }
+
+  protected openEditSceneModal(scene: Scene) {
+    const tags = scene.tags
+      .map((tagId) => this.tagsMap()[tagId])
+      .filter((v) => !!v);
+
+    const dialogRef = this.dialogService.open<
+      EditSceneModalComponent,
+      SceneInsertQuery
+    >(EditSceneModalComponent, {
+      data: {
+        formData: {
+          name: scene.name,
+          description: scene.description ?? null,
+          tags,
+          imageUrl: scene.imageUrl ?? null,
+          playlist: this.playlist() ?? null,
+        },
+      } as EditSceneModalData,
+    });
+
+    dialogRef.afterClosed$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((result) => {
+        if (!result) {
+          return;
+        }
+
+        this.scenesStore.update(
+          sceneInsertQueryToUpdateQuery(result, this.scene())
+        );
+      });
   }
 }

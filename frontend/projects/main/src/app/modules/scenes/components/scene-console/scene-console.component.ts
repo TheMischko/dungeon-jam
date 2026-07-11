@@ -69,6 +69,7 @@ export class SceneConsoleComponent {
   readonly pauseSoundEffect = output<SoundEffect>();
   readonly changeSoundEffectVolume = output<SoundEffectVolumeChange>();
   readonly trackQueryChange = output<QueryOptions>();
+  readonly editScene = output<Scene>();
 
   readonly hiddenContent = signal<boolean>(false);
 
@@ -76,6 +77,7 @@ export class SceneConsoleComponent {
   readonly ButtonType = ButtonType;
   readonly CollapsedIcon = actionsIconSet.CollapsedArrowIcon;
   readonly ExpandedIcon = actionsIconSet.ExpandedArrowIcon;
+  readonly EditIcon = actionsIconSet.EditIcon;
 
   readonly loading = computed(() => {
     return (

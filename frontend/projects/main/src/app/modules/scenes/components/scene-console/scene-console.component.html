@@ -1,6 +1,6 @@
 <div class="scene-console {{ hiddenContent() ? 'no-content' : '' }}">
   @if (loading()) {
-    <lib-loader class="loader"></lib-loader>
+    <lib-loader class="loader" size="large"></lib-loader>
   } @else {
     <div class="console-header">
       @if (sceneImageUrl(); as image) {
@@ -21,6 +21,15 @@
             [label]="scenePlayButtonText()"
             (toggle)="toggleScenePlaying($event)"
           ></lib-play-pause-button>
+          @if(!viewMode() && scene()) {
+            <lib-icon-button
+              [type]="ButtonType.Flat"
+              [size]="'regular'"
+              [icon]="EditIcon"
+              [label]="'Edit scene'"
+              (clicked)="editScene.emit(scene()!)"
+            ></lib-icon-button>
+          }
           @if (collapsable()) {
             <lib-icon-button
               [type]="ButtonType.Flat"

@@ -1,6 +1,6 @@
 ### Small missing features
 Obviously the project is WIP, so there is just a list of small missing features from the already *implemented* flows.
-- [ ] `LibraryLandingPage` "Upload" button should open a modal to consume the audio files and then open the modal with forms to fill in details
+- [x] `LibraryLandingPage` "Upload" button should open a modal to consume the audio files and then open the modal with forms to fill in details
 - [x] Custom input for tags with suggestions, and auto-splitting into pills
 - [ ] Playlist filters
 - [x] Change actions menu on playlist detail for individual tracks to include: Play next, Remove from playlist
@@ -16,3 +16,4 @@ Obviously the project is WIP, so there is just a list of small missing features 
 - [ ] Upload does not show tags immediately
 - [x] Sound Effect volume bar does not reflect the real value (small change sets the correct value)
 - [ ] Tables with collapsible columns have issue with initially hidden column cannot be shown (Scene detail Tracks table f.e.)
+- [ ] Songs table on Home page shows pause button on track, while the track is already paused

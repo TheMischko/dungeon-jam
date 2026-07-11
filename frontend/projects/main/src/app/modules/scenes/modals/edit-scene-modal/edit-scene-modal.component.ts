@@ -6,19 +6,20 @@ import { SceneFormComponent } from '../../../../forms/scene-form/scene-form.comp
 import {
   createSceneForm,
   SceneForm,
+  SceneFormData,
 } from '../../../../forms/scene-form/scene-form.model';
 
 @Component({
-  selector: 'app-create-scene-modal',
+  selector: 'app-edit-scene-modal',
   imports: [MatButton, SceneFormComponent],
-  templateUrl: './create-scene-modal.component.html',
-  styleUrl: './create-scene-modal.component.scss',
+  templateUrl: './edit-scene-modal.component.html',
+  styleUrl: './edit-scene-modal.component.scss',
 })
-export class CreateSceneModalComponent {
+export class EditSceneModalComponent {
   readonly dialog = inject(MatDialogRef<void, SceneInsertQuery>);
-  readonly dialogData = inject<CreateSceneModalData>(MAT_DIALOG_DATA);
+  readonly dialogData = inject<EditSceneModalData>(MAT_DIALOG_DATA);
 
-  readonly form: SceneForm = createSceneForm();
+  readonly form: SceneForm = createSceneForm(this.dialogData?.formData ?? {});
 
   cancel(): void {
     this.dialog.close(null);
@@ -27,7 +28,7 @@ export class CreateSceneModalComponent {
   save(): void {
     if (this.form().valid()) {
       const formValue = this.form().value();
-      const tags = formValue.tags.map((t) => t.title) ?? [];
+      const tags = formValue.tags.map((t) => t.id) ?? [];
       this.dialog.close({
         name: formValue.name,
         description: formValue.description ?? undefined,
@@ -39,4 +40,6 @@ export class CreateSceneModalComponent {
   }
 }
 
-export type CreateSceneModalData = {};
+export type EditSceneModalData = {
+  formData?: SceneFormData;
+};
