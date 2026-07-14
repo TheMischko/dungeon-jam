@@ -12,6 +12,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 import { HomeLandingPageComponent } from '../home-landing-page.component';
 import { Track } from '@shared/models/track.model';
+import { PlaylistApiService } from '@general/services/playlist-api.service';
 
 @Component({
   selector: 'app-home-landing-page-smart',
@@ -22,6 +23,7 @@ import { Track } from '@shared/models/track.model';
 export class HomeLandingPageSmartComponent implements OnInit {
   readonly tracksStore = inject(TrackLibraryStore);
   readonly playbackService = inject(PlaybackService);
+  readonly playlistApi = inject(PlaylistApiService);
 
   readonly trackEntities = this.tracksStore.entities;
   readonly tracksLoading = this.tracksStore.loading;
@@ -32,10 +34,21 @@ export class HomeLandingPageSmartComponent implements OnInit {
   });
   readonly currentlyPlayingTrackId = toSignal(
     this.playbackService.playback$.pipe(
-      map((playback) => playback.currentTrack?.id ?? null),
+      map((playback) =>
+        playback.isPlaying ? (playback.currentTrack?.id ?? null) : null
+      )
     ),
-    { initialValue: null },
+    { initialValue: null }
   );
+  readonly showPlaylists = toSignal(
+    this.playlistApi
+      .getAllPlaylists({})
+      .pipe(map((playlists) => playlists?.length > 0)),
+    { initialValue: false }
+  );
+  readonly showTracks = computed(() => {
+    return this.tracks().length > 0 && !this.tracksLoading();
+  });
 
   ngOnInit(): void {
     this.tracksStore.load({
