@@ -83,7 +83,6 @@ export class SmartTableComponent<T> implements AfterViewInit {
   readonly currentSortBy = signal<string | undefined>(undefined);
   readonly currentSortDirection = signal<SortDirection>(SortDirection.ASC);
   readonly currentFilters = signal<FilterQuery>(new FilterQuery());
-  readonly afterViewInit = signal(false);
 
   readonly currentQuery = computed<QueryOptions>(() => {
     const query: QueryOptions = {
@@ -164,24 +163,13 @@ export class SmartTableComponent<T> implements AfterViewInit {
       const config = this.config();
       this.columnStateManager.config.set(config);
     });
-
-    const initHiddenEffect = effect(() => {
-      const hiddenColumns = this.hiddenColumns();
-      const enabledColumns = this.columnStateManager.enabledColumns();
-      if (!this.afterViewInit()) {
-        return;
-      }
-      hiddenColumns.forEach((col) => {
-        if (enabledColumns.includes(col)) {
-          this.columnStateManager.toggleColumn(col);
-        }
-      });
-      return () => initHiddenEffect.destroy();
-    });
   }
 
   ngAfterViewInit() {
-    this.afterViewInit.set(true);
+    const hiddenColumns = this.hiddenColumns();
+    if (hiddenColumns?.length) {
+      this.columnStateManager.setInitialHiddenColumns(hiddenColumns);
+    }
   }
 
   setSort(event: { sortBy: string; sortDirection: SortDirection }) {

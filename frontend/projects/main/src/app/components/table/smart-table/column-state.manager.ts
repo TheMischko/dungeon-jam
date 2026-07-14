@@ -46,6 +46,19 @@ export class ColumnStateManager<T> {
     });
   }
 
+  setInitialHiddenColumns(columnNames: string[]) {
+    const hiddenColumnMap = columnNames.reduce((map, columnName) => {
+      return {
+        ...map,
+        [columnName]: false,
+      };
+    }, {});
+    this.enabledMap.update((current) => ({
+      ...current,
+      ...hiddenColumnMap,
+    }));
+  }
+
   toggleColumn(columnName: string) {
     if (this.enabledMap()[columnName] === undefined) {
       return;
