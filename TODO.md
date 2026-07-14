@@ -18,3 +18,4 @@ Obviously the project is WIP, so there is just a list of small missing features 
 - [x] Tables with collapsible columns have issue with initially hidden column cannot be shown (Scene detail Tracks table f.e.)
 - [x] Songs table on Home page shows pause button on track, while the track is already paused
 - [ ] Tracks cannot be sorted by Author
+- [ ] The tables lack "No match" state, as they show "No data" on query without results hiding the grid.
