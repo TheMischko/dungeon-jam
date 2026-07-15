@@ -141,6 +141,18 @@ export class PlaybackService implements OnDestroy {
     this.audioPlayerService.pause();
   }
 
+  async togglePlayPause(): Promise<void> {
+    const current = this.state.getValue();
+    if (!current.currentTrack) {
+      return;
+    }
+    if (current.isPlaying) {
+      this.pause();
+    } else {
+      await this.play();
+    }
+  }
+
   async playNext() {
     const current = this.state.getValue();
 
