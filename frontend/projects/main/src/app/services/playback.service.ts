@@ -131,8 +131,10 @@ export class PlaybackService implements OnDestroy {
       return;
     }
 
-    this.state.next({ ...current, isPlaying: true });
-    this.audioPlayerService.resume();
+    if (current.currentTrack) {
+      this.state.next({ ...current, isPlaying: true });
+      this.audioPlayerService.resume();
+    }
   }
 
   pause() {
