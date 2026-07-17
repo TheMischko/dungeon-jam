@@ -80,6 +80,7 @@ export class RangeSliderComponent implements ControlValueAccessor {
   }
 
   changeValue(event: Event) {
+    event.stopPropagation();
     const target = event.target as HTMLInputElement;
     const value = target.valueAsNumber;
     this.writeValue(value);

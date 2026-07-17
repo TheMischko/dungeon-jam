@@ -43,12 +43,14 @@ export class FilterSettingsComponent {
   filterOptions: ActionsMenuBaseConfig<null>[] = [
     {
       text: 'Any',
+      tooltip: 'Result must match minimum of 1 filter.',
       onSelected: () => {
         this.value.set(FilterMatchType.ANY);
       },
     },
     {
       text: 'All',
+      tooltip: 'Result must match all filters.',
       onSelected: () => {
         this.value.set(FilterMatchType.ALL);
       },

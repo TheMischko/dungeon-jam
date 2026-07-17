@@ -10,6 +10,7 @@ import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 import { provideTranslateService } from '@ngx-translate/core';
 import { AppNotificationService } from '@general/services/app-notification.service';
 import { provideNativeDateAdapter } from '@angular/material/core';
+import { MAT_TOOLTIP_DEFAULT_OPTIONS } from '@angular/material/tooltip';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -32,6 +33,12 @@ export const appConfig: ApplicationConfig = {
       },
       deps: [AppNotificationService],
       multi: true,
+    },
+    {
+      provide: MAT_TOOLTIP_DEFAULT_OPTIONS,
+      useValue: {
+        showDelay: 1000,
+      },
     },
   ],
 };
