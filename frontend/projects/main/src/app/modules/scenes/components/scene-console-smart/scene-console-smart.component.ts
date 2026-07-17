@@ -106,11 +106,7 @@ export class SceneConsoleSmartComponent implements OnInit {
       return false;
     }
     const playingSceneId = playbackState.sceneId;
-    const musicPlaying = playbackState.isPlaying;
-    return (
-      this.ambiencePlaying() ||
-      (musicPlaying && playingSceneId === this.scene().id)
-    );
+    return playingSceneId === this.scene().id;
   });
 
   readonly playMap = computed(() => {
