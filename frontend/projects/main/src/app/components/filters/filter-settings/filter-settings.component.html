@@ -1,17 +1,9 @@
-<mat-form-field
-  [appearance]="'outline'"
-  [floatLabel]="'always'"
-  [subscriptSizing]="'dynamic'"
-  class="filter-settings"
->
-  <mat-label>{{ label() }}</mat-label>
-  <lib-icon-button [icon]="filtersIcon" [matMenuTriggerFor]="menu" />
-  <mat-menu #menu="matMenu">
-    <lib-actions-menu
-      [config]="filterOptions"
-      [item]="null"
-      title="Select matching method:"
-    ></lib-actions-menu>
-  </mat-menu>
-  <input matInput class="fake-input" />
-</mat-form-field>
+<div class="label">{{ label() }}</div>
+<lib-icon-button [icon]="filtersIcon" [matMenuTriggerFor]="menu" />
+<mat-menu #menu="matMenu">
+  <lib-actions-menu
+    [config]="filterOptions"
+    [item]="null"
+    title="Select matching method:"
+  ></lib-actions-menu>
+</mat-menu>

@@ -13,20 +13,11 @@ import {
   ActionsMenuComponent,
 } from '@general/components/display/actions-menu/actions-menu.component';
 import { MatMenu, MatMenuTrigger } from '@angular/material/menu';
-import { MatFormField, MatInput, MatLabel } from '@angular/material/input';
 import { FilterMatchType } from '@shared/models/request.model';
 
 @Component({
   selector: 'app-filter-settings',
-  imports: [
-    IconButtonComponent,
-    ActionsMenuComponent,
-    MatMenu,
-    MatMenuTrigger,
-    MatLabel,
-    MatFormField,
-    MatInput,
-  ],
+  imports: [IconButtonComponent, ActionsMenuComponent, MatMenu, MatMenuTrigger],
   templateUrl: './filter-settings.component.html',
   styleUrl: './filter-settings.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -40,9 +31,9 @@ export class FilterSettingsComponent {
     effect(() => {
       const value = this.value();
       if (value === FilterMatchType.ANY) {
-        this.label.set('Any');
+        this.label.set('+');
       } else {
-        this.label.set('All');
+        this.label.set('=');
       }
       this.matchingChange.emit(value);
     });
