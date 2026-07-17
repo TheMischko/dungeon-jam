@@ -21,9 +21,10 @@ import { SceneSoundEffectsListComponent } from '../scene-sound-effects-list/scen
 import { AddSoundEffectsSectionComponent } from '../add-sound-effects-section/add-sound-effects-section.component';
 import { SoundEffectVolumeChange } from '../../../../models/sound-effect.model';
 import { QueryOptions } from '@shared/models/request.model';
-import { actionsIconSet } from '@general/icons/icons';
+import { actionsIconSet, iconSet } from '@general/icons/icons';
 import { IconButtonComponent } from '@general/components/buttons/icon-button/icon-button.component';
 import { LucideIconData } from 'lucide-angular';
+import { ActionsMenuBaseConfig } from '@general/components/display/actions-menu/actions-menu.component';
 
 @Component({
   selector: 'app-scene-console',
@@ -70,6 +71,7 @@ export class SceneConsoleComponent {
   readonly changeSoundEffectVolume = output<SoundEffectVolumeChange>();
   readonly trackQueryChange = output<QueryOptions>();
   readonly editScene = output<Scene>();
+  readonly playTrackNext = output<Track>();
 
   readonly hiddenContent = signal<boolean>(false);
 
@@ -78,6 +80,16 @@ export class SceneConsoleComponent {
   readonly CollapsedIcon = actionsIconSet.CollapsedArrowIcon;
   readonly ExpandedIcon = actionsIconSet.ExpandedArrowIcon;
   readonly EditIcon = actionsIconSet.EditIcon;
+  readonly PlayNextIcon = iconSet.PlayNextIcon;
+  readonly trackGridActions: ActionsMenuBaseConfig<Track>[] = [
+    {
+      text: 'Play next',
+      icon: this.PlayNextIcon,
+      onSelected: (item) => {
+        this.playTrackNext.emit(item);
+      },
+    },
+  ];
 
   readonly loading = computed(() => {
     return (

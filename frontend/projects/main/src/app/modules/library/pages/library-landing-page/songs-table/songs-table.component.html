@@ -44,7 +44,11 @@
 </ng-template>
 
 <ng-template #actionsColumn let-row="$implicit">
-  <lib-icon-button [matMenuTriggerFor]="menu" [icon]="ActionsIcon" />
+  <lib-icon-button
+    [matMenuTriggerFor]="menu"
+    [icon]="ActionsIcon"
+    class="actions-button"
+  />
   <mat-menu #menu="matMenu" (closed)="actionMenuClosed.emit($event)">
     <lib-actions-menu [item]="row" [config]="actionsMenuConfig()" />
   </mat-menu>

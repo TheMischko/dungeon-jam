@@ -6,8 +6,14 @@
         (matchingChange)="updateFilterMatchingType($event)"
       />
       <div class="filters">
-        <app-tags-filter [initialIds]="currentTagFilterIds()" (selectionChange)="emitTagFilters($event)" />
-        <app-playlist-filter [initialIds]="currentPlaylistFilterIds()" (selectionChange)="emitPlaylistFilters($event)" />
+        <app-tags-filter
+          [initialIds]="currentTagFilterIds()"
+          (selectionChange)="emitTagFilters($event)"
+        />
+        <app-playlist-filter
+          [initialIds]="currentPlaylistFilterIds()"
+          (selectionChange)="emitPlaylistFilters($event)"
+        />
       </div>
     } @else {
       <div></div>
@@ -21,7 +27,10 @@
 }
 @if (loading()) {
   <lib-loader size="large" class="loader"></lib-loader>
-} @else if (dataSet().length === 0 && currentSearch()) {
+} @else if (
+  dataSet().length === 0 &&
+  (currentSearch() || currentFilters().filters.length > 0)
+) {
   <div class="no-data">{{ noResultsText() }}</div>
 } @else if (dataSet().length === 0) {
   <div class="no-data">{{ noDataText() }}</div>

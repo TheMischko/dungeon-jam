@@ -447,4 +447,8 @@ export class SceneConsoleSmartComponent implements OnInit {
         );
       });
   }
+
+  protected playTrackNext(track: Track) {
+    this.playbackService.injectNext(track);
+  }
 }

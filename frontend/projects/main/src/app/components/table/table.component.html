@@ -72,9 +72,17 @@
       <!-- Actions Column -->
       @if (hasActions()) {
         <ng-container [matColumnDef]="actionsColumn">
-          <mat-header-cell *matHeaderCellDef></mat-header-cell>
-          <mat-cell *matCellDef="let row">
-            <lib-icon-button [matMenuTriggerFor]="menu" [icon]="ActionsIcon" />
+          <mat-header-cell
+            *matHeaderCellDef
+            class="actions-col"
+          ></mat-header-cell>
+          <mat-cell *matCellDef="let row" class="actions-col">
+            <lib-icon-button
+              [matMenuTriggerFor]="menu"
+              [icon]="ActionsIcon"
+              [size]="'regular'"
+              class="action-button"
+            />
             <mat-menu #menu="matMenu" (closed)="emitMenuClosed(row, $event)">
               <lib-actions-menu
                 [item]="row"

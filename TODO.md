@@ -23,3 +23,4 @@ Obviously the project is WIP, so there is just a list of small missing features 
 - [ ] Add queue management (reorder, remove, jump to track)
 - [ ] Keyboard support (ESC closing modals, Space for pausing/playing, etc.)
 - [x] Scene has playing state even if one random sound effect that is part of it plays from elsewhere
+- [ ] Show "Play next" song in Queue popup

@@ -332,6 +332,11 @@ export class PlaybackService implements OnDestroy {
     }
   }
 
+  /**
+   * @deprecated
+   * @param track
+   * @param playLast
+   */
   addToQueue(track: Track, playLast: boolean = false) {
     const state = this.state.getValue();
     const item: QueueItem = { track, isInjected: false };

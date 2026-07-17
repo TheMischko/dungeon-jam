@@ -28,11 +28,19 @@
     .selection-cell {
       max-width: 65px;
     }
-    mat-header-cell.clickable{
+    mat-header-cell.clickable {
       cursor: pointer;
       &:hover {
-        background: rgba(0,0,0,0.1);
+        background: rgba(0, 0, 0, 0.1);
       }
     }
+  }
+
+  ::ng-deep .actions-col {
+    max-width: 58px;
+    margin-left: -5px;
+  }
+  ::ng-deep .action-button .mdc-button__ripple {
+    display: none;
   }
 }

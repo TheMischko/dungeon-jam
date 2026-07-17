@@ -21,7 +21,7 @@
             [label]="scenePlayButtonText()"
             (toggle)="toggleScenePlaying($event)"
           ></lib-play-pause-button>
-          @if(!viewMode() && scene()) {
+          @if (!viewMode() && scene()) {
             <lib-icon-button
               [type]="ButtonType.Flat"
               [size]="'regular'"
@@ -59,7 +59,8 @@
             [loading]="false"
             [hiddenColumns]="excludedColumns"
             [showFilters]="false"
-            [showActionsColumn]="false"
+            [showActionsColumn]="true"
+            [actionsMenuConfig]="trackGridActions"
             (queryChange)="trackQueryChange.emit($event)"
             (playTrack)="playTrack.emit($event)"
             (pauseTrack)="pauseTrack.emit()"

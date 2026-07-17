@@ -7,7 +7,7 @@
     (click)="actionClicked(item(), config, $event)"
     [ngClass]="config?.cssClasses"
     [title]="''"
-    [matTooltip]="config?.tooltip ?? config.text"
+    [matTooltip]="config?.tooltip ?? ''"
   >
     @if (config.icon) {
       <lucide-icon [img]="config.icon"></lucide-icon>
