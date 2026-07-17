@@ -1,7 +1,6 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { Track } from '@shared/models/track.model';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { AudioApiWindow } from '../models/window-api.model';
 import { PlayingTrackState } from '../models/playback.model';
 import { Howl } from 'howler';
 import { LRUCache } from '@general/utils/lru-cache';
@@ -43,7 +42,12 @@ export class AudioPlayerService {
     }
     this.currentObjectUrl = URL.createObjectURL(trackData);
     this.howl = this.createHowl(this.currentObjectUrl);
-    this.howl.play();
+    if (this.howl.state() === 'loaded') {
+      this.howl.play();
+    } else {
+      // Onload handler starts the audio playing automatically
+      this.howl.load();
+    }
   }
 
   pause() {
@@ -90,8 +94,13 @@ export class AudioPlayerService {
     const howl = new Howl({
       src: [src],
       html5: true,
-      format: '',
+      format: 'mp3',
       volume: this.volume(),
+      preload: true,
+    });
+    howl.once('load', () => {
+      if (!this.howl) return;
+      howl.play();
     });
     howl.on('play', () => {
       if (this.howl) {
@@ -104,6 +113,7 @@ export class AudioPlayerService {
     howl.on('end', () => {
       this.trackStateSubject.next(PlayingTrackState.ENDED);
     });
+
     return howl;
   }
 
