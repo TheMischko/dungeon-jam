@@ -44,7 +44,7 @@ import { ActionsMenuBaseConfig } from '@general/components/display/actions-menu/
 export class SceneConsoleComponent {
   readonly scene = input<Scene>();
   readonly scenePlaying = input<boolean>();
-  readonly playlist = input<Playlist>();
+  readonly playlist = input<Playlist | null | undefined>(undefined);
   readonly tracks = input<Track[]>([]);
   readonly ambience = input<SoundEffect[]>([]);
   readonly stingers = input<SoundEffect[]>([]);
@@ -93,7 +93,9 @@ export class SceneConsoleComponent {
 
   readonly loading = computed(() => {
     return (
-      !this.scene() || !this.playlist() || !Object.keys(this.tagsMap()).length
+      !this.scene() ||
+      this.playlist() === undefined ||
+      !Object.keys(this.tagsMap()).length
     );
   });
   readonly playingTrackId = computed(() => {

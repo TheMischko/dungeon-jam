@@ -29,7 +29,8 @@ export class SceneDetailSmartComponent implements OnInit {
   constructor() {
     effect(() => {
       const scenesMap = this.scenesStore.entityMap();
-      this.scene.set(scenesMap[this.sceneId()]);
+      const scene = scenesMap[this.sceneId()];
+      this.scene.set(scene);
     });
   }
 

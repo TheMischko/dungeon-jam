@@ -68,7 +68,7 @@ export class SceneConsoleSmartComponent implements OnInit {
   readonly sessionId = input<string>();
 
   readonly tagsMap = this.tagsStore.entityMap;
-  readonly playlist = signal<Playlist | undefined>(undefined);
+  readonly playlist = signal<Playlist | null | undefined>(undefined);
   readonly tracks = signal<Track[]>([]);
   readonly ambience = signal<SoundEffect[]>([]);
   readonly stingers = signal<SoundEffect[]>([]);
@@ -139,11 +139,13 @@ export class SceneConsoleSmartComponent implements OnInit {
       const playlists = this.playlistStore.entityMap();
       if (!scene.playlistId) {
         console.warn(`Scene ${scene.name} has no playlistId`);
+        this.playlist.set(null);
         return;
       }
       const playlist = playlists[scene.playlistId];
       if (!playlist) {
         console.warn(`Playlist ${scene.playlistId} not found`);
+        this.playlist.set(null);
         return;
       }
       this.playlist.set(playlist);
