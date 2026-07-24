@@ -5,11 +5,9 @@
   (mouseleave)="onMouseLeave()"
 >
   <div class="image-wrapper" [ngStyle]="imageSizeStyle()">
-    @if (images().length > 0) {
+    @if (image(); as imageUrl) {
       <div class="images-container">
-        @for (imageUrl of images(); track imageUrl) {
-          <img [src]="imageUrl" [alt]="title()" />
-        }
+        <img [src]="imageUrl" [alt]="title()" />
       </div>
     } @else {
       <lucide-icon

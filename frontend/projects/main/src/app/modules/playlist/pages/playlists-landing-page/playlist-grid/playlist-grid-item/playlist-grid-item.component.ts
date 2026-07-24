@@ -34,9 +34,8 @@ export class PlaylistGridItemComponent {
   readonly tracksIcon = iconSet.TracksIcon;
   readonly playingIcon = volumeIconSet.NormalIcon;
 
-  readonly imageSrc = computed<string[]>(() => {
-    const imageUrl = this.playlistImageUrl();
-    return imageUrl ? [imageUrl] : [];
+  readonly imageSrc = computed<string | null>(() => {
+    return this.playlistImageUrl();
   });
   readonly overlayIcon = computed<LucideIconData>(() => {
     if (this.isPlaying()) {

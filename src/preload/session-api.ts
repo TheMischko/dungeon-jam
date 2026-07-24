@@ -41,6 +41,12 @@ const getSessionScenes = async (
   return await ipcRenderer.invoke(SessionChannel.GET_SESSION_SCENES, query);
 };
 
+const getSessionImages = async (
+  sessionIds: string[]
+): Promise<Record<string, string | null>> => {
+  return await ipcRenderer.invoke(SessionChannel.GET_IMAGES, sessionIds);
+};
+
 export default {
   getAllSessions,
   getSessionById,
@@ -48,4 +54,5 @@ export default {
   updateSession,
   deleteSession,
   getSessionScenes,
+  getSessionImages,
 };

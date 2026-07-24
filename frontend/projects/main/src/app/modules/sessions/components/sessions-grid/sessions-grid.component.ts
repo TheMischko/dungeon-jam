@@ -27,10 +27,9 @@ export class SessionsGridComponent {
   readonly loading = input<boolean>(false);
   readonly showControls = input<boolean>(true);
   readonly sizeConfig = input.required<GridItemSizeConfig>();
-  readonly availableSizes = input<GridItemSizeConfig[]>(
-    AllSizeGridItemConfigs
-  );
+  readonly availableSizes = input<GridItemSizeConfig[]>(AllSizeGridItemConfigs);
   readonly currentSizeIndex = input<number>(0);
+  readonly imageMap = input<Record<string, string | null>>();
 
   readonly sessionClick = output<SessionData>();
   readonly sizeChange = output<number>();
@@ -46,5 +45,9 @@ export class SessionsGridComponent {
 
   protected sizeInput(index: number) {
     this.sizeChange.emit(index);
+  }
+
+  protected getSessionImage(session: SessionData): string | null {
+    return this.imageMap()?.[session.id] ?? null;
   }
 }

@@ -111,13 +111,12 @@ export class ScenesGridComponent {
   readonly PlayIcon = iconSet.PlayIcon;
   readonly PauseIcon = iconSet.PauseIcon;
 
-  getSceneImages(scene: Scene): string[] {
+  getSceneImage(scene: Scene): string | null {
     const imageMap = this.sceneImageMap();
     if (!imageMap) {
-      return [];
+      return null;
     }
-    const image = imageMap[scene.id];
-    return image ? [image] : [];
+    return imageMap[scene.id] ?? null;
   }
 
   getSceneTags(scene: Scene): Tag[] {

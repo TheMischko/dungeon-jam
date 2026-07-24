@@ -32,13 +32,12 @@ export class SessionsGridSmartComponent implements OnInit {
   private readonly router = inject(Router);
 
   readonly showControls = input<boolean>(true);
-  readonly availableSizes = input<GridItemSizeConfig[]>(
-    AllSizeGridItemConfigs
-  );
+  readonly availableSizes = input<GridItemSizeConfig[]>(AllSizeGridItemConfigs);
   readonly initialSizeIndex = input<number>(0);
 
   readonly sessions = this.sessionStore.entities;
   readonly sessionsLoading = this.sessionStore.loading;
+  readonly sessionImages = this.sessionStore.sessionImages;
   readonly searchFilter = signal<string>('');
   readonly currentSizeIndex = signal<number>(0);
   readonly currentQuery = computed<QueryOptions>(() => {

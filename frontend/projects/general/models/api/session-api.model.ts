@@ -16,5 +16,8 @@ export type SessionWindow = Window &
       updateSession: (updateQuery: SessionUpdateQuery) => Promise<SessionData>;
       deleteSession: (sessionId: string) => Promise<void>;
       getSessionScenes: (query: SessionScenesQuery) => Promise<Scene[]>;
+      getSessionImages: (
+        sessionIds: string[]
+      ) => Promise<Record<string, string | null>>;
     };
   };

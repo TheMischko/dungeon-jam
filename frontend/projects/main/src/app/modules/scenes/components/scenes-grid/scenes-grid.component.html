@@ -20,14 +20,14 @@
 
   <div class="scenes-grid">
     @for (scene of scenes(); track scene.id) {
-      @let images = getSceneImages(scene);
+      @let image = getSceneImage(scene);
       @let tags = getSceneTags(scene);
       @let isPlaying = playingSceneId() === scene.id;
       @let playable = itemPlayable();
       @let selectable = itemSelectable();
       <app-grid-item
         [title]="scene.name"
-        [images]="images"
+        [image]="image"
         [noImageIcon]="SceneIcon"
         [tags]="tags"
         [sizeConfig]="sizeConfig()"

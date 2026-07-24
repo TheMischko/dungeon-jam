@@ -28,7 +28,7 @@ export class GridItemComponent {
   readonly leftCornerText = input<string>();
   readonly rightCornerText = input<string>();
   readonly noImageIcon = input.required<LucideIconData>();
-  readonly images = input<string[]>([]);
+  readonly image = input<string | null>(null);
   readonly sizeConfig = input<GridItemSizeConfig>(BigSizeGridItemConfig);
 
   readonly clicked = output<void>();

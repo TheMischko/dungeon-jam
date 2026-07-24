@@ -20,8 +20,10 @@
 
   <div class="sessions-grid">
     @for (session of sessions(); track session.id) {
+      @let image = getSessionImage(session);
       <app-grid-item
         [title]="session.name"
+        [image]="image"
         [noImageIcon]="SessionIcon"
         [sizeConfig]="sizeConfig()"
         (clicked)="sessionClick.emit(session)"

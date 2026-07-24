@@ -28,11 +28,13 @@ import { SessionToastService } from '@general/services/toast/session-toast.servi
 interface SessionStoreState {
   loading: boolean;
   lastLoadOptions: QueryOptions | null;
+  sessionImages: Record<string, string | null>;
 }
 
 const initialState: SessionStoreState = {
   loading: false,
   lastLoadOptions: null,
+  sessionImages: {},
 };
 
 enum SessionStoreEntity {
@@ -64,13 +66,33 @@ export const SessionStore = signalStore(
             return sessionApiService.getAll(query).pipe(
               tap((sessions) => {
                 patchState(store, setAllEntities(sessions), {
-                  loading: false,
                   lastLoadOptions: query,
                 });
               }),
               catchError((err: AppError) => {
                 toastService.showLoadAllError(err);
+                patchState(store, { loading: false });
                 return of([]);
+              }),
+              switchMap((sessions) => {
+                if (!sessions?.length) {
+                  return of(void 0);
+                }
+                return sessionApiService
+                  .getSessionImages(sessions.map((s) => s.id).filter(Boolean))
+                  .pipe(
+                    tap((imageMap) => {
+                      patchState(store, {
+                        sessionImages: imageMap,
+                        loading: false,
+                      });
+                    }),
+                    catchError((err: AppError) => {
+                      toastService.showLoadAllError(err);
+                      patchState(store, { loading: false });
+                      return of([]);
+                    })
+                  );
               })
             );
           })

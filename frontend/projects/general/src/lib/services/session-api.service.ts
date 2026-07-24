@@ -99,4 +99,20 @@ export class SessionApiService {
       });
     return subject.asObservable();
   }
+
+  getSessionImages(
+    sessionIds: string[]
+  ): Observable<Record<string, string | null>> {
+    const subject = new Subject<Record<string, string | null>>();
+    this.window.SESSION_API.getSessionImages(sessionIds)
+      .then((r) => {
+        subject.next(r);
+        subject.complete();
+      })
+      .catch((e) => {
+        subject.error(e);
+        subject.complete();
+      });
+    return subject.asObservable();
+  }
 }

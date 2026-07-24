@@ -17,11 +17,14 @@ import { ErrorCode } from '@shared/models/error.model';
 import { Scene } from '@shared/models/scene.model';
 import { SceneManager } from './scene.manager';
 import { SortDirection } from '@shared/models/common.model';
+import { combineImagesFromUrls } from '../utils/combine-images-from-urls';
+import { LRUCache } from '../../../frontend/projects/general/src/lib/utils/lru-cache';
 
 export class SessionManager {
   private static _instance: SessionManager;
 
   private readonly logger = new Logger('SessionManager', 'greenBright');
+  private readonly imageCache = new LRUCache<string, string | null>(16);
 
   constructor(private readonly database: DatabaseProvider<SessionData>) {}
 
@@ -94,6 +97,14 @@ export class SessionManager {
         const result = await this.getSessionScenes(query);
         this.logger.log(`Found ${result.length} scenes.`);
         return result;
+      })
+    );
+
+    ipcMain.handle(
+      SessionChannel.GET_IMAGES,
+      withAppError(async (_, sessionIds: string[]) => {
+        this.logger.log('Building images for sessions', sessionIds);
+        return await this.getSessionImages(sessionIds);
       })
     );
   }
@@ -225,6 +236,63 @@ export class SessionManager {
       });
     }
     return sessionScenes;
+  }
+
+  private async getSessionImages(
+    sessionIds: string[]
+  ): Promise<Record<string, string | null>> {
+    const idsSet = new Set(sessionIds);
+    const imageMap: Record<string, string | null> = {};
+
+    const sessions = await this.database.getSome('id', sessionIds);
+    const sessionsMap = new Map(sessions.map((s) => [s.id, s]));
+
+    const scenesManager = await SceneManager.getInstance();
+    const scenes = await scenesManager.getAll({});
+    const scenesMap = new Map(scenes.map((s) => [s.id, s]));
+
+    let cachedImages = 0;
+    let builtImages = 0;
+    for (const sessionId of idsSet.values()) {
+      const session = sessionsMap.get(sessionId);
+      if (!session) continue;
+      const cachedImage = this.imageCache.get(sessionId);
+      if (cachedImage !== undefined) {
+        imageMap[sessionId] = cachedImage;
+        cachedImages++;
+        continue;
+      }
+      const newImage = await this.buildSessionImage(session, scenesMap);
+      builtImages++;
+      this.imageCache.put(sessionId, newImage);
+      imageMap[sessionId] = newImage;
+    }
+
+    this.logger.log(
+      `Session images - ${cachedImages} used from cache - ${builtImages} new images`
+    );
+
+    return imageMap;
+  }
+
+  private async buildSessionImage(
+    session: SessionData,
+    scenesMap: Map<string, Scene>
+  ): Promise<string | null> {
+    const sessionScenes = session.scenes
+      .map((ref) => scenesMap.get(ref.sceneId))
+      .filter((s) => s !== undefined);
+    if (sessionScenes.length === 0) {
+      return null;
+    }
+    const imageUrls = sessionScenes
+      .map((scene) => scene?.imageUrl)
+      .filter((url) => url !== undefined);
+    if (!imageUrls.length) {
+      return null;
+    }
+
+    return await combineImagesFromUrls(imageUrls);
   }
 
   private static SearchFn(item: SessionData, filter: string): boolean {
