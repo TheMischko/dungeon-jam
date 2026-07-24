@@ -19,6 +19,8 @@ export const ErrorCode = {
   // Discord
   DiscordTokenConnectionFailed: 'ERRORS.DISCORD.TOKEN_CONNECTION_FAILED',
   DiscordChannelJoinFailed: 'ERRORS.DISCORD.CHANNEL_JOIN_FAILED',
+  DiscordChannelReconnectFailed: 'ERRORS.DISCORD.RECONNECT_FAILED',
+  DiscordChannelDisconnected: 'ERRORS.DISCORD.DISCONNECTED',
   DiscordConnectionLost: 'ERRORS.DISCORD.CONNECTION_LOST',
   DiscordApiError: 'ERRORS.DISCORD.API_ERROR',
   // Session
