@@ -31,6 +31,10 @@ export class SessionManager {
       const database = await databaseCreator
         .setTable('sessions')
         .setIdColumn('id')
+        .setSearch((item, filter) => SessionManager.SearchFn(item, filter))
+        .setSort((itemA, itemB, sortBy, direction) =>
+          SessionManager.SortFn(itemA, itemB, sortBy, direction)
+        )
         .complete();
       this._instance = new SessionManager(database);
       this._instance.registerHandlers();
@@ -221,6 +225,57 @@ export class SessionManager {
       });
     }
     return sessionScenes;
+  }
+
+  private static SearchFn(item: SessionData, filter: string): boolean {
+    return item.name.toLowerCase().includes(filter.toLowerCase());
+  }
+
+  private static SortFn(
+    itemA: SessionData,
+    itemB: SessionData,
+    sortBy: keyof SessionData | string,
+    direction: SortDirection
+  ) {
+    const directionMul = direction === SortDirection.ASC ? 1 : -1;
+    switch (sortBy) {
+      case 'order':
+        return (itemA.order - itemB.order) * directionMul;
+      case 'name':
+        return itemA.name.localeCompare(itemB.name) * directionMul;
+      case 'dateOfSession':
+        return (
+          SessionManager.CompareDates(itemA, itemB, 'dateOfSession') *
+          directionMul
+        );
+      case 'dateCreated':
+        return (
+          SessionManager.CompareDates(itemA, itemB, 'dateCreated') *
+          directionMul
+        );
+      default:
+        return (
+          SessionManager.CompareDates(itemA, itemB, 'dateUpdated') *
+          directionMul
+        );
+    }
+  }
+
+  private static CompareDates(
+    itemA: SessionData,
+    itemB: SessionData,
+    property: 'dateOfSession' | 'dateCreated' | 'dateUpdated'
+  ): number {
+    if (itemA[property] === undefined && itemB[property] === undefined) {
+      return 0;
+    }
+    if (itemA[property] === undefined) {
+      return -1;
+    }
+    if (itemB[property] === undefined) {
+      return 1;
+    }
+    return itemA[property]!.getTime() - itemB[property]!.getTime();
   }
 }
 
