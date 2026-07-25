@@ -1,22 +1,20 @@
 import { Component, input, output } from '@angular/core';
 import { PlaylistGridItemComponent } from './playlist-grid-item/playlist-grid-item.component';
-import { SearchBarComponent } from '@general/components/controls/search-bar/search-bar.component';
-import { RangeSliderComponent } from '@general/components/controls/range-slider/range-slider.component';
 import { iconSet } from '@general/icons/icons';
 import { PlaylistWithTagData } from '../../../../../../../../general/models/playlist.model';
 import { LoaderComponent } from '@general/components/display/loader/loader.component';
 import { GridPlaylistSizeConfig } from '../../../../../models/grid-item-size-config.model';
 import { CdkDrag, CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop';
+import { GridControlsComponent } from '../../../../../components/grid/grid-controls/grid-controls.component';
 
 @Component({
   selector: 'app-playlist-grid',
   imports: [
     PlaylistGridItemComponent,
-    SearchBarComponent,
-    RangeSliderComponent,
     LoaderComponent,
     CdkDrag,
     CdkDropList,
+    GridControlsComponent,
   ],
   templateUrl: './playlist-grid.component.html',
   styleUrl: './playlist-grid.component.scss',

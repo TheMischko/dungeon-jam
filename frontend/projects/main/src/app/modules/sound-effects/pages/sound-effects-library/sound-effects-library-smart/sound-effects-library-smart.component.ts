@@ -5,7 +5,6 @@ import {
   effect,
   inject,
   input,
-  OnInit,
   signal,
 } from '@angular/core';
 import { SoundEffectStore } from '@general/stores/sound-effect.store';
@@ -37,7 +36,7 @@ import { AudioFilesService } from '../../../../../services/audio-files.service';
   styleUrl: './sound-effects-library-smart.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SoundEffectsLibrarySmartComponent implements OnInit {
+export class SoundEffectsLibrarySmartComponent {
   private readonly soundEffectStore = inject(SoundEffectStore);
   private readonly newSoundEffectUploadService = inject(
     NewSoundEffectUploadService
@@ -71,10 +70,7 @@ export class SoundEffectsLibrarySmartComponent implements OnInit {
       const soundEffects = this.soundEffectStore.entities();
       this.soundEffects.set(soundEffects);
     });
-  }
-
-  ngOnInit(): void {
-    this.soundEffectStore.loadAll();
+    this.soundEffectStore.loadAll(this.currentQueryOptions);
   }
 
   createFromFiles(audioTracks?: AudioTrack[]): void {

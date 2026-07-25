@@ -66,6 +66,7 @@ export class SessionsGridSmartComponent implements OnInit {
     if (newIndex < 0 || newIndex > maxIndex) {
       return;
     }
+    console.log(newIndex);
     this.currentSizeIndex.set(newIndex);
   }
 

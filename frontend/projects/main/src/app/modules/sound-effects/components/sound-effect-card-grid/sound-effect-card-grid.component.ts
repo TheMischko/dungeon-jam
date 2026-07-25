@@ -7,23 +7,24 @@ import {
   signal,
 } from '@angular/core';
 import { SoundEffect } from '@shared/models/sound-effect.model';
-import { RangeSliderComponent } from '@general/components/controls/range-slider/range-slider.component';
-import { iconSet } from '@general/icons/icons';
 import { LoaderComponent } from '@general/components/display/loader/loader.component';
 import { SoundEffectCardComponent } from '../sound-effect-card/sound-effect-card.component';
 import { GridSoundEffectSizeConfig } from '../../../../models/grid-item-size-config.model';
 import { SoundEffectVolumeChange } from '../../pages/sound-effects-library/sound-effects-library-smart/sound-effects-library-smart.component';
 import { ActionsMenuBaseConfig } from '@general/components/display/actions-menu/actions-menu.component';
 import { CdkDrag, CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop';
+import { GridControlsComponent } from '../../../../components/grid/grid-controls/grid-controls.component';
+import { SoundEffectDisplayModeSwitchComponent } from '../sound-effect-display-mode-switch/sound-effect-display-mode-switch.component';
 
 @Component({
   selector: 'app-sound-effect-card-grid',
   imports: [
-    RangeSliderComponent,
     LoaderComponent,
     SoundEffectCardComponent,
     CdkDropList,
     CdkDrag,
+    GridControlsComponent,
+    SoundEffectDisplayModeSwitchComponent,
   ],
   templateUrl: './sound-effect-card-grid.component.html',
   styleUrl: './sound-effect-card-grid.component.scss',
@@ -33,12 +34,15 @@ export class SoundEffectCardGridComponent {
   readonly soundEffects = input.required<SoundEffect[]>();
   readonly loading = input<boolean>(false);
   readonly actionsMenu = input<ActionsMenuBaseConfig<SoundEffect>[]>([]);
+  readonly viewMode = input<'grid' | 'table'>('grid');
 
   /**
    * List of currently playing Sound Effect's IDs.
    */
   readonly currentlyPlaying = input<string[]>([]);
 
+  readonly search = output<string>();
+  readonly modeChange = output<'grid' | 'table'>();
   readonly playEffect = output<SoundEffect>();
   readonly stopEffect = output<SoundEffect>();
   readonly toggleEffectLoop = output<SoundEffect>();
@@ -51,18 +55,8 @@ export class SoundEffectCardGridComponent {
 
   readonly cardSize = signal<number>(0.75);
 
-  readonly gridBigIcon = iconSet.GridBigIcon;
-  readonly gridSmallIcon = iconSet.GridSmallIcon;
-
   isPlaying(soundEffectId: string): boolean {
     return this.currentlyPlaying().includes(soundEffectId);
-  }
-
-  updateSize(value: number): void {
-    if (value > 100 || value < 0) {
-      return;
-    }
-    this.cardSize.set(value / 100);
   }
 
   emitVolumeChange(soundEffect: SoundEffect, volume: number): void {
