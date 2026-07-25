@@ -1,20 +1,32 @@
-@if (noData()){
+@if (noData()) {
   <section>
     <h1 class="main-message">
-      Welcome to <span class="first-part">Dungeon</span
-    ><span class="second-part">Jam</span>!
+      Welcome to
+      <img
+        class="logo-text"
+        src="./dungeon-jamLogo Title Text.svg"
+        alt="Dungeon Jam logo"
+      />!
     </h1>
-    <p>You can start by visiting <a [routerLink]="libraryLink" queryParamsHandling="">Library</a> and adding some music.</p>
+    <p>
+      You can start by visiting
+      <a [routerLink]="libraryLink" queryParamsHandling="">Library</a> and
+      adding some music.
+    </p>
   </section>
 } @else {
   <section>
     <h1 class="main-message">
-      Welcome back to <span class="first-part">Dungeon</span
-    ><span class="second-part">Jam</span>!
+      Welcome back to
+      <img
+        class="logo-text"
+        src="./dungeon-jamLogo Title Text.svg"
+        alt="Dungeon Jam logo"
+      />!
     </h1>
   </section>
 
-  @if (showPlaylists()){
+  @if (showPlaylists()) {
     <section>
       <h2>Your Playlists</h2>
       <app-playlist-grid-smart [showControls]="false" [limit]="3" />
@@ -36,4 +48,3 @@
     </section>
   }
 }
-

@@ -17,5 +17,10 @@
     .second-part {
       color: col.$error;
     }
+    .logo-text {
+      display: inline-block;
+      height: 56px;
+      margin-bottom: -12px;
+    }
   }
 }
