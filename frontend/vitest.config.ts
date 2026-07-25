@@ -3,14 +3,14 @@ import path from 'path';
 
 export default defineConfig({
   resolve: {
-    alias: {
-      '@shared': path.resolve(__dirname, '../shared'),
-      '@general/public-api': path.resolve(__dirname, './projects/general/src/public-api.ts'),
-      '@general': path.resolve(__dirname, './projects/general/src/lib'),
-      'general/models': path.resolve(__dirname, './projects/general/models'),
-      'general': path.resolve(__dirname, './projects/general/src/public-api.ts'),
-      'styles': path.resolve(__dirname, './projects/general/styles'),
-    },
+    alias: [
+      { find: /^@shared\/(.*)$/, replacement: path.resolve(__dirname, '../shared/$1') },
+      { find: /^@shared$/, replacement: path.resolve(__dirname, '../shared') },
+      { find: /^@general\/public-api$/, replacement: path.resolve(__dirname, './projects/general/src/public-api.ts') },
+      { find: /^@general\/(.*)$/, replacement: path.resolve(__dirname, './projects/general/src/lib/$1') },
+      { find: /^@general$/, replacement: path.resolve(__dirname, './projects/general/src/public-api.ts') },
+      { find: /^styles\/(.*)$/, replacement: path.resolve(__dirname, './projects/general/styles/$1') },
+    ],
   },
   test: {
     globals: true,
