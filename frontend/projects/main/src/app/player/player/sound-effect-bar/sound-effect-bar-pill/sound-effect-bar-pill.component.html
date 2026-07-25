@@ -3,8 +3,11 @@
   [ngStyle]="playPositionBackground()"
   (click)="handleClick($event)"
 >
-  <span>{{ soundEffect().name }}</span>
-  <button class="stop-button" (click)="handleClose($event)">
-    <lucide-icon [size]="16" [img]="stopIcon" />
-  </button>
+  <span class="sound-effect-name" libScrollOverflowText>{{
+    soundEffect().name
+  }}</span>
+  <app-sound-effect-pill-icon-button
+    [icon]="stopIcon"
+    (clicked)="close.emit()"
+  />
 </div>
