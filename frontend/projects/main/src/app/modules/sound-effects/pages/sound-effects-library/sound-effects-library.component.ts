@@ -13,8 +13,6 @@ import { AudioTrack } from '@shared/models/track.model';
 import { SoundEffectTableComponent } from '../../components/sound-effect-table/sound-effect-table.component';
 import { SoundEffectCardGridComponent } from '../../components/sound-effect-card-grid/sound-effect-card-grid.component';
 import { SoundEffectVolumeChange } from './sound-effects-library-smart/sound-effects-library-smart.component';
-import { SoundEffectDisplayModeSwitchComponent } from '../../components/sound-effect-display-mode-switch/sound-effect-display-mode-switch.component';
-import { SearchBarComponent } from '@general/components/controls/search-bar/search-bar.component';
 import { QueryOptions } from '@shared/models/request.model';
 import { SortDirection } from '@shared/models/common.model';
 import { ActionsMenuBaseConfig } from '@general/components/display/actions-menu/actions-menu.component';
@@ -27,8 +25,6 @@ import { MatButton } from '@angular/material/button';
     FilesDropInZoneComponent,
     SoundEffectTableComponent,
     SoundEffectCardGridComponent,
-    SoundEffectDisplayModeSwitchComponent,
-    SearchBarComponent,
     MatButton,
   ],
   templateUrl: './sound-effects-library.component.html',
@@ -41,6 +37,7 @@ export class SoundEffectsLibraryComponent {
   readonly playingEffectIds = input<string[]>([]);
   readonly focusSoundEffectId = input<string>();
 
+  readonly modeChange = output<'grid' | 'table'>();
   readonly uploadAudioFiles = output<AudioTrack[]>();
   readonly playEffect = output<SoundEffect>();
   readonly stopEffect = output<SoundEffect>();

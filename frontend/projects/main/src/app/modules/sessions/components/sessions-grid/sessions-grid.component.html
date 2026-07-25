@@ -1,21 +1,12 @@
 <div class="wrapper">
   @if (showControls()) {
-    <div class="controls">
-      <div class="search">
-        <lib-search-bar (search)="search.emit($event)"></lib-search-bar>
-      </div>
-      <div class="size-control">
-        <lib-range-slider
-          [minValue]="0"
-          [maxValue]="maxSizeIndex()"
-          [stepSize]="1"
-          [value]="currentSizeIndex()"
-          [prefix]="gridSmallIcon"
-          [suffix]="gridBigIcon"
-          (inputChange)="sizeInput($event)"
-        />
-      </div>
-    </div>
+    <app-grid-controls
+      [currentValue]="currentSizeIndex()"
+      [stepSize]="1"
+      [sizeMaxValue]="availableSizes().length - 1"
+      (search)="search.emit($event)"
+      (sizeChange)="sizeInput($event)"
+    ></app-grid-controls>
   }
 
   <div class="sessions-grid">

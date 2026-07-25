@@ -1,21 +1,12 @@
 <div class="wrapper">
   @if (showControls()) {
-    <div class="controls">
-      <div class="search">
-        <lib-search-bar (search)="search.emit($event)"></lib-search-bar>
-      </div>
-      <div class="size-control">
-        <lib-range-slider
-          [minValue]="0"
-          [maxValue]="maxSizeIndex()"
-          [stepSize]="1"
-          [value]="currentSizeIndex()"
-          [prefix]="gridSmallIcon"
-          [suffix]="gridBigIcon"
-          (inputChange)="sizeInput($event)"
-        />
-      </div>
-    </div>
+    <app-grid-controls
+      [currentValue]="currentSizeIndex()"
+      [stepSize]="1"
+      [sizeMaxValue]="availableSizes().length - 1"
+      (search)="search.emit($event)"
+      (sizeChange)="sizeInput($event)"
+    ></app-grid-controls>
   }
 
   <div class="scenes-grid">
@@ -29,22 +20,21 @@
         [title]="scene.name"
         [image]="image"
         [noImageIcon]="SceneIcon"
-        [tags]="tags"
-        [sizeConfig]="sizeConfig()"
+        [tags]="[]"
+        [sizeConfig]="computedSizeConfig()"
         (clicked)="navigateToDetail(scene)"
       >
         <div ngProjectAs="content" style="display: contents">
-          @if (playable && isPlaying){
+          @if (playable && isPlaying) {
             <div class="is-playing-overlay small-overlay">
-              <lucide-icon
-                [img]="PlayingIcon"
-                [size]="16"
-              ></lucide-icon>
+              <lucide-icon [img]="PlayingIcon" [size]="16"></lucide-icon>
             </div>
           }
-          @if (selectable){
+          @if (selectable) {
             <div
-              class="selection-overlay small-overlay {{playable ? 'selection-alternative' : ''}}"
+              class="selection-overlay small-overlay {{
+                playable ? 'selection-alternative' : ''
+              }}"
               (click)="$event.stopPropagation()"
             >
               <mat-checkbox
@@ -55,8 +45,8 @@
           }
         </div>
 
-        @if (playable){
-        <div ngProjectAs="hovering-content" style="display: contents">
+        @if (playable) {
+          <div ngProjectAs="hovering-content" style="display: contents">
             <div class="hover-overlay">
               <lucide-icon
                 class="icon"
@@ -64,7 +54,7 @@
                 (click)="onOverlayButtonClick($event, scene)"
               ></lucide-icon>
             </div>
-        </div>
+          </div>
         }
       </app-grid-item>
     }

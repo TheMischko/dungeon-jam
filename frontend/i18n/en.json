@@ -30,7 +30,9 @@
   "NOTIFICATIONS": {
     "DISCORD": {
       "TOKEN_CONNECTED": "Discord bot connected successfully.",
-      "CHANNEL_JOINED": "Joined Discord voice channel."
+      "CHANNEL_JOINED": "Joined Discord voice channel.",
+      "RECONNECT_FAILED": "Failed to reconnect back to the channel.",
+      "DISCONNECTED": "Discord connection lost."
     },
     "SESSION": {
       "LOAD_ALL_ERROR_TITLE": "Loading sessions error",

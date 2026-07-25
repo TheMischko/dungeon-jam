@@ -1,6 +1,8 @@
 <div class="toast-wrapper">
   <div class="toast" [ngClass]="getToastTypeClass()">
-    <h3 class="toast-title">{{ data.title }}</h3>
+    @if (data.title.length) {
+      <h3 class="toast-title">{{ data.title }}</h3>
+    }
     @if (data.description) {
       <p class="toast-message">{{ data.description }}</p>
     }

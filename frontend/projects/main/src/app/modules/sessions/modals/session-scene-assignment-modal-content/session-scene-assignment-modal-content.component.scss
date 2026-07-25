@@ -1,8 +1,13 @@
-.content{
+.content {
   display: grid;
   grid-template-columns: 2fr 1fr;
   padding: 1rem;
   column-gap: 0.5rem;
+}
+
+::ng-deep .available-scenes app-scenes-grid-smart {
+  display: block;
+  margin-top: -1.5rem;
 }
 
 .available-scenes,
@@ -10,7 +15,7 @@
   min-width: 0;
 }
 
-.assigned-scene{
+.assigned-scene {
   display: flex;
   align-items: center;
   width: 100%;

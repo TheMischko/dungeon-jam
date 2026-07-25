@@ -39,6 +39,7 @@ import { createAppError } from '../utils/create-app-error';
 import { ErrorCode } from '@shared/models/error.model';
 import { NotificationMessageKey } from '@shared/models/notification.model';
 import Encoder = opus.Encoder;
+import { PlaybackDestinationManager } from './playback-destination.manager';
 
 export class DiscordManager {
   private static instance: DiscordManager;
@@ -79,9 +80,12 @@ export class DiscordManager {
   }
 
   private registerChannels(): void {
-    ipcMain.handle(DiscordChannel.GET_CHANNELS, withAppError(async (_) => {
-      return await this.getAvailableChannels(this.client!);
-    }));
+    ipcMain.handle(
+      DiscordChannel.GET_CHANNELS,
+      withAppError(async (_) => {
+        return await this.getAvailableChannels(this.client!);
+      })
+    );
     ipcMain.handle(
       DiscordChannel.JOIN_CHANNEL,
       withAppError(async (_, request: JoinChannelRequest) => {
@@ -93,26 +97,35 @@ export class DiscordManager {
         );
       })
     );
-    ipcMain.handle(DiscordChannel.DISCONNECT, withAppError(async (_) => {
-      this.logger.log('Disconnecting from current channel');
-      return await this.disconnect();
-    }));
+    ipcMain.handle(
+      DiscordChannel.DISCONNECT,
+      withAppError(async (_) => {
+        this.logger.log('Disconnecting from current channel');
+        return await this.disconnect();
+      })
+    );
 
     /***
      *  NEW APIs
      **/
-    ipcMain.handle(DiscordChannel.CONNECT_TOKEN, withAppError(async (_, tokenId: string) => {
-      return await this.connectNewToken(tokenId);
-    }));
+    ipcMain.handle(
+      DiscordChannel.CONNECT_TOKEN,
+      withAppError(async (_, tokenId: string) => {
+        return await this.connectNewToken(tokenId);
+      })
+    );
     ipcMain.handle(
       DiscordChannel.DISCONNECT_TOKEN,
       withAppError(async (_, tokenId: string) => {
         return await this.disconnectToken(tokenId);
       })
     );
-    ipcMain.handle(DiscordChannel.GET_CONNECTED_TOKENS, withAppError(async () => {
-      return await this.getActiveTokens();
-    }));
+    ipcMain.handle(
+      DiscordChannel.GET_CONNECTED_TOKENS,
+      withAppError(async () => {
+        return await this.getActiveTokens();
+      })
+    );
     ipcMain.handle(
       DiscordChannel.GET_TOKEN_CHANNELS,
       withAppError(async (_, tokenId: string) => {
@@ -235,7 +248,10 @@ export class DiscordManager {
       });
       await broadcastNotification(
         createErrorNotification(
-          createAppError(ErrorCode.DiscordTokenConnectionFailed, 'Token connection failed.')
+          createAppError(
+            ErrorCode.DiscordTokenConnectionFailed,
+            'Token connection failed.'
+          )
         )
       );
     } finally {
@@ -283,6 +299,14 @@ export class DiscordManager {
     });
 
     try {
+      const isActiveToken =
+        this.state.type === DiscordStateType.CONNECTED &&
+        this.state.tokenId === tokenId;
+      if (isActiveToken) {
+        this.logger.log('Active token disconnected.');
+        await this.disconnect();
+        await this.fallbackToLocalPlayback();
+      }
       await this.connections.disconnectToken(token.apiKey);
       await this.broadcastActiveTokensUpdate();
       await this.tokenManager.saveToken(
@@ -388,11 +412,14 @@ export class DiscordManager {
     tokenId: string
   ): Promise<void> {
     const token = await this.tokenManager.getTokenById(tokenId);
-    if (!token) {
+    if (!token || !token.active) {
       this.logger.logErrorMessage('Token not found during join channel.');
       await broadcastNotification(
         createErrorNotification(
-          createAppError(ErrorCode.DiscordTokenConnectionFailed, 'Token not found.')
+          createAppError(
+            ErrorCode.DiscordTokenConnectionFailed,
+            'Token not found.'
+          )
         )
       );
       return;
@@ -402,7 +429,10 @@ export class DiscordManager {
       this.logger.logErrorMessage('Client not found during join channel.');
       await broadcastNotification(
         createErrorNotification(
-          createAppError(ErrorCode.DiscordChannelJoinFailed, 'Client not found.')
+          createAppError(
+            ErrorCode.DiscordChannelJoinFailed,
+            'Client not found.'
+          )
         )
       );
       return;
@@ -470,7 +500,10 @@ export class DiscordManager {
       this.logger.logErrorMessage('Failed to join channel', { error });
       await broadcastNotification(
         createErrorNotification(
-          createAppError(ErrorCode.DiscordChannelJoinFailed, 'Failed to join voice channel.')
+          createAppError(
+            ErrorCode.DiscordChannelJoinFailed,
+            'Failed to join voice channel.'
+          )
         )
       );
     }
@@ -673,6 +706,12 @@ export class DiscordManager {
       this.logger.log('Max reconnection attempts reached', {
         maxAttempts: this.maxReconnectAttempts,
       });
+      await broadcastNotification(
+        createErrorNotification({
+          code: ErrorCode.DiscordChannelReconnectFailed,
+          message: 'Cannot reconnect',
+        })
+      );
       await this.updateState();
       return;
     }
@@ -693,9 +732,15 @@ export class DiscordManager {
       this.logger.logErrorMessage(
         'Max reconnection attempts reached, giving up'
       );
+
+      await this.fallbackToLocalPlayback();
+
       await broadcastNotification(
         createErrorNotification(
-          createAppError(ErrorCode.DiscordConnectionLost, 'Voice connection lost.')
+          createAppError(
+            ErrorCode.DiscordConnectionLost,
+            'Voice connection lost.'
+          )
         )
       );
       return;
@@ -712,6 +757,29 @@ export class DiscordManager {
 
     await new Promise((resolve) => setTimeout(resolve, delayMs));
     await this.connect(token);
+  }
+
+  private async fallbackToLocalPlayback(): Promise<void> {
+    try {
+      this.state = { type: DiscordStateType.NONE };
+      await this.broadcastDiscordState();
+
+      const playback = await PlaybackDestinationManager.getInstance();
+      await playback.updateCaptureSettings({
+        isLocalMuted: false,
+      });
+
+      if (this.audioPlayer) {
+        this.audioPlayer.stop(true);
+      }
+      this.logger.log('Fallback to local playback completed.');
+
+      // TO-DO: Notify user with toast about local fallback
+    } catch (error) {
+      this.logger.logErrorMessage('Error during local playback fallback', {
+        error,
+      });
+    }
   }
 
   /**
@@ -745,8 +813,19 @@ export class DiscordManager {
 
     this.connection.on(VoiceConnectionStatus.Disconnected, async () => {
       this.logger.logWarning('Voice connection disconnected');
-      // Attempt to reconnect
-      await this.attemptReconnect(guildId, channelId, tokenId);
+      const token = await this.tokenManager.getTokenById(tokenId);
+      if (!token || !token.active) {
+        // Token disconnected -> Local playback
+        await this.fallbackToLocalPlayback();
+        await broadcastNotification(
+          createErrorNotification({
+            code: ErrorCode.DiscordChannelDisconnected,
+            message: 'Discord disconnected',
+          })
+        );
+      } else {
+        await this.attemptReconnect(guildId, channelId, tokenId);
+      }
     });
 
     this.connection.on(VoiceConnectionStatus.Destroyed, () => {

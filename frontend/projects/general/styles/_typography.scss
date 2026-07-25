@@ -86,3 +86,7 @@ $font: 'Noto Sans', sans-serif;
   letter-spacing: 0.05px;
   text-align: left;
 }
+
+@mixin sound-effect-pill() {
+  @include body2();
+}

@@ -40,7 +40,7 @@ export const combineImagesFromUrls = async (
     // Length = 3 && index = 2 -> 512
     // Length = 4 -> 256
     const height =
-      length === 4 || (length === 3 && index === 2) ? size / 2 : size;
+      length === 4 || (length === 3 && index !== 2) ? size / 2 : size;
     const resizedImageBuffer = await images[index]
       .resize(width, height, { fit: 'cover' })
       .toBuffer();

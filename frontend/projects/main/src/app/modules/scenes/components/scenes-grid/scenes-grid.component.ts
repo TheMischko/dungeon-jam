@@ -13,12 +13,11 @@ import { iconSet, volumeIconSet } from '@general/icons/icons';
 import { Tag } from '@shared/models/tag.model';
 import { LucideAngularModule } from 'lucide-angular';
 import { MatCheckbox, MatCheckboxChange } from '@angular/material/checkbox';
-import { SearchBarComponent } from '@general/components/controls/search-bar/search-bar.component';
-import { RangeSliderComponent } from '@general/components/controls/range-slider/range-slider.component';
 import {
   AllSizeGridItemConfigs,
   GridItemSizeConfig,
 } from '../../../../models/grid.model';
+import { GridControlsComponent } from '../../../../components/grid/grid-controls/grid-controls.component';
 
 @Component({
   selector: 'app-scenes-grid',
@@ -26,8 +25,7 @@ import {
     GridItemComponent,
     LucideAngularModule,
     MatCheckbox,
-    SearchBarComponent,
-    RangeSliderComponent,
+    GridControlsComponent,
   ],
   templateUrl: './scenes-grid.component.html',
   styleUrl: './scenes-grid.component.scss',
@@ -55,11 +53,20 @@ export class ScenesGridComponent {
   readonly search = output<string>();
   readonly selected = output<Scene[]>();
 
-  readonly gridBigIcon = iconSet.GridBigIcon;
-  readonly gridSmallIcon = iconSet.GridSmallIcon;
-
   readonly maxSizeIndex = computed<number>(() => {
-    return Math.max(this.availableSizes().length - 1, 0);
+    return Math.max((this.availableSizes().length - 1) * 25, 0);
+  });
+
+  readonly currentSizeValue = computed<number>(() => {
+    return this.currentSizeIndex() * 25;
+  });
+
+  readonly computedSizeConfig = computed<GridItemSizeConfig>(() => {
+    const index = Math.min(
+      Math.max(0, this.currentSizeIndex()),
+      this.availableSizes().length - 1
+    );
+    return this.availableSizes()[index] || this.sizeConfig();
   });
 
   readonly selectedItems = signal<Scene[]>([]);
@@ -73,8 +80,10 @@ export class ScenesGridComponent {
     });
   }
 
-  protected sizeInput(index: number) {
-    this.sizeChange.emit(index);
+  protected sizeInput(value: number) {
+    const index = Math.round(value * 100);
+    const clampedIndex = Math.max(Math.min(index, this.maxSizeIndex() - 1), 0);
+    this.sizeChange.emit(clampedIndex);
   }
 
   isSelected(scene: Scene): boolean {

@@ -1,14 +1,8 @@
 <h1 class="title">Sound Effects</h1>
-<button mat-flat-button (click)="openAudioFilesDialog.emit()">Upload new sound effects</button>
-<app-sound-effect-display-mode-switch
-  class="mode-switcher"
-  [mode]="viewMode()"
-  (modeChange)="toggleViewMode($event)"
-/>
-<div class="controls">
-  <span class="empty"></span>
-  <lib-search-bar (search)="currentSearch.set($event)" />
-</div>
+<button mat-flat-button (click)="openAudioFilesDialog.emit()">
+  Upload new sound effects
+</button>
+
 <app-songs-drop-in-zone
   class="content"
   (audioDropped)="uploadAudioFiles.emit($event)"
@@ -19,11 +13,14 @@
       [loading]="loading()"
       [currentlyPlaying]="playingEffectIds()"
       [actionsMenu]="actionMenuConfig"
+      [viewMode]="viewMode()"
       (playEffect)="playEffect.emit($event)"
       (stopEffect)="stopEffect.emit($event)"
       (toggleEffectLoop)="toggleEffectLoop.emit($event)"
       (effectVolumeChange)="effectVolumeChange.emit($event)"
       (reorderDrop)="reorderDrop.emit($event)"
+      (search)="currentSearch.set($event)"
+      (modeChange)="toggleViewMode($event)"
     ></app-sound-effect-card-grid>
   } @else {
     <app-sound-effect-table
@@ -32,9 +29,12 @@
       [loading]="loading()"
       [currentlyPlaying]="playingEffectIds()"
       [actionsMenu]="actionMenuConfig"
+      [viewMode]="viewMode()"
       (playEffect)="playEffect.emit($event)"
       (stopEffect)="stopEffect.emit($event)"
       (toggleEffectLoop)="toggleEffectLoop.emit($event)"
+      (search)="currentSearch.set($event)"
+      (modeChange)="toggleViewMode($event)"
     ></app-sound-effect-table>
   }
 </app-songs-drop-in-zone>

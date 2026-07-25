@@ -30,6 +30,10 @@
     .search-bar {
       width: 40%;
     }
+    ::ng-deep .search-bar {
+      --mat-form-field-container-height: 40px;
+      --mat-form-field-container-vertical-padding: 10px;
+    }
   }
 
   .table {
@@ -39,7 +43,7 @@
   }
 }
 
-::ng-deep .columns-menu .mat-mdc-menu-content{
+::ng-deep .columns-menu .mat-mdc-menu-content {
   display: flex;
   flex-direction: column;
 }

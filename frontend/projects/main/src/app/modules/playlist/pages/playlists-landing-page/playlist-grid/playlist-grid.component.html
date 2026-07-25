@@ -1,22 +1,9 @@
 <div class="wrapper">
   @if (showControls()) {
-    <div class="controls">
-      <div class="filters">Filters</div>
-      <div class="search">
-        <lib-search-bar (search)="search.emit($event)"></lib-search-bar>
-      </div>
-      <div class="size-control">
-        <lib-range-slider
-          [minValue]="0"
-          [maxValue]="100"
-          [stepSize]="5"
-          [value]="75"
-          [prefix]="gridSmallIcon"
-          [suffix]="gridBigIcon"
-          (inputChange)="sizeInput($event)"
-        />
-      </div>
-    </div>
+    <app-grid-controls
+      (search)="search.emit($event)"
+      (sizeChange)="sizeChange.emit($event)"
+    ></app-grid-controls>
   }
 
   <div

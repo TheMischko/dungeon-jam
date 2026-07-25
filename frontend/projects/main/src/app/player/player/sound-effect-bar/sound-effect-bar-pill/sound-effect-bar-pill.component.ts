@@ -9,10 +9,17 @@ import { SoundEffect } from '@shared/models/sound-effect.model';
 import { NgStyle } from '@angular/common';
 import { actionsIconSet } from '@general/icons/icons';
 import { LucideAngularModule } from 'lucide-angular';
+import { SoundEffectPillIconButtonComponent } from '../sound-effect-pill-stop-icon/sound-effect-pill-icon-button.component';
+import { ScrollOverflowTextDirective } from '@general/directives/scroll-overflow-text.directive';
 
 @Component({
   selector: 'app-sound-effect-bar-pill',
-  imports: [NgStyle, LucideAngularModule],
+  imports: [
+    NgStyle,
+    LucideAngularModule,
+    SoundEffectPillIconButtonComponent,
+    ScrollOverflowTextDirective,
+  ],
   templateUrl: './sound-effect-bar-pill.component.html',
   styleUrl: './sound-effect-bar-pill.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -44,11 +51,5 @@ export class SoundEffectBarPillComponent {
     event.stopPropagation();
     event.preventDefault();
     this.click.emit(this.soundEffect());
-  }
-
-  protected handleClose(event: PointerEvent) {
-    event.stopPropagation();
-    event.preventDefault();
-    this.close.emit();
   }
 }

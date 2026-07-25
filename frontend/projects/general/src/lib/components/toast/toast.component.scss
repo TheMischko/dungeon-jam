@@ -1,5 +1,9 @@
 @use 'colors' as col;
 
+:host {
+  display: flex;
+}
+
 .toast-wrapper {
   display: flex;
   flex-direction: column;
@@ -41,7 +45,7 @@
   .dismiss-button {
     position: absolute;
     top: 50%;
-    transform: translateY(-55%);
+    transform: translateY(-51%);
     right: 2px;
   }
 }

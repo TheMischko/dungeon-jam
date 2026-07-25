@@ -14,31 +14,12 @@
     align-items: center;
     justify-content: space-between;
     min-width: 80px;
-    max-width: 150px;
+    max-width: 16vw;
     border-radius: 20px;
-    @include typo.body2();
+    @include typo.sound-effect-pill();
+  }
 
-    .stop-button {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 24px;
-      width: 24px;
-      border: none;
-      margin-right: -2px;
-      padding: 4px;
-      border-radius: 50%;
-      background: none;
-      color: col.$text-main;
-      cursor: pointer;
-
-      lucide-icon {
-        margin-bottom: -3px;
-      }
-
-      &:hover {
-        background: col.$transparent-dark-medium;
-      }
-    }
+  .sound-effect-name {
+    white-space: nowrap;
   }
 }
