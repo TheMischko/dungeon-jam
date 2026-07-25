@@ -13,6 +13,7 @@ describe('SceneSoundEffectsListComponent', () => {
 
     fixture = TestBed.createComponent(SceneSoundEffectsListComponent);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('soundEffects', []);
     fixture.detectChanges();
   });
 

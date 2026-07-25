@@ -13,6 +13,7 @@ describe('SoundEffectTableComponent', () => {
 
     fixture = TestBed.createComponent(SoundEffectTableComponent);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('soundEffects', []);
     fixture.detectChanges();
   });
 

@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { IconButtonComponent } from './icon-button.component';
+import { iconSet } from '../../../icons/icons';
 
 describe('IconButtonComponent', () => {
   let component: IconButtonComponent;
@@ -14,6 +15,7 @@ describe('IconButtonComponent', () => {
 
     fixture = TestBed.createComponent(IconButtonComponent);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('icon', iconSet.PlayIcon);
     fixture.detectChanges();
   });
 

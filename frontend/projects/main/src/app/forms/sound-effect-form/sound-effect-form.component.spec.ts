@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SoundEffectFormComponent } from './sound-effect-form.component';
+import { createSoundEffectForm } from './sound-effect-form.model';
 
 describe('SoundEffectFormComponent', () => {
   let component: SoundEffectFormComponent;
@@ -13,6 +14,8 @@ describe('SoundEffectFormComponent', () => {
 
     fixture = TestBed.createComponent(SoundEffectFormComponent);
     component = fixture.componentInstance;
+    const form = TestBed.runInInjectionContext(() => createSoundEffectForm());
+    fixture.componentRef.setInput('form', form);
     fixture.detectChanges();
   });
 

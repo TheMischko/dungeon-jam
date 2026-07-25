@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { PlayerComponent } from './player.component';
+import { initialPlaybackState } from '../../models/playback.model';
 
 describe('PlayerComponent', () => {
   let component: PlayerComponent;
@@ -14,6 +15,7 @@ describe('PlayerComponent', () => {
 
     fixture = TestBed.createComponent(PlayerComponent);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('playBackState', initialPlaybackState);
     fixture.detectChanges();
   });
 

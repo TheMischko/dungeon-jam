@@ -12,8 +12,12 @@
     "build:topbar": "ng build topbar --base-href /topbar/",
     "build": "npm run build:main && npm run build:sidebar && npm run build:topbar",
     "watch": "ng build --watch --configuration development",
-    "test": "shx rm -rf .angular && ng test",
-    "test:ci": "shx rm -rf .angular && ng test --watch=false --browsers=ChromeHeadless"
+    "test": "ng test",
+    "test:general": "shx rm -rf .angular && ng test general --watch=false",
+    "test:main": "shx rm -rf .angular && ng test main --watch=false",
+    "test:sidebar": "shx rm -rf .angular && ng test sidebar --watch=false",
+    "test:topbar": "shx rm -rf .angular && ng test topbar --watch=false",
+    "test:ci": "npm run test:general && npm run test:main && npm run test:sidebar && npm run test:topbar"
   },
   "private": true,
   "dependencies": {
@@ -42,15 +46,10 @@
     "@angular/compiler-cli": "^21.2.8",
     "@angular/localize": "^21.2.17",
     "@types/howler": "^2.2.12",
-    "@types/jasmine": "~5.1.15",
-    "jasmine-core": "~5.13.0",
-    "karma": "~6.4.4",
-    "karma-chrome-launcher": "~3.2.0",
-    "karma-coverage": "~2.2.1",
-    "karma-jasmine": "~5.1.0",
-    "karma-jasmine-html-reporter": "~2.2.0",
+    "jsdom": "^27.4.0",
     "ng-packagr": "^21.2.2",
     "shx": "^0.4.0",
-    "typescript": "~5.9.3"
+    "typescript": "~5.9.3",
+    "vitest": "^4.1.10"
   }
 }

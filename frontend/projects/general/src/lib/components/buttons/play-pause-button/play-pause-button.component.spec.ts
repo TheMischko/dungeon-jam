@@ -14,6 +14,7 @@ describe('PlayPauseButtonComponent', () => {
 
     fixture = TestBed.createComponent(PlayPauseButtonComponent);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('state', 'play');
     fixture.detectChanges();
   });
 

@@ -1,15 +1,8 @@
 import { TestBed } from '@angular/core/testing';
+import { firstValueFrom } from 'rxjs';
+import { vi } from 'vitest';
 import { DiscordService } from './discord.service';
 import { GuildWithChannels } from '@shared/models/discord.model';
-
-// Mock window.DISCORD_API for testing
-declare global {
-  interface Window {
-    DISCORD_API: {
-      getChannels: () => Promise<GuildWithChannels[]>;
-    };
-  }
-}
 
 describe('DiscordService', () => {
   let service: DiscordService;
@@ -33,9 +26,8 @@ describe('DiscordService', () => {
 
     // Mock the window.DISCORD_API
     window.DISCORD_API = {
-      getChannels: jasmine
-        .createSpy('getChannels')
-        .and.returnValue(Promise.resolve(mockGuilds)),
+      ...window.DISCORD_API,
+      getChannels: vi.fn().mockResolvedValue(mockGuilds),
     };
   });
 
@@ -43,28 +35,19 @@ describe('DiscordService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should fetch channels from DISCORD_API', (done) => {
-    service.getChannels().subscribe((guilds) => {
-      expect(guilds).toEqual(mockGuilds);
-      expect(window.DISCORD_API.getChannels).toHaveBeenCalled();
-      done();
-    });
+  it('should fetch channels from DISCORD_API', async () => {
+    const guilds = await firstValueFrom(service.getChannels());
+
+    expect(guilds).toEqual(mockGuilds);
+    expect(window.DISCORD_API.getChannels).toHaveBeenCalled();
   });
 
-  it('should handle errors from DISCORD_API', (done) => {
+  it('should handle errors from DISCORD_API', async () => {
     const mockError = new Error('API Error');
-    window.DISCORD_API.getChannels = jasmine
-      .createSpy('getChannels')
-      .and.returnValue(Promise.reject(mockError));
+    window.DISCORD_API.getChannels = vi.fn().mockRejectedValue(mockError);
 
-    service.getChannels().subscribe(
-      () => {
-        fail('should have errored');
-      },
-      (error) => {
-        expect(error).toEqual(mockError);
-        done();
-      },
+    await expect(firstValueFrom(service.getChannels())).rejects.toEqual(
+      mockError
     );
   });
 });

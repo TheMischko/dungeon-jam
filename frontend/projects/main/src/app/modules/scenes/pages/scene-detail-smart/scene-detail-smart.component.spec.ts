@@ -13,6 +13,7 @@ describe('SceneDetailSmartComponent', () => {
 
     fixture = TestBed.createComponent(SceneDetailSmartComponent);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('sceneId', 'scene-1');
     fixture.detectChanges();
   });
 

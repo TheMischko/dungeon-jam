@@ -13,6 +13,7 @@ describe('SessionDetailSmartComponent', () => {
 
     fixture = TestBed.createComponent(SessionDetailSmartComponent);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('sessionId', 'session-1');
     fixture.detectChanges();
   });
 

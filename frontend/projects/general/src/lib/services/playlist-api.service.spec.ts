@@ -1,17 +1,10 @@
 import { TestBed } from '@angular/core/testing';
+import { firstValueFrom } from 'rxjs';
+import { vi } from 'vitest';
 import { PlaylistApiService } from './playlist-api.service';
 import { Playlist } from '@shared/models/playlist.model';
 import { QueryRequest } from '@shared/models/request.model';
 import { SortDirection } from '@shared/models/common.model';
-
-// Mock window.PLAYLIST_API for testing
-declare global {
-  interface Window {
-    PLAYLIST_API: {
-      getAllPlaylists: (options: QueryRequest) => Promise<Playlist[]>;
-    };
-  }
-}
 
 describe('PlaylistApiService', () => {
   let service: PlaylistApiService;
@@ -49,37 +42,36 @@ describe('PlaylistApiService', () => {
       },
     ];
 
-    spyOn(window.PLAYLIST_API, 'getAllPlaylists').and.returnValue(
-      Promise.resolve(mockPlaylists),
+    vi.spyOn(window.PLAYLIST_API, 'getAllPlaylists').mockResolvedValue(
+      mockPlaylists
     );
   });
 
-  it('should return playlists when API call succeeds', () => {
-    service.getAllPlaylists(mockQueryRequest).subscribe((playlists) => {
-      expect(playlists).toEqual(mockPlaylists);
-      expect(playlists.length).toBe(2);
-    });
+  it('should return playlists when API call succeeds', async () => {
+    const playlists = await firstValueFrom(
+      service.getAllPlaylists(mockQueryRequest)
+    );
+
+    expect(playlists).toEqual(mockPlaylists);
+    expect(playlists.length).toBe(2);
   });
 
-  it('should emit error when API call fails', (done) => {
+  it('should emit error when API call fails', async () => {
     const testError = new Error('Failed to fetch playlists');
-    spyOn(window.PLAYLIST_API, 'getAllPlaylists').and.returnValue(
-      Promise.reject(testError),
+    vi.spyOn(window.PLAYLIST_API, 'getAllPlaylists').mockRejectedValue(
+      testError
     );
 
-    service.getAllPlaylists(mockQueryRequest).subscribe({
-      error: (error) => {
-        expect(error).toEqual(testError);
-        done();
-      },
-    });
+    await expect(
+      firstValueFrom(service.getAllPlaylists(mockQueryRequest))
+    ).rejects.toEqual(testError);
   });
 
-  it('should call getAllPlaylists with query options', () => {
-    service.getAllPlaylists(mockQueryRequest).subscribe(() => {
-      expect(window.PLAYLIST_API.getAllPlaylists).toHaveBeenCalledWith(
-        mockQueryRequest,
-      );
-    });
+  it('should call getAllPlaylists with query options', async () => {
+    await firstValueFrom(service.getAllPlaylists(mockQueryRequest));
+
+    expect(window.PLAYLIST_API.getAllPlaylists).toHaveBeenCalledWith(
+      mockQueryRequest
+    );
   });
 });

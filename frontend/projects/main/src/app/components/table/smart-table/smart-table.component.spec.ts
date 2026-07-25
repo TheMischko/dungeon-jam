@@ -2,9 +2,14 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SmartTableComponent } from './smart-table.component';
 
+interface TestRow {
+  id: string;
+  name: string;
+}
+
 describe('SmartTableComponent', () => {
-  let component: SmartTableComponent;
-  let fixture: ComponentFixture<SmartTableComponent>;
+  let component: SmartTableComponent<TestRow>;
+  let fixture: ComponentFixture<SmartTableComponent<TestRow>>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -12,8 +17,12 @@ describe('SmartTableComponent', () => {
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(SmartTableComponent);
+    fixture =
+      TestBed.createComponent<SmartTableComponent<TestRow>>(
+        SmartTableComponent
+      );
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('config', {});
     fixture.detectChanges();
   });
 

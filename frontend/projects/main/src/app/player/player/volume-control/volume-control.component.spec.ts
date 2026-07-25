@@ -14,6 +14,7 @@ describe('VolumeControlComponent', () => {
 
     fixture = TestBed.createComponent(VolumeControlComponent);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('volume', 1);
     fixture.detectChanges();
   });
 

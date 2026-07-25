@@ -92,33 +92,13 @@
           "builder": "@angular/build:extract-i18n"
         },
         "test": {
-          "builder": "@angular/build:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing",
-              "@angular/localize/init"
-            ],
+            "runner": "vitest",
+            "buildTarget": "main:build:development",
             "tsConfig": "projects/main/tsconfig.spec.json",
-            "inlineStyleLanguage": "scss",
-            "assets": [
-              {
-                "glob": "**/*",
-                "input": "projects/main/public"
-              },
-              {
-                "glob": "**/*",
-                "input": "projects/general/assets"
-              }
-            ],
-            "styles": [
-              "projects/main/src/styles.scss",
-              "projects/general/styles/global.scss"
-            ],
-            "scripts": [],
-            "stylePreprocessorOptions": {
-              "includePaths": ["projects/general/styles"]
-            }
+            "setupFiles": ["projects/general/src/test-setup.ts"],
+            "providersFile": "projects/general/src/test-providers.ts"
           }
         }
       }
@@ -212,38 +192,13 @@
           "builder": "@angular/build:extract-i18n"
         },
         "test": {
-          "builder": "@angular/build:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing",
-              "@angular/localize/init"
-            ],
+            "runner": "vitest",
+            "buildTarget": "sidebar:build:development",
             "tsConfig": "projects/sidebar/tsconfig.spec.json",
-            "inlineStyleLanguage": "scss",
-            "assets": [
-              {
-                "glob": "**/*",
-                "input": "projects/sidebar/public"
-              },
-              {
-                "glob": "**/*",
-                "input": "projects/general/assets"
-              },
-              {
-                "glob": "**/*",
-                "input": "i18n",
-                "output": "/assets/i18n"
-              }
-            ],
-            "styles": [
-              "projects/sidebar/src/styles.scss",
-              "projects/general/styles/global.scss"
-            ],
-            "scripts": [],
-            "stylePreprocessorOptions": {
-              "includePaths": ["projects/general/styles"]
-            }
+            "setupFiles": ["projects/general/src/test-setup.ts"],
+            "providersFile": "projects/general/src/test-providers.ts"
           }
         }
       }
@@ -339,38 +294,13 @@
           "builder": "@angular/build:extract-i18n"
         },
         "test": {
-          "builder": "@angular/build:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing",
-              "@angular/localize/init"
-            ],
+            "runner": "vitest",
+            "buildTarget": "topbar:build:development",
             "tsConfig": "projects/topbar/tsconfig.spec.json",
-            "inlineStyleLanguage": "scss",
-            "assets": [
-              {
-                "glob": "**/*",
-                "input": "projects/topbar/public"
-              },
-              {
-                "glob": "**/*",
-                "input": "projects/general/assets"
-              },
-              {
-                "glob": "**/*",
-                "input": "i18n",
-                "output": "/assets/i18n"
-              }
-            ],
-            "styles": [
-              "projects/topbar/src/styles.scss",
-              "projects/general/styles/global.scss"
-            ],
-            "scripts": [],
-            "stylePreprocessorOptions": {
-              "includePaths": ["projects/general/styles"]
-            }
+            "setupFiles": ["projects/general/src/test-setup.ts"],
+            "providersFile": "projects/general/src/test-providers.ts"
           }
         }
       }
@@ -404,18 +334,13 @@
           "defaultConfiguration": "production"
         },
         "test": {
-          "builder": "@angular/build:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
+            "runner": "vitest",
+            "buildTarget": "main:build:development",
             "tsConfig": "projects/general/tsconfig.spec.json",
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing",
-              "@angular/localize/init"
-            ],
-            "scripts": [],
-            "stylePreprocessorOptions": {
-              "includePaths": ["projects/general/styles"]
-            }
+            "setupFiles": ["projects/general/src/test-setup.ts"],
+            "providersFile": "projects/general/src/test-providers.ts"
           }
         }
       }

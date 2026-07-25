@@ -13,6 +13,7 @@ describe('SoundEffectCardGridComponent', () => {
 
     fixture = TestBed.createComponent(SoundEffectCardGridComponent);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('soundEffects', []);
     fixture.detectChanges();
   });
 
