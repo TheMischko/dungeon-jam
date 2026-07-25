@@ -20,10 +20,10 @@ describe('AppComponent', () => {
     expect(app.title).toEqual('topbar');
   });
 
-  it('should render title', () => {
+  it('should render title logo', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('DungeonJam');
+    expect(compiled.querySelector('img.logo-text')?.getAttribute('alt')).toContain('Dungeon Jam logo');
   });
 });

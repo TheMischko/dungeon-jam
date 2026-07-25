@@ -95,6 +95,7 @@
           "builder": "@angular/build:unit-test",
           "options": {
             "runner": "vitest",
+            "runnerConfig": "vitest.config.ts",
             "buildTarget": "main:build:development",
             "tsConfig": "projects/main/tsconfig.spec.json",
             "setupFiles": ["projects/general/src/test-setup.ts"],
@@ -195,6 +196,7 @@
           "builder": "@angular/build:unit-test",
           "options": {
             "runner": "vitest",
+            "runnerConfig": "vitest.config.ts",
             "buildTarget": "sidebar:build:development",
             "tsConfig": "projects/sidebar/tsconfig.spec.json",
             "setupFiles": ["projects/general/src/test-setup.ts"],
@@ -297,6 +299,7 @@
           "builder": "@angular/build:unit-test",
           "options": {
             "runner": "vitest",
+            "runnerConfig": "vitest.config.ts",
             "buildTarget": "topbar:build:development",
             "tsConfig": "projects/topbar/tsconfig.spec.json",
             "setupFiles": ["projects/general/src/test-setup.ts"],
@@ -337,6 +340,7 @@
           "builder": "@angular/build:unit-test",
           "options": {
             "runner": "vitest",
+            "runnerConfig": "vitest.config.ts",
             "buildTarget": "main:build:development",
             "tsConfig": "projects/general/tsconfig.spec.json",
             "setupFiles": ["projects/general/src/test-setup.ts"],
