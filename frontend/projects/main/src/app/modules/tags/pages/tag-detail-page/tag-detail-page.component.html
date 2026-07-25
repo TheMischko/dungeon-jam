@@ -9,7 +9,7 @@
       #colorInput
       type="color"
       class="color-input"
-      [value]="tag()?.color"
+      [value]="$safeNavigationMigration(tag()?.color)"
       (change)="emitNewColor()"
     />
     <h1>Tag -&nbsp;</h1>

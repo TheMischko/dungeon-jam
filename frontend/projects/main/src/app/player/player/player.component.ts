@@ -1,4 +1,10 @@
-import { Component, computed, input, output } from '@angular/core';
+import {
+  Component,
+  computed,
+  input,
+  output,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import {
   PlaybackState,
   PlaybackTrackPosition,
@@ -30,6 +36,7 @@ import { SoundEffectBarSmartComponent } from './sound-effect-bar/sound-effect-ba
     SoundEffectBarSmartComponent,
   ],
   templateUrl: './player.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './player.component.scss',
 })
 export class PlayerComponent {

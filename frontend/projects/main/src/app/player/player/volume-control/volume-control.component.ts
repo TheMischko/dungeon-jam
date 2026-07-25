@@ -1,4 +1,11 @@
-import { Component, computed, effect, input, output } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  input,
+  output,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { LucideAngularModule } from 'lucide-angular';
 import { volumeIconSet } from '@general/icons/icons';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -10,6 +17,7 @@ import { debounceTime } from 'rxjs';
   selector: 'app-volume-control',
   imports: [LucideAngularModule, ReactiveFormsModule, RangeSliderComponent],
   templateUrl: './volume-control.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './volume-control.component.scss',
 })
 export class VolumeControlComponent {

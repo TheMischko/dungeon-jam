@@ -1,4 +1,11 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  OnInit,
+  signal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { FilesDropInZoneComponent } from '../../../../components/drag-and-drop/files-drop-in-zone.component';
 import { AudioTrack, Track } from '@shared/models/track.model';
 import { SongsTableComponent } from './songs-table/songs-table.component';
@@ -36,6 +43,7 @@ import { MatButton } from '@angular/material/button';
   selector: 'app-library-landing-page',
   imports: [FilesDropInZoneComponent, SongsTableComponent, MatButton],
   templateUrl: './library-landing-page.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './library-landing-page.component.scss',
 })
 export class LibraryLandingPageComponent implements OnInit {

@@ -2,8 +2,8 @@ import {
   ChangeDetectionStrategy,
   Component,
   input,
-  model,
   output,
+  linkedSignal,
 } from '@angular/core';
 import { MatFormField, MatLabel } from '@angular/material/input';
 import {
@@ -31,9 +31,10 @@ export class FilterBoxComponent<T> {
   readonly optionDisplayField = input.required<keyof T>();
   readonly label = input.required<string>();
   readonly placeholder = input<string>('Select options');
-  readonly selection = model<T[]>([]);
+  readonly selectionInput = input<T[]>([], { alias: 'selection' });
+  readonly selection = linkedSignal(this.selectionInput);
   readonly trackBy = input<(index: number, item: T) => unknown>(
-    (_, item) => item,
+    (_, item) => item
   );
 
   readonly selectionChange = output<T[]>();

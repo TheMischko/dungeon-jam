@@ -1,4 +1,9 @@
-import { Component, DestroyRef, inject } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  inject,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { RoutingListenerService } from './services/routing-listener.service';
 import { MatDialogModule } from '@angular/material/dialog';
@@ -17,6 +22,7 @@ import { DialogService } from './services/dialog.service';
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     RouterOutlet,
     MatDialogModule,

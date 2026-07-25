@@ -7,6 +7,7 @@ import {
   OnInit,
   signal,
   untracked,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { PlaylistGridComponent } from '../playlist-grid.component';
 import { Playlist } from '@shared/models/playlist.model';
@@ -29,6 +30,7 @@ import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
   selector: 'app-playlist-grid-smart',
   imports: [PlaylistGridComponent],
   templateUrl: './playlist-grid-smart.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './playlist-grid-smart.component.scss',
 })
 export class PlaylistGridSmartComponent implements OnInit {

@@ -1,4 +1,9 @@
-import { Component, input, output } from '@angular/core';
+import {
+  Component,
+  input,
+  output,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { DndDirective } from '../../directives/dnd.directive';
 import { AudioTrack } from '@shared/models/track.model';
 
@@ -6,6 +11,7 @@ import { AudioTrack } from '@shared/models/track.model';
   selector: 'app-files-drop-in-zone',
   imports: [DndDirective],
   templateUrl: './files-drop-in-zone.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './files-drop-in-zone.component.scss',
 })
 export class FilesDropInZoneComponent {

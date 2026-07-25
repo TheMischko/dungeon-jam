@@ -6,6 +6,7 @@ import {
   model,
   output,
   signal,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { LucideAngularModule, LucideIconData } from 'lucide-angular';
@@ -17,6 +18,7 @@ import { NgStyle } from '@angular/common';
   imports: [MatSlider, MatSliderThumb, LucideAngularModule, NgStyle],
   templateUrl: './range-slider.component.html',
   styleUrl: './range-slider.component.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

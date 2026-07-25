@@ -10,6 +10,7 @@ import {
   signal,
   untracked,
   viewChild,
+  linkedSignal,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MatFormField } from '@angular/material/form-field';
@@ -56,7 +57,8 @@ export class TagsInputComponent implements ControlValueAccessor {
   readonly disabled = model<boolean>(false);
   readonly required = input<boolean>(false);
   readonly errors = input<readonly ValidationError.WithField[]>([]);
-  readonly touched = model<boolean>(false);
+  readonly touchedInput = input<boolean>(false, { alias: 'touched' });
+  readonly touched = linkedSignal(this.touchedInput);
 
   readonly suggestionBar = viewChild<MatAutocomplete>('suggestionBar');
 
@@ -275,7 +277,7 @@ export class TagsInputComponent implements ControlValueAccessor {
     this.tagApiService.getTagSuggestion(value).subscribe((tags) => {
       const value = untracked(() => this.value());
       const notAlreadySelected = tags.filter(
-        (tag) => !value.some((v) => v.id === tag.id),
+        (tag) => !value.some((v) => v.id === tag.id)
       );
       this.suggestions.set(notAlreadySelected);
     });

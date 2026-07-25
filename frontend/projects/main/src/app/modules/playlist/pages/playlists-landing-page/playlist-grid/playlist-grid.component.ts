@@ -1,4 +1,9 @@
-import { Component, input, output } from '@angular/core';
+import {
+  Component,
+  input,
+  output,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { PlaylistGridItemComponent } from './playlist-grid-item/playlist-grid-item.component';
 import { iconSet } from '@general/icons/icons';
 import { PlaylistWithTagData } from '../../../../../../../../general/models/playlist.model';
@@ -17,6 +22,7 @@ import { GridControlsComponent } from '../../../../../components/grid/grid-contr
     GridControlsComponent,
   ],
   templateUrl: './playlist-grid.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './playlist-grid.component.scss',
 })
 export class PlaylistGridComponent {

@@ -11,7 +11,7 @@
           [scene]="scene"
           [viewMode]="true"
           [initContentHidden]="isSceneContentHidden(scene)"
-          [sessionId]="session()?.id"
+          [sessionId]="$safeNavigationMigration(session()?.id)"
         ></app-scene-console-smart>
       }
     }

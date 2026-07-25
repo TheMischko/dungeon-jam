@@ -1,4 +1,10 @@
-import { Component, computed, inject, OnInit } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  OnInit,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { RedirectPath, RedirectRequest } from '@shared/models/redirect.model';
 import { SidebarItem } from '../../models/sidebar.model';
 import { SidebarItemComponent } from './sidebar-item/sidebar-item.component';
@@ -12,6 +18,7 @@ import { StreamSettingsComponent } from '../stream-settings/stream-settings.comp
   selector: 'app-sidebar',
   imports: [SidebarItemComponent, StreamSettingsComponent],
   templateUrl: './sidebar.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './sidebar.component.scss',
 })
 export class SidebarComponent implements OnInit {

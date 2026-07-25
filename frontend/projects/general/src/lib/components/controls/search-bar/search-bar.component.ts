@@ -1,4 +1,9 @@
-import { Component, input, output } from '@angular/core';
+import {
+  Component,
+  input,
+  output,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { InputComponent } from '../input/input.component';
 import { actionsIconSet } from '../../../icons/icons';
 
@@ -6,6 +11,7 @@ import { actionsIconSet } from '../../../icons/icons';
   selector: 'lib-search-bar',
   imports: [InputComponent],
   templateUrl: './search-bar.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './search-bar.component.scss',
 })
 export class SearchBarComponent {

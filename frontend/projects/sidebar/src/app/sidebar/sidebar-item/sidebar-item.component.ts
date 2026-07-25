@@ -1,4 +1,11 @@
-import { Component, computed, input, output, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  input,
+  output,
+  signal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { SidebarItem } from '../../../models/sidebar.model';
 import { RedirectRequest } from '@shared/models/redirect.model';
 import { actionsIconSet } from '@general/icons/icons';
@@ -8,6 +15,7 @@ import { LucideAngularModule } from 'lucide-angular';
   selector: 'app-sidebar-item',
   imports: [LucideAngularModule],
   templateUrl: './sidebar-item.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './sidebar-item.component.scss',
 })
 export class SidebarItemComponent {

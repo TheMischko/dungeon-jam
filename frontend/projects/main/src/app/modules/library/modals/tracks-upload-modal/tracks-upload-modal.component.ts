@@ -1,4 +1,10 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  signal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import {
   MAT_DIALOG_DATA,
   MatDialogModule,
@@ -28,6 +34,7 @@ export type TracksUploadModalData = {
   ],
   templateUrl: './tracks-upload-modal.component.html',
   styleUrl: './tracks-upload-modal.component.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true,
 })
 export class TracksUploadModalComponent {
@@ -36,7 +43,7 @@ export class TracksUploadModalComponent {
 
   readonly currentStep = signal<number>(0);
   readonly isLastStep = computed(
-    () => this.currentStep() === this.tracks.length - 1,
+    () => this.currentStep() === this.tracks.length - 1
   );
   readonly currentForm = computed(() => {
     return this.forms[this.currentStep()];
@@ -48,11 +55,14 @@ export class TracksUploadModalComponent {
         path: track.fullPath,
         title: track.title,
         author: track.author,
-        tags: track.tags?.map((tagLabel) => this.tagsMap.get(tagLabel)).filter((t) => !!t) || [],
+        tags:
+          track.tags
+            ?.map((tagLabel) => this.tagsMap.get(tagLabel))
+            .filter((t) => !!t) || [],
       },
       (form) => {
         disabled(form.path);
-      },
+      }
     );
     return form;
   });

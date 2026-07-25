@@ -1,4 +1,10 @@
-import { Component, computed, input, output } from '@angular/core';
+import {
+  Component,
+  computed,
+  input,
+  output,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { Track } from '@shared/models/track.model';
 import { SongsTableComponent } from '../../../library/pages/library-landing-page/songs-table/songs-table.component';
 import { SlicePipe } from '@angular/common';
@@ -16,6 +22,7 @@ import { libraryRouteStrings } from '../../../library/library-route-strings';
     RouterLink,
   ],
   templateUrl: './home-landing-page.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './home-landing-page.component.scss',
 })
 export class HomeLandingPageComponent {

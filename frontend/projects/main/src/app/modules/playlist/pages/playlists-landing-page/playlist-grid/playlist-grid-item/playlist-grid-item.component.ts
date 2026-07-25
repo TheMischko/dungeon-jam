@@ -1,4 +1,11 @@
-import { Component, computed, inject, input, output } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  input,
+  output,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { NgStyle } from '@angular/common';
 import { iconSet, volumeIconSet } from '@general/icons/icons';
 import { LucideAngularModule, LucideIconData } from 'lucide-angular';
@@ -11,6 +18,7 @@ import { GridItemComponent } from '../../../../../../components/grid/grid-item/g
   selector: 'app-playlist-grid-item',
   imports: [NgStyle, LucideAngularModule, GridItemComponent],
   templateUrl: './playlist-grid-item.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './playlist-grid-item.component.scss',
 })
 export class PlaylistGridItemComponent {

@@ -1,4 +1,9 @@
-import { Component, computed, inject } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { ApplicationStateService } from '@general/services/application-state.service';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map, tap } from 'rxjs';
@@ -11,6 +16,7 @@ import { NgStyle } from '@angular/common';
   selector: 'app-root',
   imports: [WindowControlsComponent, NgStyle],
   templateUrl: './app.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './app.component.scss',
 })
 export class AppComponent {

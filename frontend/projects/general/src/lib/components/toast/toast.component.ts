@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import {
   MAT_SNACK_BAR_DATA,
   MatSnackBarRef,
@@ -12,6 +12,7 @@ import { ToastData, ToastType } from '../../../../models/toast.model';
   selector: 'app-toast',
   imports: [IconButtonComponent, NgClass],
   templateUrl: './toast.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './toast.component.scss',
 })
 export class ToastComponent {

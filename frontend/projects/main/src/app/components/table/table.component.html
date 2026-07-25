@@ -98,7 +98,9 @@
       <mat-row
         appCustomTableRowAttr
         [customRowAttribute]="customRowAttributeName()"
-        [customRowAttributeValue]="customRowAttributeValueFn()?.(row)"
+        [customRowAttributeValue]="
+          $safeNavigationMigration(customRowAttributeValueFn()?.(row))
+        "
         *matRowDef="let row; columns: columnNames()"
         (mouseenter)="hoverStart.emit(row)"
         (mouseleave)="hoverEnd.emit(row)"

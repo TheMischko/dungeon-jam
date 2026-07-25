@@ -7,6 +7,7 @@ import {
   signal,
   TemplateRef,
   viewChild,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { Track } from '@shared/models/track.model';
 import { LucideAngularModule } from 'lucide-angular';
@@ -53,6 +54,7 @@ import { PageEvent } from '@angular/material/paginator';
     SmartTableComponent,
   ],
   templateUrl: './songs-table.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './songs-table.component.scss',
 })
 export class SongsTableComponent {

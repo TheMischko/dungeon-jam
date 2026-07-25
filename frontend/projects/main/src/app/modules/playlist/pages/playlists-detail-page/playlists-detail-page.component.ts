@@ -5,6 +5,7 @@ import {
   output,
   TemplateRef,
   viewChild,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { Playlist } from '@shared/models/playlist.model';
 import { AudioTrack, Track } from '@shared/models/track.model';
@@ -43,6 +44,7 @@ import { FilesDropInZoneComponent } from '../../../../components/drag-and-drop/f
     FilesDropInZoneComponent,
   ],
   templateUrl: './playlists-detail-page.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './playlists-detail-page.component.scss',
 })
 export class PlaylistsDetailPageComponent {

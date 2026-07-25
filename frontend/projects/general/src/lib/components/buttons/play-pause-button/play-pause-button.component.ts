@@ -1,4 +1,9 @@
-import { Component, input, output } from '@angular/core';
+import {
+  Component,
+  input,
+  output,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { IconButtonComponent } from '../icon-button/icon-button.component';
 import { iconSet } from '../../../icons/icons';
 import { ButtonSize, ButtonType } from '../../../../../models/button.model';
@@ -7,6 +12,7 @@ import { ButtonSize, ButtonType } from '../../../../../models/button.model';
   selector: 'lib-play-pause-button',
   imports: [IconButtonComponent],
   templateUrl: './play-pause-button.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './play-pause-button.component.css',
 })
 export class PlayPauseButtonComponent {

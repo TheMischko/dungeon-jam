@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { PlayerComponent } from '../player/player.component';
 import { PlaybackService } from '../../services/playback.service';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -10,6 +10,7 @@ import { RedirectPath } from '@shared/models/redirect.model';
   selector: 'app-player-smart',
   imports: [PlayerComponent],
   templateUrl: './player-smart.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: ':host{ display: contents }',
 })
 export class PlayerSmartComponent {

@@ -5,7 +5,7 @@
   <button
     mat-menu-item
     (click)="actionClicked(item(), config, $event)"
-    [ngClass]="config?.cssClasses"
+    [ngClass]="$safeNavigationMigration(config?.cssClasses)"
     [title]="''"
     [matTooltip]="config?.tooltip ?? ''"
   >

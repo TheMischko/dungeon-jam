@@ -1,8 +1,8 @@
 <div class="sidebar-list">
-  @for(item of items(); track item.title){
+  @for (item of items(); track item.title) {
     <app-sidebar-item
       [item]="item"
-      [children]="item?.children"
+      [children]="$safeNavigationMigration(item?.children)"
       (clicked)="triggerRedirect($event)"
     ></app-sidebar-item>
   }

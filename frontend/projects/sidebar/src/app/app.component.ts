@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { SidebarComponent } from './sidebar/sidebar.component';
 import { ApplicationStateService } from '@general/services/application-state.service';
@@ -10,6 +10,7 @@ import { addAppInitClass } from '@general/utils/add-app-init-class';
   selector: 'app-root',
   imports: [RouterOutlet, SidebarComponent],
   templateUrl: './app.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './app.component.scss',
 })
 export class AppComponent {
@@ -17,8 +18,8 @@ export class AppComponent {
 
   readonly applicationReady = toSignal(
     this.applicationStateService.applicationReady$.pipe(
-      tap((ready) => addAppInitClass(ready)),
-    ),
+      tap((ready) => addAppInitClass(ready))
+    )
   );
   title = 'sidebar';
 }

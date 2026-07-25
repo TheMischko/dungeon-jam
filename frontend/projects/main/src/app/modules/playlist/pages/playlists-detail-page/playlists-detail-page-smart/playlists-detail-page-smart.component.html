@@ -4,7 +4,7 @@
   [tracks]="tracks()"
   [parentPlaylist]="parentPlaylist()"
   [childrenPlaylists]="childPlaylists()"
-  [playingTrackId]="playbackState()?.currentTrack?.id"
+  [playingTrackId]="$safeNavigationMigration(playbackState()?.currentTrack?.id)"
   [playlistPlaying]="isPlaylistPlaying()"
   [songActionsMenuConfig]="songActionsMenuConfig()"
   (playPlaylist)="playPlaylist()"

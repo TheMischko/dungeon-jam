@@ -1,4 +1,10 @@
-import { Component, computed, input, output } from '@angular/core';
+import {
+  Component,
+  computed,
+  input,
+  output,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { iconSet } from '@general/icons/icons';
 import { IconButtonComponent } from '@general/components/buttons/icon-button/icon-button.component';
 import { ButtonSize } from '../../../../../../general/models/button.model';
@@ -9,6 +15,7 @@ import { RepeatState } from '@shared/models/track.model';
   selector: 'app-repeat-state-button',
   imports: [IconButtonComponent, NgClass],
   templateUrl: './repeat-state-button.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './repeat-state-button.component.scss',
 })
 export class RepeatStateButtonComponent {

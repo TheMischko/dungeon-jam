@@ -6,6 +6,7 @@ import {
   input,
   computed,
   model,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import {
@@ -22,6 +23,7 @@ import { ValidationError } from '@angular/forms/signals';
   imports: [MatFormField, MatInput, MatLabel, MatPrefix, LucideAngularModule],
   templateUrl: './input.component.html',
   styleUrl: './input.component.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
@@ -30,9 +32,9 @@ import { ValidationError } from '@angular/forms/signals';
     },
   ],
 })
-export class InputComponent<V = string | number | null>
-  implements ControlValueAccessor
-{
+export class InputComponent<
+  V = string | number | null,
+> implements ControlValueAccessor {
   readonly value = model<V>(undefined as V);
   readonly touched = model<boolean>(false);
   readonly required = input<boolean>(false);

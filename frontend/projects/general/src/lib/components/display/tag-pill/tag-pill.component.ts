@@ -1,4 +1,10 @@
-import { Component, computed, input, output } from '@angular/core';
+import {
+  Component,
+  computed,
+  input,
+  output,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { Tag, TagData } from '@shared/models/tag.model';
 import { NgClass, NgStyle } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
@@ -12,6 +18,7 @@ import {
   selector: 'lib-tag-pill',
   imports: [NgStyle, LucideAngularModule, NgClass],
   templateUrl: './tag-pill.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './tag-pill.component.scss',
 })
 export class TagPillComponent {

@@ -6,6 +6,7 @@ import {
   output,
   signal,
   viewChild,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { NgStyle } from '@angular/common';
 import { TrackDurationPipe } from '@general/pipes/track-duration.pipe';
@@ -14,6 +15,7 @@ import { TrackDurationPipe } from '@general/pipes/track-duration.pipe';
   selector: 'app-player-bar',
   imports: [NgStyle, TrackDurationPipe],
   templateUrl: './player-bar.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './player-bar.component.scss',
 })
 export class PlayerBarComponent {

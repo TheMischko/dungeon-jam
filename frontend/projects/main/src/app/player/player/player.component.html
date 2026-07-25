@@ -1,7 +1,11 @@
 <div class="player-content">
   <div class="info">
-    <p libScrollOverflowText (click)="navigateToActiveTrack.emit()">{{ currentTrack()?.name || '' }}</p>
-    <p libScrollOverflowText (click)="navigateToActiveTrack.emit()">{{ currentTrack()?.author || '' }}</p>
+    <p libScrollOverflowText (click)="navigateToActiveTrack.emit()">
+      {{ currentTrack()?.name || '' }}
+    </p>
+    <p libScrollOverflowText (click)="navigateToActiveTrack.emit()">
+      {{ currentTrack()?.author || '' }}
+    </p>
   </div>
   <div class="controls">
     <!-- Prev -->
@@ -38,8 +42,8 @@
 
     <app-player-bar
       class="duration-bar"
-      [duration]="trackPosition()?.duration"
-      [position]="trackPosition()?.position"
+      [duration]="$safeNavigationMigration(trackPosition()?.duration)"
+      [position]="$safeNavigationMigration(trackPosition()?.position)"
       (seek)="seek.emit($event)"
     ></app-player-bar>
   </div>

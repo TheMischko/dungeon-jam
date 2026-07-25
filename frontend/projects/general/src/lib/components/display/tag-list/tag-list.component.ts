@@ -1,4 +1,10 @@
-import { Component, computed, input, output } from '@angular/core';
+import {
+  Component,
+  computed,
+  input,
+  output,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { Tag, TagData } from '@shared/models/tag.model';
 import { TagPillComponent } from '@general/components/display/tag-pill/tag-pill.component';
 import { MatTooltip } from '@angular/material/tooltip';
@@ -7,6 +13,7 @@ import { MatTooltip } from '@angular/material/tooltip';
   selector: 'lib-tag-list',
   imports: [TagPillComponent, MatTooltip],
   templateUrl: './tag-list.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './tag-list.component.scss',
 })
 export class TagListComponent {

@@ -1,4 +1,10 @@
-import { Component, computed, input, output } from '@angular/core';
+import {
+  Component,
+  computed,
+  input,
+  output,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { ButtonSize, ButtonType } from '../../../../../models/button.model';
 import { MatButton } from '@angular/material/button';
 import { NgClass, NgTemplateOutlet } from '@angular/common';
@@ -8,6 +14,7 @@ import { LucideAngularModule, LucideIconData } from 'lucide-angular';
   selector: 'lib-icon-button',
   imports: [MatButton, NgTemplateOutlet, LucideAngularModule, NgClass],
   templateUrl: './icon-button.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './icon-button.component.scss',
 })
 export class IconButtonComponent {

@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { PlaylistGridSmartComponent } from './playlist-grid/playlist-grid-smart/playlist-grid-smart.component';
 import { MatButton } from '@angular/material/button';
 import { DialogService } from '../../../../services/dialog.service';
@@ -13,6 +13,7 @@ import { TagApiService } from '@general/services/tag-api.service';
   selector: 'app-playlists-landing-page',
   imports: [PlaylistGridSmartComponent, MatButton],
   templateUrl: './playlists-landing-page.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './playlists-landing-page.component.scss',
 })
 export class PlaylistsLandingPageComponent {
@@ -33,17 +34,17 @@ export class PlaylistsLandingPageComponent {
             return of(result);
           }
           const tagsToCreate = result.tags.filter(
-            (tag) => (tag as TagData).id === undefined,
+            (tag) => (tag as TagData).id === undefined
           );
           const tagsReady = result.tags.filter(
-            (tag) => (tag as TagData).id !== undefined,
+            (tag) => (tag as TagData).id !== undefined
           );
           if (tagsToCreate.length === 0) {
             return of(result);
           }
 
           const requests = tagsToCreate.map((tag: Tag) =>
-            this.tagApiService.insertTag(tag),
+            this.tagApiService.insertTag(tag)
           );
           return this.tagApiService.clearOrphanedTags().pipe(
             switchMap(() => {
@@ -54,9 +55,9 @@ export class PlaylistsLandingPageComponent {
                 ...result,
                 tags: [...tagsReady, ...tags.map((t) => t.id)],
               } as PlaylistInsertQuery;
-            }),
+            })
           );
-        }),
+        })
       )
       .subscribe((result) => {
         if (!result) {

@@ -7,6 +7,7 @@ import {
   input,
   OnInit,
   signal,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { SortDirection } from '@shared/models/common.model';
 import {
@@ -52,6 +53,7 @@ import { TagsStore } from '@general/stores/tags.store';
 @Component({
   selector: 'app-playlists-detail-page-smart',
   imports: [PlaylistsDetailPageComponent],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './playlists-detail-page-smart.component.html',
 })
 export class PlaylistsDetailPageSmartComponent implements OnInit {

@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatButton } from '@angular/material/button';
 import { SceneInsertQuery } from '@shared/models/scene.model';
@@ -13,6 +13,7 @@ import {
   selector: 'app-edit-scene-modal',
   imports: [MatButton, SceneFormComponent],
   templateUrl: './edit-scene-modal.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './edit-scene-modal.component.scss',
 })
 export class EditSceneModalComponent {
