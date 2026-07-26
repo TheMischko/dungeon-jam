@@ -4,7 +4,7 @@ import {
   inject,
   ChangeDetectionStrategy,
 } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { NavigationStart, Router, RouterOutlet } from '@angular/router';
 import { RoutingListenerService } from './services/routing-listener.service';
 import { MatDialogModule } from '@angular/material/dialog';
 import { PlayerSmartComponent } from './player/player-smart/player-smart.component';
@@ -38,6 +38,7 @@ export class AppComponent {
   private readonly keyboardShortcutService = inject(KeyboardShortcutService);
   private readonly playbackService = inject(PlaybackService);
   private readonly dialogService = inject(DialogService);
+  private readonly router = inject(Router);
 
   readonly applicationReady = toSignal(
     this.applicationStateService.applicationReady$.pipe(
@@ -56,5 +57,12 @@ export class AppComponent {
     this.keyboardShortcutService.closeSignal$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.dialogService.closeMostRecentDialog());
+    this.router.events
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((event) => {
+        if (event instanceof NavigationStart) {
+          this.dialogService.closeAllDialogs();
+        }
+      });
   }
 }

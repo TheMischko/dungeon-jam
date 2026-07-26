@@ -42,6 +42,7 @@ export class DialogService {
         take(1),
         tap(() => this.removeDialogRefFromOpen(currentRef))
       ),
+      currentRef,
       componentRef: currentRef.componentRef!,
     };
   }
@@ -52,6 +53,13 @@ export class DialogService {
       return;
     }
     dialogRef.close();
+  }
+
+  closeAllDialogs(): void {
+    while (this.openDialogs.length > 0) {
+      const dialogRef = this.openDialogs.pop();
+      dialogRef?.close();
+    }
   }
 
   private removeDialogRefFromOpen(dialogRef: MatDialogRef<unknown>) {
