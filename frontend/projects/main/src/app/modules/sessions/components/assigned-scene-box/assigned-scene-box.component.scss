@@ -1,0 +1,23 @@
+@use "typography" as typo;
+
+:host{
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 8px;
+  gap: 4px;
+
+  &.dragging{
+    color: white;
+    padding: 0;
+    .checkbox, .order-number{
+      display: none;
+    }
+  }
+
+  @include typo.body2();
+
+  ::ng-deep svg[lucideIcon] {
+    margin-top: 3px;
+  }
+}

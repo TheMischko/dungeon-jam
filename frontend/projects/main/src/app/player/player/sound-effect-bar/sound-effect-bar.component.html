@@ -1,0 +1,23 @@
+<div #wrapper class="sound-effects" (wheel)="scrollPills($event)">
+  @let playingEffectsList = playingEffects();
+  @if (playingEffectsList?.length) {
+    <app-sound-effect-control-pill
+      [expanded]="showEffects()"
+      [soundEffectsCount]="playingEffectsList?.length ?? 0"
+      (toggled)="toggleShowEffects()"
+      (closed)="emitStopAll()"
+    ></app-sound-effect-control-pill>
+    @if (showEffects()) {
+      @for (soundEffect of playingEffectsList; track soundEffect.id) {
+        <app-sound-effect-bar-pill
+          animate.enter="lean-in-animation"
+          animate.leave="lean-out-animation"
+          [soundEffect]="soundEffect.soundEffect"
+          [position]="playingEffectsPositions()?.[soundEffect.id] ?? 0"
+          (close)="stopSoundEffect.emit(soundEffect.id)"
+          (click)="showDetail.emit($event)"
+        />
+      }
+    }
+  }
+</div>

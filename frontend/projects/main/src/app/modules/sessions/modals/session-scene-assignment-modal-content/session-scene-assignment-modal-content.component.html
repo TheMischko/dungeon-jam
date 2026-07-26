@@ -1,0 +1,24 @@
+<div class="content">
+  <div class="available-scenes">
+    <app-scenes-grid-smart
+      [itemPlayable]="false"
+      [itemSelectable]="true"
+      [itemDetailNavigation]="false"
+      [availableSizes]="availableSceneSizes"
+      [initialSelection]="currentSelection()"
+      (selected)="selectionChanged.emit($event)"
+    />
+  </div>
+  <div class="assigned-scenes" cdkDropList (cdkDropListDropped)="emitSceneMoved($event)">
+    @for (scene of currentSelection(); track scene.id){
+      <app-assigned-scene-box
+        cdkDrag
+        cdkDragPreviewClass="dragging"
+        cdkDragBoundary=".assigned-scenes"
+        [scene]="scene"
+        [order]="$index+1"
+        (unselected)="unselectScene.emit(scene)"
+      ></app-assigned-scene-box>
+    }
+  </div>
+</div>

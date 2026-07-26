@@ -1,0 +1,50 @@
+/* Neutral button with white icon and drop shadow */
+.neutral-button {
+  color: white;
+  border: none;
+  svg[lucideIcon] {
+    color: white;
+  }
+  ::ng-deep &.mat-mdc-button:not(:disabled) {
+    --mat-button-text-label-text-color: white;
+    color: white;
+  }
+  ::ng-deep &.mat-mdc-button .mat-mdc-button-persistent-ripple::before {
+    --mat-button-text-state-layer-color: white;
+  }
+}
+
+.neutral-button:disabled {
+  background-color: rgba(0, 0, 0, 0.08);
+  color: rgba(255, 255, 255, 0.4);
+  box-shadow: none;
+}
+
+/* Ensure icon color follows button color */
+.neutral-button svg[lucideIcon] {
+  color: inherit;
+}
+
+:host ::ng-deep button.pill-button {
+  .mdc-button__label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .button-label {
+    white-space: nowrap;
+  }
+}
+
+:host ::ng-deep .mdc-button__label {
+  display: flex;
+  align-items: center;
+}
+
+.button-icon {
+  margin-bottom: -3px;
+  &.has-text {
+    margin-bottom: 0;
+  }
+}

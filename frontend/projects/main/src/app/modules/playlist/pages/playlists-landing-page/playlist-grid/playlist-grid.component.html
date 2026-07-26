@@ -1,0 +1,37 @@
+<div class="wrapper">
+  @if (showControls()) {
+    <app-grid-controls
+      (search)="search.emit($event)"
+      (sizeChange)="sizeChange.emit($event)"
+    ></app-grid-controls>
+  }
+
+  <div
+    class="grid-content"
+    cdkDropList
+    cdkDropListOrientation="mixed"
+    [cdkDropListData]="dataSet()"
+    (cdkDropListDropped)="playlistDropped($event)"
+  >
+    @if (loading()) {
+      <lib-loader [center]="true" [size]="'large'"></lib-loader>
+    } @else {
+      @for (playlist of dataSet(); track trackPlaylist(playlist)) {
+        <app-playlist-grid-item
+          cdkDrag
+          cdkDragPreviewClass="dragging"
+          [cdkDragData]="playlist"
+          [cdkDragDisabled]="!reorderingEnabled()"
+          class="grid-item"
+          [playlist]="playlist"
+          [playlistImageUrl]="getPlaylistImageUrl(playlist)"
+          [sizeConfig]="sizeConfig()"
+          [isPlaying]="isPlaying(playlist.id)"
+          (playlistClick)="playlistClick.emit($event)"
+          (playPlaylist)="playPlaylist.emit($event)"
+          (pausePlaylist)="pausePlaylist.emit($event)"
+        ></app-playlist-grid-item>
+      }
+    }
+  </div>
+</div>

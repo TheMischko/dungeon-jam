@@ -1,0 +1,16 @@
+<div class="wrapper">
+  <div class="header">
+    <h1>{{ title }}</h1>
+  </div>
+
+  <app-session-form [form]="form"></app-session-form>
+
+  <div class="footer">
+    <div class="buttons">
+      <button mat-flat-button (click)="save()">Save</button>
+      <button mat-flat-button (click)="cancel()" color="tertiary">
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>

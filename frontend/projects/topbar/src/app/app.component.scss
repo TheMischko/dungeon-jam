@@ -1,0 +1,31 @@
+@use 'typography' as typo;
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.top-line {
+  height: 12px;
+}
+.content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  .title {
+    height: 100%;
+    min-width: 200px;
+    display: flex;
+    align-items: center;
+
+    .logo-text {
+      height: 42px;
+      padding-left: 8px;
+    }
+  }
+}
+
+.draggable-area {
+  -webkit-app-region: drag;
+  user-select: none;
+}

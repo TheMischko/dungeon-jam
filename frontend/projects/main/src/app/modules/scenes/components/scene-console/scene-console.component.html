@@ -1,0 +1,119 @@
+<div class="scene-console {{ hiddenContent() ? 'no-content' : '' }}">
+  @if (loading()) {
+    <lib-loader class="loader" size="large"></lib-loader>
+  } @else {
+    <div class="console-header">
+      @if (sceneImageUrl(); as image) {
+        <img [src]="image" alt="Scene image" class="scene-image" />
+      }
+      <div class="header-content">
+        <div class="header-properties">
+          <h1 class="scene-title">{{ scene()?.name }}</h1>
+          <lib-tag-list-smart
+            [tagIds]="scene()?.tags ?? []"
+          ></lib-tag-list-smart>
+        </div>
+        <div class="header-actions">
+          <lib-play-pause-button
+            [state]="scenePlayButtonState()"
+            [type]="ButtonType.Flat"
+            [size]="'regular'"
+            [label]="scenePlayButtonText()"
+            (toggle)="toggleScenePlaying($event)"
+          ></lib-play-pause-button>
+          @if (!viewMode() && scene()) {
+            <lib-icon-button
+              [type]="ButtonType.Flat"
+              [size]="'regular'"
+              [icon]="EditIcon"
+              [label]="'Edit scene'"
+              (clicked)="editScene.emit(scene()!)"
+            ></lib-icon-button>
+          }
+          @if (collapsable()) {
+            <lib-icon-button
+              class="collapse-button {{
+                !hiddenContent() ? 'expanded' : 'collapsed'
+              }}"
+              [type]="ButtonType.Flat"
+              [size]="'regular'"
+              [icon]="toggleIcon()"
+              (clicked)="toggleHideContent()"
+            ></lib-icon-button>
+          }
+        </div>
+      </div>
+    </div>
+    @if (!hiddenContent()) {
+      <div
+        class="console-content"
+        animate.enter="slide-in-animation"
+        animate.leave="slide-out-animation"
+      >
+        <div class="music-sector">
+          <h2 class="section-header">
+            Music
+            <span class="playlist-name">Playlist: {{ playlist()?.name }}</span>
+          </h2>
+
+          <app-songs-table
+            [tracks]="tracks()"
+            [playingTrackId]="playingTrackId()"
+            [loading]="false"
+            [hiddenColumns]="excludedColumns"
+            [showFilters]="false"
+            [showActionsColumn]="true"
+            [actionsMenuConfig]="trackGridActions"
+            (queryChange)="trackQueryChange.emit($event)"
+            (playTrack)="playTrack.emit($event)"
+            (pauseTrack)="pauseTrack.emit()"
+          ></app-songs-table>
+        </div>
+        <div class="sound-effects-sector">
+          <div class="ambience sound-effects-sector-item">
+            @if (viewMode() || ambience().length) {
+              <app-scene-sound-effects-list
+                [soundEffects]="ambience()"
+                [playMap]="ambiencePlayMap()"
+                [volumeMap]="soundEffectsVolumeMap()"
+                title="Ambience"
+                (changeSelection)="changeAmbience.emit()"
+                (playAll)="playAmbience.emit()"
+                (pauseAll)="pauseAmbience.emit()"
+                (playSoundEffect)="playAmbienceSoundEffect.emit($event)"
+                (pauseSoundEffect)="pauseSoundEffect.emit($event)"
+                (changeVolume)="changeSoundEffectVolume.emit($event)"
+              ></app-scene-sound-effects-list>
+            } @else {
+              <app-add-sound-effects-section
+                soundEffectType="ambience"
+                (addSoundEffects)="changeAmbience.emit()"
+              ></app-add-sound-effects-section>
+            }
+          </div>
+
+          <div class="stingers sound-effects-sector-item">
+            @if (viewMode() || stingers().length) {
+              <app-scene-sound-effects-list
+                [soundEffects]="stingers()"
+                [playMap]="stingersPlayMap()"
+                [showPlayAll]="false"
+                [volumeMap]="soundEffectsVolumeMap()"
+                title="Stingers"
+                (changeSelection)="changeStingers.emit()"
+                (playSoundEffect)="playStingerSoundEffect.emit($event)"
+                (pauseSoundEffect)="pauseSoundEffect.emit($event)"
+                (changeVolume)="changeSoundEffectVolume.emit($event)"
+              ></app-scene-sound-effects-list>
+            } @else {
+              <app-add-sound-effects-section
+                soundEffectType="ambience"
+                (addSoundEffects)="changeStingers.emit()"
+              ></app-add-sound-effects-section>
+            }
+          </div>
+        </div>
+      </div>
+    }
+  }
+</div>

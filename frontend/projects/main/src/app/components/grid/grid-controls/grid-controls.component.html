@@ -1,0 +1,19 @@
+<div class="controls">
+  <ng-content />
+  <div class="search">
+    <lib-search-bar (search)="search.emit($event)"></lib-search-bar>
+  </div>
+  @if (showSizeControl()) {
+    <div class="size-control">
+      <lib-range-slider
+        [minValue]="0"
+        [maxValue]="sizeMaxValue()"
+        [stepSize]="stepSize()"
+        [value]="currentValue()"
+        [prefix]="gridSmallIcon"
+        [suffix]="gridBigIcon"
+        (inputChange)="sizeInput($event)"
+      />
+    </div>
+  }
+</div>

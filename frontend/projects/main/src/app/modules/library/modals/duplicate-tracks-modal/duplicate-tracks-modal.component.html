@@ -1,0 +1,32 @@
+<div class="wrapper">
+  <div class="header">
+    <h1>Duplicate Tracks Detected</h1>
+  </div>
+
+  <div class="content">
+    <p class="description">
+      The following {{ duplicates.length === 1 ? 'track is' : 'tracks are' }} already in your library.
+      Would you like to override {{ duplicates.length === 1 ? 'it' : 'them' }} or skip {{ duplicates.length === 1 ? 'it' : 'them' }} during this upload?
+    </p>
+
+    <ul class="duplicates-list">
+      @for (duplicate of duplicates; track duplicate.path) {
+        <li class="duplicate-item">
+          <span class="track-name">{{ duplicate.track.name }}</span>
+          @if (duplicate.track.author) {
+            <span class="track-author">{{ duplicate.track.author }}</span>
+          }
+        </li>
+      }
+    </ul>
+  </div>
+
+  <div class="footer">
+    <div class="buttons">
+      <button mat-flat-button color="error" (click)="override()">Override</button>
+      <button mat-flat-button color="primary" (click)="skip()">Skip Duplicates</button>
+      <button mat-flat-button color="secondary" (click)="cancel()">Cancel Upload</button>
+    </div>
+  </div>
+</div>
+

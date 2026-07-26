@@ -1,0 +1,26 @@
+<div class="wrapper">
+  <div class="header">
+    <h1>{{ title }}</h1>
+  </div>
+
+  @if (currentForm()) {
+    <app-track-form [form]="currentForm()"></app-track-form>
+  }
+
+  <div class="footer">
+    <div class="steps">
+      @for (track of tracks; track track) {
+        <span class="step-dot" [class.active]="$index === currentStep()"></span>
+      }
+    </div>
+    <div class="buttons">
+      @if (currentStep() > 0) {
+        <button mat-flat-button (click)="previousStep()">Previous</button>
+      }
+      <button mat-flat-button (click)="nextStep()">
+        {{ isLastStep() ? 'Finish' : 'Next' }}
+      </button>
+      <button mat-flat-button color="neutral" (click)="cancel()">Cancel</button>
+    </div>
+  </div>
+</div>

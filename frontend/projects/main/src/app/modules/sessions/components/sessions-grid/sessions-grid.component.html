@@ -1,0 +1,24 @@
+<div class="wrapper">
+  @if (showControls()) {
+    <app-grid-controls
+      [currentValue]="currentSizeIndex()"
+      [stepSize]="1"
+      [sizeMaxValue]="availableSizes().length - 1"
+      (search)="search.emit($event)"
+      (sizeChange)="sizeInput($event)"
+    ></app-grid-controls>
+  }
+
+  <div class="sessions-grid">
+    @for (session of sessions(); track session.id) {
+      @let image = getSessionImage(session);
+      <app-grid-item
+        [title]="session.name"
+        [image]="image"
+        [noImageIcon]="SessionIcon"
+        [sizeConfig]="sizeConfig()"
+        (clicked)="sessionClick.emit(session)"
+      ></app-grid-item>
+    }
+  </div>
+</div>

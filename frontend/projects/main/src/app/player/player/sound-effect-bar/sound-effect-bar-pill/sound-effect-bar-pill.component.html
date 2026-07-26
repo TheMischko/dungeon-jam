@@ -1,0 +1,13 @@
+<div
+  class="sound-effect-content"
+  [ngStyle]="playPositionBackground()"
+  (click)="handleClick($event)"
+>
+  <span class="sound-effect-name" libScrollOverflowText>{{
+    soundEffect().name
+  }}</span>
+  <app-sound-effect-pill-icon-button
+    [icon]="stopIcon"
+    (clicked)="close.emit()"
+  />
+</div>

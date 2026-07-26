@@ -1,0 +1,31 @@
+<mat-form-field
+  appearance="outline"
+  subscriptSizing="dynamic"
+  class="form-field"
+  [class.has-errors]="hasErrors()"
+>
+  <mat-label>{{ label() }}</mat-label>
+  @if (iconPrefix()){
+  <span matPrefix>
+    <svg
+      [size]="16"
+      [lucideIcon]="iconPrefix()!"
+      class="icon-16 prefix-icon"
+    ></svg>
+  </span>
+  }
+  <input
+    matInput
+    [value]="value() ?? null"
+    [disabled]="isDisabled()"
+    [required]="required()"
+    (blur)="setTouched()"
+    (input)="onInputChange($event)"
+  />
+</mat-form-field>
+
+<div class="errors">
+  @if (hasErrors()) { @for (error of errors(); track error.kind){
+  <div class="error-message">{{ error.message }}</div>
+  } }
+</div>

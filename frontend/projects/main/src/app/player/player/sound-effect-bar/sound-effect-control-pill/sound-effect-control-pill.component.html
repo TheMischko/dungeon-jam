@@ -1,0 +1,15 @@
+@let expandedState = expanded();
+<div class="control-pill {{ expandedState ? 'expanded' : 'collapsed' }}">
+  @if (!expandedState) {
+    <app-sound-effect-pill-icon-button
+      [icon]="stopIcon"
+      (clicked)="emitClose()"
+    />
+    <span class="info-text">{{ soundEffectsCount() }} effects</span>
+  }
+  <app-sound-effect-pill-icon-button
+    class="toggle-button"
+    [icon]="toggleIcon()"
+    (clicked)="toggled.emit()"
+  />
+</div>

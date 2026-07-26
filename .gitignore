@@ -10,8 +10,17 @@ node_modules
 
 # Build
 build
+dist
+dist-electron
 
 #ENV files
 *.env*
-.env
-^.env$
+!.env.example
+!.prod.env.example
+
+#Coverage
+coverage
+
+tests/reports
+plans
+TODO.md

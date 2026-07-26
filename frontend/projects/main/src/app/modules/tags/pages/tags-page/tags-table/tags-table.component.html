@@ -1,0 +1,18 @@
+<app-smart-table
+  [config]="tableConfig()"
+  [dataSet]="tags()"
+  [trackBy]="trackByFn"
+  [loading]="loading()"
+  (queryChange)="queryChange.emit($event)"
+/>
+
+<ng-template #titleColumn let-row="$implicit">
+  <lib-tag-pill [tag]="row" />
+</ng-template>
+
+<ng-template #actionsColumn let-row="$implicit">
+  <lib-icon-button [matMenuTriggerFor]="menu" [icon]="ActionsIcon" />
+  <mat-menu #menu="matMenu">
+    <lib-actions-menu [item]="row" [config]="actionsMenuConfig()" />
+  </mat-menu>
+</ng-template>

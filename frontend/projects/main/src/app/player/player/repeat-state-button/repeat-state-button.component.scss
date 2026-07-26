@@ -1,0 +1,25 @@
+@use 'colors' as col;
+
+:host ::ng-deep{
+  .none .mat-mdc-button:not(:disabled){
+    color: col.$button-inactive;
+  }
+}
+:host{
+  position: relative;
+}
+.single-indicator{
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  color: col.$text-main;
+  background: col.$primary;
+  width: 1rem;
+  height: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  z-index: 200;
+}

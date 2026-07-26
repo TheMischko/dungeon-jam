@@ -1,0 +1,91 @@
+<div class="card" (mouseenter)="onMouseEnter()" (mouseleave)="onMouseLeave()">
+  @let effect = soundEffect();
+
+  <div class="card-icon">
+    <svg [lucideIcon]="SoundEffectIcon" [size]="iconSize()" />
+  </div>
+
+  <div class="card-content">
+    @if (isSingleRow()) {
+      <div class="card-row card-row--centered" animate.enter="">
+        <div
+          libScrollOverflowText
+          class="item-name"
+          [ngStyle]="titleSizeStyle()"
+        >
+          {{ effect.name }}
+        </div>
+
+        <lib-play-pause-button
+          animate.enter="fade-in-animation"
+          animate.leave="fade-out-animation"
+          [state]="playPauseState()"
+          (toggle)="handlePlayPause($event)"
+        />
+      </div>
+    } @else {
+      <div class="card-row">
+        @if (showTags()) {
+          <div class="name-and-tags">
+            <div
+              libScrollOverflowText
+              class="item-name"
+              [ngStyle]="titleSizeStyle()"
+            >
+              {{ effect.name }}
+            </div>
+            <lib-tag-list-smart
+              [tagIds]="soundEffect().tags ?? []"
+              [fontSize]="tagFontSize()"
+            />
+          </div>
+        } @else {
+          <div
+            libScrollOverflowText
+            class="item-name"
+            [ngStyle]="titleSizeStyle()"
+          >
+            {{ effect.name }}
+          </div>
+        }
+        @if (showLoop()) {
+          <app-repeat-state-button
+            animate.enter="fade-in-animation"
+            animate.leave="fade-out-animation"
+            [repeatState]="repeatState()"
+            (clicked)="loopingChange.emit()"
+          />
+        }
+      </div>
+
+      @if (showVolume() || showPlay()) {
+        <div class="card-row">
+          @if (showVolume()) {
+            <app-volume-control
+              animate.enter="fade-in-animation"
+              animate.leave="fade-out-animation"
+              [size]="volumeSize()"
+              [volume]="volumeState()"
+              (changed)="volumeChange.emit($event)"
+            />
+          }
+          <div class="item-spacer"></div>
+          @if (showPlay()) {
+            <lib-play-pause-button
+              animate.enter="fade-in-animation"
+              animate.leave="fade-out-animation"
+              [state]="playPauseState()"
+              (toggle)="handlePlayPause($event)"
+            />
+          }
+        </div>
+      }
+    }
+  </div>
+  <div class="actions">
+    <lib-icon-button [matMenuTriggerFor]="menu" [icon]="ActionsIcon" />
+    <mat-menu #menu="matMenu">
+      <lib-actions-menu [item]="soundEffect()" [config]="actionsMenu()" />
+    </mat-menu>
+  </div>
+</div>

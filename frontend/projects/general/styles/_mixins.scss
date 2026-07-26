@@ -1,0 +1,62 @@
+@use 'colors' as col;
+@use 'typography' as typo;
+
+$animation-fn: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+@mixin base-dialog() {
+  color: col.$text-main;
+  display: flex;
+  overflow-x: hidden;
+  overflow-y: auto;
+  max-height: 75vh;
+  min-height: 0;
+
+  .wrapper {
+    max-height: inherit;
+    width: 500px;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+
+    .header {
+      @include typo.default-font;
+      h1 {
+        @include typo.h1;
+      }
+    }
+
+    .content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 1.5rem;
+      overflow-x: hidden;
+      overflow-y: hidden;
+      max-height: 70%;
+      min-height: 0;
+    }
+  }
+
+  .footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: stretch;
+    width: 100%;
+    gap: 1rem;
+
+    .buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+      width: 100%;
+    }
+  }
+}
+
+@mixin base-form() {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+}

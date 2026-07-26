@@ -1,0 +1,50 @@
+@if (noData()) {
+  <section>
+    <h1 class="main-message">
+      Welcome to
+      <img
+        class="logo-text"
+        src="./dungeon-jamLogo Title Text.svg"
+        alt="Dungeon Jam logo"
+      />!
+    </h1>
+    <p>
+      You can start by visiting
+      <a [routerLink]="libraryLink" queryParamsHandling="">Library</a> and
+      adding some music.
+    </p>
+  </section>
+} @else {
+  <section>
+    <h1 class="main-message">
+      Welcome back to
+      <img
+        class="logo-text"
+        src="./dungeon-jamLogo Title Text.svg"
+        alt="Dungeon Jam logo"
+      />!
+    </h1>
+  </section>
+
+  @if (showPlaylists()) {
+    <section>
+      <h2>Your Playlists</h2>
+      <app-playlist-grid-smart [showControls]="false" [limit]="3" />
+    </section>
+  }
+
+  @if (showTracks()) {
+    <section>
+      <h2>Your Tracks</h2>
+      <app-songs-table
+        [tracks]="tracks() | slice: 0 : 4"
+        [playingTrackId]="playingTrackId()"
+        [loading]="tracksLoading()"
+        [showActionsColumn]="false"
+        [showControls]="false"
+        (playTrack)="playTrack.emit($event)"
+        (pauseTrack)="pauseTrack.emit($event)"
+      ></app-songs-table>
+    </section>
+  }
+}

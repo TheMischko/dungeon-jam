@@ -1,0 +1,10 @@
+@if (!applicationReady()) {
+  <lib-loader class="app-loader" size="large"></lib-loader>
+} @else {
+  <br />
+  <div class="page-container">
+    <router-outlet />
+  </div>
+
+  <app-player-smart></app-player-smart>
+}

@@ -1,0 +1,41 @@
+@use 'colors' as col;
+.content {
+  padding: 1rem;
+  border-radius: 18px;
+  cursor: pointer;
+  height: 32px;
+
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  .icon {
+    width: 24px;
+  }
+
+  .content-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+  }
+
+  &:hover {
+    background: col.$background-hover;
+  }
+}
+
+.settings-menu {
+  min-width: 32px;
+  width: 15rem;
+  display: block;
+}
+
+::ng-deep svg.lucide-discord,
+::ng-deep .settings-menu .discord-icon svg {
+  stroke-width: 1px !important;
+}
+
+::ng-deep .mat-mdc-menu-item.active {
+  color: col.$primary;
+}

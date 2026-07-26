@@ -1,0 +1,54 @@
+@use "mixins" as mix;
+@use "colors" as col;
+@use "typography" as typo;
+
+:host {
+  .card-play-pause-button{
+    opacity: 0;
+    margin-right: 16px;
+    transition: opacity 0.1s mix.$animation-fn;
+  }
+  &:hover .card-play-pause-button{
+    opacity: 1;
+  }
+}
+
+.card-wrapper{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.25rem;
+  box-shadow: 2px 2px 1px rgba(0, 0, 0, 0.125);
+  padding: 0.25rem;
+  border-radius: 8px;
+
+  .title{
+      @include typo.body1();
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+  &.playing{
+    background: rgba(255,255,255,0.05);
+
+    .title{
+      color: col.$primary-light;
+    }
+  }
+}
+
+.main-content {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 80%;
+  gap: 0.25rem;
+  padding: 0.5rem;
+
+
+  @media (min-width: 1024px) {
+    flex-direction: row;
+    gap: 0.5rem;
+    justify-content: space-between;
+  }
+}

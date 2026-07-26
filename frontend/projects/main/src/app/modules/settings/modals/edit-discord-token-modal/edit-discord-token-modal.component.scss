@@ -1,0 +1,23 @@
+@use 'mixins' as mix;
+@use 'colors' as col;
+
+:host {
+  @include mix.base-dialog();
+
+  .wrapper {
+    width: 600px;
+    min-height: 350px;
+    padding: 1.5rem;
+
+    .header {
+      margin-bottom: 1.5rem;
+    }
+
+    .content {
+      margin-bottom: 2rem;
+      padding-top: 0.75rem;
+    }
+  }
+}
+
+

@@ -1,0 +1,54 @@
+@use '../../../../../styles/colors' as col;
+
+:host {
+  width: 100%;
+  display: block;
+
+  mat-form-field {
+    width: 100%;
+  }
+
+  .tags-input {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+
+    width: 100%;
+
+    .tags {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .tag-input {
+      border: none;
+      background: none;
+      padding: 2px;
+      flex: 1;
+      min-width: 80px;
+    }
+  }
+
+  .errors {
+    display: flex;
+    flex-direction: row;
+    gap: 0.25rem;
+    margin-bottom: 0.25rem;
+    margin-top: -1rem;
+    min-height: 22px;
+
+    .error-message {
+      color: col.$error;
+      margin: 0;
+    }
+  }
+
+  ::ng-deep .has-errors .mat-mdc-notch-piece {
+    border-color: col.$error;
+  }
+}

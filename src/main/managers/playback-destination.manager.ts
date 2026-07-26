@@ -1,0 +1,63 @@
+import { ViewManager } from './view.manager';
+import { ipcMain } from 'electron';
+import { CaptureChannel } from '@shared/models/channels.model';
+import { PlaybackChannel } from '@shared/models/channels.model';
+import { CaptureSettings } from '@shared/models/capture.model';
+import { DiscordManager } from './discord.manager';
+import { Logger } from '../utils/logger';
+
+export class PlaybackDestinationManager {
+  private static instance: PlaybackDestinationManager;
+  private logger = new Logger('PlaybackDestination', 'blue');
+
+  private constructor(
+    private viewManager: ViewManager,
+    private discordManager: DiscordManager
+  ) {}
+
+  public static async getInstance(): Promise<PlaybackDestinationManager> {
+    if (!PlaybackDestinationManager.instance) {
+      const viewManager = await ViewManager.getInstance();
+      const discordManager = await DiscordManager.getInstance();
+      PlaybackDestinationManager.instance = new PlaybackDestinationManager(
+        viewManager,
+        discordManager
+      );
+      await PlaybackDestinationManager.instance.registerChannels();
+    }
+    return PlaybackDestinationManager.instance!;
+  }
+
+  private async registerChannels(): Promise<void> {
+    ipcMain.on(
+      PlaybackChannel.CAPTURE_SETTINGS,
+      (_, settings: CaptureSettings) => {
+        this.updateCaptureSettings(settings).catch((e) =>
+          this.logger.logErrorMessage('Error handling update', { error: e })
+        );
+      }
+    );
+    this.logger.log('Listeners registered');
+  }
+
+  public async updateCaptureSettings(settings: CaptureSettings): Promise<void> {
+    try {
+      this.viewManager.captureTab.webContents.send(
+        CaptureChannel.SETTINGS,
+        settings
+      );
+      if (settings.isLocalMuted) {
+        this.discordManager.resumeStreaming();
+      } else {
+        this.discordManager.stopStreaming();
+      }
+      this.logger.log('Capture settings updated', {
+        localMuted: settings.isLocalMuted,
+      });
+    } catch (e) {
+      this.logger.logErrorMessage('Failed to update capture settings', {
+        error: e,
+      });
+    }
+  }
+}

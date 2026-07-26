@@ -1,0 +1,36 @@
+<mat-form-field
+  appearance="outline"
+  subscriptSizing="dynamic"
+  class="form-field"
+  [class.has-errors]="hasErrors()"
+>
+  <mat-label>{{ label() }}</mat-label>
+  <input
+    matInput
+    [matDatepicker]="picker"
+    [value]="value() ?? null"
+    [disabled]="isDisabled()"
+    [required]="required()"
+    (blur)="setTouched()"
+    (dateChange)="onInputChange($event)"
+  />
+  <mat-hint>{{ FORM_HINT }}</mat-hint>
+  @if (value()) {
+    <svg
+      matIconSuffix
+      [lucideIcon]="ClearIcon"
+      [size]="24"
+      class="clear-icon"
+      (click)="clearValue($event)"
+    ></svg>
+  }
+  <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+  <mat-datepicker #picker [disabled]="disabled()"></mat-datepicker>
+</mat-form-field>
+<div class="errors">
+  @if (hasErrors()) {
+    @for (error of errors(); track error.kind) {
+      <div class="error-message">{{ error.message }}</div>
+    }
+  }
+</div>

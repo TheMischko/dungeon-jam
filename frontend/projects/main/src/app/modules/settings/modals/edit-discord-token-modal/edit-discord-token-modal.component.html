@@ -1,0 +1,21 @@
+<div class="wrapper">
+  <div class="header">
+    <h1>Edit Discord Token</h1>
+  </div>
+
+  <div class="content">
+    <app-discord-token-form [form]="form"></app-discord-token-form>
+  </div>
+
+  <div class="footer">
+    <div class="buttons">
+      <button mat-flat-button color="primary" (click)="save()">
+        Save
+      </button>
+      <button mat-flat-button color="secondary" (click)="cancel()">
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>
+

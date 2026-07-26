@@ -1,0 +1,17 @@
+@if (title()) {
+  <h3 class="menu-title">{{ title() }}</h3>
+}
+@for (config of config(); track config.text) {
+  <button
+    mat-menu-item
+    (click)="actionClicked(item(), config, $event)"
+    [ngClass]="$safeNavigationMigration(config?.cssClasses)"
+    [title]="''"
+    [matTooltip]="config?.tooltip ?? ''"
+  >
+    @if (config.icon) {
+      <svg [lucideIcon]="config.icon!"></svg>
+    }
+    <span>{{ config.text }}</span>
+  </button>
+}

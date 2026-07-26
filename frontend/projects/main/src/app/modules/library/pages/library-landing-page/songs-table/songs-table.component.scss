@@ -1,0 +1,47 @@
+@use 'colors' as col;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+
+  ::ng-deep lib-input,
+  ::ng-deep app-filter-box {
+    --mat-form-field-container-vertical-padding: 10px;
+    --mat-form-field-container-height: 40px;
+  }
+
+  ::ng-deep .mdc-notched-outline {
+    top: unset;
+  }
+}
+
+.search-bar {
+  max-width: 250px;
+}
+
+.table {
+  flex: 1;
+  min-height: 0;
+  background: none;
+  padding-bottom: 1rem;
+
+  .mat-mdc-row {
+    transition: color 0.25s ease;
+  }
+  .active-row {
+    background: col.$background-hover;
+  }
+  .playing {
+    color: col.$primary;
+  }
+  .mat-column-play {
+    max-width: 10%;
+    min-width: 50px;
+  }
+  .mat-column-duration {
+    max-width: 20%;
+    min-width: 80px;
+  }
+}

@@ -1,0 +1,18 @@
+<div class="control-wrapper">
+  @if (hasImage()) {
+    <button class="discard-button" (click)="discardImage()">X</button>
+    <img class="selected-image" [src]="imageDataUrl()" [alt]="imagePath()" />
+  } @else {
+    <app-songs-drop-in-zone
+      class="drop-in-zone"
+      accept="image/.*"
+      (filesDropped)="processDroppedFiles($event)"
+    >
+    <div class="upload-wrapper" (click)="openImageDialog()">
+      <svg [lucideIcon]="UploadIcon" [size]="48"></svg>
+      <span>Click here to select an image.</span>
+    </div>
+    </app-songs-drop-in-zone>
+  }
+  <div class="upload-label">{{label()}}{{required() ? '*' : ''}}</div>
+</div>

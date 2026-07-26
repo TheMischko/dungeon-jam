@@ -1,0 +1,6 @@
+@use 'mixins' as mix;
+@use 'colors' as col;
+
+:host {
+  @include mix.base-dialog();
+}

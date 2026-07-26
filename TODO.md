@@ -1,0 +1,27 @@
+### Small missing features
+Obviously the project is WIP, so there is just a list of small missing features from the already *implemented* flows.
+- [x] `LibraryLandingPage` "Upload" button should open a modal to consume the audio files and then open the modal with forms to fill in details
+- [x] Custom input for tags with suggestions, and auto-splitting into pills
+- [ ] Playlist filters for Playlist grid
+- [x] Change actions menu on playlist detail for individual tracks to include: Play next, Remove from playlist
+- [x] Fix playing empty playlist resumes currently played queue
+- [x] Fix Playlist card without tags having shifted layout
+- [x] Enable opening of modals after closing them. Currently, if you close a modal, you can open it again without leaving the page
+- [ ] Create custom scrollbar
+- [x] Use `TableComponent` in `SongsTableComponent` 
+- [x] Table and search box on Tracks landing page disappears if you set invalid search
+- [x] Better landing page with empty data (no sections etc.)
+- [ ] Add the loading state to NewTrackDropInService and wire it to tracks landing and playlist detail page and show loader
+- [x] Autoresolve upload does not auto-assign tags from genres
+- [ ] Upload does not show tags immediately
+- [x] Sound Effect volume bar does not reflect the real value (small change sets the correct value)
+- [x] Tables with collapsible columns have issue with initially hidden column cannot be shown (Scene detail Tracks table f.e.)
+- [x] Songs table on Home page shows pause button on track, while the track is already paused
+- [ ] Tracks cannot be sorted by Author
+- [ ] The tables lack "No match" state, as they show "No data" on query without results hiding the grid.
+- [ ] Navigation should close current dialogs. Or should not redirect and wait.
+- [ ] Add queue management (reorder, remove, jump to track)
+- [ ] Keyboard support (ESC closing modals, Space for pausing/playing, etc.)
+- [x] Scene has playing state even if one random sound effect that is part of it plays from elsewhere
+- [ ] Show "Play next" song in Queue popup
+- [ ] Clicking on effect didn't work

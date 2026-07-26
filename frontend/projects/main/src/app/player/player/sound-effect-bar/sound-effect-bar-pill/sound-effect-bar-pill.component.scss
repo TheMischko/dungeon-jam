@@ -1,0 +1,25 @@
+@use 'colors' as col;
+@use 'typography' as typo;
+
+:host {
+  background: col.$primary-dark;
+  border-radius: 20px;
+  user-select: none;
+  -moz-user-select: none;
+  cursor: pointer;
+
+  .sound-effect-content {
+    padding: 4px 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-width: 80px;
+    max-width: 16vw;
+    border-radius: 20px;
+    @include typo.sound-effect-pill();
+  }
+
+  .sound-effect-name {
+    white-space: nowrap;
+  }
+}

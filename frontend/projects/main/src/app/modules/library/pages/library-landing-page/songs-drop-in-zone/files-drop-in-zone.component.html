@@ -1,0 +1,14 @@
+<div
+  class="drop-zone-wrapper"
+  appDnd
+  [accept]="accept()"
+  (audioFilesDropped)="onAudioFilesDropped($event)"
+  (filesDropped)="filesDropped.emit($event)"
+>
+  <div class="content">
+    <ng-content></ng-content>
+  </div>
+  <div class="upload-info">
+    <h3>Drop the files here</h3>
+  </div>
+</div>

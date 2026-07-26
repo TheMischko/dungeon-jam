@@ -1,0 +1,44 @@
+<div class="wrapper">
+  <div class="header">
+    <h1>Large Upload Detected</h1>
+  </div>
+
+  <div class="content">
+    <p class="description">
+      You are about to upload <strong>{{ count }} files</strong>. Would you like
+      to review and edit each file individually, or let the app autoresolve the
+      track names and metadata?
+    </p>
+
+    <div class="options">
+      <div class="option">
+        <h3>Review each file</h3>
+        <p>
+          Go through every track one by one and confirm or adjust the title,
+          author and tags before uploading.
+        </p>
+      </div>
+      <div class="option">
+        <h3>Autoresolve <span class="badge">Coming soon</span></h3>
+        <p>
+          Automatically extract metadata from each file and upload all tracks
+          without manual review.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="buttons">
+      <button mat-flat-button color="primary" (click)="reviewManually()">
+        Review Each File
+      </button>
+      <button mat-flat-button color="secondary" (click)="autoResolve()">
+        Autoresolve
+      </button>
+      <button mat-flat-button color="secondary" (click)="cancel()">
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>

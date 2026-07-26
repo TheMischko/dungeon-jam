@@ -1,0 +1,34 @@
+@use 'typography' as typo;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: stretch;
+
+  .title{
+    @include typo.page-title();
+  }
+
+  .mode-switcher {
+    align-self: flex-end;
+    margin: 0 1rem 0.5rem 0;
+  }
+
+  .controls {
+    width: 98%;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .content {
+    width: 100%;
+    margin-bottom: 10vh;
+  }
+
+  .effect-table {
+    width: 100%;
+  }
+}

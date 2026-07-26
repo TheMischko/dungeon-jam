@@ -1,0 +1,35 @@
+<div class="header">
+  <div class="title-section">
+    <h2 class="list-header">{{ title() }}</h2>
+    <lib-icon-button
+      [icon]="EditIcon"
+      size="small"
+      class="play-pause-button"
+      (clicked)="changeSelection.emit()"
+    ></lib-icon-button>
+  </div>
+  <div class="controls">
+    @if (showPlayAll()) {
+      <lib-play-pause-button
+        [state]="playingAllState()"
+        size="regular"
+        [type]="ButtonType.Flat"
+        class="play-pause-button"
+        (toggle)="emitPlayAllOrPauseAll()"
+      />
+    }
+  </div>
+</div>
+
+<div class="sound-effects">
+  @for (soundEffect of soundEffects(); track soundEffect.id) {
+    <app-scene-sound-effect-card
+      [soundEffect]="soundEffect"
+      [isPlaying]="isSoundEffectPlaying(soundEffect)"
+      [volume]="getSoundEffectVolume(soundEffect)"
+      (playSoundEffect)="emitPlaySoundEffect(soundEffect)"
+      (pauseSoundEffect)="pauseSoundEffect.emit(soundEffect)"
+      (updateVolume)="emitVolumeChange(soundEffect, $event)"
+    ></app-scene-sound-effect-card>
+  }
+</div>

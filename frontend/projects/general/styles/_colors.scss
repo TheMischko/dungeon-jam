@@ -1,0 +1,32 @@
+@use 'sass:color';
+
+$background-main: #13171c;
+$background-deep: color.scale($background-main, $lightness: -20%);
+$background-hover: color.scale($background-main, $lightness: 20%);
+
+$primary: #1ea193;
+$primary-light: #27d1bf;
+$primary-dark: #1c6c66;
+$primary-dark-dark: #142226;
+
+$warning: #fed766;
+$error: #f46036;
+$neutral: #6e6e6e;
+$success: #49f436;
+
+$text-main: #dfe1e3;
+$text-main-bright: #f4f7fa;
+$text-note: #b9bbbe;
+$text-secondary: #212121;
+$text-secondary-bright: #424242;
+$button-inactive: #929292;
+
+$transparent-dark-very-low: rgba(0,0,0,0.125);
+$transparent-dark-low: rgba(0,0,0,0.15);
+$transparent-dark-medium: rgba(0,0,0,0.25);
+$transparent-dark: rgba(0,0,0,0.5);
+
+$transparent-light-very-low: rgba(255,255,255,0.125);
+$transparent-light-low: rgba(255,255,255,0.15);
+$transparent-light-medium: rgba(255,255,255,0.25);
+$transparent-light: rgba(255,255,255,0.5);

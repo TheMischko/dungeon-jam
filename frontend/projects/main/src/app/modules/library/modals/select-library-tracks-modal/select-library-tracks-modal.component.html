@@ -1,0 +1,34 @@
+<div class="wrapper">
+  <div class="header">
+    <h1>Select tracks</h1>
+  </div>
+
+  <div class="content">
+    <app-songs-table
+      class="table"
+      [tracks]="tracks()"
+      [selection]="true"
+      [showPlayWithSelection]="true"
+      [allSelectedState]="selectAllState()"
+      [loading]="tracksLoading()"
+      [showActionsColumn]="false"
+      [playingTrackId]="trackIdPlaying()"
+      [hiddenColumns]="['duration']"
+      (queryChange)="tracksQuery.set($event)"
+      (selectionChange)="selectionChanged($event)"
+      (playTrack)="playTrack($event)"
+      (pauseTrack)="pauseTrack()"
+    ></app-songs-table>
+  </div>
+
+  <div class="footer">
+    <div class="footer-button">
+      <button mat-flat-button color="primary" (click)="saveSelection()">
+        Save
+      </button>
+      <button mat-flat-button color="neutral" (click)="cancelClick()">
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>

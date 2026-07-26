@@ -1,0 +1,34 @@
+@if (prefix()) {
+  @if (prefixIcon()) {
+    <svg
+      class="prefix side-icon"
+      [lucideIcon]="prefixIcon()!"
+      [size]="iconSize()"
+    ></svg>
+  } @else {
+    <span class="prefix side-text">{{ prefix() }}</span>
+  }
+}
+<mat-slider
+  [min]="minValue()"
+  [max]="maxValue()"
+  [step]="stepSize()"
+  [disableRipple]="true"
+  (mousedown)="$event.stopPropagation()"
+  (input)="changeValue($event)"
+  class="slider"
+  [ngStyle]="sliderStyles()"
+>
+  <input matSliderThumb [value]="value()" />
+</mat-slider>
+@if (suffix()) {
+  @if (suffixIcon()) {
+    <svg
+      class="prefix side-icon"
+      [lucideIcon]="suffixIcon()!"
+      [size]="iconSize()"
+    ></svg>
+  } @else {
+    <span class="prefix side-text">{{ suffix() }}</span>
+  }
+}

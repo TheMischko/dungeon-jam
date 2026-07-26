@@ -1,0 +1,121 @@
+<div class="table-container">
+  <div class="table-wrapper">
+    <mat-table
+      [dataSource]="dataSet()"
+      [trackBy]="trackBy"
+      [matSortActive]="defaultSortBy()"
+      [matSortDirection]="matSortDirection()"
+      class="table"
+      matSort
+      (matSortChange)="emitSortChange($event)"
+    >
+      <!-- Selection Column -->
+      @if (selection()) {
+        <ng-container [matColumnDef]="selectionColumn">
+          <mat-header-cell *matHeaderCellDef class="selection-cell">
+            <mat-checkbox
+              [checked]="isAllChecked()"
+              [indeterminate]="isAllIndeterminate()"
+              (change)="selectAllAvailable($event)"
+            ></mat-checkbox>
+          </mat-header-cell>
+          <mat-cell *matCellDef="let row" class="selection-cell">
+            <mat-checkbox
+              [checked]="isSelected(row)"
+              (change)="itemSelected(row, $event)"
+            ></mat-checkbox>
+          </mat-cell>
+        </ng-container>
+      }
+
+      <!-- Data Columns -->
+      @for (colName of configColumnNames(); track colName) {
+        @let columnConfig = config()[colName];
+        <ng-container [matColumnDef]="colName">
+          <mat-header-cell
+            *matHeaderCellDef
+            [disabled]="!columnConfig?.sortable"
+            [mat-sort-header]="colName"
+            [style.max-width]="columnConfig?.width"
+            [ngClass]="{ clickable: !!headerCellMenu() }"
+            (contextmenu)="onHeaderCellClicked($event, colName, menuTrigger)"
+            >{{ config()[colName]?.title }}
+            <div
+              style="visibility: hidden"
+              [matMenuTriggerFor]="headerCellMenu()"
+              [matMenuTriggerData]="{ column: colName, config: columnConfig }"
+              #menuTrigger="matMenuTrigger"
+            ></div>
+          </mat-header-cell>
+          <mat-cell
+            *matCellDef="let row"
+            [style.max-width]="columnConfig?.width"
+          >
+            @if (columnConfig?.template) {
+              <!-- Template Column -->
+              @let template = columnConfig!.template!();
+              <ng-container
+                *ngTemplateOutlet="template; context: { $implicit: row }"
+              ></ng-container>
+            } @else {
+              <!-- Standard Column -->
+              <app-table-cell
+                [item]="row"
+                [config]="columnConfig"
+                [columnKey]="getColumnNameKeyOf(colName)"
+              ></app-table-cell>
+            }
+          </mat-cell>
+        </ng-container>
+      }
+
+      <!-- Actions Column -->
+      @if (hasActions()) {
+        <ng-container [matColumnDef]="actionsColumn">
+          <mat-header-cell
+            *matHeaderCellDef
+            class="actions-col"
+          ></mat-header-cell>
+          <mat-cell *matCellDef="let row" class="actions-col">
+            <lib-icon-button
+              [matMenuTriggerFor]="menu"
+              [icon]="ActionsIcon"
+              [size]="'regular'"
+              class="action-button"
+            />
+            <mat-menu #menu="matMenu" (closed)="emitMenuClosed(row, $event)">
+              <lib-actions-menu
+                [item]="row"
+                [config]="getActionsMenuConfig(row)"
+              />
+            </mat-menu>
+          </mat-cell>
+        </ng-container>
+      }
+
+      <!-- Row Declarations -->
+      <mat-header-row *matHeaderRowDef="columnNames()"></mat-header-row>
+      <mat-row
+        appCustomTableRowAttr
+        [customRowAttribute]="customRowAttributeName()"
+        [customRowAttributeValue]="
+          $safeNavigationMigration(customRowAttributeValueFn()?.(row))
+        "
+        *matRowDef="let row; columns: columnNames()"
+        (mouseenter)="hoverStart.emit(row)"
+        (mouseleave)="hoverEnd.emit(row)"
+      ></mat-row>
+    </mat-table>
+    @let paginationConfig = pagination();
+    @if (paginationConfig) {
+      <mat-paginator
+        [length]="paginationConfig.totalItems"
+        [pageSize]="paginationConfig.pageSize"
+        [pageSizeOptions]="paginationConfig.pageSizeOptions"
+        [pageIndex]="paginationConfig.currentPageIndex"
+        aria-label="Select page"
+        (page)="pageChange.emit($event)"
+      />
+    }
+  </div>
+</div>

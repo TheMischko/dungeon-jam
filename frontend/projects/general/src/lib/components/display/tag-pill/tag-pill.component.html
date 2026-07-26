@@ -1,0 +1,12 @@
+<div
+  class="tag"
+  [ngStyle]="pillStyles()"
+  [ngClass]="{ highlighted: highlighted() }"
+>
+  <span>{{ tag().title }}</span>
+  @if (removable()) {
+    <button class="remove-button" (click)="removed.emit(this.tag())">
+      <svg [lucideIcon]="removeIcon" [size]="16"></svg>
+    </button>
+  }
+</div>

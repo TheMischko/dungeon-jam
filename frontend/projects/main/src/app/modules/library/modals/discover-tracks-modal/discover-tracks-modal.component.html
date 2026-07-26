@@ -1,0 +1,43 @@
+<div class="wrapper">
+  <div class="header">
+    <h1>
+      Discover tracks for <b>{{ playlist.name }}</b>
+    </h1>
+  </div>
+
+  <div class="content">
+    <app-songs-table
+      class="table"
+      [tracks]="tracks()"
+      [selection]="true"
+      [showPlayWithSelection]="true"
+      [allSelectedState]="selectAllState()"
+      [loading]="tracksLoading()"
+      [showActionsColumn]="false"
+      [playingTrackId]="trackIdPlaying()"
+      [hiddenColumns]="['duration']"
+      [paginationPages]="PAGE_SIZES"
+      [initialPageSize]="batchSize()"
+      [initialQuery]="tracksQuery()"
+      (queryChange)="tracksQuery.set($event)"
+      (selectionChange)="selectionChanged($event)"
+      (playTrack)="playTrack($event)"
+      (pauseTrack)="pauseTrack()"
+      (pageSizeChange)="batchSize.set($event)"
+    ></app-songs-table>
+  </div>
+
+  <div class="footer">
+    <div class="footer-button">
+      <button mat-flat-button color="primary" (click)="saveSelection(true)">
+        Save and discover next
+      </button>
+      <button mat-flat-button color="primary" (click)="saveSelection(false)">
+        Save
+      </button>
+      <button mat-flat-button color="neutral" (click)="cancelClick()">
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>

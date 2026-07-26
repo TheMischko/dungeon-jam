@@ -1,0 +1,42 @@
+<mat-form-field
+  appearance="outline"
+  [floatLabel]="value().length > 0 ? 'always' : 'auto'"
+  [class.has-errors]="hasErrors()"
+>
+  <mat-label>Tags</mat-label>
+  <div class="tags-input">
+    <div class="tags">
+      <lib-tag-list
+        [tags]="value()"
+        [editable]="true"
+        (removed)="removeTag($event)"
+      ></lib-tag-list>
+    </div>
+    <input
+      matInput
+      class="tag-input"
+      type="text"
+      [matAutocomplete]="suggestionBar"
+      [value]="inputValue()"
+      (input)="handleUserTyping($event)"
+      (keydown)="handleKeyDown($event)"
+      (focusout)="createTagFromRemaining($event)"
+    />
+  </div>
+</mat-form-field>
+
+<div class="errors">
+  @if (hasErrors()) { @for (error of errors(); track error.kind){
+  <div class="error-message">{{ error.message }}</div>
+  } }
+</div>
+
+<mat-autocomplete #suggestionBar="matAutocomplete">
+  @for (suggestion of suggestions(); track suggestion.id){
+  <mat-option
+    [value]="null"
+    (onSelectionChange)="saveSuggestion($event, suggestion)"
+    >{{ suggestion.title }}</mat-option
+  >
+  }
+</mat-autocomplete>

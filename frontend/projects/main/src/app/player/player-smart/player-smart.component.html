@@ -1,0 +1,13 @@
+<app-player
+  [playBackState]="playBackState()"
+  [trackPosition]="trackPosition()"
+  (play)="play()"
+  (pause)="pause()"
+  (skipNext)="playNextTrack()"
+  (skipPrev)="playPrevTrack()"
+  (seek)="seek($event)"
+  (shuffleChange)="shuffle()"
+  (volumeChange)="changeVolume($event)"
+  (repeatChange)="changeRepeat()"
+  (navigateToActiveTrack)="navigateToActiveTrack()"
+></app-player>

@@ -1,0 +1,25 @@
+@use 'colors' as col;
+@use 'typography' as typo;
+
+.stop-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 24px;
+  width: 24px;
+  border: none;
+  margin-right: -2px;
+  padding: 4px;
+  border-radius: 50%;
+  background: none;
+  color: col.$text-main;
+  cursor: pointer;
+
+  svg[lucideIcon] {
+    margin-bottom: -3px;
+  }
+
+  &:hover {
+    background: col.$transparent-dark-medium;
+  }
+}

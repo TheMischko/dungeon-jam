@@ -1,0 +1,62 @@
+<div class="wrapper">
+  @if (showControls()) {
+    <app-grid-controls
+      [currentValue]="currentSizeIndex()"
+      [stepSize]="1"
+      [sizeMaxValue]="availableSizes().length - 1"
+      (search)="search.emit($event)"
+      (sizeChange)="sizeInput($event)"
+    ></app-grid-controls>
+  }
+
+  <div class="scenes-grid">
+    @for (scene of scenes(); track scene.id) {
+      @let image = getSceneImage(scene);
+      @let tags = getSceneTags(scene);
+      @let isPlaying = playingSceneId() === scene.id;
+      @let playable = itemPlayable();
+      @let selectable = itemSelectable();
+      <app-grid-item
+        [title]="scene.name"
+        [image]="image"
+        [noImageIcon]="SceneIcon"
+        [tags]="[]"
+        [sizeConfig]="computedSizeConfig()"
+        (clicked)="navigateToDetail(scene)"
+      >
+        <div ngProjectAs="content" style="display: contents">
+          @if (playable && isPlaying) {
+            <div class="is-playing-overlay small-overlay">
+              <svg [lucideIcon]="PlayingIcon" [size]="16"></svg>
+            </div>
+          }
+          @if (selectable) {
+            <div
+              class="selection-overlay small-overlay {{
+                playable ? 'selection-alternative' : ''
+              }}"
+              (click)="$event.stopPropagation()"
+            >
+              <mat-checkbox
+                [checked]="isSelected(scene)"
+                (change)="itemSelected(scene, $event)"
+              ></mat-checkbox>
+            </div>
+          }
+        </div>
+
+        @if (playable) {
+          <div ngProjectAs="hovering-content" style="display: contents">
+            <div class="hover-overlay">
+              <svg
+                class="icon"
+                [lucideIcon]="isPlaying ? PauseIcon : PlayIcon"
+                (click)="onOverlayButtonClick($event, scene)"
+              ></svg>
+            </div>
+          </div>
+        }
+      </app-grid-item>
+    }
+  </div>
+</div>

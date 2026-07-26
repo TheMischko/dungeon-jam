@@ -1,0 +1,15 @@
+:host {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.25rem;
+  padding: 0.25rem;
+}
+
+::ng-deep .tags-tooltip {
+  word-spacing: 75px;
+  width: 75px;
+}

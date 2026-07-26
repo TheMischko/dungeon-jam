@@ -1,0 +1,51 @@
+{
+  "COMMON": {
+    "ERROR": "Error"
+  },
+  "ERRORS": {
+    "COMMON": {
+      "GENERIC_ERROR": "Unknown application error."
+    },
+    "DATABASE": {
+      "INSERT_FAILED": "Failed to create record.",
+      "UPDATE_FAILED": "Failed to update record.",
+      "DELETE_FAILED": "Failed to delete record.",
+      "NOT_FOUND": "Record not found.",
+      "QUERY_FAILED": "Failed to process query."
+    },
+    "DISCORD": {
+      "TOKEN_CONNECTION_FAILED": "Failed to connect Discord bot.",
+      "CHANNEL_JOIN_FAILED": "Failed to join voice channel.",
+      "CONNECTION_LOST": "Discord voice connection was lost.",
+      "API_ERROR": "A Discord API error occurred."
+    },
+    "PLAYLIST": {
+      "ID_REQUIRED": "Playlist ID is required for update.",
+      "ID_NOT_FOUND": "Playlist with ID {{playlistId}} not found."
+    },
+    "SESSION": {
+      "NAME_REQUIRED": "Session name is required."
+    }
+  },
+  "NOTIFICATIONS": {
+    "DISCORD": {
+      "TOKEN_CONNECTED": "Discord bot connected successfully.",
+      "CHANNEL_JOINED": "Joined Discord voice channel.",
+      "RECONNECT_FAILED": "Failed to reconnect back to the channel.",
+      "DISCONNECTED": "Discord connection lost."
+    },
+    "SESSION": {
+      "LOAD_ALL_ERROR_TITLE": "Loading sessions error",
+      "INSERT_ERROR_TITLE": "Creating session error",
+      "INSERT_SUCCESS_TITLE": "Session created",
+      "INSERT_SUCCESS_MESSAGE": "Session {{name}} was created",
+      "UPDATE_ERROR_TITLE": "Updating session error",
+      "UPDATE_SUCCESS_TITLE": "Session updated",
+      "UPDATE_SUCCESS_MESSAGE": "Session {{name}} was updated",
+      "DELETE_ERROR_TITLE": "Deleting session error",
+      "DELETE_SUCCESS_TITLE": "Session deleted",
+      "DELETE_SUCCESS_MESSAGE": "Session was successfully deleted.",
+      "GENERIC_ERROR_MESSAGE": "An unknown error occurred."
+    }
+  }
+}

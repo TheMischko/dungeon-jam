@@ -1,0 +1,97 @@
+@use 'colors' as col;
+@use 'typography' as typo;
+
+:host {
+  display: grid;
+  grid-template-columns: 60px auto;
+}
+
+.switch-box {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.token-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: stretch;
+  padding: 0.5rem 1.25rem;
+  background: col.$primary;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+
+  .token-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .token-metadata {
+    @include typo.note();
+    color: col.$text-secondary-bright;
+
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+
+    .status-success {
+      color: col.$success;
+    }
+    .status-warning {
+      color: col.$warning;
+    }
+    .status-error {
+      color: col.$error;
+    }
+  }
+}
+
+:host:hover {
+  .token-item {
+    background: col.$primary-light;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+}
+
+.token-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.token-name {
+  font-weight: 600;
+  font-size: 1rem;
+  color: col.$text-secondary;
+}
+
+.token-key {
+  font-family: 'Courier New', monospace;
+  color: col.$text-secondary;
+  font-size: 0.875rem;
+  opacity: 0.8;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.token-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-left: 1rem;
+
+  ::ng-deep {
+    button {
+      transition: all 0.2s ease;
+
+      .lucide {
+        color: col.$text-secondary;
+      }
+    }
+  }
+}

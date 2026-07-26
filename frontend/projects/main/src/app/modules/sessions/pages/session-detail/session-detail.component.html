@@ -1,0 +1,19 @@
+@if (loading()) {
+  <lib-loader size="large" />
+} @else {
+  <h1 class="title">{{ session()?.name }}</h1>
+  <button mat-flat-button (click)="changeScenes.emit()">Edit scenes</button>
+  <div class="scenes-wrapper">
+    @for (sceneRef of session()?.scenes ?? []; track sceneRef.sceneId) {
+      @if (scenesMap()[sceneRef.sceneId]; as scene) {
+        <app-scene-console-smart
+          class="scene-console"
+          [scene]="scene"
+          [viewMode]="true"
+          [initContentHidden]="isSceneContentHidden(scene)"
+          [sessionId]="$safeNavigationMigration(session()?.id)"
+        ></app-scene-console-smart>
+      }
+    }
+  </div>
+}

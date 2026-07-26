@@ -1,0 +1,97 @@
+<div class="header">
+  @if (playlistImageUrl(); as imageUrl) {
+    <img
+      class="playlist-image"
+      [src]="imageUrl"
+      [alt]="$safeNavigationMigration(playlist()?.name)"
+    />
+  }
+  <div class="header-content">
+    <div class="header-info">
+      <h1 class="playlist-name">{{ playlist()?.name }}</h1>
+      @if (playlist()?.description) {
+        <h2 class="playlist-description">{{ playlist()?.description }}</h2>
+      }
+    </div>
+
+    @if (parentPlaylist()) {
+      <div class="header-parent-playlist">
+        <a [routerLink]="parentDetailRoute()">{{ parentPlaylist()?.name }}</a>
+        <span>Back to </span>
+      </div>
+    }
+  </div>
+  <div class="header-bottom">
+    <div class="header-controls">
+      <lib-play-pause-button
+        [state]="playButtonState()"
+        [type]="buttonType"
+        [size]="buttonSize"
+        (toggle)="playPauseClicked($event)"
+      ></lib-play-pause-button>
+
+      <button mat-flat-button (click)="editPlaylist.emit()">
+        Edit playlist
+      </button>
+      <button mat-flat-button (click)="openDiscover.emit()">
+        Discover new tracks
+      </button>
+      <button mat-flat-button (click)="deletePlaylist.emit()" color="error">
+        Delete playlist
+      </button>
+    </div>
+    <lib-tag-list-smart
+      class="playlist-tags"
+      [tagIds]="playlist()?.tags ?? []"
+    />
+  </div>
+</div>
+
+<div class="sections">
+  <lib-collapsible-section
+    [data]="childrenSectionConfig()"
+  ></lib-collapsible-section>
+</div>
+
+<h3 class="tracks-header">Tracks</h3>
+
+<app-files-drop-in-zone (audioDropped)="audioDropped.emit($event)">
+  <div class="actions">
+    <button mat-flat-button (click)="openAddTracks.emit()">
+      <svg [lucideIcon]="addTracksIcon"></svg>
+      <span>Add tracks from library</span>
+    </button>
+    <lib-switch
+      label="Include tracks from children playlists"
+      (toggled)="toggleIncludeChildren($event)"
+    />
+  </div>
+
+  <div class="content">
+    <app-songs-table
+      [tracks]="tracks()"
+      [playingTrackId]="playingTrackId()"
+      [actionsMenuConfig]="songActionsMenuConfig()"
+      (playTrack)="playTrack.emit($event)"
+      (pauseTrack)="pause.emit()"
+      (queryChange)="queryChange.emit($event)"
+    ></app-songs-table>
+  </div>
+</app-files-drop-in-zone>
+
+<ng-template #childrenTemplate>
+  <div class="child-playlists-section">
+    @if (playlist(); as playlist) {
+      <app-child-playlist-actions-smart [parent]="playlist" />
+    }
+    <div class="playlists">
+      @for (child of childrenPlaylists(); track child.id) {
+        @if (child) {
+          <a [routerLink]="['../', child.id]">
+            <app-child-playlist-box [playlist]="child" />
+          </a>
+        }
+      }
+    </div>
+  </div>
+</ng-template>

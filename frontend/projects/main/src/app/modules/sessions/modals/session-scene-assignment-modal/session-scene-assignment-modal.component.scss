@@ -1,0 +1,11 @@
+@use 'mixins' as mix;
+
+:host {
+  @include mix.base-dialog();
+  display: flex;
+
+  .wrapper {
+    width: 875px;
+    max-width: 100%;
+  }
+}

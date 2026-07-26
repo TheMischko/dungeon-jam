@@ -1,0 +1,22 @@
+@if (form()) {
+  <lib-input
+    class="text-input"
+    label="Playlist name"
+    [formField]="form()!.name"
+  ></lib-input>
+  <lib-input
+    class="text-input"
+    label="Description"
+    [formField]="form()!.description!"
+  ></lib-input>
+  <lib-tags-input [formField]="form()!.tags"></lib-tags-input>
+  <lib-playlist-select
+    label="Pick parent playlist (optional)"
+    [formField]="form()!.parentPlaylist"
+  ></lib-playlist-select>
+  <app-image-upload
+    label="Playlist Image"
+    class="image-upload"
+    [formField]="form()!.imageUrl"
+  />
+}

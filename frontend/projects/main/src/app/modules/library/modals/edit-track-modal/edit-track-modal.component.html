@@ -1,0 +1,41 @@
+<div class="wrapper">
+  <div class="header">
+    <h1>Edit Track {{ trackForm().title().value() }}</h1>
+  </div>
+
+  <div class="content">
+    @if (loading() && !trackForm()) {
+      <lib-loader size="large" class="loader"></lib-loader>
+    } @else {
+      <app-track-form [form]="trackForm()!"></app-track-form>
+    }
+  </div>
+
+  <div class="footer">
+    <div class="buttons">
+      <lib-icon-button
+        [icon]="deleteIcon"
+        [type]="ButtonType.Flat"
+        label="Delete"
+        size="regular"
+        color="error"
+        (click)="deleteTrack()"
+      >
+        Delete
+      </lib-icon-button>
+      <lib-icon-button
+        [icon]="saveIcon"
+        [type]="ButtonType.Flat"
+        label="Save"
+        size="regular"
+        color="primary"
+        (click)="updateTrack()"
+      >
+        Delete
+      </lib-icon-button>
+      <button mat-flat-button color="secondary" (click)="cancel()">
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,6 @@
+<app-sound-effect-bar
+  [playingEffects]="playingEffects()"
+  [playingEffectsPositions]="playingEffectsPositions()"
+  (stopSoundEffect)="stopEffect($event)"
+  (showDetail)="redirectToSoundEffectLanding($event)"
+/>

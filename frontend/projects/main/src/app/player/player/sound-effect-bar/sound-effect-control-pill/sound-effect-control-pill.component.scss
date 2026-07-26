@@ -1,0 +1,34 @@
+@use 'colors' as col;
+@use 'typography' as typo;
+
+.control-pill {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+
+  &.expanded {
+    .toggle-button {
+      margin-left: -2px;
+    }
+  }
+
+  &.collapsed {
+    min-width: 110px;
+  }
+
+  background: col.$primary-dark;
+  color: col.$text-main;
+  border-radius: 20px;
+  height: 24px;
+  padding: 4px 8px;
+
+  .info-text {
+    @include typo.sound-effect-pill();
+  }
+
+  svg[lucideIcon] {
+    margin-bottom: -4px;
+  }
+}

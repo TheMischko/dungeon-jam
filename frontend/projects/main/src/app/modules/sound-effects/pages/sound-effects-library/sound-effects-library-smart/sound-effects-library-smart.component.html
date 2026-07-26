@@ -1,0 +1,16 @@
+<app-sound-effects-library
+  [dataset]="soundEffects()"
+  [loading]="loading()"
+  [playingEffectIds]="playingEffectIds()"
+  [focusSoundEffectId]="soundEffectId()"
+  (uploadAudioFiles)="createFromFiles($event)"
+  (playEffect)="playEffect($event)"
+  (stopEffect)="stopEffect($event)"
+  (toggleEffectLoop)="toggleEffectLoop($event)"
+  (effectVolumeChange)="updateVolume($event)"
+  (queryOptions)="currentQueryOptions.set($event)"
+  (editSoundEffect)="editSoundEffect($event)"
+  (deleteSoundEffect)="deleteSoundEffect($event)"
+  (reorderDrop)="reorderSoundEffects($event)"
+  (openAudioFilesDialog)="beginUploadWithDialogSelection()"
+/>

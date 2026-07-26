@@ -4,11 +4,17 @@
     "module": "commonjs",
     "strict": true,
     "esModuleInterop": true,
+    "resolveJsonModule": true,
     "outDir": "./build",
+    "rootDir": ".",
+    "baseUrl": ".",
+    "paths": {
+      "@shared/*": ["shared/*"]
+    }
   },
-  "files": [
-    "src/index.ts",
-    "src/preload.ts",
-    "src/capture.ts"
+  "include": [
+    "src/**/*",
+    "shared/**/*",
+    "node_modules/vitest/globals.d.ts"
   ]
 }

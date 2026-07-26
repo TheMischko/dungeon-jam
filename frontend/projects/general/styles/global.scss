@@ -1,0 +1,317 @@
+@use '@angular/material' as mat;
+@use './styles_theme-colors' as custom;
+@use './colors' as col;
+@use './typography' as typo;
+
+html {
+  @include mat.theme(
+    (
+      color: (
+        theme-type: dark,
+        primary: custom.$primary-palette,
+        accent: custom.$neutral-palette,
+        tertiary: custom.$tertiary-palette,
+      ),
+      typography: (
+        plain-family: typo.$font,
+        brand-family: typo.$font,
+        bold-weight: 800,
+        medium-weight: 500,
+        regular-weight: 300,
+      ),
+      density: 0,
+    )
+  );
+
+  @include mat.paginator-overrides(
+    (
+      container-background-color: transparent,
+      container-text-color: col.$text-main,
+      container-text-font: typo.$font,
+    )
+  );
+
+  scrollbar-width: none;
+  -webkit-scrollbar {
+    display: none;
+  }
+  scrollbar-color: col.$primary transparent;
+  scrollbar-arrow-color: transparent;
+  -ms-scrollbar-track-color: transparent;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: col.$background-deep;
+  overflow: hidden;
+  @include typo.default-font();
+}
+app-root {
+  display: block;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  &.initialized {
+    margin: 8px 8px 0 8px;
+    padding: 8px;
+    background: col.$background-main;
+    color: col.$text-main;
+  }
+
+  & > * {
+    box-sizing: border-box;
+  }
+}
+
+.app-dialog-container {
+  box-shadow: 1px 2px 5px 5px rgba(0, 0, 0, 0.3);
+
+  width: auto !important;
+  max-width: 90vw;
+  max-height: 90vh;
+
+  .mat-mdc-dialog-surface {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+
+    padding: 1rem;
+    box-sizing: border-box;
+
+    background: col.$background-main;
+  }
+}
+
+.icon-small {
+  max-width: 16px;
+  max-height: 16px;
+}
+.icon-regular {
+  max-width: 24px;
+  max-height: 24px;
+}
+.icon-large {
+  max-width: 32px;
+  max-height: 32px;
+}
+
+button.mdc-button.button-small {
+  height: 26px;
+  width: 26px;
+  min-width: 26px;
+  padding-top: 3px;
+}
+button.mdc-button.button-regular {
+  height: 42px;
+  width: 42px;
+  min-width: 42px;
+  padding-top: 4px;
+}
+button.mdc-button.button-large {
+  height: 56px;
+  width: 56px;
+  min-width: 56px;
+  padding-top: 3px;
+}
+
+/* Circular icon-only buttons */
+button.mdc-button.icon-only-button {
+  border-radius: 50%;
+  padding: 0;
+  aspect-ratio: 1 / 1;
+}
+
+/* Pill buttons (icon + label) */
+button.mdc-button.button-small.pill-button {
+  width: auto;
+  min-width: fit-content;
+  border-radius: 13px;
+  padding: 4px 12px;
+
+  .button-label {
+    font-size: 12px;
+  }
+}
+button.mdc-button.button-regular.pill-button {
+  width: auto;
+  min-width: fit-content;
+  border-radius: 21px;
+  padding: 4px 16px;
+
+  .button-label {
+    font-size: 14px;
+  }
+}
+button.mdc-button.button-large.pill-button {
+  height: 48px;
+  width: auto;
+  min-width: fit-content;
+  border-radius: 24px;
+  padding: 0 18px;
+
+  .button-label {
+    font-size: 15px;
+  }
+}
+
+/**
+ * Flat buttons Color overrides
+ */
+button.mdc-button.mat-mdc-unelevated-button.mat-error,
+button.mdc-button.mat-mdc-unelevated-button.mat-danger {
+  background-color: col.$error;
+  color: col.$text-main;
+}
+button.mdc-button.mat-mdc-unelevated-button.mat-secondary,
+button.mdc-button.mat-mdc-unelevated-button.mat-neutral {
+  background-color: col.$text-main;
+  color: col.$text-secondary;
+}
+button.mdc-button {
+  svg[lucideIcon] {
+    display: inline-block;
+    margin-bottom: -5px;
+  }
+}
+a {
+  @include typo.default-font();
+  color: col.$text-main;
+
+  &:active,
+  &:focus {
+    color: col.$text-main;
+  }
+
+  &:hover {
+    color: col.$primary;
+  }
+}
+
+.fade-in-animation {
+  animation: fade-in 0.4s;
+}
+
+.fade-out-animation {
+  animation: fade-out 0.4s;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0);
+  }
+}
+
+.lean-in-animation {
+  animation: lean-in 0.4s;
+}
+
+.lean-out-animation {
+  animation: lean-out 0.4s;
+}
+
+@keyframes lean-in {
+  from {
+    transform: translateX(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes lean-out {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(50px);
+    opacity: 0;
+  }
+}
+
+.slide-in-animation {
+  animation: slide-in 0.15s;
+}
+
+.slide-out-animation {
+  animation: slide-out 0.1s;
+}
+
+@keyframes slide-in {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-out {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-25px);
+    opacity: 0;
+  }
+}
+
+.highlight-focus {
+  animation: highlight-flash 2s;
+  transition: background-color 0.4s linear;
+}
+
+@keyframes highlight-flash {
+  0% {
+    background-color: opacify(col.$primary, 0.5);
+  }
+  25% {
+    background-color: transparent;
+  }
+  50% {
+    background-color: opacify(col.$primary, 0.5);
+  }
+  75% {
+    background-color: transparent;
+  }
+}
+
+.dragging {
+  background: col.$background-deep;
+  color: col.$text-main;
+  opacity: 0.75;
+}
+
+.mat-mdc-snack-bar-container.notification-animation {
+  animation: lean-in 0.4s cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
+
+  &.mdc-snackbar--closing,
+  &.mat-mdc-snack-bar-closing {
+    animation: lean-out 0.3s ease-in forwards !important;
+  }
+}

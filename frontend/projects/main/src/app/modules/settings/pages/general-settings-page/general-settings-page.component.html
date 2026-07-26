@@ -1,0 +1,35 @@
+<h1 class="title">Settings</h1>
+<div class="page-content">
+  <lib-collapsible-section [data]="sections()" />
+  <div class="footer-buttons">
+    <button mat-flat-button color="error" (click)="openLogsDir.emit()">
+      Open logs
+    </button>
+  </div>
+  <div class="app-version">DungeonJam v{{ appVersion() }}</div>
+</div>
+
+<ng-template #tokensTemp>
+  <button mat-flat-button (click)="onCreateToken()">Create token</button>
+  @if (tokensLoading()) {
+    <div class="loading">Loading tokens...</div>
+  } @else {
+    @if (tokens()?.length === 0) {
+      <div class="empty-state">
+        No Discord tokens configured. Add one to get started.
+      </div>
+    } @else {
+      <div class="tokens-list">
+        @for (token of tokens(); track token.id) {
+          <app-token-box
+            [token]="token"
+            [tokenState]="tokenConnectionMap()[token.id]"
+            (editToken)="onEditToken($event)"
+            (deleteToken)="onDeleteToken($event)"
+            (toggleConnection)="toggleTokenConnection.emit($event)"
+          />
+        }
+      </div>
+    }
+  }
+</ng-template>

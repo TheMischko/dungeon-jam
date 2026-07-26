@@ -1,0 +1,41 @@
+@use 'colors' as col;
+@use 'typography' as typo;
+
+.title {
+  @include typo.page-title();
+}
+
+.page-content {
+  display: block;
+  padding: 1rem;
+  max-width: 95%;
+}
+
+.loading {
+  padding: 2rem;
+  text-align: center;
+}
+
+.empty-state {
+  padding: 2rem;
+  text-align: center;
+  font-style: italic;
+}
+
+.tokens-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+}
+
+.footer-buttons {
+  margin-top: 2rem;
+  align-self: flex-end;
+}
+
+.app-version {
+  margin-top: 2rem;
+  justify-self: flex-end;
+  color: col.$text-secondary-bright;
+}

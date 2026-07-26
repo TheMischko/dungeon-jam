@@ -1,0 +1,16 @@
+<div
+  class="container"
+  (dragover)="blockEvent($event)"
+  (dragend)="blockEvent($event)"
+  (drag)="blockEvent($event)"
+  (mousedown)="mouseDown()"
+  (mouseup)="mouseUp($event)"
+  (mousemove)="mouseOverBar($event)"
+>
+  <div class="position">{{ position() | trackDuration }}</div>
+  <div #progressBar class="progress-bar">
+    <div class="pointer" [ngStyle]="pointerLeftStyle()"></div>
+    <div class="fill" [ngStyle]="fillWidthStyle()"></div>
+  </div>
+  <div class="duration">{{ duration() | trackDuration }}</div>
+</div>

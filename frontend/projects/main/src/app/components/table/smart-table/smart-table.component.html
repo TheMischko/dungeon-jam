@@ -1,0 +1,73 @@
+@if (showControls()) {
+  <div class="controls">
+    @if (filterEnabled()) {
+      <app-filter-settings
+        [value]="currentFilterMatchingMethod()"
+        (matchingChange)="updateFilterMatchingType($event)"
+      />
+      <div class="filters">
+        <app-tags-filter
+          [initialIds]="currentTagFilterIds()"
+          (selectionChange)="emitTagFilters($event)"
+        />
+        <app-playlist-filter
+          [initialIds]="currentPlaylistFilterIds()"
+          (selectionChange)="emitPlaylistFilters($event)"
+        />
+      </div>
+    } @else {
+      <div></div>
+    }
+    <lib-search-bar
+      class="search-bar"
+      [value]="currentSearch()"
+      (search)="currentSearch.set($event)"
+    ></lib-search-bar>
+  </div>
+}
+@if (loading()) {
+  <lib-loader size="large" class="loader"></lib-loader>
+} @else if (
+  dataSet().length === 0 &&
+  (currentSearch() || currentFilters().filters.length > 0)
+) {
+  <div class="no-data">{{ noResultsText() }}</div>
+} @else if (dataSet().length === 0) {
+  <div class="no-data">{{ noDataText() }}</div>
+} @else {
+  <app-table
+    class="table"
+    [config]="config()"
+    [dataSet]="dataSet()"
+    [selection]="selection()"
+    [initialSelection]="initialSelection()"
+    [allSelectedState]="allSelectedState()"
+    [actionsFn]="actionsFn()"
+    [trackBy]="trackBy()"
+    [uniquenessFn]="uniquenessFn()"
+    [defaultSortBy]="currentSortBy() ?? ''"
+    [defaultSortDirection]="currentSortDirection()"
+    [headerCellMenu]="columnsMenu"
+    [visibleColumns]="enabledColumns()"
+    [pagination]="pagination()"
+    [customRowAttributeName]="customRowAttributeName()"
+    [customRowAttributeValueFn]="customRowAttributeValueFn()"
+    (selected)="selected.emit($event)"
+    (hoverStart)="hoverStart.emit($event)"
+    (hoverEnd)="hoverEnd.emit($event)"
+    (sortChange)="setSort($event)"
+    (pageChange)="pageChange.emit($event)"
+  ></app-table>
+}
+
+<mat-menu #columnsMenu="matMenu" class="columns-menu">
+  @for (colName of collapsibleColumnNames(); track colName) {
+    @let col = collapsibleColumns()[colName]!;
+    <mat-checkbox
+      [checked]="isColumnEnabled(colName)"
+      (click)="toggleColumn(colName, $event)"
+    >
+      {{ col.title }}
+    </mat-checkbox>
+  }
+</mat-menu>

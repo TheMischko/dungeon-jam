@@ -1,0 +1,47 @@
+@use 'colors' as col;
+@use 'typography' as typo;
+@use "mixins" as mix;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+
+  .play-pause-button{
+    opacity: 0;
+    transition: opacity 0.1s mix.$animation-fn;
+  }
+  &:hover .play-pause-button{
+    opacity: 1;
+  }
+}
+
+.sound-effects {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  overflow-y: auto;
+}
+
+.header {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 0.5rem;
+
+  .title-section {
+    display: flex;
+    gap: 0.5rem;
+
+    .list-header {
+      @include typo.h3();
+    }
+  }
+}

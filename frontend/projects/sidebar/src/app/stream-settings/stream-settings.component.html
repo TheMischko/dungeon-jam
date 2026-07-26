@@ -1,0 +1,28 @@
+<div [matMenuTriggerFor]="streamingMenu" class="content">
+  <div class="icon">
+    <svg [lucideIcon]="currentIcon()!" [size]="28"></svg>
+  </div>
+  <div class="content-info">
+    <div class="stream-title">
+      @if (isDiscordPlayback()) {
+        {{ '' }}
+      } @else {
+        {{ localStreamText }}
+      }
+    </div>
+    @if (isDiscordPlayback()) {
+      <div class="stream-description">
+        @let discordData = discordPlayback();
+        Channel: {{ discordData.guildName }} - {{ discordData.channelName
+        }}<span></span>
+      </div>
+    }
+  </div>
+</div>
+<mat-menu #streamingMenu="matMenu">
+  <lib-actions-menu
+    [config]="actionMenuConfig()"
+    [item]="null"
+    class="settings-menu"
+  />
+</mat-menu>

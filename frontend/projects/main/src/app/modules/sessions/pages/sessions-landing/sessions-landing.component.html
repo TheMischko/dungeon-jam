@@ -1,0 +1,6 @@
+<h1 class="title">Sessions</h1>
+<button mat-flat-button (click)="createSession.emit()">
+  Create new session
+</button>
+
+<app-sessions-grid-smart [initialSizeIndex]="defaultSizeIndex" />

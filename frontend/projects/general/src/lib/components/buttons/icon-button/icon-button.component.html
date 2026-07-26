@@ -1,0 +1,58 @@
+@switch (type()) {
+  @case (ButtonType.Flat) {
+    <button
+      mat-flat-button
+      [color]="materialColor()"
+      [disabled]="disabled()"
+      [ngClass]="buttonClass()"
+      (click)="buttonClicked()"
+    >
+      <ng-container *ngTemplateOutlet="content"></ng-container>
+    </button>
+  }
+  @case (ButtonType.Raised) {
+    <button
+      mat-raised-button
+      [color]="materialColor()"
+      [disabled]="disabled()"
+      [ngClass]="buttonClass()"
+      (click)="buttonClicked()"
+    >
+      <ng-container *ngTemplateOutlet="content"></ng-container>
+    </button>
+  }
+  @case (ButtonType.Stroked) {
+    <button
+      mat-stroked-button
+      [color]="materialColor()"
+      [disabled]="disabled()"
+      [ngClass]="buttonClass()"
+      (click)="buttonClicked()"
+    >
+      <ng-container *ngTemplateOutlet="content"></ng-container>
+    </button>
+  }
+  @default {
+    <button
+      mat-button
+      [color]="materialColor()"
+      [disabled]="disabled()"
+      [ngClass]="buttonClass()"
+      (click)="buttonClicked()"
+    >
+      <ng-container *ngTemplateOutlet="content"></ng-container>
+    </button>
+  }
+}
+
+<ng-template #content>
+  <svg
+    class="button-icon {{ !!label()?.length ? 'has-text' : '' }}"
+    [size]="iconSize()"
+    [lucideIcon]="icon()"
+    [ngClass]="iconClass()"
+  ></svg>
+  @if (label()) {
+    <span class="button-label">{{ label() }}</span>
+  }
+</ng-template>

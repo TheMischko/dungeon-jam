@@ -1,0 +1,12 @@
+<app-sessions-grid
+  [sessions]="sessions()"
+  [loading]="sessionsLoading()"
+  [showControls]="showControls()"
+  [sizeConfig]="sizeConfig()"
+  [availableSizes]="availableSizes()"
+  [currentSizeIndex]="currentSizeIndex()"
+  [imageMap]="sessionImages()"
+  (sessionClick)="navigateToDetail($event)"
+  (sizeChange)="handleSizeChange($event)"
+  (search)="searchFilter.set($event)"
+></app-sessions-grid>

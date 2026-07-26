@@ -1,0 +1,59 @@
+@use 'colors' as col;
+
+:host {
+  display: flex;
+}
+
+.toast-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 54px;
+  background: white;
+  width: 100%;
+  clip-path: polygon(0% 0%, 97.5% 0%, 100% 50%, 97.5% 100%, 0% 100%, 2.5% 50%);
+}
+
+.toast {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-around;
+  gap: 0.125rem;
+  padding: 0 1rem;
+  height: calc(100% - 4px);
+  width: calc(100% - 38px);
+  clip-path: polygon(0% 0%, 97.5% 0%, 100% 50%, 97.5% 100%, 0% 100%, 2.5% 50%);
+
+  &.success {
+    background: col.$primary;
+    color: white;
+  }
+
+  &.error {
+    background: col.$error;
+    color: white;
+  }
+
+  .toast-title,
+  .toast-message {
+    margin: 0;
+  }
+
+  .dismiss-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-51%);
+    right: 2px;
+  }
+}
+
+::ng-deep .mdc-snackbar__label {
+  padding: 0;
+}
+
+::ng-deep .mat-mdc-snack-bar-container .mat-mdc-snackbar-surface {
+  background: none;
+}

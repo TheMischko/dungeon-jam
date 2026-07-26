@@ -1,0 +1,57 @@
+<app-grid-controls [showSizeControl]="false" (search)="search.emit($event)">
+  <app-sound-effect-display-mode-switch
+    class="mode-switcher"
+    [mode]="viewMode()"
+    (modeChange)="modeChange.emit($event)"
+  />
+</app-grid-controls>
+
+<app-smart-table
+  [config]="config"
+  [dataSet]="soundEffects()"
+  [loading]="loading()"
+  [showControls]="false"
+  [selection]="selection()"
+  [initialSelection]="initialSelection()"
+  [allSelectedState]="allSelectedState()"
+  [hiddenColumns]="hiddenColumns()"
+  [uniquenessFn]="uniquenessFunction"
+  (selected)="selectionChange.emit($event)"
+  customRowAttributeName="sound-effect-id"
+  [customRowAttributeValueFn]="idFunction"
+></app-smart-table>
+
+<ng-template #playColumn let-row="$implicit">
+  <lib-play-pause-button
+    [state]="getPlayBtnState(row)"
+    (toggle)="emitPlayOrPause(row)"
+  />
+</ng-template>
+
+<ng-template #loopColumn let-row="$implicit">
+  <app-repeat-state-button
+    [repeatState]="getRepeatState(row)"
+    (clicked)="toggleEffectLoop.emit(row)"
+  />
+</ng-template>
+
+<ng-template #volumeColumn let-row="$implicit">
+  <app-volume-control [volume]="row.volume" [showIcon]="false" [size]="0.75" />
+</ng-template>
+
+<ng-template #tagColumn let-row="$implicit">
+  @if (row.tags) {
+    <lib-tag-list-smart
+      [tagIds]="row.tags"
+      [editable]="false"
+      [priorityValue]="'currentSearchValue()'"
+    />
+  }
+</ng-template>
+
+<ng-template #actionsColumn let-row="$implicit">
+  <lib-icon-button [matMenuTriggerFor]="menu" [icon]="ActionsIcon" />
+  <mat-menu #menu="matMenu">
+    <lib-actions-menu [item]="row" [config]="actionsMenu()" />
+  </mat-menu>
+</ng-template>

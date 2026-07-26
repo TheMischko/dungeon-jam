@@ -1,0 +1,26 @@
+@use "@angular/material" as mat;
+@use "colors" as col;
+
+.switch-wrapper{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+
+  .switch{
+    width: 70px;
+  }
+}
+
+:host {
+  @include mat.slide-toggle-overrides((
+    selected-icon-size: 0px,
+    unselected-icon-size: 0px,
+    track-width: 70px,
+    touch-target-size: 70px,
+  ));
+
+  ::ng-deep .mat-mdc-slide-toggle .mdc-switch--selected .mdc-switch__handle:has(.mdc-switch__icons) {
+    margin: 0 42px;
+  }
+}

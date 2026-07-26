@@ -1,0 +1,13 @@
+<mat-form-field [subscriptSizing]="'dynamic'">
+  <mat-label>{{ label() }}</mat-label>
+  <mat-select
+    [placeholder]="placeholder()"
+    [value]="selection()"
+    (selectionChange)="emitSelection($event)"
+    multiple
+  >
+    @for (option of options(); track trackBy()($index, option)){
+    <mat-option [value]="option">{{ option[optionDisplayField()] }}</mat-option>
+    }
+  </mat-select>
+</mat-form-field>

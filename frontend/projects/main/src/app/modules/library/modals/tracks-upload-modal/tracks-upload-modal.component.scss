@@ -1,0 +1,26 @@
+@use 'mixins' as mix;
+@use 'colors' as col;
+
+:host {
+  @include mix.base-dialog();
+}
+
+.footer {
+  .steps {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    .step-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: col.$text-main;
+      transition: background-color 0.25s ease;
+
+      &.active {
+        background: col.$primary;
+      }
+    }
+  }
+}

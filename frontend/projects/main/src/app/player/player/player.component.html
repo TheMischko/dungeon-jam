@@ -1,0 +1,60 @@
+<div class="player-content">
+  <div class="info">
+    <p libScrollOverflowText (click)="navigateToActiveTrack.emit()">
+      {{ currentTrack()?.name || '' }}
+    </p>
+    <p libScrollOverflowText (click)="navigateToActiveTrack.emit()">
+      {{ currentTrack()?.author || '' }}
+    </p>
+  </div>
+  <div class="controls">
+    <!-- Prev -->
+    <div class="buttons">
+      <app-shuffle-button
+        [shuffleState]="shuffle()"
+        (clicked)="shuffleChange.emit()"
+      ></app-shuffle-button>
+      <lib-icon-button
+        [icon]="prevIcon"
+        size="regular"
+        (clicked)="skipPrev.emit()"
+      ></lib-icon-button>
+
+      <!-- Play/Pause -->
+      <lib-play-pause-button
+        [state]="playPauseState()"
+        (toggle)="togglePlayPause($event)"
+      ></lib-play-pause-button>
+
+      <!-- Next -->
+      <lib-icon-button
+        [icon]="nextIcon"
+        size="regular"
+        (clicked)="skipNext.emit()"
+      ></lib-icon-button>
+
+      <!-- Repeat -->
+      <app-repeat-state-button
+        [repeatState]="repeat()"
+        (clicked)="repeatChange.emit()"
+      ></app-repeat-state-button>
+    </div>
+
+    <app-player-bar
+      class="duration-bar"
+      [duration]="$safeNavigationMigration(trackPosition()?.duration)"
+      [position]="$safeNavigationMigration(trackPosition()?.position)"
+      (seek)="seek.emit($event)"
+    ></app-player-bar>
+  </div>
+  <div class="volume">
+    <app-queue-indicator [playback]="playBackState()" class="queue-display" />
+    <div class="volume-wrapper">
+      <app-volume-control
+        [volume]="volume()"
+        (changed)="volumeChange.emit($event)"
+      ></app-volume-control>
+    </div>
+  </div>
+</div>
+<app-sound-effect-bar-smart />

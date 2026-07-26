@@ -1,0 +1,10 @@
+<lib-tag-list
+  animate.enter="fade-in-animation"
+  animate.leave="fade-out-animation"
+  [tags]="loadedTags()"
+  [fontSize]="fontSize()"
+  [editable]="editable()"
+  [maxShownTags]="maxShownTags()"
+  [priorityValue]="priorityValue()"
+  (removed)="tagRemoved($event)"
+/>

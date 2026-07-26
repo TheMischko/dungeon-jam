@@ -1,0 +1,45 @@
+@let playlistItem = playlist();
+<app-grid-item
+  [title]="playlistItem.name"
+  [tags]="playlistItem.tags"
+  [image]="imageSrc()"
+  [noImageIcon]="PlaylistIcon"
+  [sizeConfig]="sizeConfig()"
+  (clicked)="onPlaylistClick()"
+>
+  <div ngProjectAs="content" style="display: contents">
+    @if (showTrackCount()) {
+      <div class="tracks-overlay small-overlay">
+        <svg
+          [lucideIcon]="tracksIcon"
+          [size]="sizeConfig().trackCountSize"
+        />
+        <span [ngStyle]="trackCountSize()">{{
+          playlist().trackIds.length
+        }}</span>
+      </div>
+    }
+    @if (parentPlaylist()) {
+      <div class="parent-overlay small-overlay">
+        {{ parentPlaylist()!.name }}
+      </div>
+    }
+    @if (isPlaying()) {
+      <div class="is-playing-overlay small-overlay">
+        <svg
+          [lucideIcon]="playingIcon"
+          [size]="sizeConfig().trackCountSize ?? 14"
+        ></svg>
+      </div>
+    }
+  </div>
+  <div ngProjectAs="hovering-content" style="display: contents">
+    <div class="hover-overlay">
+      <svg
+        class="icon"
+        [lucideIcon]="overlayIcon()!"
+        (click)="onOverlayButtonClick($event)"
+      ></svg>
+    </div>
+  </div>
+</app-grid-item>

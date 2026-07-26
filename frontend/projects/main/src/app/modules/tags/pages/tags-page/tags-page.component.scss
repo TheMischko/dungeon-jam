@@ -1,0 +1,13 @@
+@use 'typography' as typo;
+
+.title{
+  @include typo.page-title();
+}
+
+.tags-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 16px;
+  box-sizing: border-box;
+}

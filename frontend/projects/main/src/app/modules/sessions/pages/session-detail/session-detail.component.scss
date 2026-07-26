@@ -1,0 +1,24 @@
+@use 'typography' as typo;
+
+:host {
+  display: block;
+  margin-bottom: 3rem;
+}
+
+.title {
+  @include typo.page-title();
+}
+
+.scenes-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 0.5rem;
+}
+
+.scene-console {
+  display: flex;
+  padding: 0.5rem;
+  border-radius: 8px;
+  box-shadow: 0 0 5px 3px rgba(0, 0, 0, 0.25);
+}

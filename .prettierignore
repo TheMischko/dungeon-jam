@@ -1,0 +1,2 @@
+# Exclude range-slider component from Prettier formatting
+frontend/projects/general/src/lib/components/controls/range-slider/range-slider.component.html

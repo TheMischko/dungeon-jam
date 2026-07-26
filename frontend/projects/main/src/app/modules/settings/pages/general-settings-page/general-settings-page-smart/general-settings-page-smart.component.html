@@ -1,0 +1,11 @@
+<app-general-settings-page
+  [tokens]="tokens()"
+  [tokensLoading]="tokensLoading()"
+  [tokenConnectionMap]="tokenConnectionMap()"
+  [appVersion]="appVersion()"
+  (editToken)="editToken($event)"
+  (deleteToken)="deleteToken($event)"
+  (createToken)="createToken()"
+  (toggleTokenConnection)="toggleTokenState($event)"
+  (openLogsDir)="openLogsDir()"
+/>

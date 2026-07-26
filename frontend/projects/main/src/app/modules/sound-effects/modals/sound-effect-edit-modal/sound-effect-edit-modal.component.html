@@ -1,0 +1,29 @@
+<div class="wrapper">
+  <div class="header">
+    <h1>Edit Sound Effect {{ soundEffectForm().title().value() }}</h1>
+  </div>
+
+  <div class="content">
+    @if(loading() && !soundEffectForm()) {
+    <lib-loader size="large" class="loader"></lib-loader>
+    } @else {
+    <app-sound-effect-form [form]="soundEffectForm()!"></app-sound-effect-form>
+    }
+  </div>
+
+  <div class="footer">
+    <div class="buttons">
+      <button mat-flat-button color="error" (click)="deleteSoundEffect()">
+        <svg [lucideIcon]="deleteIcon" size="20" />
+        Delete
+      </button>
+      <button mat-flat-button color="primary" (click)="updateSoundEffect()">
+        <svg [lucideIcon]="saveIcon" size="20" />
+        Save
+      </button>
+      <button mat-flat-button color="secondary" (click)="cancel()">
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>

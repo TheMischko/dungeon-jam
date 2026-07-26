@@ -1,0 +1,39 @@
+@use 'mixins' as mix;
+
+:host {
+  @include mix.base-dialog();
+  width: 80vw;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  overflow-y: hidden;
+
+  .wrapper {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 0;
+  }
+
+  .content {
+    flex: 1;
+    min-height: 0;
+    max-height: 60%;
+    overflow: hidden;
+
+    .table {
+      height: 500px;
+      min-height: 0;
+    }
+  }
+
+  .footer-button {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    width: 100%;
+  }
+}

@@ -1,0 +1,10 @@
+:host {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+
+  .unmaximize-icon {
+    transform: rotateY(180deg);
+  }
+}
