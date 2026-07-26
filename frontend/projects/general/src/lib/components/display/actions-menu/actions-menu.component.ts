@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { LucideAngularModule, LucideIconData } from 'lucide-angular';
+import { LucideDynamicIcon, LucideIconData } from '@lucide/angular';
 import { MatMenuItem } from '@angular/material/menu';
 import { NgClass } from '@angular/common';
 import { MatTooltip } from '@angular/material/tooltip';
 
 @Component({
   selector: 'lib-actions-menu',
-  imports: [LucideAngularModule, MatMenuItem, NgClass, MatTooltip],
+  imports: [LucideDynamicIcon, MatMenuItem, NgClass, MatTooltip],
   templateUrl: './actions-menu.component.html',
   styleUrl: './actions-menu.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

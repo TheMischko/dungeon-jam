@@ -8,11 +8,11 @@ import {
 import { ButtonSize, ButtonType } from '../../../../../models/button.model';
 import { MatButton } from '@angular/material/button';
 import { NgClass, NgTemplateOutlet } from '@angular/common';
-import { LucideAngularModule, LucideIconData } from 'lucide-angular';
+import { LucideDynamicIcon, LucideIconData } from '@lucide/angular';
 
 @Component({
   selector: 'lib-icon-button',
-  imports: [MatButton, NgTemplateOutlet, LucideAngularModule, NgClass],
+  imports: [MatButton, NgTemplateOutlet, LucideDynamicIcon, NgClass],
   templateUrl: './icon-button.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './icon-button.component.scss',

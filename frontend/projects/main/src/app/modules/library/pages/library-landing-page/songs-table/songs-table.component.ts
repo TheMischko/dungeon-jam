@@ -10,7 +10,7 @@ import {
   ChangeDetectionStrategy,
 } from '@angular/core';
 import { Track } from '@shared/models/track.model';
-import { LucideAngularModule } from 'lucide-angular';
+import { LucideDynamicIcon } from '@lucide/angular';
 import { actionsIconSet, iconSet } from '@general/icons/icons';
 import { MatIconButton } from '@angular/material/button';
 import { TrackDurationPipe } from '@general/pipes/track-duration.pipe';
@@ -44,7 +44,7 @@ import { PageEvent } from '@angular/material/paginator';
 @Component({
   selector: 'app-songs-table',
   imports: [
-    LucideAngularModule,
+    LucideDynamicIcon,
     MatIconButton,
     IconButtonComponent,
     MatMenuTrigger,

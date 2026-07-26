@@ -28,7 +28,7 @@
     @include typo.sound-effect-pill();
   }
 
-  lucide-icon {
+  svg[lucideIcon] {
     margin-bottom: -4px;
   }
 }

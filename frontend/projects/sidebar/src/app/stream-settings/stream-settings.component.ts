@@ -9,10 +9,10 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
-  LucideAngularModule,
+  LucideDynamicIcon,
   LucideIconData,
-  MonitorSpeakerIcon,
-} from 'lucide-angular';
+  LucideMonitorSpeaker,
+} from '@lucide/angular';
 import { MatMenu, MatMenuTrigger } from '@angular/material/menu';
 import {
   ActionsMenuBaseConfig,
@@ -38,7 +38,7 @@ type PlaybackApiWindow = Window & {
   selector: 'app-stream-settings',
   imports: [
     CommonModule,
-    LucideAngularModule,
+    LucideDynamicIcon,
     MatMenu,
     ActionsMenuComponent,
     MatMenuTrigger,
@@ -81,7 +81,7 @@ export class StreamSettingsComponent implements OnInit, AfterViewInit {
 
   readonly localStreamText = 'Playing locally';
 
-  readonly localPlaybackIcon = MonitorSpeakerIcon;
+  readonly localPlaybackIcon = LucideMonitorSpeaker.icon;
   readonly discordPlaybackIcon = 'discord';
 
   readonly serversFlattened = computed<ActionsMenuBaseConfig<null>[]>(() => {

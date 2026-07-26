@@ -172,7 +172,7 @@ button.mdc-button.mat-mdc-unelevated-button.mat-neutral {
   color: col.$text-secondary;
 }
 button.mdc-button {
-  lucide-icon svg {
+  svg[lucideIcon] {
     display: inline-block;
     margin-bottom: -5px;
   }

@@ -6,7 +6,6 @@ import {
   output,
   ChangeDetectionStrategy,
 } from '@angular/core';
-import { LucideAngularModule } from 'lucide-angular';
 import { volumeIconSet } from '@general/icons/icons';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -15,7 +14,7 @@ import { debounceTime } from 'rxjs';
 
 @Component({
   selector: 'app-volume-control',
-  imports: [LucideAngularModule, ReactiveFormsModule, RangeSliderComponent],
+  imports: [ReactiveFormsModule, RangeSliderComponent],
   templateUrl: './volume-control.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './volume-control.component.scss',

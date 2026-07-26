@@ -9,11 +9,11 @@ import {
 import { SidebarItem } from '../../../models/sidebar.model';
 import { RedirectRequest } from '@shared/models/redirect.model';
 import { actionsIconSet } from '@general/icons/icons';
-import { LucideAngularModule } from 'lucide-angular';
+import { LucideDynamicIcon } from '@lucide/angular';
 
 @Component({
   selector: 'app-sidebar-item',
-  imports: [LucideAngularModule],
+  imports: [LucideDynamicIcon],
   templateUrl: './sidebar-item.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './sidebar-item.component.scss',

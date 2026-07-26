@@ -18,7 +18,7 @@ import { LoaderComponent } from '@general/components/display/loader/loader.compo
 import { toObservable } from '@angular/core/rxjs-interop';
 import { combineLatestWith, map } from 'rxjs';
 import { actionsIconSet } from '@general/icons/icons';
-import { LucideAngularModule } from 'lucide-angular';
+import { LucideDynamicIcon } from '@lucide/angular';
 
 @Component({
   selector: 'app-sound-effect-edit-modal',
@@ -26,7 +26,7 @@ import { LucideAngularModule } from 'lucide-angular';
     MatButton,
     SoundEffectFormComponent,
     LoaderComponent,
-    LucideAngularModule,
+    LucideDynamicIcon,
   ],
   templateUrl: './sound-effect-edit-modal.component.html',
   styleUrl: './sound-effect-edit-modal.component.scss',

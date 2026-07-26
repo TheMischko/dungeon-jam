@@ -14,7 +14,7 @@ import { RepeatStateButtonComponent } from '../../../../player/player/repeat-sta
 import { VolumeControlComponent } from '../../../../player/player/volume-control/volume-control.component';
 import { NgStyle } from '@angular/common';
 import { actionsIconSet, iconSet } from '@general/icons/icons';
-import { LucideAngularModule } from 'lucide-angular';
+import { LucideDynamicIcon } from '@lucide/angular';
 import {
   ActionsMenuBaseConfig,
   ActionsMenuComponent,
@@ -33,7 +33,7 @@ import { ScrollOverflowTextDirective } from '@general/directives/scroll-overflow
     RepeatStateButtonComponent,
     VolumeControlComponent,
     NgStyle,
-    LucideAngularModule,
+    LucideDynamicIcon,
     ActionsMenuComponent,
     IconButtonComponent,
     MatMenu,

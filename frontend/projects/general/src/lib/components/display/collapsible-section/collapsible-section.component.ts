@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, effect, input, signal } from '@angu
 import { CdkAccordionModule } from '@angular/cdk/accordion';
 import { NgTemplateOutlet } from '@angular/common';
 import { actionsIconSet } from '@general/icons/icons';
-import { LucideAngularModule } from 'lucide-angular';
+import { LucideDynamicIcon } from '@lucide/angular';
 import { CollapsibleSectionConfig } from '../../../../../models/collapsible-section-component.model';
 
 @Component({
@@ -10,7 +10,7 @@ import { CollapsibleSectionConfig } from '../../../../../models/collapsible-sect
   imports: [
     NgTemplateOutlet,
     CdkAccordionModule,
-    LucideAngularModule,
+    LucideDynamicIcon,
   ],
   templateUrl: './collapsible-section.component.html',
   styleUrl: './collapsible-section.component.scss',

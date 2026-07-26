@@ -10,8 +10,8 @@
   <div ngProjectAs="content" style="display: contents">
     @if (showTrackCount()) {
       <div class="tracks-overlay small-overlay">
-        <lucide-icon
-          [img]="tracksIcon"
+        <svg
+          [lucideIcon]="tracksIcon"
           [size]="sizeConfig().trackCountSize"
         />
         <span [ngStyle]="trackCountSize()">{{
@@ -26,20 +26,20 @@
     }
     @if (isPlaying()) {
       <div class="is-playing-overlay small-overlay">
-        <lucide-icon
-          [img]="playingIcon"
+        <svg
+          [lucideIcon]="playingIcon"
           [size]="sizeConfig().trackCountSize ?? 14"
-        ></lucide-icon>
+        ></svg>
       </div>
     }
   </div>
   <div ngProjectAs="hovering-content" style="display: contents">
     <div class="hover-overlay">
-      <lucide-icon
+      <svg
         class="icon"
-        [img]="overlayIcon()"
+        [lucideIcon]="overlayIcon()!"
         (click)="onOverlayButtonClick($event)"
-      ></lucide-icon>
+      ></svg>
     </div>
   </div>
 </app-grid-item>

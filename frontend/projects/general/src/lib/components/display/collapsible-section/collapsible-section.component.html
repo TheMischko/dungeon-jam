@@ -12,7 +12,7 @@
           (click)="toggleExpanded(item.value, $index)"
         >
           <h3>{{ item.title }}</h3>
-          <lucide-icon [img]="getExpandedIcon(expanded)" />
+          <svg [lucideIcon]="getExpandedIcon(expanded)" />
         </div>
 
         @if (expanded) {

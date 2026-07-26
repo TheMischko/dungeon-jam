@@ -13,13 +13,13 @@ import {
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { ImageApiService } from '@general/services/image-api.service';
 import { actionsIconSet } from '@general/icons/icons';
-import { LucideAngularModule } from 'lucide-angular';
+import { LucideDynamicIcon } from '@lucide/angular';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { FilesDropInZoneComponent } from '../../../modules/library/pages/library-landing-page/songs-drop-in-zone/files-drop-in-zone.component';
 
 @Component({
   selector: 'app-image-upload',
-  imports: [LucideAngularModule, FilesDropInZoneComponent],
+  imports: [LucideDynamicIcon, FilesDropInZoneComponent],
   templateUrl: './image-upload.component.html',
   styleUrl: './image-upload.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

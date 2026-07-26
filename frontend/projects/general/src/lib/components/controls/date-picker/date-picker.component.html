@@ -16,13 +16,13 @@
   />
   <mat-hint>{{ FORM_HINT }}</mat-hint>
   @if (value()) {
-    <lucide-icon
+    <svg
       matIconSuffix
-      [img]="ClearIcon"
+      [lucideIcon]="ClearIcon"
       [size]="24"
       class="clear-icon"
       (click)="clearValue($event)"
-    ></lucide-icon>
+    ></svg>
   }
   <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
   <mat-datepicker #picker [disabled]="disabled()"></mat-datepicker>

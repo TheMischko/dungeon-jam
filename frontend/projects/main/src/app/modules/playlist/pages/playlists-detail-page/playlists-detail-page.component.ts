@@ -18,7 +18,7 @@ import {
 import { ActionsMenuConfig } from '@general/components/display/actions-menu/actions-menu.component';
 import { actionsIconSet } from '@general/icons/icons';
 import { MatButton } from '@angular/material/button';
-import { LucideAngularModule } from 'lucide-angular';
+import { LucideDynamicIcon } from '@lucide/angular';
 import { QueryOptions } from '@shared/models/request.model';
 import { SwitchComponent } from '@general/components/controls/switch/switch.component';
 import { RouterLink } from '@angular/router';
@@ -34,7 +34,7 @@ import { FilesDropInZoneComponent } from '../../../../components/drag-and-drop/f
     SongsTableComponent,
     PlayPauseButtonComponent,
     MatButton,
-    LucideAngularModule,
+    LucideDynamicIcon,
     SwitchComponent,
     RouterLink,
     CollapsibleSectionComponent,

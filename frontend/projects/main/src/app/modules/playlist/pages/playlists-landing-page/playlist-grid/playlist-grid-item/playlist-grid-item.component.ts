@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { NgStyle } from '@angular/common';
 import { iconSet, volumeIconSet } from '@general/icons/icons';
-import { LucideAngularModule, LucideIconData } from 'lucide-angular';
+import { LucideDynamicIcon, LucideIconData } from '@lucide/angular';
 import { PlaylistWithTagData } from '../../../../../../../../../general/models/playlist.model';
 import { PlaylistStore } from '@general/stores/playlist.store';
 import { GridPlaylistSizeConfig } from '../../../../../../models/grid-item-size-config.model';
@@ -16,7 +16,7 @@ import { GridItemComponent } from '../../../../../../components/grid/grid-item/g
 
 @Component({
   selector: 'app-playlist-grid-item',
-  imports: [NgStyle, LucideAngularModule, GridItemComponent],
+  imports: [NgStyle, LucideDynamicIcon, GridItemComponent],
   templateUrl: './playlist-grid-item.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './playlist-grid-item.component.scss',

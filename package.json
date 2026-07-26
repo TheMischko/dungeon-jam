@@ -3,7 +3,7 @@
   "version": "0.0.2-alpha",
   "author": "TheMischko",
   "private": true,
-  "license": "ISC",
+  "license": "GPL-3.0-only",
   "description": "",
   "main": "build/src/index.js",
   "scripts": {

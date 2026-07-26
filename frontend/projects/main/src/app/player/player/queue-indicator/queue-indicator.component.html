@@ -4,7 +4,7 @@
   [disabled]="!queueCount()"
   (click)="preventOnEmptyQueue($event)"
 >
-  <lucide-icon [img]="playlistIcon"></lucide-icon>
+  <svg [lucideIcon]="playlistIcon"></svg>
   <span class="queue-count">{{ queueCount() }}</span>
 </button>
 

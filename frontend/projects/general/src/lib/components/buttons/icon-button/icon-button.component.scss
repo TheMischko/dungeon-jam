@@ -2,7 +2,7 @@
 .neutral-button {
   color: white;
   border: none;
-  lucide-icon {
+  svg[lucideIcon] {
     color: white;
   }
   ::ng-deep &.mat-mdc-button:not(:disabled) {
@@ -21,7 +21,7 @@
 }
 
 /* Ensure icon color follows button color */
-.neutral-button lucide-icon {
+.neutral-button svg[lucideIcon] {
   color: inherit;
 }
 

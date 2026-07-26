@@ -7,12 +7,12 @@ import {
 import { Scene } from '@shared/models/scene.model';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { actionsIconSet } from '@general/icons/icons';
-import { LucideAngularModule } from 'lucide-angular';
+import { LucideDynamicIcon } from '@lucide/angular';
 import { CdkDragHandle } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-assigned-scene-box',
-  imports: [MatCheckbox, LucideAngularModule, CdkDragHandle],
+  imports: [MatCheckbox, LucideDynamicIcon, CdkDragHandle],
   templateUrl: './assigned-scene-box.component.html',
   styleUrl: './assigned-scene-box.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

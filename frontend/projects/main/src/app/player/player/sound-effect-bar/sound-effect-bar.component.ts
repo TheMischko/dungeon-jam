@@ -10,14 +10,12 @@ import {
 import { ActiveSoundEffect } from '../../../services/sound-effects-player.service';
 import { SoundEffectBarPillComponent } from './sound-effect-bar-pill/sound-effect-bar-pill.component';
 import { SoundEffect } from '@shared/models/sound-effect.model';
-import { LucideAngularModule } from 'lucide-angular';
 import { SoundEffectControlPillComponent } from './sound-effect-control-pill/sound-effect-control-pill.component';
 
 @Component({
   selector: 'app-sound-effect-bar',
   imports: [
     SoundEffectBarPillComponent,
-    LucideAngularModule,
     SoundEffectControlPillComponent,
   ],
   templateUrl: './sound-effect-bar.component.html',

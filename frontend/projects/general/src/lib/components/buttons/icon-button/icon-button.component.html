@@ -41,11 +41,11 @@
 } }
 
 <ng-template #content>
-  <lucide-icon
+  <svg
     [size]="iconSize()"
-    [img]="icon()"
+    [lucideIcon]="icon()"
     [ngClass]="iconClass()"
-  ></lucide-icon>
+  ></svg>
   @if (label()) {
     <span class="button-label">{{ label() }}</span>
   }

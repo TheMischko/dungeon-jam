@@ -4,7 +4,7 @@ import {
   computed,
   input,
 } from '@angular/core';
-import { LucideAngularModule } from 'lucide-angular';
+import { LucideDynamicIcon } from '@lucide/angular';
 import { iconSet } from '@general/icons/icons';
 import { PlaybackState } from '../../../models/playback.model';
 import { MatMenu, MatMenuTrigger } from '@angular/material/menu';
@@ -13,7 +13,7 @@ import { ScrollOverflowTextDirective } from '@general/directives/scroll-overflow
 @Component({
   selector: 'app-queue-indicator',
   imports: [
-    LucideAngularModule,
+    LucideDynamicIcon,
     MatMenuTrigger,
     MatMenu,
     ScrollOverflowTextDirective,

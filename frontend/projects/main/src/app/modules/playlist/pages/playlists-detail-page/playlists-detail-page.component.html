@@ -58,7 +58,7 @@
 <app-files-drop-in-zone (audioDropped)="audioDropped.emit($event)">
   <div class="actions">
     <button mat-flat-button (click)="openAddTracks.emit()">
-      <lucide-icon [img]="addTracksIcon"></lucide-icon>
+      <svg [lucideIcon]="addTracksIcon"></svg>
       <span>Add tracks from library</span>
     </button>
     <lib-switch

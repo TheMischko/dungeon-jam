@@ -86,7 +86,7 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    lucide-icon {
+    svg[lucideIcon] {
       margin-top: 2px;
     }
   }

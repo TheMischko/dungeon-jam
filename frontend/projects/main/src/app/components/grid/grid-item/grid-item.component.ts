@@ -6,7 +6,7 @@ import {
   output,
   signal,
 } from '@angular/core';
-import { LucideAngularModule, LucideIconData } from 'lucide-angular';
+import { LucideDynamicIcon, LucideIconData } from '@lucide/angular';
 import { Tag } from '@shared/models/tag.model';
 import { ScrollOverflowTextDirective } from '@general/directives/scroll-overflow-text.directive';
 import {
@@ -17,7 +17,7 @@ import { NgStyle } from '@angular/common';
 
 @Component({
   selector: 'app-grid-item',
-  imports: [LucideAngularModule, ScrollOverflowTextDirective, NgStyle],
+  imports: [LucideDynamicIcon, ScrollOverflowTextDirective, NgStyle],
   templateUrl: './grid-item.component.html',
   styleUrl: './grid-item.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -15,12 +15,12 @@ import {
   MatLabel,
   MatPrefix,
 } from '@angular/material/input';
-import { LucideAngularModule, LucideIconData } from 'lucide-angular';
+import { LucideDynamicIcon, LucideIconData } from '@lucide/angular';
 import { ValidationError } from '@angular/forms/signals';
 
 @Component({
   selector: 'lib-input',
-  imports: [MatFormField, MatInput, MatLabel, MatPrefix, LucideAngularModule],
+  imports: [MatFormField, MatInput, MatLabel, MatPrefix, LucideDynamicIcon],
   templateUrl: './input.component.html',
   styleUrl: './input.component.scss',
   changeDetection: ChangeDetectionStrategy.Eager,

@@ -17,7 +17,7 @@
 
   @include typo.body2();
 
-  ::ng-deep lucide-icon svg {
+  ::ng-deep svg[lucideIcon] {
     margin-top: 3px;
   }
 }

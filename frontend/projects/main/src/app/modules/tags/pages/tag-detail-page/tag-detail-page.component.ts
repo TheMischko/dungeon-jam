@@ -17,7 +17,7 @@ import { actionsIconSet } from '@general/icons/icons';
 import { ActionsMenuConfig } from '@general/components/display/actions-menu/actions-menu.component';
 import { Playlist } from '@shared/models/playlist.model';
 import { MatButton } from '@angular/material/button';
-import { LucideAngularModule } from 'lucide-angular';
+import { LucideDynamicIcon } from '@lucide/angular';
 
 @Component({
   selector: 'app-tag-detail-page',
@@ -26,7 +26,7 @@ import { LucideAngularModule } from 'lucide-angular';
     NgStyle,
     IconButtonComponent,
     MatButton,
-    LucideAngularModule,
+    LucideDynamicIcon,
   ],
   templateUrl: './tag-detail-page.component.html',
   styleUrl: './tag-detail-page.component.scss',

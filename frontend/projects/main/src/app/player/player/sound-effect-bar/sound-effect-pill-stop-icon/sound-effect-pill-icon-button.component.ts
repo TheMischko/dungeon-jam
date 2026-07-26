@@ -5,11 +5,11 @@ import {
   output,
 } from '@angular/core';
 import { actionsIconSet } from '@general/icons/icons';
-import { LucideAngularModule, LucideIconData } from 'lucide-angular';
+import { LucideDynamicIcon, LucideIconData } from '@lucide/angular';
 
 @Component({
   selector: 'app-sound-effect-pill-icon-button',
-  imports: [LucideAngularModule],
+  imports: [LucideDynamicIcon],
   templateUrl: './sound-effect-pill-icon-button.component.html',
   styleUrl: './sound-effect-pill-icon-button.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

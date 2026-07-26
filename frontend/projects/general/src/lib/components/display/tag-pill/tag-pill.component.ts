@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 import { Tag, TagData } from '@shared/models/tag.model';
 import { NgClass, NgStyle } from '@angular/common';
-import { LucideAngularModule } from 'lucide-angular';
+import { LucideDynamicIcon } from '@lucide/angular';
 import { actionsIconSet } from '@general/icons/icons';
 import {
   calculateRelativeLuminance,
@@ -16,7 +16,7 @@ import {
 
 @Component({
   selector: 'lib-tag-pill',
-  imports: [NgStyle, LucideAngularModule, NgClass],
+  imports: [NgStyle, LucideDynamicIcon, NgClass],
   templateUrl: './tag-pill.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './tag-pill.component.scss',

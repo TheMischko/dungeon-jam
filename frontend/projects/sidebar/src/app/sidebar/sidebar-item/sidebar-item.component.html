@@ -4,7 +4,7 @@
   </div>
   @if(hasChildren()){
     <button class="toggle-button" (click)="toggleExpandState($event)">
-      <lucide-icon [img]="toggleIcon()" />
+      <svg [lucideIcon]="toggleIcon()" />
     </button>
   }
 </div>

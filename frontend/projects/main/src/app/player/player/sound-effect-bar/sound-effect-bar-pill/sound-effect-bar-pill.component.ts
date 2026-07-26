@@ -8,7 +8,6 @@ import {
 import { SoundEffect } from '@shared/models/sound-effect.model';
 import { NgStyle } from '@angular/common';
 import { actionsIconSet } from '@general/icons/icons';
-import { LucideAngularModule } from 'lucide-angular';
 import { SoundEffectPillIconButtonComponent } from '../sound-effect-pill-stop-icon/sound-effect-pill-icon-button.component';
 import { ScrollOverflowTextDirective } from '@general/directives/scroll-overflow-text.directive';
 
@@ -16,7 +15,6 @@ import { ScrollOverflowTextDirective } from '@general/directives/scroll-overflow
   selector: 'app-sound-effect-bar-pill',
   imports: [
     NgStyle,
-    LucideAngularModule,
     SoundEffectPillIconButtonComponent,
     ScrollOverflowTextDirective,
   ],

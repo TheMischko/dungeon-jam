@@ -24,11 +24,11 @@
 <ng-template #playColumn let-row="$implicit">
   @if (isActiveRow(row) && !isTrackPlaying(row)) {
     <button mat-icon-button (click)="play(row)">
-      <lucide-icon class="icon-small" [img]="PlayIcon"></lucide-icon>
+      <svg class="icon-small" [lucideIcon]="PlayIcon"></svg>
     </button>
   } @else if (isTrackPlaying(row)) {
     <button mat-icon-button (click)="pause()">
-      <lucide-icon class="icon-small" [img]="PauseIcon"></lucide-icon>
+      <svg class="icon-small" [lucideIcon]="PauseIcon"></svg>
     </button>
   }
 </ng-template>

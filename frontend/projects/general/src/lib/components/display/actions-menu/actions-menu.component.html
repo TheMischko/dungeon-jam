@@ -10,7 +10,7 @@
     [matTooltip]="config?.tooltip ?? ''"
   >
     @if (config.icon) {
-      <lucide-icon [img]="config.icon"></lucide-icon>
+      <svg [lucideIcon]="config.icon!"></svg>
     }
     <span>{{ config.text }}</span>
   </button>

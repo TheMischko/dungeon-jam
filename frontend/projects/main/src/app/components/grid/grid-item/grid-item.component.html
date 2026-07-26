@@ -10,9 +10,9 @@
         <img [src]="imageUrl" [alt]="title()" />
       </div>
     } @else {
-      <lucide-icon
+      <svg
         class="no-image-icon"
-        [img]="noImageIcon()"
+        [lucideIcon]="noImageIcon()!"
         [size]="fallbackIconSize()"
       />
     }

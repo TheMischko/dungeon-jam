@@ -9,13 +9,13 @@ import {
   ChangeDetectionStrategy,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { LucideAngularModule, LucideIconData } from 'lucide-angular';
+import { LucideDynamicIcon, LucideIconData } from '@lucide/angular';
 import { MatSlider, MatSliderThumb } from '@angular/material/slider';
 import { NgStyle } from '@angular/common';
 
 @Component({
   selector: 'lib-range-slider',
-  imports: [MatSlider, MatSliderThumb, LucideAngularModule, NgStyle],
+  imports: [MatSlider, MatSliderThumb, LucideDynamicIcon, NgStyle],
   templateUrl: './range-slider.component.html',
   styleUrl: './range-slider.component.scss',
   changeDetection: ChangeDetectionStrategy.Eager,

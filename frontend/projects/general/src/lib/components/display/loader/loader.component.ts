@@ -4,12 +4,12 @@ import {
   computed,
   input,
 } from '@angular/core';
-import { LucideAngularModule } from 'lucide-angular';
+import { LucideDynamicIcon } from '@lucide/angular';
 import { iconSet } from '@general/icons/icons';
 
 @Component({
   selector: 'lib-loader',
-  imports: [LucideAngularModule],
+  imports: [LucideDynamicIcon],
   templateUrl: './loader.component.html',
   styleUrl: './loader.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

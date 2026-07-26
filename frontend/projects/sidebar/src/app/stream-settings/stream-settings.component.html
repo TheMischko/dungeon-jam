@@ -1,10 +1,6 @@
 <div [matMenuTriggerFor]="streamingMenu" class="content">
   <div class="icon">
-    @if (isStringIcon(currentIcon())) {
-      <lucide-icon [name]="currentIcon()" [size]="32"> </lucide-icon>
-    } @else {
-      <lucide-icon [img]="currentIcon()"> </lucide-icon>
-    }
+    <svg [lucideIcon]="currentIcon()!" [size]="32"></svg>
   </div>
   <div class="content-info">
     <div class="stream-title">

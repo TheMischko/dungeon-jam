@@ -7,11 +7,11 @@
   <mat-label>{{ label() }}</mat-label>
   @if (iconPrefix()){
   <span matPrefix>
-    <lucide-icon
+    <svg
       [size]="16"
-      [img]="iconPrefix()"
+      [lucideIcon]="iconPrefix()!"
       class="icon-16 prefix-icon"
-    ></lucide-icon>
+    ></svg>
   </span>
   }
   <input

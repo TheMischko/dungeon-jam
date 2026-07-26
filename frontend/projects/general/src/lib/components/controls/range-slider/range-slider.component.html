@@ -1,10 +1,10 @@
 @if (prefix()) {
   @if (prefixIcon()) {
-    <lucide-icon
+    <svg
       class="prefix side-icon"
-      [img]="prefixIcon()"
+      [lucideIcon]="prefixIcon()!"
       [size]="iconSize()"
-    ></lucide-icon>
+    ></svg>
   } @else {
     <span class="prefix side-text">{{ prefix() }}</span>
   }
@@ -23,11 +23,11 @@
 </mat-slider>
 @if (suffix()) {
   @if (suffixIcon()) {
-    <lucide-icon
+    <svg
       class="prefix side-icon"
-      [img]="suffixIcon()"
+      [lucideIcon]="suffixIcon()!"
       [size]="iconSize()"
-    ></lucide-icon>
+    ></svg>
   } @else {
     <span class="prefix side-text">{{ suffix() }}</span>
   }

@@ -24,7 +24,7 @@ import {
   MatDatepickerToggle,
 } from '@angular/material/datepicker';
 import { actionsIconSet } from '@general/icons/icons';
-import { LucideAngularModule } from 'lucide-angular';
+import { LucideDynamicIcon } from '@lucide/angular';
 
 @Component({
   selector: 'lib-date-picker',
@@ -37,7 +37,7 @@ import { LucideAngularModule } from 'lucide-angular';
     MatSuffix,
     MatDatepicker,
     MatDatepickerToggle,
-    LucideAngularModule,
+    LucideDynamicIcon,
   ],
   templateUrl: './date-picker.component.html',
   styleUrl: './date-picker.component.scss',

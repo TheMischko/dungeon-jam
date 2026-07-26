@@ -24,7 +24,7 @@
     display: flex;
     margin-right: -0.75rem;
     cursor: pointer;
-    lucide-icon {
+    svg[lucideIcon] {
       margin-top: 4px;
     }
     &:hover {

@@ -27,7 +27,7 @@
         <div ngProjectAs="content" style="display: contents">
           @if (playable && isPlaying) {
             <div class="is-playing-overlay small-overlay">
-              <lucide-icon [img]="PlayingIcon" [size]="16"></lucide-icon>
+              <svg [lucideIcon]="PlayingIcon" [size]="16"></svg>
             </div>
           }
           @if (selectable) {
@@ -48,11 +48,11 @@
         @if (playable) {
           <div ngProjectAs="hovering-content" style="display: contents">
             <div class="hover-overlay">
-              <lucide-icon
+              <svg
                 class="icon"
-                [img]="isPlaying ? PauseIcon : PlayIcon"
+                [lucideIcon]="isPlaying ? PauseIcon : PlayIcon"
                 (click)="onOverlayButtonClick($event, scene)"
-              ></lucide-icon>
+              ></svg>
             </div>
           </div>
         }

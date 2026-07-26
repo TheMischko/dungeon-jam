@@ -13,7 +13,6 @@ import { PlayPauseButtonComponent } from '@general/components/buttons/play-pause
 import { iconSet } from '@general/icons/icons';
 import { IconButtonComponent } from '@general/components/buttons/icon-button/icon-button.component';
 import { PlayerBarComponent } from './player-bar/player-bar.component';
-import { LucideAngularModule } from 'lucide-angular';
 import { VolumeControlComponent } from './volume-control/volume-control.component';
 import { RepeatStateButtonComponent } from './repeat-state-button/repeat-state-button.component';
 import { ShuffleButtonComponent } from './shuffle-button/shuffle-button.component';
@@ -27,7 +26,6 @@ import { SoundEffectBarSmartComponent } from './sound-effect-bar/sound-effect-ba
     PlayPauseButtonComponent,
     IconButtonComponent,
     PlayerBarComponent,
-    LucideAngularModule,
     VolumeControlComponent,
     RepeatStateButtonComponent,
     ShuffleButtonComponent,

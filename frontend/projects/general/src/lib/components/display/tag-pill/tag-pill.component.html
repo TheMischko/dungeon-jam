@@ -6,7 +6,7 @@
   <span>{{ tag().title }}</span>
   @if (removable()) {
     <button class="remove-button" (click)="removed.emit(this.tag())">
-      <lucide-icon [img]="removeIcon" [size]="16"></lucide-icon>
+      <svg [lucideIcon]="removeIcon" [size]="16"></svg>
     </button>
   }
 </div>

@@ -11,7 +11,7 @@ import { Scene } from '@shared/models/scene.model';
 import { GridItemComponent } from '../../../../components/grid/grid-item/grid-item.component';
 import { iconSet, volumeIconSet } from '@general/icons/icons';
 import { Tag } from '@shared/models/tag.model';
-import { LucideAngularModule } from 'lucide-angular';
+import { LucideDynamicIcon } from '@lucide/angular';
 import { MatCheckbox, MatCheckboxChange } from '@angular/material/checkbox';
 import {
   AllSizeGridItemConfigs,
@@ -23,7 +23,7 @@ import { GridControlsComponent } from '../../../../components/grid/grid-controls
   selector: 'app-scenes-grid',
   imports: [
     GridItemComponent,
-    LucideAngularModule,
+    LucideDynamicIcon,
     MatCheckbox,
     GridControlsComponent,
   ],
