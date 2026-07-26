@@ -21,5 +21,6 @@ export type GeneralApiModel = Window &
       ) => void;
       getOS: () => Promise<OperatingSystem>;
       openLogsFolder: () => Promise<void>;
+      getAppVersion: () => Promise<string>;
     };
   };

@@ -1,5 +1,6 @@
 export enum GeneralChannels {
   GET_OS = 'GET_OS',
+  GET_APP_VERSION = 'app/get-version',
   REDIRECT = 'redirect',
   APP_READY = 'app/ready',
   CLOSE_APP = 'app/close',

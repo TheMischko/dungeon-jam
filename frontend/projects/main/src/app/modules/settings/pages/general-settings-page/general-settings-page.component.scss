@@ -8,6 +8,7 @@
 .page-content {
   display: block;
   padding: 1rem;
+  max-width: 95%;
 }
 
 .loading {
@@ -31,4 +32,10 @@
 .footer-buttons {
   margin-top: 2rem;
   align-self: flex-end;
+}
+
+.app-version {
+  margin-top: 2rem;
+  justify-self: flex-end;
+  color: col.$text-secondary-bright;
 }

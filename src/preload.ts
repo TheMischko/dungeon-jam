@@ -56,6 +56,9 @@ const generalApi = {
   getOS(): Promise<OperatingSystem> {
     return ipcRenderer.invoke(GeneralChannels.GET_OS);
   },
+  getAppVersion(): Promise<string> {
+    return ipcRenderer.invoke(GeneralChannels.GET_APP_VERSION);
+  },
   openLogsFolder(): Promise<void> {
     return ipcRenderer.invoke(GeneralChannels.OPEN_LOGS_DIR);
   },

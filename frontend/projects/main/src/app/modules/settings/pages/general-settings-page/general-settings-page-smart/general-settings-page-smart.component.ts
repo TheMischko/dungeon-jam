@@ -14,6 +14,7 @@ import { GeneralSettingsPageComponent } from '../general-settings-page.component
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { EditDiscordTokenModalComponent } from '../../../modals/edit-discord-token-modal/edit-discord-token-modal.component';
 import { GeneralSettingsService } from '../../../services/general-settings.service';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-general-settings-page-smart',
@@ -29,6 +30,9 @@ export class GeneralSettingsPageSmartComponent implements OnInit {
   readonly tokens = this.discordTokenStore.entities;
   readonly tokensLoading = this.discordTokenStore.loading;
   readonly tokenConnectionMap = this.discordTokenStore.connectionMap;
+  readonly appVersion = toSignal(this.generalSettingsService.getAppVersion(), {
+    initialValue: '0.0.0',
+  });
 
   ngOnInit() {
     this.discordTokenStore.loadTokens();

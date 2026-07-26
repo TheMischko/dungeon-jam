@@ -27,6 +27,11 @@ export class AppInfoManager {
       this.logger.log('Fetching OS info. Result: ' + os);
       return os;
     });
+    ipcMain.handle(GeneralChannels.GET_APP_VERSION, () => {
+      const version = app.getVersion();
+      this.logger.log('Fetching app version. Result: ' + version);
+      return version;
+    });
     ipcMain.handle(GeneralChannels.CLOSE_APP, () => {
       this.logger.log('Closing Application via API.');
       return this.closeApp();

@@ -28,6 +28,7 @@ export class GeneralSettingsPageComponent {
   readonly tokens = input<DiscordTokenData[]>();
   readonly tokenConnectionMap = input<Record<string, DiscordStateType>>({});
   readonly tokensLoading = input<boolean>();
+  readonly appVersion = input<string>('0.0.0');
 
   readonly editToken = output<DiscordTokenData>();
   readonly deleteToken = output<string>();

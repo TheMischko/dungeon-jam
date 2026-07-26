@@ -4,13 +4,15 @@ import { StartupManager } from './main/managers/startup.manager';
 import { Logger } from './main/utils/logger';
 import path from 'path';
 import { AppInfoManager } from './main/managers/app-info.manager';
+import pkg from '../package.json';
 
 configDotenv();
 const ENV = process.env.ENV || 'production';
 const appLogger = new Logger('APP', 'cyanBright');
 let startupManager: StartupManager;
 
-app.name = 'dungeon-jam';
+app.name = pkg.name;
+app.version = pkg.version;
 
 if (!app.isPackaged) {
   const appData = app.getPath('appData');
@@ -22,6 +24,7 @@ Logger.cleanOldLogs(5);
 
 app.on('ready', async () => {
   try {
+    appLogger.log(`Starting DungeonJam v${app.getVersion()}`, { env: ENV });
     startupManager = StartupManager.getInstance(__dirname, ENV);
     const managersInitSuccess = await startupManager.initializeAllManagers();
     const resourcesInitSuccess = await startupManager.initializeResources();
