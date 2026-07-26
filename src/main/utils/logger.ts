@@ -4,6 +4,7 @@ import { getLogsDir } from '../configs';
 import { generateLogsFilePath } from '../configs/get-logs-dir';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import { getLocalISODateString } from './get-local-iso-date-string';
 
 export class Logger {
   private static _logsFile: string | null = null;
@@ -74,7 +75,7 @@ export class Logger {
     additionalFields?: Record<string, any>
   ): string {
     return JSON.stringify({
-      time: new Date().toISOString(),
+      time: getLocalISODateString(new Date(), ':'),
       ...(owner && { owner: `[${owner}]` }),
       message,
       ...additionalFields,
