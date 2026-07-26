@@ -96,7 +96,7 @@
     "@types/mime-types": "^3.0.1",
     "@types/node": "^25.8.0",
     "@types/ws": "^8.18.1",
-    "@vitest/coverage-v8": "^4.1.4",
+    "@vitest/coverage-v8": "^4.1.10",
     "@vitest/ui": "^4.1.4",
     "concurrently": "^9.2.1",
     "cross-env": "^10.1.0",
