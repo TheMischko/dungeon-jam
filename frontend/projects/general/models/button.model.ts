@@ -1,8 +1,1 @@
-export enum ButtonType {
-  Default,
-  Raised,
-  Flat,
-  Stroked,
-}
-
-export type ButtonSize = 'small' | 'regular' | 'large';
+export * from '../src/lib/models/button.model';

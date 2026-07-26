@@ -74,6 +74,8 @@ declare global {
         callback: (isMaximized: boolean) => void | Promise<void>,
       ) => void;
       getOS: () => Promise<OperatingSystem>;
+      openLogsFolder: () => Promise<void>;
+      getAppVersion: () => Promise<string>;
     };
     TRACK_API: {
       getAllTracks: (query?: QueryRequest) => Promise<Track[]>;
@@ -227,6 +229,8 @@ function installWindowApiStubs(): void {
     onAppMinimized: () => undefined,
     onAppMaximized: () => undefined,
     getOS: () => Promise.resolve(OperatingSystem.MacOS),
+    openLogsFolder: () => Promise.resolve(),
+    getAppVersion: () => Promise.resolve('1.0.0'),
   };
 
   window.TRACK_API = {

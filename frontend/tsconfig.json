@@ -31,6 +31,9 @@
       "@general/*": [
         "./projects/general/src/lib/*"
       ],
+      "@general/models/*": [
+        "./projects/general/models/*"
+      ],
       "general": [
         "./dist/general"
       ],

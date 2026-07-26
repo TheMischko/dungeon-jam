@@ -6,7 +6,7 @@ import {
 } from '@angular/core';
 import { IconButtonComponent } from '../icon-button/icon-button.component';
 import { iconSet } from '../../../icons/icons';
-import { ButtonSize, ButtonType } from '../../../../../models/button.model';
+import { ButtonSize, ButtonType } from '../../../models/button.model';
 
 @Component({
   selector: 'lib-play-pause-button',
