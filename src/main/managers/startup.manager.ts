@@ -8,6 +8,7 @@ import Encoder = opus.Encoder;
 import { getAudioConfig } from '../configs';
 import { Logger } from '../utils/logger';
 import { DiscordTokenManager } from './discord-token.manager';
+import { UpdateManager } from './update.manager';
 import { startLocalServer, stopLocalServer } from '../services/local-server';
 
 export class StartupManager {
@@ -114,6 +115,12 @@ export class StartupManager {
     this.logger.log('Performing post-initialization tasks');
     const discordTokenManager = await DiscordTokenManager.getInstance();
     await discordTokenManager.connectActiveTokens();
+    try {
+      const updateManager = await UpdateManager.getInstance();
+      updateManager.checkForUpdates();
+    } catch (e) {
+      this.logger.logWarning('Update check failed during startup', { error: e });
+    }
   }
 
   public async onAppEnd(): Promise<void> {
