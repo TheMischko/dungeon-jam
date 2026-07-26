@@ -35,7 +35,9 @@ export class DiscordTokenManager {
     try {
       const oldToken = id ? await this.db.getBy('id', id) : null;
       if (oldToken) {
-        this.logger.log(`Updating Discord token ${id}`, { tokenData });
+        this.logger.log(`Updating Discord token ${id}`, {
+          tokenData: this.redactApiKey(tokenData),
+        });
         return await this.db.update('id', oldToken.id, {
           ...oldToken,
           ...tokenData,
@@ -43,7 +45,7 @@ export class DiscordTokenManager {
       }
 
       this.logger.log('Creating new Discord token', {
-        tokenData,
+        tokenData: this.redactApiKey(tokenData),
       });
       return await this.db.create(tokenData, id);
     } catch (error) {
@@ -95,6 +97,16 @@ export class DiscordTokenManager {
     }
   }
 
+  public redactApiKey<T extends { apiKey?: string }>(data: T): T {
+    if (!data || !data.apiKey) {
+      return data;
+    }
+    return {
+      ...data,
+      apiKey: `${data.apiKey.slice(0, 7)}...***REDACTED***`,
+    };
+  }
+
   private registerIpcHandlers(): void {
     ipcMain.handle(
       DiscordTokenChannel.CREATE,
@@ -108,7 +120,9 @@ export class DiscordTokenManager {
       withAppError(
         async (_, payload: { id: string; newData: DiscordTokenUpdateData }) => {
           const result = await this.saveToken(payload.newData, payload.id);
-          this.logger.log(`Token updated. Result:`, result);
+          this.logger.log(`Token updated.`, {
+            updatedToken: this.redactApiKey(result),
+          });
           return result;
         }
       )

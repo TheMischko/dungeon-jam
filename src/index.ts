@@ -17,6 +17,9 @@ if (!app.isPackaged) {
   app.setPath('userData', path.join(appData, app.name));
 }
 
+Logger.initGlobalErrorHandlers();
+Logger.cleanOldLogs(5);
+
 app.on('ready', async () => {
   try {
     startupManager = StartupManager.getInstance(__dirname, ENV);

@@ -221,7 +221,7 @@ export class DiscordManager {
 
     this.logger.log('Connecting with new token', {
       tokenId,
-      key: `${token.apiKey.slice(0, 6)}...`,
+      key: this.tokenManager.redactApiKey(token).apiKey,
     });
 
     this.reconnectAttempts = 0;
@@ -844,7 +844,7 @@ export class DiscordManager {
     const tokens = await this.tokenManager.getTokens();
     const viewManager = await ViewManager.getInstance();
     this.logger.log('Broadcasting active tokens update', {
-      connectedTokens: tokens,
+      connectedTokens: tokens.map((t) => this.tokenManager.redactApiKey(t)),
     });
     const update = apiKeys
       .map((key) => tokens.find((t) => t.apiKey === key)?.id)

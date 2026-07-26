@@ -8,3 +8,5 @@ export {
 } from './view.config';
 
 export { getAudioConfig, type AudioConfig } from './audio.config';
+
+export { getLogsDir } from './get-logs-dir';

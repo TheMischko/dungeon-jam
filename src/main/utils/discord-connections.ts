@@ -1,4 +1,5 @@
 import { Client, Collection, IntentsBitField } from 'discord.js';
+import { DiscordTokenManager } from '../managers/discord-token.manager';
 
 export class DiscordConnections {
   readonly clients: Collection<string, Client> = new Collection();
@@ -7,17 +8,17 @@ export class DiscordConnections {
     const client = new Client({
       intents: this.getIntents(),
     });
+    const tokenText = await this.getTokenText(token);
     try {
       await client.login(token);
       this.clients.set(token, client);
       await this.waitForReady(client);
-      console.log(
-        `[DiscordConnections] Connected with token: ${this.tokenText(token)}`
-      );
+
+      console.log(`[DiscordConnections] Connected with token: ${tokenText}`);
       return client;
     } catch (e) {
       console.log(
-        `[DiscordConnections] Failed to connect with token: ${this.tokenText(token)}`,
+        `[DiscordConnections] Failed to connect with token: ${tokenText}`,
         e
       );
       throw e;
@@ -29,9 +30,8 @@ export class DiscordConnections {
     if (client) {
       await client.destroy();
       this.clients.delete(token);
-      console.log(
-        `[DiscordConnections] Disconnected token: ${this.tokenText(token)}`
-      );
+      const tokenText = await this.getTokenText(token);
+      console.log(`[DiscordConnections] Disconnected token: ${tokenText}`);
     }
   }
 
@@ -54,7 +54,10 @@ export class DiscordConnections {
     return intents;
   }
 
-  private tokenText(token: string) {
-    return `${token.slice(0, 6)}...`;
+  private async getTokenText(token: string) {
+    const discordTokenManager = await DiscordTokenManager.getInstance();
+    return discordTokenManager.redactApiKey({
+      apiKey: token,
+    }).apiKey;
   }
 }
