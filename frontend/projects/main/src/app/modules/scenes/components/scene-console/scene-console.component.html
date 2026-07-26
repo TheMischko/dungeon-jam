@@ -17,7 +17,7 @@
           <lib-play-pause-button
             [state]="scenePlayButtonState()"
             [type]="ButtonType.Flat"
-            [size]="'large'"
+            [size]="'regular'"
             [label]="scenePlayButtonText()"
             (toggle)="toggleScenePlaying($event)"
           ></lib-play-pause-button>
@@ -32,8 +32,11 @@
           }
           @if (collapsable()) {
             <lib-icon-button
+              class="collapse-button {{
+                !hiddenContent() ? 'expanded' : 'collapsed'
+              }}"
               [type]="ButtonType.Flat"
-              [size]="'large'"
+              [size]="'regular'"
               [icon]="toggleIcon()"
               (clicked)="toggleHideContent()"
             ></lib-icon-button>

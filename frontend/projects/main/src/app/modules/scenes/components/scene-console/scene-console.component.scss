@@ -133,3 +133,11 @@
   background: rgba(0, 0, 0, 0.35);
   width: fit-content;
 }
+
+::ng-deep .collapse-button.collapsed .button-icon {
+  margin-bottom: -3px;
+}
+
+::ng-deep .collapse-button.expanded .button-icon {
+  margin-bottom: 1px;
+}

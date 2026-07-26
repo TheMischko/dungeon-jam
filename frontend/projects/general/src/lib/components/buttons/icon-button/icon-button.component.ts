@@ -30,7 +30,10 @@ export class IconButtonComponent {
   readonly materialColor = computed(() => {
     const color = this.color();
     // Only apply Material color if it's a valid Material color
-    return color === 'primary' || color === 'accent' || color === 'warn'
+    return color === 'primary' ||
+      color === 'accent' ||
+      color === 'warn' ||
+      color === 'error'
       ? color
       : undefined;
   });
@@ -54,9 +57,9 @@ export class IconButtonComponent {
       case 'small':
         return 20;
       case 'large':
-        return 32;
+        return 28;
       default:
-        return 24;
+        return 22;
     }
   });
 

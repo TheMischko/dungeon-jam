@@ -6,7 +6,6 @@
   gap: 0.5rem;
   width: 100%;
 
-
   .item {
     display: flex;
     align-items: center;
@@ -25,7 +24,7 @@
       padding: 0.5rem;
       margin-top: 8px;
 
-      svg[lucideIcon] {
+      svg {
         color: col.$text-main;
       }
     }

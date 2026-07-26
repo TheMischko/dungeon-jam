@@ -1,7 +1,7 @@
 @use 'colors' as col;
 @use 'sass:color';
 
-:host{
+:host {
   z-index: 10;
   position: absolute;
   bottom: 2%;
@@ -44,7 +44,7 @@
       white-space: nowrap;
       width: 100%;
       cursor: pointer;
-      &:hover{
+      &:hover {
         color: col.$primary-light;
       }
     }
@@ -54,6 +54,8 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    gap: 0.85rem;
+    margin-bottom: -0.75rem;
   }
 
   .controls {

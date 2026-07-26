@@ -18,7 +18,8 @@ import { LoaderComponent } from '@general/components/display/loader/loader.compo
 import { toObservable } from '@angular/core/rxjs-interop';
 import { combineLatestWith, map } from 'rxjs';
 import { actionsIconSet } from '@general/icons/icons';
-import { LucideDynamicIcon } from '@lucide/angular';
+import { IconButtonComponent } from '@general/components/buttons/icon-button/icon-button.component';
+import { ButtonType } from '../../../../../../../general/models/button.model';
 
 @Component({
   selector: 'app-edit-track-modal',
@@ -26,7 +27,7 @@ import { LucideDynamicIcon } from '@lucide/angular';
     MatButton,
     TrackFormComponent,
     LoaderComponent,
-    LucideDynamicIcon,
+    IconButtonComponent,
   ],
   templateUrl: './edit-track-modal.component.html',
   styleUrl: './edit-track-modal.component.scss',
@@ -108,6 +109,8 @@ export class EditTrackModalComponent {
       },
     });
   }
+
+  protected readonly ButtonType = ButtonType;
 }
 
 export type EditTrackResult = CancelResult | DeleteResult | UpdateResult;

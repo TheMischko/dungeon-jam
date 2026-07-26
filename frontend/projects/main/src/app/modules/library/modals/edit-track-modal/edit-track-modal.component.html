@@ -4,23 +4,35 @@
   </div>
 
   <div class="content">
-    @if(loading() && !trackForm()) {
-    <lib-loader size="large" class="loader"></lib-loader>
+    @if (loading() && !trackForm()) {
+      <lib-loader size="large" class="loader"></lib-loader>
     } @else {
-    <app-track-form [form]="trackForm()!"></app-track-form>
+      <app-track-form [form]="trackForm()!"></app-track-form>
     }
   </div>
 
   <div class="footer">
     <div class="buttons">
-      <button mat-flat-button color="error" (click)="deleteTrack()">
-        <svg [lucideIcon]="deleteIcon" size="20" />
+      <lib-icon-button
+        [icon]="deleteIcon"
+        [type]="ButtonType.Flat"
+        label="Delete"
+        size="regular"
+        color="error"
+        (click)="deleteTrack()"
+      >
         Delete
-      </button>
-      <button mat-flat-button color="primary" (click)="updateTrack()">
-        <svg [lucideIcon]="saveIcon" size="20" />
-        Save
-      </button>
+      </lib-icon-button>
+      <lib-icon-button
+        [icon]="saveIcon"
+        [type]="ButtonType.Flat"
+        label="Save"
+        size="regular"
+        color="primary"
+        (click)="updateTrack()"
+      >
+        Delete
+      </lib-icon-button>
       <button mat-flat-button color="secondary" (click)="cancel()">
         Cancel
       </button>
