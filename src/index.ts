@@ -1,12 +1,10 @@
 import { app } from 'electron';
-import { configDotenv } from 'dotenv';
 import { StartupManager } from './main/managers/startup.manager';
 import { Logger } from './main/utils/logger';
 import path from 'path';
 import { AppInfoManager } from './main/managers/app-info.manager';
 import pkg from '../package.json';
 
-configDotenv();
 const ENV = process.env.ENV || 'production';
 const appLogger = new Logger('APP', 'cyanBright');
 let startupManager: StartupManager;

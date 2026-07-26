@@ -1,11 +1,17 @@
 import { build } from 'esbuild';
 import { nodeExternalsPlugin } from 'esbuild-node-externals';
 
+const isDev = process.argv.includes('--dev') || process.env.NODE_ENV === 'development';
+const envType = process.env.ENV || (isDev ? 'development' : 'production');
+
 const sharedConfig = {
   bundle: true,
   platform: 'node',
   sourcemap: true,
   target: 'node20',
+  define: {
+    'process.env.ENV': JSON.stringify(envType),
+  },
   plugins: [nodeExternalsPlugin()],
   external: ['electron', 'prism-media', 'opusscript', 'lowdb'],
   loader: {

@@ -15,8 +15,8 @@ dist-electron
 
 #ENV files
 *.env*
-.env
-^.env$
+!.env.example
+!.prod.env.example
 
 #Coverage
 coverage
