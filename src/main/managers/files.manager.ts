@@ -1,5 +1,8 @@
-import { dialog, ipcMain, OpenDialogOptions } from 'electron';
-import { AudioFileChannel } from '@shared/models/channels.model';
+import { dialog, ipcMain, OpenDialogOptions, shell } from 'electron';
+import {
+  AudioFileChannel,
+  GeneralChannels,
+} from '@shared/models/channels.model';
 import * as fs from 'node:fs';
 import { IAudioMetadata, parseFile } from 'music-metadata';
 import { AudioTrack, FileBase64, Track } from '@shared/models/track.model';
@@ -10,6 +13,7 @@ import { Logger } from '../utils/logger';
 import { getTitleFromFileName } from '../utils/resolve-audio-track';
 import path from 'path';
 import { withAppError } from '../utils/ipc-handler';
+import { getLogsDir } from '../configs';
 
 export class FilesManager {
   private static _instance: FilesManager;
@@ -27,20 +31,37 @@ export class FilesManager {
   }
 
   private registerChannels(): void {
-    ipcMain.handle(AudioFileChannel.FETCH_DATA, withAppError(async (_, paths: string[]) => {
-      const data = paths
-        .filter((path) => fs.existsSync(path))
-        .map(async (path) => await this.readMetadata(path));
-      return await Promise.all(data);
-    }));
+    ipcMain.handle(
+      AudioFileChannel.FETCH_DATA,
+      withAppError(async (_, paths: string[]) => {
+        const data = paths
+          .filter((path) => fs.existsSync(path))
+          .map(async (path) => await this.readMetadata(path));
+        return await Promise.all(data);
+      })
+    );
 
-    ipcMain.handle(AudioFileChannel.LOAD_FILE, withAppError(async (_, filePath: string) => {
-      return await this.loadFileBase64(filePath);
-    }));
+    ipcMain.handle(
+      AudioFileChannel.LOAD_FILE,
+      withAppError(async (_, filePath: string) => {
+        return await this.loadFileBase64(filePath);
+      })
+    );
 
-    ipcMain.handle(AudioFileChannel.OPEN_AUDIO_FILES_PICKER, withAppError(async () => {
-      return await this.openAudioFilesPicker();
-    }));
+    ipcMain.handle(
+      AudioFileChannel.OPEN_AUDIO_FILES_PICKER,
+      withAppError(async () => {
+        return await this.openAudioFilesPicker();
+      })
+    );
+
+    ipcMain.handle(
+      GeneralChannels.OPEN_LOGS_DIR,
+      withAppError(async () => {
+        this.logger.log('Opening logs directory in system file explorer.');
+        return await this.openLogsDirectory();
+      })
+    );
   }
 
   async updateTrackFile(track: Track): Promise<void> {
@@ -135,5 +156,10 @@ export class FilesManager {
         this.readMetadata(filePath)
       )
     );
+  }
+
+  private async openLogsDirectory() {
+    const directory = getLogsDir();
+    await shell.openPath(directory);
   }
 }

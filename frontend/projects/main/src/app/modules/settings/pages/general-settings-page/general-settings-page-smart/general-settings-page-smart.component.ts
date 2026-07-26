@@ -13,6 +13,7 @@ import {
 import { GeneralSettingsPageComponent } from '../general-settings-page.component';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { EditDiscordTokenModalComponent } from '../../../modals/edit-discord-token-modal/edit-discord-token-modal.component';
+import { GeneralSettingsService } from '../../../services/general-settings.service';
 
 @Component({
   selector: 'app-general-settings-page-smart',
@@ -23,6 +24,7 @@ import { EditDiscordTokenModalComponent } from '../../../modals/edit-discord-tok
 export class GeneralSettingsPageSmartComponent implements OnInit {
   private readonly discordTokenStore = inject(DiscordTokenStore);
   private readonly dialog = inject(MatDialog);
+  private readonly generalSettingsService = inject(GeneralSettingsService);
 
   readonly tokens = this.discordTokenStore.entities;
   readonly tokensLoading = this.discordTokenStore.loading;
@@ -78,5 +80,9 @@ export class GeneralSettingsPageSmartComponent implements OnInit {
       width: '600px',
       data: data ?? null,
     });
+  }
+
+  protected async openLogsDir() {
+    await this.generalSettingsService.openLogsDirectory();
   }
 }

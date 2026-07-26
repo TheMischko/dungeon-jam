@@ -33,6 +33,7 @@ export class GeneralSettingsPageComponent {
   readonly deleteToken = output<string>();
   readonly createToken = output<void>();
   readonly toggleTokenConnection = output<DiscordTokenData>();
+  readonly openLogsDir = output<void>();
 
   readonly tokenSectionTemp =
     viewChild.required<TemplateRef<{ $implicit: DiscordTokenData[] }>>(

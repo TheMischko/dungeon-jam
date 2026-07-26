@@ -1,6 +1,11 @@
 <h1 class="title">Settings</h1>
 <div class="page-content">
   <lib-collapsible-section [data]="sections()" />
+  <div class="footer-buttons">
+    <button mat-flat-button color="error" (click)="openLogsDir.emit()">
+      Open logs
+    </button>
+  </div>
 </div>
 
 <ng-template #tokensTemp>

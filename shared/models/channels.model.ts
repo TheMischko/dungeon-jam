@@ -8,6 +8,7 @@ export enum GeneralChannels {
   UNMAXIMIZE_APP = 'app/unmaximize',
   APP_MINIMIZED = 'app/minimized',
   APP_MAXIMIZED = 'app/maximized',
+  OPEN_LOGS_DIR = 'app/open-logs-dir',
 }
 
 export enum TrackChannel {
