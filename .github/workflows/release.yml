@@ -11,8 +11,12 @@ permissions:
 
 jobs:
   build-release:
-    name: Build & Publish Release Assets
-    runs-on: windows-latest
+    name: Build & Publish (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
 
     steps:
       - name: Checkout Repository
