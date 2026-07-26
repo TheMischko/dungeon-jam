@@ -234,7 +234,7 @@ describe('DatabaseProvider', () => {
 
       const result = await provider.update('id', 'nonexistent-id', newEntity);
 
-      expect(createSpy).toHaveBeenCalledWith(newEntity);
+      expect(createSpy).toHaveBeenCalledWith(newEntity, 'new');
       expect(result).toEqual(newEntity);
     });
 

@@ -8,9 +8,7 @@ import { DatabaseProvider } from '../database/database-provider';
 import { DatabaseProviderCreator } from '../database/database-provider-creator';
 import { Logger } from '../utils/logger';
 import { DiscordManager } from './discord.manager';
-import { withAppError } from '../utils/ipc-handler';
-import { createAppError } from '../utils/create-app-error';
-import { ErrorCode } from '@shared/models/error.model';
+import { isAppError, withAppError } from '../utils/ipc-handler';
 
 export class DiscordTokenManager {
   private static instance: DiscordTokenManager;
@@ -49,10 +47,9 @@ export class DiscordTokenManager {
       });
       return await this.db.create(tokenData, id);
     } catch (error) {
-      throw createAppError(
-        ErrorCode.DatabaseUpdateFailed,
-        'Failed to save token.'
-      );
+      if (isAppError(error)) throw error;
+      console.error('[DiscordTokenManager] Failed to save token', error);
+      throw error;
     }
   }
 
@@ -69,10 +66,9 @@ export class DiscordTokenManager {
     try {
       return await this.db.deleteOne('id', id);
     } catch (error) {
-      throw createAppError(
-        ErrorCode.DatabaseDeleteFailed,
-        'Failed to delete token.'
-      );
+      if (isAppError(error)) throw error;
+      console.error('[DiscordTokenManager] Failed to delete token', error);
+      throw error;
     }
   }
 

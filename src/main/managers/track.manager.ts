@@ -215,6 +215,7 @@ export class TrackManager {
     try {
       await this.filesManager.updateTrackFile(updatedRecord);
     } catch (e) {
+      console.error('[TrackManager] Failed to update track file metadata', e);
       this.logger.logErrorMessage('Failed to update track file metadata', {
         error: e,
       });

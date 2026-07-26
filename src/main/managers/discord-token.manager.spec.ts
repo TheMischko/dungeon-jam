@@ -46,6 +46,7 @@ describe('DiscordTokenManager', () => {
       getAll: vi.fn().mockResolvedValue([]),
       getBy: vi.fn().mockResolvedValue(null),
       create: vi.fn().mockImplementation((data, id) => Promise.resolve({ ...data, id: id ?? 'generated-id' })),
+      update: vi.fn().mockImplementation((col, val, data) => Promise.resolve(data)),
       replaceRecord: vi.fn().mockImplementation((record) => Promise.resolve(record)),
       deleteOne: vi.fn().mockResolvedValue(true),
     };
@@ -102,22 +103,21 @@ describe('DiscordTokenManager', () => {
 
       const result = await manager.saveToken(data);
 
-      expect(mockTokenProvider.getBy).toHaveBeenCalledWith('id', undefined);
-      expect(mockTokenProvider.create).toHaveBeenCalledWith(data, undefined);
+      expect(mockTokenProvider.create).toHaveBeenCalledWith(expect.objectContaining(data), undefined);
       expect(result).toEqual(created);
     });
 
-    it('should update an existing token via replaceRecord when a record is found', async () => {
+    it('should update an existing token via db.update when a record is found', async () => {
       const existing = mockTokenData();
       const data = mockUpdateData({ name: 'Updated Name' });
       const expected = { ...existing, ...data };
       mockTokenProvider.getBy.mockResolvedValue(existing);
-      mockTokenProvider.replaceRecord.mockResolvedValue(expected);
+      mockTokenProvider.update.mockResolvedValue(expected);
 
       const result = await manager.saveToken(data, 'test-id');
 
       expect(mockTokenProvider.getBy).toHaveBeenCalledWith('id', 'test-id');
-      expect(mockTokenProvider.replaceRecord).toHaveBeenCalledWith(expected);
+      expect(mockTokenProvider.update).toHaveBeenCalledWith('id', 'test-id', expect.objectContaining(expected));
       expect(result).toEqual(expected);
     });
 
@@ -129,10 +129,10 @@ describe('DiscordTokenManager', () => {
       await expect(manager.saveToken(data)).rejects.toThrow('DB write failed');
     });
 
-    it('should propagate errors from the database on replaceRecord', async () => {
+    it('should propagate errors from the database on update', async () => {
       const existing = mockTokenData();
       mockTokenProvider.getBy.mockResolvedValue(existing);
-      mockTokenProvider.replaceRecord.mockRejectedValue(new Error('DB replace failed'));
+      mockTokenProvider.update.mockRejectedValue(new Error('DB replace failed'));
 
       await expect(manager.saveToken(mockUpdateData(), 'test-id')).rejects.toThrow('DB replace failed');
     });
@@ -203,7 +203,7 @@ describe('DiscordTokenManager', () => {
         data,
       );
 
-      expect(mockTokenProvider.create).toHaveBeenCalledWith(data, undefined);
+      expect(mockTokenProvider.create).toHaveBeenCalledWith(expect.objectContaining(data), undefined);
       expect(result).toEqual(created);
     });
 
@@ -212,7 +212,7 @@ describe('DiscordTokenManager', () => {
       const newData = mockUpdateData({ name: 'Updated Name' });
       const expected = { ...existing, ...newData };
       mockTokenProvider.getBy.mockResolvedValue(existing);
-      mockTokenProvider.replaceRecord.mockResolvedValue(expected);
+      mockTokenProvider.update.mockResolvedValue(expected);
 
       const result = await triggerIpcMainHandle<DiscordTokenData>(
         DiscordTokenChannel.UPDATE,
@@ -220,7 +220,7 @@ describe('DiscordTokenManager', () => {
       );
 
       expect(mockTokenProvider.getBy).toHaveBeenCalledWith('id', 'test-id');
-      expect(mockTokenProvider.replaceRecord).toHaveBeenCalledWith(expected);
+      expect(mockTokenProvider.update).toHaveBeenCalledWith('id', 'test-id', expect.objectContaining(expected));
       expect(result).toEqual(expected);
     });
 

@@ -225,7 +225,7 @@ export class PlaylistManager {
     if (!playlist) {
       throw createAppError(
         ErrorCode.PlaylistIdNotFound,
-        'Playlist with ID ${query.id} not found',
+        `Playlist with ID ${query.id} not found`,
         {
           playlistId: query.id,
         }
@@ -484,6 +484,10 @@ export class PlaylistManager {
     }
     // Check if filter matches any tag
     return playlist.tags.some((tag) => tag.toLowerCase().includes(filterLower));
+  }
+
+  public static filterPlaylists(playlist: Playlist, filter?: string): boolean {
+    return PlaylistManager.searchPlaylists(playlist, filter);
   }
 
   private async repairOrderRecords(

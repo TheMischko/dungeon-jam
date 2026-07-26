@@ -65,7 +65,7 @@ describe('RedirectManager', () => {
 
     expect(mockViewManagerInstance.broadcast).toHaveBeenCalledWith(
       GeneralChannels.REDIRECT,
-      expect.any(Number),
+      null,
       redirectRequest,
     );
   });

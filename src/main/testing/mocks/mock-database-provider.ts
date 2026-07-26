@@ -6,7 +6,7 @@ export const mockDatabaseProviderInstance = {
   getAll: vi.fn<[], Promise<any[]>>(() => Promise.resolve([])),
   getBy: vi.fn<[string, any], Promise<any>>(() => Promise.resolve(null)),
   getSubset: vi.fn<[string, any[], any], Promise<any[]>>(() =>
-    Promise.resolve([]),
+    Promise.resolve([])
   ),
   getMatching: vi.fn<() => boolean, any>(() => Promise.resolve([])),
   create: vi.fn<[any], Promise<any>>(() => Promise.resolve({})),
@@ -18,6 +18,7 @@ export class MockDatabaseProviderCreator {
   private table: string = '';
   private sort: any = null;
   private filter: any = null;
+  private search: any = null;
   private idColumn: string = 'id';
 
   static create<T>(): MockDatabaseProviderCreator {
@@ -41,6 +42,11 @@ export class MockDatabaseProviderCreator {
 
   setFilter(filterFn: any) {
     this.filter = filterFn;
+    return this;
+  }
+
+  setSearch(searchFn: any) {
+    this.search = searchFn;
     return this;
   }
 

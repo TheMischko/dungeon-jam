@@ -16,6 +16,15 @@ import { Playlist } from '@shared/models/playlist.model';
 vi.mock('electron', () => mockElectron);
 vi.mock('./../database/database', () => mockDatabase);
 vi.mock('../database/database-provider-creator');
+vi.mock('./image.manager', () => ({
+  ImageEntityType: { PLAYLIST: 'playlist' },
+  ImageManager: {
+    getInstance: vi.fn().mockResolvedValue({
+      processAndSaveImage: vi.fn().mockImplementation((url) => Promise.resolve(url)),
+      deleteImage: vi.fn().mockResolvedValue(true),
+    }),
+  },
+}));
 
 describe('PlaylistManager', () => {
   let playlistManager: PlaylistManager;
@@ -30,19 +39,27 @@ describe('PlaylistManager', () => {
       getBy: vi.fn().mockResolvedValue(null),
       getById: vi.fn().mockResolvedValue(null),
       getSome: vi.fn().mockResolvedValue([]),
+      getMatching: vi.fn().mockResolvedValue([]),
       create: vi
         .fn()
         .mockImplementation((data) =>
           Promise.resolve({ ...data, id: data.id || 'generated-id' }),
         ),
+      createMultiple: vi
+        .fn()
+        .mockImplementation((data) => Promise.resolve(data)),
       replaceRecord: vi
         .fn()
         .mockImplementation((data) => Promise.resolve(data)),
+      deleteOne: vi.fn().mockResolvedValue(true),
+      deleteMultiple: vi.fn().mockResolvedValue(true),
     };
 
     vi.mocked(DatabaseProviderCreator.create).mockReturnValue({
       setTable: vi.fn().mockReturnThis(),
+      setIdColumn: vi.fn().mockReturnThis(),
       setSort: vi.fn().mockReturnThis(),
+      setSearch: vi.fn().mockReturnThis(),
       setFilter: vi.fn().mockReturnThis(),
       complete: vi
         .fn()
