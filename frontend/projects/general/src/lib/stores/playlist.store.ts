@@ -7,6 +7,7 @@ import {
 } from '@ngrx/signals';
 import {
   entityConfig,
+  removeEntity,
   setAllEntities,
   setEntities,
   setEntity,
@@ -179,6 +180,23 @@ export const PlaylistStore = signalStore(
         )
       );
 
+      const deletePlaylist = rxMethod<string>(
+        pipe(
+          switchMap((playlistId) => {
+            return playlistApiService.deletePlaylist(playlistId).pipe(
+              tap(() => {
+                toastService.showDeleteSuccess();
+                patchState(store, removeEntity(playlistId));
+              }),
+              catchError((err) => {
+                toastService.showDeleteError(err);
+                return EMPTY;
+              })
+            );
+          })
+        )
+      );
+
       return {
         load,
         insertNew,
@@ -186,6 +204,7 @@ export const PlaylistStore = signalStore(
         getParent,
         updatePlaylist,
         changeOrder,
+        deletePlaylist,
       };
     }
   )

@@ -14,15 +14,30 @@ import {
   GridItemSizeConfig,
 } from '../../../models/grid.model';
 import { NgStyle } from '@angular/common';
+import {
+  ActionsMenuComponent,
+  ActionsMenuConfig,
+} from '@general/components/display/actions-menu/actions-menu.component';
+import { IconButtonComponent } from '@general/components/buttons/icon-button/icon-button.component';
+import { actionsIconSet } from '@general/icons/icons';
+import { MatMenu, MatMenuTrigger } from '@angular/material/menu';
 
 @Component({
   selector: 'app-grid-item',
-  imports: [LucideDynamicIcon, ScrollOverflowTextDirective, NgStyle],
+  imports: [
+    LucideDynamicIcon,
+    ScrollOverflowTextDirective,
+    NgStyle,
+    IconButtonComponent,
+    ActionsMenuComponent,
+    MatMenuTrigger,
+    MatMenu,
+  ],
   templateUrl: './grid-item.component.html',
   styleUrl: './grid-item.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class GridItemComponent {
+export class GridItemComponent<T> {
   readonly title = input.required<string>();
   readonly tags = input<Tag[]>();
   readonly leftCornerText = input<string>();
@@ -30,10 +45,13 @@ export class GridItemComponent {
   readonly noImageIcon = input.required<LucideIconData>();
   readonly image = input<string | null>(null);
   readonly sizeConfig = input<GridItemSizeConfig>(BigSizeGridItemConfig);
+  readonly dataItem = input<T>();
+  readonly actions = input<ActionsMenuConfig<T, unknown>[]>([]);
 
   readonly clicked = output<void>();
 
   readonly isHovering = signal(false);
+  readonly actionsIcon = actionsIconSet.ActionsMenu;
 
   readonly imageSizeStyle = computed<Record<string, string>>(() => {
     const size = `${this.sizeConfig().imageSize ?? 250}px`;
@@ -59,5 +77,10 @@ export class GridItemComponent {
   }
   protected onMouseLeave() {
     this.isHovering.set(false);
+  }
+
+  protected preventClickBubbling(event: PointerEvent) {
+    event.stopPropagation();
+    event.preventDefault();
   }
 }

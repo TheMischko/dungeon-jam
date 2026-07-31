@@ -19,6 +19,25 @@
 
     <ng-content select="content" />
 
+    @if (actions().length > 0 && dataItem()) {
+      <div class="action-overlay">
+        <lib-icon-button
+          [icon]="actionsIcon"
+          size="regular"
+          color="neutral"
+          class="action-button"
+          [matMenuTriggerFor]="gridItemMenu"
+          (click)="preventClickBubbling($event)"
+        ></lib-icon-button>
+        <mat-menu #gridItemMenu>
+          <lib-actions-menu
+            [config]="actions()"
+            [item]="dataItem()!"
+          ></lib-actions-menu>
+        </mat-menu>
+      </div>
+    }
+
     @if (isHovering()) {
       <ng-content select="hovering-content" />
     }

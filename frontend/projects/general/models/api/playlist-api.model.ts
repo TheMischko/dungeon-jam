@@ -18,5 +18,6 @@ export type PlaylistApiWindow = Window &
       ) => Promise<Map<string, Playlist>>;
       updatePlaylist: (query: PlaylistUpdateQuery) => Promise<Playlist>;
       changePlaylistOrder: (query: PlaylistReorderQuery) => Promise<void>;
+      deletePlaylist: (playlistId: string) => Promise<void>;
     };
   };

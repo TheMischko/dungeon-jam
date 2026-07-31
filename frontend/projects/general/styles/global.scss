@@ -69,10 +69,18 @@ app-root {
 
 .app-dialog-container {
   box-shadow: 1px 2px 5px 5px rgba(0, 0, 0, 0.3);
+  border-radius: 0 !important;
 
   width: auto !important;
   max-width: 90vw;
   max-height: 90vh;
+
+  &,
+  .mat-mdc-dialog-container,
+  .mat-mdc-dialog-surface,
+  .mdc-dialog__surface {
+    border-radius: 0 !important;
+  }
 
   .mat-mdc-dialog-surface {
     display: flex !important;
@@ -83,6 +91,7 @@ app-root {
     box-sizing: border-box;
 
     background: col.$background-main;
+    border-radius: 0 !important;
   }
 }
 

@@ -44,11 +44,17 @@ import {
   DiscoverTracksModalData,
   DiscoverTracksModalResult,
 } from '../../../../library/modals/discover-tracks-modal/discover-tracks-modal.component';
-import { ToastType } from '../../../../../../../../general/models/toast.model';
+import { ToastType } from '@general/models/toast.model';
 import { ToastService } from '@general/services/toast.service';
 import { NewTrackDropInService } from '../../../../library/services/new-track-drop-in.service';
 import { PlaylistToastService } from '@general/services/toast/playlist-toast.service';
 import { TagsStore } from '@general/stores/tags.store';
+import { Router } from '@angular/router';
+import { playlistRouteStrings } from '../../../playlist-route-strings';
+import {
+  ConfirmationDialogComponent,
+  ConfirmationDialogData,
+} from '../../../../../components/dialog/confirmation-dialog/confirmation-dialog.component';
 
 @Component({
   selector: 'app-playlists-detail-page-smart',
@@ -66,6 +72,7 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
   readonly defaultActionsService = inject(DefaultTrackActionsService);
   readonly imageApiService = inject(ImageApiService);
   readonly destroyRef = inject(DestroyRef);
+  private readonly router = inject(Router);
   private readonly newTrackDropInService = inject(NewTrackDropInService);
   private readonly playlistToastService = inject(PlaylistToastService);
   private readonly tagsStore = inject(TagsStore);
@@ -292,6 +299,32 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
 
   protected updateIncludeChildren(include: boolean) {
     this.currentIncludeChildren.set(include);
+  }
+
+  openDeletePlaylistModal(): void {
+    const playlist = this.playlist();
+    if (!playlist) {
+      return;
+    }
+    const dialogRef = this.dialogService.open<
+      ConfirmationDialogComponent,
+      boolean
+    >(ConfirmationDialogComponent, {
+      data: {
+        title: 'Delete playlist',
+        message: `Are you sure you want to delete playlist "${playlist.name}"?`,
+        confirmText: 'Delete',
+        dismissText: 'Cancel',
+      } satisfies ConfirmationDialogData,
+    });
+
+    dialogRef.afterClosed$.subscribe((confirmed) => {
+      if (!confirmed) {
+        return;
+      }
+      this.playlistStore.deletePlaylist(playlist.id);
+      this.router.navigate([`/${playlistRouteStrings.playlists}`]);
+    });
   }
 
   protected openDiscoverModal(query: QueryOptions | undefined) {

@@ -99,6 +99,13 @@ export class PlaylistManager {
         return await this.changePlaylistOrder(query);
       })
     );
+    ipcMain.handle(
+      PlaylistChannel.DELETE,
+      withAppError(async (_, id: string) => {
+        this.logger.log('Deleting playlist', { id });
+        return await this.delete(id);
+      })
+    );
   }
 
   async getAllPlaylists(query?: QueryRequest): Promise<Playlist[]> {
@@ -312,6 +319,14 @@ export class PlaylistManager {
 
   async getById(id: string) {
     return this.playlistProvider.getBy('id', id);
+  }
+
+  async delete(playlistId: string): Promise<void> {
+    const playlist = await this.getById(playlistId);
+    if (playlist?.imageUrl) {
+      await this.imageManager.deleteImage(playlist.imageUrl);
+    }
+    await this.playlistProvider.deleteOne('id', playlistId);
   }
 
   async removeTracksFromPlaylists(trackIds: string[]): Promise<number> {

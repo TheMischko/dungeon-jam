@@ -39,6 +39,10 @@ const changePlaylistOrder = async (
   return await ipcRenderer.invoke(PlaylistChannel.CHANGE_ORDER, query);
 };
 
+const deletePlaylist = async (playlistId: string): Promise<void> => {
+  return await ipcRenderer.invoke(PlaylistChannel.DELETE, playlistId);
+};
+
 export default {
   getAllPlaylists,
   getPlaylistById,
@@ -46,4 +50,5 @@ export default {
   addTracksToPlaylists,
   updatePlaylist,
   changePlaylistOrder,
+  deletePlaylist,
 };

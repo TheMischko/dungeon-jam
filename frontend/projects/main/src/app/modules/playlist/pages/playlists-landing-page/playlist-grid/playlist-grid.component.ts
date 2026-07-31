@@ -6,11 +6,12 @@ import {
 } from '@angular/core';
 import { PlaylistGridItemComponent } from './playlist-grid-item/playlist-grid-item.component';
 import { iconSet } from '@general/icons/icons';
-import { PlaylistWithTagData } from '../../../../../../../../general/models/playlist.model';
+import { PlaylistWithTagData } from '@general/models/playlist.model';
 import { LoaderComponent } from '@general/components/display/loader/loader.component';
 import { GridPlaylistSizeConfig } from '../../../../../models/grid-item-size-config.model';
 import { CdkDrag, CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop';
 import { GridControlsComponent } from '../../../../../components/grid/grid-controls/grid-controls.component';
+import { ActionsMenuConfig } from '@general/components/display/actions-menu/actions-menu.component';
 
 @Component({
   selector: 'app-playlist-grid',
@@ -40,6 +41,23 @@ export class PlaylistGridComponent {
   readonly playlistClick = output<string>();
   readonly search = output<string>();
   readonly reorderDrop = output<CdkDragDrop<PlaylistWithTagData[]>>();
+  readonly editPlaylist = output<PlaylistWithTagData>();
+  readonly deletePlaylist = output<PlaylistWithTagData>();
+
+  readonly playlistActions: ActionsMenuConfig<PlaylistWithTagData, string>[] = [
+    {
+      text: 'Edit playlist',
+      onSelected: (playlist: PlaylistWithTagData) => {
+        this.editPlaylist.emit(playlist);
+      },
+    },
+    {
+      text: 'Delete playlist',
+      onSelected: (playlist: PlaylistWithTagData) => {
+        this.deletePlaylist.emit(playlist);
+      },
+    },
+  ];
 
   readonly gridBigIcon = iconSet.GridBigIcon;
   readonly gridSmallIcon = iconSet.GridSmallIcon;
