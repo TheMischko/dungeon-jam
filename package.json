@@ -36,7 +36,8 @@
     "publish": {
       "provider": "github",
       "owner": "TheMischko",
-      "repo": "dungeon-jam"
+      "repo": "dungeon-jam",
+      "releaseType": "release"
     },
     "mac": {
       "category": "public.app-category.music",

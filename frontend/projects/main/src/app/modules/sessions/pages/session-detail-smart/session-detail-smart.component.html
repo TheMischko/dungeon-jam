@@ -3,5 +3,7 @@
   [loading]="loading()"
   [scenesMap]="scenesMap()"
   [scenesContentHiddenMap]="scenesContentHiddenMap()"
+  (editDetails)="openEditSessionModal()"
   (changeScenes)="openSceneAssignmentModal()"
+  (deleteSession)="openDeleteSessionModal()"
 ></app-session-detail>

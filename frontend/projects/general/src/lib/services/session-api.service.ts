@@ -74,7 +74,7 @@ export class SessionApiService {
 
   delete(sessionId: string): Observable<void> {
     const subject = new Subject<void>();
-    this.window.SESSION_API.getSessionById(sessionId)
+    this.window.SESSION_API.deleteSession(sessionId)
       .then(() => {
         subject.next();
         subject.complete();

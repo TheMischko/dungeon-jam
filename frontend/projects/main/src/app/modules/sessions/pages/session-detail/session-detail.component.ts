@@ -9,10 +9,11 @@ import { LoaderComponent } from '@general/components/display/loader/loader.compo
 import { MatButton } from '@angular/material/button';
 import { SceneConsoleSmartComponent } from '../../../scenes/components/scene-console-smart/scene-console-smart.component';
 import { Scene } from '@shared/models/scene.model';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-session-detail',
-  imports: [LoaderComponent, MatButton, SceneConsoleSmartComponent],
+  imports: [LoaderComponent, MatButton, SceneConsoleSmartComponent, DatePipe],
   templateUrl: './session-detail.component.html',
   styleUrl: './session-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -23,7 +24,9 @@ export class SessionDetailComponent {
   readonly scenesMap = input<Record<string, Scene>>({});
   readonly scenesContentHiddenMap = input<Record<string, boolean>>();
 
+  readonly editDetails = output<void>();
   readonly changeScenes = output<void>();
+  readonly deleteSession = output<void>();
 
   isSceneContentHidden(scene: Scene): boolean {
     return this.scenesContentHiddenMap()?.[scene.id] ?? false;

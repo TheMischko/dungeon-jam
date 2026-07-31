@@ -1,8 +1,28 @@
 @if (loading()) {
   <lib-loader size="large" />
 } @else {
-  <h1 class="title">{{ session()?.name }}</h1>
-  <button mat-flat-button (click)="changeScenes.emit()">Edit scenes</button>
+  <div class="header">
+    <div class="header-info">
+      <h1 class="title">{{ session()?.name }}</h1>
+      @if (session()?.description) {
+        <p class="description">{{ session()?.description }}</p>
+      }
+      @if (session()?.dateOfSession; as dateVal) {
+        <div class="session-date">
+          <span class="date-label">Session date: </span>
+          <span class="date-value">{{ dateVal | date: 'mediumDate' }}</span>
+        </div>
+      }
+    </div>
+    <div class="header-controls">
+      <button mat-flat-button (click)="editDetails.emit()">Edit details</button>
+      <button mat-flat-button (click)="changeScenes.emit()">Edit scenes</button>
+      <button mat-flat-button color="error" (click)="deleteSession.emit()">
+        Delete session
+      </button>
+    </div>
+  </div>
+
   <div class="scenes-wrapper">
     @for (sceneRef of session()?.scenes ?? []; track sceneRef.sceneId) {
       @if (scenesMap()[sceneRef.sceneId]; as scene) {
@@ -11,7 +31,7 @@
           [scene]="scene"
           [viewMode]="true"
           [initContentHidden]="isSceneContentHidden(scene)"
-          [sessionId]="$safeNavigationMigration(session()?.id)"
+          [sessionId]="session()?.id"
         ></app-scene-console-smart>
       }
     }

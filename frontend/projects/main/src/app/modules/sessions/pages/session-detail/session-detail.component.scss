@@ -5,8 +5,48 @@
   margin-bottom: 3rem;
 }
 
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 0 0.5rem;
+}
+
+.header-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
 .title {
   @include typo.page-title();
+  margin: 0;
+}
+
+.description {
+  margin: 0;
+  color: var(--text-secondary, rgba(255, 255, 255, 0.7));
+  font-size: 1rem;
+  max-width: 600px;
+}
+
+.session-date {
+  font-size: 0.875rem;
+  color: var(--text-tertiary, rgba(255, 255, 255, 0.5));
+
+  .date-label {
+    font-weight: 500;
+  }
+}
+
+.header-controls {
+  display: flex;
+  gap: 0.25rem;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 .scenes-wrapper {
