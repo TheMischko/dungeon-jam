@@ -46,7 +46,7 @@
     "@angular/compiler-cli": "^22.0.8",
     "@angular/localize": "^22.0.8",
     "@types/howler": "^2.2.12",
-    "jsdom": "^29.1.1",
+    "jsdom": "^30.0.1",
     "ng-packagr": "^22.0.2",
     "shx": "^0.4.0",
     "typescript": "~6.0.3",
