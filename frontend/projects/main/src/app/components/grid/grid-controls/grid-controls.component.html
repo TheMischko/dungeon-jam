@@ -1,7 +1,7 @@
 <div class="controls">
   <ng-content />
   <div class="search">
-    <lib-search-bar (search)="search.emit($event)"></lib-search-bar>
+    <lib-search-bar (search)="search.emit($event ?? '')"></lib-search-bar>
   </div>
   @if (showSizeControl()) {
     <div class="size-control">
