@@ -20,7 +20,7 @@
     }
     <lib-search-bar
       class="search-bar"
-      [value]="currentSearch()"
+      [value]="currentSearch() ?? undefined"
       (search)="currentSearch.set($event)"
     ></lib-search-bar>
   </div>

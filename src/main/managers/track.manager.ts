@@ -51,19 +51,25 @@ export class TrackManager {
   }
 
   private registerChannels(): void {
-    ipcMain.handle(TrackChannel.GET_ALL, withAppError(async (_, query?: QueryRequest) => {
-      this.logger.log('Fetching playlist tracks', { query });
-      const result = await this.getAll(query);
-      this.logger.log(`Found ${result.length} matching tracks`);
-      return result;
-    }));
+    ipcMain.handle(
+      TrackChannel.GET_ALL,
+      withAppError(async (_, query?: QueryRequest) => {
+        this.logger.log('Fetching playlist tracks', { query });
+        const result = await this.getAll(query);
+        this.logger.log(`Found ${result.length} matching tracks`);
+        return result;
+      })
+    );
 
-    ipcMain.handle(TrackChannel.GET_BY_ID, withAppError(async (_, id: string) => {
-      this.logger.log('Fetching playlist tracks', { id });
-      const result = await this.get(id);
-      this.logger.log('Found:', { track: result });
-      return result;
-    }));
+    ipcMain.handle(
+      TrackChannel.GET_BY_ID,
+      withAppError(async (_, id: string) => {
+        this.logger.log('Fetching playlist tracks', { id });
+        const result = await this.get(id);
+        this.logger.log('Found:', { track: result });
+        return result;
+      })
+    );
 
     ipcMain.handle(
       TrackChannel.GET_PLAYLIST_TRACKS,
@@ -89,49 +95,60 @@ export class TrackManager {
 
     ipcMain.handle(
       TrackChannel.INSERT,
-      withAppError(async (
-        _,
-        name: string,
-        url: string,
-        duration: number,
-        author?: string,
-        tags?: string[]
-      ) => {
-        return await this.insert(name, url, duration, author, tags);
+      withAppError(
+        async (
+          _,
+          name: string,
+          url: string,
+          duration: number,
+          author?: string,
+          tags?: string[]
+        ) => {
+          return await this.insert(name, url, duration, author, tags);
+        }
+      )
+    );
+
+    ipcMain.handle(
+      AudioFileChannel.UPLOAD,
+      withAppError(async (_, tracks: AudioTrack[]) => {
+        const inserted: Track[] = [];
+        for (const track of tracks) {
+          const resolved = resolveAudioTrack(track);
+          this.logger.log('Uploading track', {
+            name: resolved.name,
+            url: resolved.url,
+            author: resolved.author,
+            duration: resolved.duration,
+          });
+
+          inserted.push(
+            await this.insert(
+              resolved.name,
+              resolved.url,
+              resolved.duration,
+              resolved.author,
+              resolved.tags
+            )
+          );
+        }
+        return inserted;
       })
     );
 
-    ipcMain.handle(AudioFileChannel.UPLOAD, withAppError(async (_, tracks: AudioTrack[]) => {
-      const inserted: Track[] = [];
-      for (const track of tracks) {
-        const resolved = resolveAudioTrack(track);
-        this.logger.log('Uploading track', {
-          name: resolved.name,
-          url: resolved.url,
-          author: resolved.author,
-          duration: resolved.duration,
-        });
+    ipcMain.handle(
+      TrackChannel.UPDATE,
+      withAppError(async (_, track: Track) => {
+        return await this.update(track);
+      })
+    );
 
-        inserted.push(
-          await this.insert(
-            resolved.name,
-            resolved.url,
-            resolved.duration,
-            resolved.author,
-            resolved.tags
-          )
-        );
-      }
-      return inserted;
-    }));
-
-    ipcMain.handle(TrackChannel.UPDATE, withAppError(async (_, track: Track) => {
-      return await this.update(track);
-    }));
-
-    ipcMain.handle(TrackChannel.DELETE, withAppError(async (_, id: string) => {
-      return await this.deleteById(id);
-    }));
+    ipcMain.handle(
+      TrackChannel.DELETE,
+      withAppError(async (_, id: string) => {
+        return await this.deleteById(id);
+      })
+    );
 
     ipcMain.handle(
       TrackChannel.GET_TAGGED_TRACKS,
@@ -351,6 +368,14 @@ export class TrackManager {
 
     const valA = trackA[sortValue] as string;
     const valB = trackB[sortValue] as string;
+
+    if (!!valA && !valB) {
+      return -1;
+    } else if (!valA && !!valB) {
+      return 1;
+    } else if (!valA && !valB) {
+      return 0;
+    }
 
     return valA.toLowerCase().localeCompare(valB.toLowerCase()) * directionNum;
   }

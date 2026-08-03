@@ -16,6 +16,6 @@ import { actionsIconSet } from '../../../icons/icons';
 })
 export class SearchBarComponent {
   readonly value = input<string>();
-  readonly search = output<string>();
+  readonly search = output<string | null>();
   readonly searchIcon = actionsIconSet.SearchIcon;
 }

@@ -116,9 +116,11 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
     );
   });
   readonly playlistImageUrl = signal<string | null>(null);
-  readonly currentFilter = signal<string>('');
-  readonly currentSortBy = signal<string>('name');
-  readonly currentSortDirection = signal<SortDirection>(SortDirection.ASC);
+  readonly currentFilter = signal<string | undefined>(undefined);
+  readonly currentSortBy = signal<string | undefined>('name');
+  readonly currentSortDirection = signal<SortDirection | undefined>(
+    SortDirection.ASC
+  );
   readonly currentIncludeChildren = signal<boolean>(false);
   readonly currentFilters = signal<FilterQuery>(new FilterQuery());
 
@@ -283,15 +285,9 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
   }
 
   protected updateQuery(queryOptions: QueryOptions) {
-    if (queryOptions.search) {
-      this.currentFilter.set(queryOptions.search);
-    }
-    if (queryOptions.sortBy) {
-      this.currentSortBy.set(queryOptions.sortBy);
-    }
-    if (queryOptions.sortDirection) {
-      this.currentSortDirection.set(queryOptions.sortDirection);
-    }
+    this.currentFilter.set(queryOptions.search);
+    this.currentSortBy.set(queryOptions.sortBy);
+    this.currentSortDirection.set(queryOptions.sortDirection);
     if (queryOptions.filters) {
       this.currentFilters.set(queryOptions.filters);
     }

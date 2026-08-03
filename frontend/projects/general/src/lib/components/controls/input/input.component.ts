@@ -33,9 +33,9 @@ import { ValidationError } from '@angular/forms/signals';
   ],
 })
 export class InputComponent<
-  V = string | number | null,
+  V = string | number,
 > implements ControlValueAccessor {
-  readonly value = model<V>(undefined as V);
+  readonly value = model<V | null>(null as V);
   readonly touched = model<boolean>(false);
   readonly required = input<boolean>(false);
   readonly label = input.required<string>();
@@ -43,7 +43,7 @@ export class InputComponent<
   readonly iconPrefix = input<LucideIconData>();
   readonly errors = input<readonly ValidationError.WithField[]>([]);
 
-  readonly inputChange = output<V>();
+  readonly inputChange = output<V | null>();
   readonly onTouched = output<void>();
 
   readonly formDisabled = signal<boolean>(false);
@@ -59,13 +59,20 @@ export class InputComponent<
   onInputChange(event: Event): void {
     const target = event.target as HTMLInputElement;
     const newValue: V = target?.value as V;
+
+    const emitValue =
+      typeof newValue === 'string' && !newValue.length
+        ? null
+        : (newValue ?? null);
+
     if (newValue !== undefined) {
-      this.writeValue(newValue);
-      this.inputChange.emit(newValue);
+      this.writeValue(emitValue);
+      console.log(emitValue);
+      this.inputChange.emit(emitValue);
     }
   }
 
-  writeValue(value: V): void {
+  writeValue(value: V | null): void {
     this.value.set(value);
     this.onTouched.emit();
   }
