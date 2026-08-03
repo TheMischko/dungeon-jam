@@ -1,6 +1,6 @@
 {
   "name": "dungeon-jam",
-  "version": "0.0.2-alpha",
+  "version": "0.0.3-alpha",
   "author": "TheMischko",
   "private": true,
   "license": "GPL-3.0-only",
@@ -36,7 +36,8 @@
     "publish": {
       "provider": "github",
       "owner": "TheMischko",
-      "repo": "dungeon-jam"
+      "repo": "dungeon-jam",
+      "releaseType": "release"
     },
     "mac": {
       "category": "public.app-category.music",

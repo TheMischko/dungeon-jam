@@ -4,7 +4,7 @@
   [tracks]="tracks()"
   [parentPlaylist]="parentPlaylist()"
   [childrenPlaylists]="childPlaylists()"
-  [playingTrackId]="$safeNavigationMigration(playbackState()?.currentTrack?.id)"
+  [playingTrackId]="playbackState()?.currentTrack?.id"
   [playlistPlaying]="isPlaylistPlaying()"
   [songActionsMenuConfig]="songActionsMenuConfig()"
   (playPlaylist)="playPlaylist()"
@@ -15,5 +15,6 @@
   (openDiscover)="openDiscoverModal(undefined)"
   (includeChildren)="updateIncludeChildren($event)"
   (editPlaylist)="openEditPlaylistModal()"
+  (deletePlaylist)="openDeletePlaylistModal()"
   (audioDropped)="onTracksDropped($event)"
 ></app-playlists-detail-page>

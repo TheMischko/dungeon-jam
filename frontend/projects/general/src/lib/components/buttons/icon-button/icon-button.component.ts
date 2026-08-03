@@ -5,7 +5,7 @@ import {
   output,
   ChangeDetectionStrategy,
 } from '@angular/core';
-import { ButtonSize, ButtonType } from '../../../models/button.model';
+import { ButtonSize, ButtonType } from '@general';
 import { MatButton } from '@angular/material/button';
 import { NgClass, NgTemplateOutlet } from '@angular/common';
 import { LucideDynamicIcon, LucideIconData } from '@lucide/angular';
@@ -67,5 +67,10 @@ export class IconButtonComponent {
     this.clicked.emit();
   }
 
-  readonly ButtonType = ButtonType || { Default: 0, Raised: 1, Flat: 2, Stroked: 3 };
+  readonly ButtonType = ButtonType || {
+    Default: 0,
+    Raised: 1,
+    Flat: 2,
+    Stroked: 3,
+  };
 }

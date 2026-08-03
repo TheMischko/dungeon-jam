@@ -1,1 +1,4 @@
-<app-scene-console-smart [scene]="scene()"></app-scene-console-smart>
+<app-scene-console-smart
+  [scene]="scene()"
+  (deleteScene)="deleteScene.emit($event)"
+></app-scene-console-smart>

@@ -111,4 +111,18 @@ export class PlaylistApiService {
       });
     return subject;
   }
+
+  deletePlaylist(playlistId: string): Observable<void> {
+    const subject = new Subject<void>();
+    this.window.PLAYLIST_API.deletePlaylist(playlistId)
+      .then(() => {
+        subject.next();
+        subject.complete();
+      })
+      .catch((err) => {
+        subject.error(err);
+        subject.complete();
+      });
+    return subject.asObservable();
+  }
 }

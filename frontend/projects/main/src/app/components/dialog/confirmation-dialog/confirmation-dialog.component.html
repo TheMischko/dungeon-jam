@@ -8,7 +8,9 @@
     </div>
     <div class="footer">
       <button mat-flat-button (click)="confirm()">{{ confirmText }}</button>
-      <button mat-flat-button (click)="reject()">{{ dismissText }}</button>
+      <button mat-flat-button (click)="reject()" color="neutral">
+        {{ dismissText }}
+      </button>
     </div>
   </div>
 </div>

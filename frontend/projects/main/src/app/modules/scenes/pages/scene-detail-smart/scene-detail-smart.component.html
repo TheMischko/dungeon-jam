@@ -1,7 +1,10 @@
 @let sceneData = scene();
 
 @if (sceneData !== undefined) {
-  <app-scene-detail [scene]="sceneData"></app-scene-detail>
+  <app-scene-detail
+    [scene]="sceneData"
+    (deleteScene)="openDeleteSceneModal()"
+  ></app-scene-detail>
 } @else {
   <lib-loader class="loader"></lib-loader>
 }

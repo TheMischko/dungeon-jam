@@ -5,15 +5,14 @@
   [image]="imageSrc()"
   [noImageIcon]="PlaylistIcon"
   [sizeConfig]="sizeConfig()"
+  [actions]="actions()"
+  [dataItem]="playlistItem"
   (clicked)="onPlaylistClick()"
 >
   <div ngProjectAs="content" style="display: contents">
     @if (showTrackCount()) {
       <div class="tracks-overlay small-overlay">
-        <svg
-          [lucideIcon]="tracksIcon"
-          [size]="sizeConfig().trackCountSize"
-        />
+        <svg [lucideIcon]="tracksIcon" [size]="sizeConfig().trackCountSize" />
         <span [ngStyle]="trackCountSize()">{{
           playlist().trackIds.length
         }}</span>

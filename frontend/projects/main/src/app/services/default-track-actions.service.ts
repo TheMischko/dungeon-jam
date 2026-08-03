@@ -10,6 +10,10 @@ import {
   EditTrackModalComponent,
   EditTrackResult,
 } from '../modules/library/modals/edit-track-modal/edit-track-modal.component';
+import {
+  ConfirmationDialogComponent,
+  ConfirmationDialogData,
+} from '../components/dialog/confirmation-dialog/confirmation-dialog.component';
 
 @Injectable({
   providedIn: 'root',
@@ -114,8 +118,24 @@ export class DefaultTrackActionsService {
     if (!track) {
       return;
     }
-    this.tracksStore.removeTrack(track.id);
-    this._afterDeleteTrack$.next(track);
+    const dialogRef = this.dialogService.open<
+      ConfirmationDialogComponent,
+      boolean
+    >(ConfirmationDialogComponent, {
+      data: {
+        title: 'Delete track',
+        message: `Are you sure you want to delete track "${track.name}"? This action cannot be undone.`,
+        confirmText: 'Delete',
+        dismissText: 'Cancel',
+      } satisfies ConfirmationDialogData,
+    });
+
+    dialogRef.afterClosed$.subscribe((confirmed) => {
+      if (confirmed) {
+        this.tracksStore.removeTrack(track.id);
+        this._afterDeleteTrack$.next(track);
+      }
+    });
   }
 }
 

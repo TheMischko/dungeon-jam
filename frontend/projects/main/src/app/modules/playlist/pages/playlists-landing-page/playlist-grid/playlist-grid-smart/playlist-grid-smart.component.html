@@ -11,4 +11,6 @@
   (playlistClick)="showPlaylistDetails($event)"
   (search)="searchFilter.set($event)"
   (reorderDrop)="reorderPlaylist($event)"
+  (editPlaylist)="openEditModal($event)"
+  (deletePlaylist)="deletePlaylist($event)"
 ></app-playlist-grid>

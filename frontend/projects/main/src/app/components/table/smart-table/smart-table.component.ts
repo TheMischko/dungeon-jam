@@ -79,14 +79,14 @@ export class SmartTableComponent<T> implements AfterViewInit {
   readonly queryChange = output<QueryOptions>();
   readonly pageChange = output<PageEvent>();
 
-  readonly currentSearch = signal<string>('');
+  readonly currentSearch = signal<string | null>(null);
   readonly currentSortBy = signal<string | undefined>(undefined);
   readonly currentSortDirection = signal<SortDirection>(SortDirection.ASC);
   readonly currentFilters = signal<FilterQuery>(new FilterQuery());
 
   readonly currentQuery = computed<QueryOptions>(() => {
     const query: QueryOptions = {
-      search: this.currentSearch(),
+      search: this.currentSearch() ?? undefined,
       sortBy: this.currentSortBy(),
       sortDirection: this.currentSortDirection(),
       filters: this.currentFilters(),

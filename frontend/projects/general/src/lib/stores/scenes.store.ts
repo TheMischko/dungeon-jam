@@ -8,6 +8,7 @@ import {
 import {
   addEntity,
   entityConfig,
+  removeEntity,
   setAllEntities,
   setEntity,
   withEntities,
@@ -131,11 +132,28 @@ export const ScenesStore = signalStore(
       )
     );
 
+    const deleteScene = rxMethod<string>(
+      pipe(
+        switchMap((sceneId) => {
+          return sceneApiService.delete(sceneId).pipe(
+            tap(() => {
+              patchState(store, removeEntity(sceneId));
+            }),
+            catchError((err) => {
+              console.error(err);
+              return EMPTY;
+            })
+          );
+        })
+      )
+    );
+
     return {
       loadAll,
       insert,
       update,
       updateSoundEffectVolume,
+      deleteScene,
     };
   })
 );

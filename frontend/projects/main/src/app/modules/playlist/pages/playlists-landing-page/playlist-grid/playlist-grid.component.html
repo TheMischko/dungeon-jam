@@ -27,6 +27,7 @@
           [playlistImageUrl]="getPlaylistImageUrl(playlist)"
           [sizeConfig]="sizeConfig()"
           [isPlaying]="isPlaying(playlist.id)"
+          [actions]="showControls() ? playlistActions : []"
           (playlistClick)="playlistClick.emit($event)"
           (playPlaylist)="playPlaylist.emit($event)"
           (pausePlaylist)="pausePlaylist.emit($event)"

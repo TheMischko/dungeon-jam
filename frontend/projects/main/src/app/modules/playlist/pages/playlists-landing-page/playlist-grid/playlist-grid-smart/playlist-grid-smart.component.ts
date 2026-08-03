@@ -10,7 +10,7 @@ import {
   ChangeDetectionStrategy,
 } from '@angular/core';
 import { PlaylistGridComponent } from '../playlist-grid.component';
-import { Playlist } from '@shared/models/playlist.model';
+import { Playlist, PlaylistUpdateQuery } from '@shared/models/playlist.model';
 import { SortDirection } from '@shared/models/common.model';
 import { QueryRequest } from '@shared/models/request.model';
 import { PlaylistStore } from '@general/stores/playlist.store';
@@ -21,10 +21,19 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { forkJoin, map, Observable, of, take, tap } from 'rxjs';
 import { TrackService } from '../../../../../../services/track.service';
 import { TagsStore } from '@general/stores/tags.store';
-import { PlaylistWithTagData } from '../../../../../../../../../general/models/playlist.model';
+import { PlaylistWithTagData } from '@general/models/playlist.model';
 import { GridPlaylistSizeConfig } from '../../../../../../models/grid-item-size-config.model';
 import { ImageApiService } from '@general/services/image-api.service';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { DialogService } from '../../../../../../services/dialog.service';
+import {
+  UpdatePlaylistModalComponent,
+  UpdatePlaylistModalData,
+} from '../../../../modals/update-playlist-modal/update-playlist-modal.component';
+import {
+  ConfirmationDialogComponent,
+  ConfirmationDialogData,
+} from '../../../../../../components/dialog/confirmation-dialog/confirmation-dialog.component';
 
 @Component({
   selector: 'app-playlist-grid-smart',
@@ -184,6 +193,53 @@ export class PlaylistGridSmartComponent implements OnInit {
     this.playlistStore.changeOrder({
       playlistId: item.id,
       newOrder: event.currentIndex,
+    });
+  }
+
+  readonly dialogService = inject(DialogService);
+
+  protected openEditModal(playlistItem: PlaylistWithTagData) {
+    const playlist = this.playlistStore.entityMap()[playlistItem.id];
+    if (!playlist) {
+      return;
+    }
+    const parentPlaylist = this.playlistStore.getParent(playlist.id);
+    const dialogRef = this.dialogService.open<
+      UpdatePlaylistModalComponent,
+      PlaylistUpdateQuery
+    >(UpdatePlaylistModalComponent, {
+      data: {
+        playlist,
+        parentPlaylistId: parentPlaylist ?? undefined,
+      } as UpdatePlaylistModalData,
+    });
+
+    dialogRef.afterClosed$.subscribe((result) => {
+      if (!result) {
+        return;
+      }
+      this.playlistStore.updatePlaylist(result);
+    });
+  }
+
+  protected deletePlaylist(playlist: PlaylistWithTagData) {
+    const dialogRef = this.dialogService.open<
+      ConfirmationDialogComponent,
+      boolean
+    >(ConfirmationDialogComponent, {
+      data: {
+        title: 'Delete playlist',
+        message: `Are you sure you want to delete playlist "${playlist.name}"?`,
+        confirmText: 'Delete',
+        dismissText: 'Cancel',
+      } satisfies ConfirmationDialogData,
+    });
+
+    dialogRef.afterClosed$.subscribe((confirmed) => {
+      if (!confirmed) {
+        return;
+      }
+      this.playlistStore.deletePlaylist(playlist.id);
     });
   }
 }

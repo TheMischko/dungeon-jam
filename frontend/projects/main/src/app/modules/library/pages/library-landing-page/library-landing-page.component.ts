@@ -38,6 +38,10 @@ import { DefaultTrackActionsService } from '../../../../services/default-track-a
 import { TagsStore } from '@general/stores/tags.store';
 import { AudioFilesService } from '../../../../services/audio-files.service';
 import { MatButton } from '@angular/material/button';
+import {
+  ConfirmationDialogComponent,
+  ConfirmationDialogData,
+} from '../../../../components/dialog/confirmation-dialog/confirmation-dialog.component';
 
 @Component({
   selector: 'app-library-landing-page',
@@ -195,7 +199,23 @@ export class LibraryLandingPageComponent implements OnInit {
     if (!track) {
       return;
     }
-    this.trackStore.removeTrack(track.id);
+    const dialogRef = this.dialogService.open<
+      ConfirmationDialogComponent,
+      boolean
+    >(ConfirmationDialogComponent, {
+      data: {
+        title: 'Delete track',
+        message: `Are you sure you want to delete track "${track.name}"? This action cannot be undone.`,
+        confirmText: 'Delete',
+        dismissText: 'Cancel',
+      } satisfies ConfirmationDialogData,
+    });
+
+    dialogRef.afterClosed$.subscribe((confirmed) => {
+      if (confirmed) {
+        this.trackStore.removeTrack(track.id);
+      }
+    });
   }
 
   private editTrack(track: Track) {

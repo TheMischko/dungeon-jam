@@ -1,9 +1,14 @@
 @use "mixins" as mix;
 
-:host{
+:host {
   @include mix.base-dialog();
+  border-radius: 0 !important;
 
-  .footer{
+  .wrapper {
+    border-radius: 0 !important;
+  }
+
+  .footer {
     margin-top: 1rem;
     display: flex;
     flex-direction: row;

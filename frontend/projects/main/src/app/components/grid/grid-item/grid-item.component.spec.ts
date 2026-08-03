@@ -4,15 +4,15 @@ import { GridItemComponent } from './grid-item.component';
 import { iconSet } from '@general/icons/icons';
 
 describe('GridItemComponent', () => {
-  let component: GridItemComponent;
-  let fixture: ComponentFixture<GridItemComponent>;
+  let component: GridItemComponent<unknown>;
+  let fixture: ComponentFixture<GridItemComponent<unknown>>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [GridItemComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(GridItemComponent);
+    fixture = TestBed.createComponent(GridItemComponent<unknown>);
     component = fixture.componentInstance;
     fixture.componentRef.setInput('title', 'Test Title');
     fixture.componentRef.setInput('noImageIcon', iconSet.TracksIcon);

@@ -5,11 +5,15 @@ import { PlaylistApiService } from './playlist-api.service';
 import { Playlist } from '@shared/models/playlist.model';
 import { QueryRequest } from '@shared/models/request.model';
 import { SortDirection } from '@shared/models/common.model';
+import { PlaylistApiWindow } from '../../../models/api/playlist-api.model';
 
 describe('PlaylistApiService', () => {
   let service: PlaylistApiService;
   let mockPlaylists: Playlist[];
   let mockQueryRequest: QueryRequest;
+
+  const getPlaylistApi = () =>
+    (window as unknown as PlaylistApiWindow).PLAYLIST_API;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
@@ -42,9 +46,15 @@ describe('PlaylistApiService', () => {
       },
     ];
 
-    vi.spyOn(window.PLAYLIST_API, 'getAllPlaylists').mockResolvedValue(
-      mockPlaylists
-    );
+    (window as any).PLAYLIST_API = {
+      getAllPlaylists: vi.fn().mockResolvedValue(mockPlaylists),
+      getPlaylistById: vi.fn(),
+      insertPlaylist: vi.fn(),
+      addTracksToPlaylists: vi.fn(),
+      updatePlaylist: vi.fn(),
+      changePlaylistOrder: vi.fn(),
+      deletePlaylist: vi.fn().mockResolvedValue(undefined),
+    };
   });
 
   it('should return playlists when API call succeeds', async () => {
@@ -58,9 +68,7 @@ describe('PlaylistApiService', () => {
 
   it('should emit error when API call fails', async () => {
     const testError = new Error('Failed to fetch playlists');
-    vi.spyOn(window.PLAYLIST_API, 'getAllPlaylists').mockRejectedValue(
-      testError
-    );
+    vi.spyOn(getPlaylistApi(), 'getAllPlaylists').mockRejectedValue(testError);
 
     await expect(
       firstValueFrom(service.getAllPlaylists(mockQueryRequest))
@@ -70,8 +78,18 @@ describe('PlaylistApiService', () => {
   it('should call getAllPlaylists with query options', async () => {
     await firstValueFrom(service.getAllPlaylists(mockQueryRequest));
 
-    expect(window.PLAYLIST_API.getAllPlaylists).toHaveBeenCalledWith(
+    expect(getPlaylistApi().getAllPlaylists).toHaveBeenCalledWith(
       mockQueryRequest
+    );
+  });
+
+  it('should call window.PLAYLIST_API.deletePlaylist when deletePlaylist is called', async () => {
+    vi.spyOn(getPlaylistApi(), 'deletePlaylist').mockResolvedValue(undefined);
+
+    await firstValueFrom(service.deletePlaylist('playlist-123'));
+
+    expect(getPlaylistApi().deletePlaylist).toHaveBeenCalledWith(
+      'playlist-123'
     );
   });
 });

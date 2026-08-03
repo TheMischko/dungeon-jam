@@ -7,6 +7,7 @@ import {
   inject,
   input,
   OnInit,
+  output,
   signal,
 } from '@angular/core';
 import { Scene, SceneInsertQuery } from '@shared/models/scene.model';
@@ -19,7 +20,7 @@ import { SoundEffect } from '@shared/models/sound-effect.model';
 import { TagsStore } from '@general/stores/tags.store';
 import { SceneConsoleComponent } from '../scene-console/scene-console.component';
 import { ImageApiService } from '@general/services/image-api.service';
-import { ListChanged } from '../../../../../../../general/models/list-changed.model';
+import { ListChanged } from '@general/models/list-changed.model';
 import { ScenesStore } from '@general/stores/scenes.store';
 import { DialogService } from '../../../../services/dialog.service';
 import { SelectSoundEffectsModalComponent } from '../../../sound-effects/modals/select-sound-effects-modal/select-sound-effects-modal.component';
@@ -66,6 +67,8 @@ export class SceneConsoleSmartComponent implements OnInit {
   readonly viewMode = input<boolean>(false);
   readonly initContentHidden = input<boolean>(false);
   readonly sessionId = input<string>();
+
+  readonly deleteScene = output<Scene>();
 
   readonly tagsMap = this.tagsStore.entityMap;
   readonly playlist = signal<Playlist | null | undefined>(undefined);

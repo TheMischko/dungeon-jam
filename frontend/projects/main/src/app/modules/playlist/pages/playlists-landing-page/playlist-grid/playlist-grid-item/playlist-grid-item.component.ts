@@ -9,10 +9,11 @@ import {
 import { NgStyle } from '@angular/common';
 import { iconSet, volumeIconSet } from '@general/icons/icons';
 import { LucideDynamicIcon, LucideIconData } from '@lucide/angular';
-import { PlaylistWithTagData } from '../../../../../../../../../general/models/playlist.model';
+import { PlaylistWithTagData } from '@general/models/playlist.model';
 import { PlaylistStore } from '@general/stores/playlist.store';
 import { GridPlaylistSizeConfig } from '../../../../../../models/grid-item-size-config.model';
 import { GridItemComponent } from '../../../../../../components/grid/grid-item/grid-item.component';
+import { ActionsMenuConfig } from '@general/components/display/actions-menu/actions-menu.component';
 
 @Component({
   selector: 'app-playlist-grid-item',
@@ -27,6 +28,9 @@ export class PlaylistGridItemComponent {
   readonly sizeConfig = input.required<GridPlaylistSizeConfig>();
   readonly isPlaying = input<boolean>(false);
   readonly playlistImageUrl = input<string | null>(null);
+  readonly actions = input<ActionsMenuConfig<PlaylistWithTagData, string>[]>(
+    []
+  );
 
   readonly playlistClick = output<string>();
   readonly playPlaylist = output<string>();

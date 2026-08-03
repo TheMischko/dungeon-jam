@@ -3,4 +3,8 @@
 :host {
   @include mix.base-dialog();
   display: flex;
+
+  .header {
+    margin-bottom: 1rem;
+  }
 }

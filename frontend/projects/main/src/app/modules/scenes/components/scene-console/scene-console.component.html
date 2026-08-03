@@ -29,6 +29,14 @@
               [label]="'Edit scene'"
               (clicked)="editScene.emit(scene()!)"
             ></lib-icon-button>
+            <lib-icon-button
+              [type]="ButtonType.Flat"
+              [icon]="DeleteIcon"
+              size="regular"
+              label="Delete scene"
+              color="error"
+              (clicked)="deleteScene.emit(scene()!)"
+            ></lib-icon-button>
           }
           @if (collapsable()) {
             <lib-icon-button

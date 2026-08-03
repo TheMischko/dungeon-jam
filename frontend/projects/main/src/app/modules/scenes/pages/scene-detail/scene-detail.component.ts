@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { Scene } from '@shared/models/scene.model';
 import { SceneConsoleSmartComponent } from '../../components/scene-console-smart/scene-console-smart.component';
 
@@ -11,4 +11,5 @@ import { SceneConsoleSmartComponent } from '../../components/scene-console-smart
 })
 export class SceneDetailComponent {
   readonly scene = input.required<Scene>();
+  readonly deleteScene = output<Scene>();
 }

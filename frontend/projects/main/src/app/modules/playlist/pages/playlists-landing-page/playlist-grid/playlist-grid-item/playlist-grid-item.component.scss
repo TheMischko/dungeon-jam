@@ -148,7 +148,7 @@
   .tracks-overlay {
     position: absolute;
     top: 6px;
-    right: 6px;
+    left: 6px;
   }
 
   .parent-overlay {
@@ -159,7 +159,7 @@
 
   .is-playing-overlay {
     position: absolute;
-    top: 6px;
+    top: 38px;
     left: 6px;
     color: col.$primary-light;
     &.small-overlay {
