@@ -16,7 +16,7 @@ import { LoaderComponent } from '@general/components/display/loader/loader.compo
 import { SongsTableComponent } from '../../../library/pages/library-landing-page/songs-table/songs-table.component';
 import { PlayPauseButtonComponent } from '@general/components/buttons/play-pause-button/play-pause-button.component';
 import { TagListSmartComponent } from '@general/components/display/tag-list/tag-list-smart/tag-list-smart.component';
-import { ButtonType } from '../../../../../../../general/models/button.model';
+import { ButtonType } from '@general';
 import { SceneSoundEffectsListComponent } from '../scene-sound-effects-list/scene-sound-effects-list.component';
 import { AddSoundEffectsSectionComponent } from '../add-sound-effects-section/add-sound-effects-section.component';
 import { SoundEffectVolumeChange } from '../../../../models/sound-effect.model';
@@ -71,6 +71,7 @@ export class SceneConsoleComponent {
   readonly changeSoundEffectVolume = output<SoundEffectVolumeChange>();
   readonly trackQueryChange = output<QueryOptions>();
   readonly editScene = output<Scene>();
+  readonly deleteScene = output<Scene>();
   readonly playTrackNext = output<Track>();
 
   readonly hiddenContent = signal<boolean>(false);
@@ -80,6 +81,7 @@ export class SceneConsoleComponent {
   readonly CollapsedIcon = actionsIconSet.CollapsedArrowIcon;
   readonly ExpandedIcon = actionsIconSet.ExpandedArrowIcon;
   readonly EditIcon = actionsIconSet.EditIcon;
+  readonly DeleteIcon = actionsIconSet.DeleteIcon;
   readonly PlayNextIcon = iconSet.PlayNextIcon;
   readonly trackGridActions: ActionsMenuBaseConfig<Track>[] = [
     {
