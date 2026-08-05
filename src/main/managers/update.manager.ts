@@ -1,6 +1,5 @@
 import { autoUpdater } from 'electron-updater';
 import { Logger } from '../utils/logger';
-import { ViewManager } from './view.manager';
 
 export class UpdateManager {
   private static instance: UpdateManager;
@@ -18,7 +17,8 @@ export class UpdateManager {
   }
 
   private setupAutoUpdater(): void {
-    autoUpdater.autoDownload = false;
+    autoUpdater.allowPrerelease = true;
+    autoUpdater.autoDownload = true;
     autoUpdater.autoInstallOnAppQuit = true;
 
     autoUpdater.on('checking-for-update', () => {
