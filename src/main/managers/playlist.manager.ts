@@ -328,9 +328,29 @@ export class PlaylistManager {
 
   async delete(playlistId: string): Promise<void> {
     const playlist = await this.getById(playlistId);
-    if (playlist?.imageUrl) {
+    if (!playlist) {
+      return;
+    }
+
+    if (playlist.imageUrl) {
       await this.imageManager.deleteImage(playlist.imageUrl);
     }
+
+    // 1. Remove this playlist from its parent (if it was a child)
+    await this.removeParentOwnership(playlistId);
+
+    // 2. Clear ownershipId on all children (if it was a parent)
+    if (playlist.childrenIds?.length) {
+      const allPlaylists = await this.playlistProvider.getAll();
+      for (const childId of playlist.childrenIds) {
+        const child = allPlaylists.find((p) => p.id === childId);
+        if (child && child.ownershipId === playlistId) {
+          const { ownershipId, ...childWithoutOwnership } = child;
+          await this.playlistProvider.replaceRecord(childWithoutOwnership);
+        }
+      }
+    }
+
     await this.playlistProvider.deleteOne('id', playlistId);
   }
 

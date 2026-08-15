@@ -63,12 +63,6 @@
       right: 6px;
     }
 
-    .parent-overlay {
-      position: absolute;
-      top: 6px;
-      left: 6px;
-    }
-
     .is-playing-overlay {
       position: absolute;
       top: 6px;
@@ -153,8 +147,9 @@
 
   .parent-overlay {
     position: absolute;
-    top: 6px;
     left: 6px;
+    bottom: 6px;
+    max-width: 95%;
   }
 
   .is-playing-overlay {

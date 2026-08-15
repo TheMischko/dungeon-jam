@@ -383,8 +383,35 @@ describe('PlaylistManager', () => {
         name: 'Updated Name',
       })) as Playlist;
 
-      expect(result.order).toBe(5);
       expect(result.description).toBe('Original Description');
+      expect(result.order).toBe(5);
+    });
+  });
+
+  describe('delete', () => {
+    it('should clear ownershipId on children when parent playlist is deleted', async () => {
+      const parentPlaylist = mockPlaylist({
+        id: 'parent-1',
+        name: 'Parent Playlist',
+        childrenIds: ['child-1'],
+      });
+      const childPlaylist = mockPlaylist({
+        id: 'child-1',
+        name: 'Child Playlist',
+        ownershipId: 'parent-1',
+      });
+
+      mockPlaylistProvider.getBy.mockResolvedValue(parentPlaylist);
+      mockPlaylistProvider.getById.mockResolvedValue(parentPlaylist);
+      mockPlaylistProvider.getAll.mockResolvedValue([parentPlaylist, childPlaylist]);
+
+      await playlistManager.delete('parent-1');
+
+      // Verify that child playlist record was updated to remove ownershipId
+      expect(mockPlaylistProvider.replaceRecord).toHaveBeenCalledWith(
+        expect.not.objectContaining({ ownershipId: 'parent-1' }),
+      );
+      expect(mockPlaylistProvider.deleteOne).toHaveBeenCalledWith('id', 'parent-1');
     });
   });
 
