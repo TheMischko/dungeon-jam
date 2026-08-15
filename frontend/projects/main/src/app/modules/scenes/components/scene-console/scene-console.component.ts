@@ -94,12 +94,9 @@ export class SceneConsoleComponent {
   ];
 
   readonly loading = computed(() => {
-    return (
-      !this.scene() ||
-      this.playlist() === undefined ||
-      !Object.keys(this.tagsMap()).length
-    );
+    return !this.scene() || this.playlist() === undefined;
   });
+
   readonly playingTrackId = computed(() => {
     const track = this.playingTrack();
     if (!track) {
