@@ -3,7 +3,11 @@
     <app-grid-controls
       (search)="search.emit($event)"
       (sizeChange)="sizeChange.emit($event)"
-    ></app-grid-controls>
+    >
+      <app-playlist-parent-filter
+        (parentSelected)="parentChange.emit($event)"
+      />
+    </app-grid-controls>
   }
 
   <div
