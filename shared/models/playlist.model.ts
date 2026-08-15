@@ -33,7 +33,7 @@ export interface PlaylistUpdateQuery {
   tagsRemoved?: string[];
   tracksAdded?: string[];
   tracksRemoved?: string[];
-  parentPlaylistId?: string;
+  parentPlaylistId?: string | null;
 }
 
 export interface PlaylistFetchQuery extends QueryRequest {

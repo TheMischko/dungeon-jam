@@ -13,6 +13,7 @@
   <lib-playlist-select
     label="Pick parent playlist (optional)"
     [formField]="form()!.parentPlaylist"
+    [omitPlaylist]="omitParentPlaylistOption()"
   ></lib-playlist-select>
   <app-image-upload
     label="Playlist Image"

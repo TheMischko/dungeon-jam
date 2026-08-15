@@ -207,7 +207,7 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
     >(UpdatePlaylistModalComponent, {
       data: {
         playlist: this.playlist(),
-        parentPlaylist: this.parentPlaylist() ?? undefined,
+        parentPlaylistId: this.parentPlaylist() ?? undefined,
       } as UpdatePlaylistModalData,
     });
 

@@ -63,14 +63,20 @@ export class PlaylistManager {
   }
 
   private registerChannels(): void {
-    ipcMain.handle(PlaylistChannel.GET_ALL, withAppError(async (_, query?: QueryRequest) => {
-      this.logger.log('Getting playlist channels', { query });
-      return await this.getAllPlaylists(query);
-    }));
-    ipcMain.handle(PlaylistChannel.GET_BY_ID, withAppError(async (_, id: string) => {
-      this.logger.log('Getting playlist by id', { id });
-      return await this.getById(id);
-    }));
+    ipcMain.handle(
+      PlaylistChannel.GET_ALL,
+      withAppError(async (_, query?: QueryRequest) => {
+        this.logger.log('Getting playlist channels', { query });
+        return await this.getAllPlaylists(query);
+      })
+    );
+    ipcMain.handle(
+      PlaylistChannel.GET_BY_ID,
+      withAppError(async (_, id: string) => {
+        this.logger.log('Getting playlist by id', { id });
+        return await this.getById(id);
+      })
+    );
     ipcMain.handle(
       PlaylistChannel.INSERT,
       withAppError(async (_, query: PlaylistInsertQuery) => {
@@ -281,15 +287,14 @@ export class PlaylistManager {
       tags: playlistTags,
       trackIds: playlistTracks,
       order: playlist.order,
+      ownershipId: playlist.ownershipId,
+      childrenIds: playlist.childrenIds,
       dateCreated: playlist.dateCreated,
       dateUpdated: new Date(),
     };
     try {
       await this.playlistProvider.replaceRecord(updatedPlaylist);
-      await this.setParentOwnership(
-        query.parentPlaylistId ?? undefined,
-        updatedPlaylist.id
-      );
+      await this.setParentOwnership(query.parentPlaylistId, updatedPlaylist.id);
 
       const finalizedPlaylist = await this.getById(playlist.id);
       if (!finalizedPlaylist) {
@@ -413,12 +418,19 @@ export class PlaylistManager {
   }
 
   private async setParentOwnership(
-    parentId: string | undefined,
+    parentId: string | null | undefined,
     childId: string
   ): Promise<void> {
-    if (!parentId) {
+    if (parentId === undefined) {
       return;
     }
+
+    await this.removeParentOwnership(childId);
+
+    if (parentId === null) {
+      return;
+    }
+
     const parentPlaylist = await this.getById(parentId);
     if (!parentPlaylist) {
       return;
@@ -538,5 +550,26 @@ export class PlaylistManager {
       currentAllPlaylists,
       PlaylistOrderContext.Landing
     );
+  }
+
+  private async removeParentOwnership(childId: string) {
+    const playlists = await this.getAll({});
+    const child = playlists.find((playlist) => playlist.id === childId);
+    if (child && child.ownershipId) {
+      const { ownershipId, ...childWithoutOwnership } = child;
+      await this.playlistProvider.replaceRecord(childWithoutOwnership);
+    }
+
+    const parent = playlists.find((playlist) =>
+      playlist.childrenIds?.includes(childId)
+    );
+    if (!parent) {
+      return;
+    }
+    const childrenIds = parent.childrenIds!.filter((id) => id !== childId);
+    await this.playlistProvider.replaceRecord({
+      ...parent,
+      childrenIds,
+    });
   }
 }

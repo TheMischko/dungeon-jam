@@ -6,7 +6,12 @@
     [disabled]="disabled()"
   >
     @if (!loading()) {
-      @for (playlist of playlists(); track playlist.id) {
+      @if (!playlists().length) {
+        <mat-option [disabled]="true">There are no playlists yet.</mat-option>
+      } @else {
+        <mat-option [value]="null">None</mat-option>
+      }
+      @for (playlist of playlistOptions(); track playlist.id) {
         <mat-option [value]="playlist">{{ playlist.name }}</mat-option>
       }
     }

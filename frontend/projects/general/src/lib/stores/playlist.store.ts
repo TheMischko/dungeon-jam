@@ -103,6 +103,10 @@ export const PlaylistStore = signalStore(
         )
       );
 
+      const update = rxMethod<void>(
+        pipe(tap(() => load(store.lastLoadQuery())))
+      );
+
       const updatePlaylist = rxMethod<PlaylistUpdateQuery>(
         pipe(
           tap(() => patchState(store, { loading: true })),
@@ -111,6 +115,7 @@ export const PlaylistStore = signalStore(
               tap((updatedPlaylist) => {
                 toastService.showUpdateSuccess(updatedPlaylist.name);
                 patchState(store, setEntity(updatedPlaylist));
+                update();
               }),
               catchError((err) => {
                 toastService.showUpdateError(err);
