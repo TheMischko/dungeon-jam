@@ -19,7 +19,11 @@
       </div>
     }
     @if (parentPlaylist()) {
-      <div class="parent-overlay small-overlay" libScrollOverflowText>
+      <div
+        class="parent-overlay small-overlay"
+        libScrollOverflowText
+        [ngStyle]="trackCountSize()"
+      >
         {{ parentPlaylist()!.name }}
       </div>
     }
