@@ -6,11 +6,33 @@ import path from 'path';
 import * as fs from 'node:fs';
 
 export class DatabaseWrapper {
+  private static activeTempFilePath: string | null = null;
+
+  public static get isTempMode(): boolean {
+    const isArgTempMode =
+      Array.isArray(process.argv) && process.argv.includes('--temp-db');
+    return process.env.TEMP_DB === 'true' || isArgTempMode;
+  }
+
   private static get DB_FILE(): string {
-    let fullPath: string =
-      process.env.ENV !== 'test'
-        ? path.join(app.getPath('userData'), 'db.json')
-        : path.join(__dirname, 'db_test.json');
+    let fullPath: string;
+
+    if (DatabaseWrapper.isTempMode) {
+      fullPath = path.join(app.getPath('userData'), 'db_temp.json');
+      DatabaseWrapper.activeTempFilePath = fullPath;
+      if (fs.existsSync(fullPath)) {
+        try {
+          fs.unlinkSync(fullPath);
+        } catch {
+          // ignore error if deletion fails
+        }
+      }
+    } else {
+      fullPath =
+        process.env.ENV !== 'test'
+          ? path.join(app.getPath('userData'), 'db.json')
+          : path.join(__dirname, 'db_test.json');
+    }
 
     const dir = path.dirname(fullPath);
     if (!fs.existsSync(dir)) {
@@ -26,9 +48,28 @@ export class DatabaseWrapper {
   static async getInstance(): Promise<DatabaseWrapper> {
     if (!DatabaseWrapper._instance) {
       const db = await JSONFilePreset(DatabaseWrapper.DB_FILE, initDatabase());
+      await db.write();
       DatabaseWrapper._instance = new DatabaseWrapper(db);
     }
     return DatabaseWrapper._instance!;
+  }
+
+  static resetInstance(): void {
+    DatabaseWrapper._instance = undefined;
+    DatabaseWrapper.activeTempFilePath = null;
+  }
+
+  static cleanupTempDb(): void {
+    if (
+      DatabaseWrapper.activeTempFilePath &&
+      fs.existsSync(DatabaseWrapper.activeTempFilePath)
+    ) {
+      try {
+        fs.unlinkSync(DatabaseWrapper.activeTempFilePath);
+      } catch {
+        // ignore errors during cleanup
+      }
+    }
   }
 
   readTable<T>(tableName: DatabaseTable): T | null {

@@ -83,6 +83,12 @@ Found a bug or have a suggestion?
    npm run start
    ```
 
+### Command Line Flags & Environment Variables
+
+| Flag / Variable               | Description                                                                                                                                             | Command / Usage                                                      |
+|-------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------|
+| `--temp-db`<br>`TEMP_DB=true` | Launches the app in **temporary database mode**. Starts with a fresh, empty database (`db_temp.json`) that is automatically erased when the app closes. | `npm run start:temp`<br>*or*<br> `electron build/src/index.js --temp-db` |
+
 ---
 
 ## License

@@ -18,6 +18,7 @@
     "compile:dev": "npm run build:electron:dev && npm run copyfiles:basic && npm run build:frontend",
     "compile:prod": "npm run build:electron:prod && npm run copyfiles:basic && npm run build:frontend",
     "start": "npm run build:electron:dev && npm run copyfiles:basic && electron build/src/index.js",
+    "start:temp": "npm run build:electron:dev && npm run copyfiles:basic && electron build/src/index.js --temp-db",
     "start:frontend": "cd frontend && npm run start && cd ..",
     "test:frontend": "cd frontend && npm run test:ci",
     "test:electron": "vitest run",
