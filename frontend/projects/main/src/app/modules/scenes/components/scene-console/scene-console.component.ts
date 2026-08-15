@@ -125,6 +125,8 @@ export class SceneConsoleComponent {
     return this.hiddenContent() ? this.CollapsedIcon : this.ExpandedIcon;
   });
 
+  readonly noPlaylistText = 'This scene has no playlist attached yet.';
+
   constructor() {
     effect(() => {
       const hidden = this.initContentHidden();

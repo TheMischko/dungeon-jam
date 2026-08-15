@@ -76,6 +76,12 @@ export class SongsTableComponent {
   readonly paginationPages = input<number[] | undefined>(undefined);
   readonly initialPageSize = input<number>(DEFAULT_PAGE_SIZE);
   readonly initialQuery = input<QueryOptions>({});
+  readonly noDataText = input<string>(
+    'Oops, there are no tracks yet. You need to upload some!'
+  );
+  readonly noSearchResultsText = input<string>(
+    'No tracks match your search query.'
+  );
 
   readonly queryChange = output<QueryOptions>();
   readonly playTrack = output<Track>();
@@ -153,10 +159,6 @@ export class SongsTableComponent {
       },
     }),
   }));
-
-  readonly noDataText =
-    'Oops, there are no tracks yet. You need to upload some!';
-  readonly noSearchResultsText = 'No tracks match your search query.';
 
   constructor() {
     this.paginationService = SignalPaginationService.create(this.tracks);
