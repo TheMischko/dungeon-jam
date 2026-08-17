@@ -102,6 +102,9 @@ export class PlaylistGridSmartComponent implements OnInit {
   readonly queryOptions = computed<QueryRequest>(() => ({
     search: this.searchFilter(),
   }));
+  readonly showParentsFilter = computed<boolean>(() => {
+    return this.playlistStore.allParents().length > 0;
+  });
   readonly playingPlaylistId = toSignal(
     this.playbackService.playback$.pipe(
       map((state) => (state.isPlaying ? state.playlistId : undefined))

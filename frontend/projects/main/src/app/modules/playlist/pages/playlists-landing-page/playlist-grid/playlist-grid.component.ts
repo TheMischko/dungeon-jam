@@ -39,6 +39,7 @@ export class PlaylistGridComponent {
   readonly loading = input<boolean>(false);
   readonly showControls = input<boolean>(true);
   readonly reorderingEnabled = input<boolean>(true);
+  readonly showParentsFilter = input<boolean>(false);
 
   readonly sizeChange = output<number>();
   readonly playPlaylist = output<string>();
