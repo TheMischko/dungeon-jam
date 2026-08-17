@@ -8,6 +8,7 @@ import {
   OnInit,
   signal,
   ChangeDetectionStrategy,
+  ViewContainerRef,
 } from '@angular/core';
 import { SortDirection } from '@shared/models/common.model';
 import {
@@ -55,10 +56,12 @@ import {
   ConfirmationDialogComponent,
   ConfirmationDialogData,
 } from '../../../../../components/dialog/confirmation-dialog/confirmation-dialog.component';
+import { DiscoverTracksStateService } from '../../../../../services/discover-tracks-state.service';
 
 @Component({
   selector: 'app-playlists-detail-page-smart',
   imports: [PlaylistsDetailPageComponent],
+  providers: [DiscoverTracksStateService],
   changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './playlists-detail-page-smart.component.html',
 })
@@ -76,6 +79,8 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
   private readonly newTrackDropInService = inject(NewTrackDropInService);
   private readonly playlistToastService = inject(PlaylistToastService);
   private readonly tagsStore = inject(TagsStore);
+  private readonly viewContainerRef = inject(ViewContainerRef);
+  private readonly discoverStateService = inject(DiscoverTracksStateService);
 
   readonly playlistId = input<string>('', { alias: 'id' });
 
@@ -151,16 +156,23 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
     effect(() => {
       const playlist = this.playlist();
       if (!playlist || !playlist.imageUrl) {
+        this.playlistImageUrl.set(null);
         return;
       }
       const sub = this.imageApiService
         .fetchImage(playlist.imageUrl)
+        .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe((image) => {
           this.playlistImageUrl.set(image);
         });
       return () => {
         sub?.unsubscribe();
       };
+    });
+
+    effect(() => {
+      this.playlistId();
+      this.discoverStateService.reset();
     });
   }
 
@@ -323,28 +335,26 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
     });
   }
 
-  protected openDiscoverModal(query: QueryOptions | undefined) {
+  protected openDiscoverModal() {
     const dialog = this.dialogService.open<
       DiscoverTracksModalComponent,
       DiscoverTracksModalResult
     >(DiscoverTracksModalComponent, {
+      viewContainerRef: this.viewContainerRef,
       data: {
         playlist: this.playlist(),
-        query,
       } as DiscoverTracksModalData,
     });
 
     dialog.afterClosed$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((result) => {
-        const triggerRepeat = result?.again
-          ? () => setTimeout(() => this.openDiscoverModal(result?.query), 500)
-          : () => {};
-        if (!result || result.selectedTracks.length === 0) {
-          return triggerRepeat();
+        if (result?.selectedTracks?.length) {
+          this.addTracksToPlaylist(result.selectedTracks);
         }
-        this.addTracksToPlaylist(result.selectedTracks);
-        return triggerRepeat();
+        if (result?.again) {
+          this.openDiscoverModal();
+        }
       });
   }
 }
