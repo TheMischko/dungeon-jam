@@ -1,10 +1,6 @@
 <div class="header">
   @if (playlistImageUrl(); as imageUrl) {
-    <img
-      class="playlist-image"
-      [src]="imageUrl"
-      [alt]="$safeNavigationMigration(playlist()?.name)"
-    />
+    <img class="playlist-image" [src]="imageUrl" [alt]="playlist()?.name" />
   }
   <div class="header-content">
     <div class="header-info">
@@ -72,6 +68,7 @@
       [tracks]="tracks()"
       [playingTrackId]="playingTrackId()"
       [actionsMenuConfig]="songActionsMenuConfig()"
+      [noDataText]="noTracksWarning"
       (playTrack)="playTrack.emit($event)"
       (pauseTrack)="pause.emit()"
       (queryChange)="queryChange.emit($event)"

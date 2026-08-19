@@ -16,7 +16,7 @@ import { LoaderComponent } from '@general/components/display/loader/loader.compo
 import { SongsTableComponent } from '../../../library/pages/library-landing-page/songs-table/songs-table.component';
 import { PlayPauseButtonComponent } from '@general/components/buttons/play-pause-button/play-pause-button.component';
 import { TagListSmartComponent } from '@general/components/display/tag-list/tag-list-smart/tag-list-smart.component';
-import { ButtonType } from '@general';
+import { ButtonType } from '@general/models/button.model';
 import { SceneSoundEffectsListComponent } from '../scene-sound-effects-list/scene-sound-effects-list.component';
 import { AddSoundEffectsSectionComponent } from '../add-sound-effects-section/add-sound-effects-section.component';
 import { SoundEffectVolumeChange } from '../../../../models/sound-effect.model';
@@ -77,7 +77,12 @@ export class SceneConsoleComponent {
   readonly hiddenContent = signal<boolean>(false);
 
   readonly excludedColumns: (keyof Track)[] = ['author', 'tags'];
-  readonly ButtonType = ButtonType;
+  readonly ButtonType = ButtonType || {
+    Default: 0,
+    Raised: 1,
+    Flat: 2,
+    Stroked: 3,
+  };
   readonly CollapsedIcon = actionsIconSet.CollapsedArrowIcon;
   readonly ExpandedIcon = actionsIconSet.ExpandedArrowIcon;
   readonly EditIcon = actionsIconSet.EditIcon;
@@ -94,12 +99,9 @@ export class SceneConsoleComponent {
   ];
 
   readonly loading = computed(() => {
-    return (
-      !this.scene() ||
-      this.playlist() === undefined ||
-      !Object.keys(this.tagsMap()).length
-    );
+    return !this.scene() || this.playlist() === undefined;
   });
+
   readonly playingTrackId = computed(() => {
     const track = this.playingTrack();
     if (!track) {
@@ -127,6 +129,8 @@ export class SceneConsoleComponent {
   readonly toggleIcon = computed<LucideIconData>(() => {
     return this.hiddenContent() ? this.CollapsedIcon : this.ExpandedIcon;
   });
+
+  readonly noPlaylistText = 'This scene has no playlist attached yet.';
 
   constructor() {
     effect(() => {

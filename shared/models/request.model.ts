@@ -27,4 +27,5 @@ export interface BatchRequest extends QueryRequest {
 
 export interface PlaylistDiscoverBatchRequest extends BatchRequest {
   playlistId: string;
+  excludeIds: string[];
 }

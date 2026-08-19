@@ -63,18 +63,23 @@ export class UpdatePlaylistModalComponent implements OnInit {
     if (this.form().valid()) {
       const formValue = this.form().value();
       const originalTagIds = this.dialogData.playlist.tags ?? [];
-      const removedTagIds = this.dialogData.playlist.tags.filter((tagId) =>
-        !formValue.tags.some((formTag) => formTag.id === tagId)
+      const removedTagIds = this.dialogData.playlist.tags.filter(
+        (tagId) => !formValue.tags.some((formTag) => formTag.id === tagId)
       );
       const addedTagIds = formValue.tags
         .filter((t) => !originalTagIds.includes(t.id))
         .map((t) => t.id);
+      const newParentPlaylist =
+        formValue.parentPlaylist === null &&
+        this.dialogData.parentPlaylistId === undefined
+          ? undefined
+          : (formValue.parentPlaylist?.id ?? null);
       this.dialog.close({
         id: this.dialogData.playlist.id,
         name: formValue.name,
         description: formValue.description,
         imageUrl: formValue.imageUrl,
-        parentPlaylistId: formValue.parentPlaylist?.id ?? undefined,
+        parentPlaylistId: newParentPlaylist,
         tagsRemoved: removedTagIds,
         tagsAdded: addedTagIds,
       } as PlaylistUpdateQuery);
