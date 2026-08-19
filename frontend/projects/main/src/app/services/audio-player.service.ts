@@ -1,26 +1,29 @@
-import { inject, Injectable, signal } from '@angular/core';
+import { DestroyRef, inject, Injectable, signal } from '@angular/core';
 import { Track } from '@shared/models/track.model';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { PlayingTrackState } from '../models/playback.model';
-import { Howl } from 'howler';
 import { LRUCache } from '@general/utils/lru-cache';
 import { LoadSoundService } from './load-sound.service';
+import { HowlTrack } from '../utils/howl-track';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AudioPlayerService {
   private readonly loadSoundService = inject(LoadSoundService);
+  private readonly destroyRef = inject(DestroyRef);
 
-  private howl?: Howl;
+  private howlTrack: HowlTrack | undefined;
+
+  private trackPositionSubscription: Subscription | undefined;
   private positionSubject = new BehaviorSubject<number>(0);
-  private timerId?: number;
+  private trackStateSubscription: Subscription | undefined;
   private trackStateSubject = new BehaviorSubject<PlayingTrackState>(
     PlayingTrackState.NONE
   );
   private volume = signal<number>(1);
   private playIdRef = 0;
-  private currentObjectUrl: string | undefined = undefined;
 
   private trackDataCache = new LRUCache<string, Blob>(20);
 
@@ -40,97 +43,49 @@ export class AudioPlayerService {
     if (id !== this.playIdRef) {
       return;
     }
-    this.currentObjectUrl = URL.createObjectURL(trackData);
-    this.howl = this.createHowl(this.currentObjectUrl);
-    if (this.howl.state() === 'loaded') {
-      this.howl.play();
-    } else {
-      // Onload handler starts the audio playing automatically
-      this.howl.load();
-    }
+    this.howlTrack = new HowlTrack(trackData, this.volume());
+
+    this.trackPositionSubscription?.unsubscribe();
+    this.trackPositionSubscription = this.howlTrack.position$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((position) => {
+        this.positionSubject.next(position);
+      });
+
+    this.trackStateSubscription?.unsubscribe();
+    this.trackStateSubscription = this.howlTrack.state$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((state) => {
+        this.trackStateSubject.next(state);
+      });
+    await this.howlTrack.play();
   }
 
   pause() {
-    this.stopWatchdog();
-    if (!this.howl) {
-      return;
-    }
-    this.howl.pause();
+    this.howlTrack?.pause();
   }
 
   resume() {
-    if (!this.howl) {
-      return;
-    }
-    this.howl.play();
+    this.howlTrack?.resume();
   }
 
   stop() {
-    this.stopWatchdog();
-    if (this.howl) {
-      this.howl.stop();
-      this.howl.unload();
-      this.howl = undefined;
-    }
-    if (this.currentObjectUrl) {
-      URL.revokeObjectURL(this.currentObjectUrl);
-      this.currentObjectUrl = undefined;
-    }
+    this.trackPositionSubscription?.unsubscribe();
+    this.trackStateSubscription?.unsubscribe();
+    this.howlTrack?.stop();
+    this.howlTrack?.dispose();
+    this.howlTrack = undefined;
+    this.positionSubject.next(0);
+    this.trackStateSubject.next(PlayingTrackState.NONE);
   }
 
   seek(position: number) {
-    if (!this.howl) {
-      return;
-    }
-    this.howl.seek(position);
+    this.howlTrack?.seek(position);
   }
 
   setVolume(volume: number): void {
     this.volume.set(volume);
-    this.howl?.volume(volume);
-  }
-
-  private createHowl(src: string): Howl {
-    const howl = new Howl({
-      src: [src],
-      html5: true,
-      format: 'mp3',
-      volume: this.volume(),
-      preload: true,
-    });
-    howl.once('load', () => {
-      if (!this.howl) return;
-      howl.play();
-    });
-    howl.on('play', () => {
-      if (this.howl) {
-        this.trackStateSubject.next(PlayingTrackState.PLAYING);
-        const position = this.howl.seek();
-        this.positionSubject.next(position);
-        this.setupWatchdog();
-      }
-    });
-    howl.on('end', () => {
-      this.trackStateSubject.next(PlayingTrackState.ENDED);
-    });
-
-    return howl;
-  }
-
-  private setupWatchdog() {
-    this.stopWatchdog();
-    this.timerId = setInterval(() => {
-      const howl = this.howl;
-      if (howl && howl.playing()) {
-        this.positionSubject.next(howl.seek());
-      }
-    }, 250) as unknown as number;
-  }
-
-  private stopWatchdog() {
-    if (this.timerId) {
-      clearInterval(this.timerId);
-    }
+    this.howlTrack?.setVolume(volume);
   }
 
   private async getTrackData(track: Track): Promise<Blob> {
