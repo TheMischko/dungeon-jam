@@ -10,6 +10,7 @@ import {
   takeWhile,
 } from 'rxjs';
 import { PlayingTrackState } from '../models/playback.model';
+import { Track } from '@shared/models/track.model';
 
 export class HowlTrack {
   private positionSubject = new BehaviorSubject<number>(0);
@@ -27,7 +28,11 @@ export class HowlTrack {
   private readonly currentObjectUrl: string;
   private timerId: number | undefined;
 
-  constructor(trackData: Blob, initialVolume: number = 1) {
+  constructor(
+    trackData: Blob,
+    readonly track: Track,
+    initialVolume: number = 1
+  ) {
     this.currentObjectUrl = URL.createObjectURL(trackData);
     this.trackVolumeSubject = new BehaviorSubject<number>(initialVolume);
 
@@ -143,7 +148,7 @@ export class HowlTrack {
   }
 
   resume(): void {
-    if (!this.howl) {
+    if (!this.howl || this.howl.seek() === 0) {
       return;
     }
     this.howl.play();
