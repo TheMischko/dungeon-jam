@@ -43,7 +43,7 @@ export class AudioPlayerService {
     if (id !== this.playIdRef) {
       return;
     }
-    this.howlTrack = new HowlTrack(trackData, this.volume());
+    this.howlTrack = new HowlTrack(trackData, track, this.volume());
 
     this.trackPositionSubscription?.unsubscribe();
     this.trackPositionSubscription = this.howlTrack.position$
