@@ -57,7 +57,8 @@ export class PlayingState implements TrackTransitionState {
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         filter(
-          (position) => track.track.duration - position <= context.fadeDuration
+          (position) =>
+            track.track.duration - position <= context.crossFadeDuration / 1000
         ),
         take(1)
       )
@@ -74,7 +75,8 @@ export class PlayingState implements TrackTransitionState {
         takeUntilDestroyed(this.destroyRef),
         filter(
           (position) =>
-            track.track.duration - position <= context.fadeDuration * 2
+            track.track.duration - position <=
+            (context.crossFadeDuration / 1000) * 2
         ),
         take(1)
       )

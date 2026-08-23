@@ -73,7 +73,7 @@ export class CrossfadingToNextState implements TrackTransitionState {
   async startCrossfade(context: TrackTransitionStateContext): Promise<void> {
     const currentTrack = context.activeTrack.getValue();
     const nextTrack = context.nextTrack.getValue();
-    const fadeDuration = context.fadeDuration;
+    const fadeDuration = context.crossFadeDuration;
     if (!currentTrack || !nextTrack) {
       await context.transitionTo(IdleState);
       return;
@@ -81,8 +81,8 @@ export class CrossfadingToNextState implements TrackTransitionState {
     context.activeTrack.next(nextTrack);
     context.nextTrack.next(undefined);
     this.crossfadeFinishSub = forkJoin([
-      currentTrack.fade(1, 0, this.getFadeOutDuration(context)),
-      nextTrack.fade(0, 1, fadeDuration * 1000),
+      currentTrack.fade(1, 0, this.getFadeOutDuration(fadeDuration)),
+      nextTrack.fade(0, 1, fadeDuration),
     ])
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(async () => {
@@ -97,7 +97,7 @@ export class CrossfadingToNextState implements TrackTransitionState {
     return 'CrossfadingToNextState';
   }
 
-  private getFadeOutDuration(context: TrackTransitionStateContext): number {
-    return Math.floor(context.fadeDuration * 1000 * 0.8);
+  private getFadeOutDuration(baseDuration: number): number {
+    return Math.floor(baseDuration * 0.8);
   }
 }

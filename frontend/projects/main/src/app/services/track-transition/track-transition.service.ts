@@ -12,7 +12,7 @@ import {
   TrackTransitionStateContext,
 } from '../../models/track-transition.model';
 import { IdleState } from './states/idle-state';
-import { Track } from '@shared/models/track.model';
+import { StoredTransitionSettings, Track } from '@shared/models/track.model';
 import {
   BehaviorSubject,
   distinctUntilChanged,
@@ -22,17 +22,29 @@ import {
   switchMap,
 } from 'rxjs';
 import { PlayingTrackState } from '../../models/playback.model';
+import { PlaybackSettingsApiService } from '@general/services/playback-settings-api.service';
 
 @Service()
 export class TrackTransitionService implements TrackTransitionStateContext {
   private readonly loadSoundService = inject(LoadSoundService);
   private readonly injector = inject(Injector);
+  private readonly playbackSettingsService = inject(PlaybackSettingsApiService);
 
   masterVolume: number = 1;
+  get fadeInDuration(): number {
+    return this.transitionSettings.getValue().fadeInDuration * 1000;
+  }
+  get crossFadeDuration(): number {
+    return this.transitionSettings.getValue().crossFadeDuration * 1000;
+  }
   fadeDuration: number = 7.5;
   pullNextTrackFn: () => Track | undefined = () => undefined;
   readonly activeTrack = new BehaviorSubject<HowlTrack | undefined>(undefined);
   readonly nextTrack = new BehaviorSubject<HowlTrack | undefined>(undefined);
+  readonly transitionSettings = new BehaviorSubject<StoredTransitionSettings>({
+    fadeInDuration: 1,
+    crossFadeDuration: 1,
+  });
 
   private currentState: TrackTransitionState = new IdleState();
   private transitionQueue: Promise<void> = Promise.resolve();
@@ -52,6 +64,20 @@ export class TrackTransitionService implements TrackTransitionStateContext {
       return howlTrack.track;
     })
   );
+
+  constructor() {
+    this.playbackSettingsService
+      .loadTransitionSettings()
+      .subscribe((settings) => {
+        console.log('transition settings', settings);
+        this.transitionSettings.next(settings);
+      });
+
+    this.playbackSettingsService.transitionSettings$.subscribe((settings) => {
+      console.log('transition settings synced', settings);
+      this.transitionSettings.next(settings);
+    });
+  }
 
   async transitionTo(stateType: Type<TrackTransitionState>): Promise<void> {
     this.transitionQueue = this.transitionQueue.then(() => {
