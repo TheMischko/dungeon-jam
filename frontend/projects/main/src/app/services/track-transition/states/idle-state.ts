@@ -3,8 +3,11 @@ import {
   TrackTransitionStateContext,
 } from '../../../models/track-transition.model';
 import { HowlTrack } from '../../../utils/howl-track';
-import { PlayingState } from './playing-state';
+import { FadeInState } from './fade-in-state';
 
+/**
+ * Stops and dispose both active and next tracks.
+ */
 export class IdleState implements TrackTransitionState {
   onEnter(context: TrackTransitionStateContext): void {
     context.activeTrack.getValue()?.dispose();
@@ -19,9 +22,9 @@ export class IdleState implements TrackTransitionState {
     context: TrackTransitionStateContext,
     howlTrack: HowlTrack
   ): Promise<void> {
+    howlTrack.load();
     context.activeTrack.next(howlTrack);
-    await context.transitionTo(PlayingState);
-    await howlTrack.play();
+    await context.transitionTo(FadeInState);
   }
 
   stop(context: TrackTransitionStateContext): void {}
