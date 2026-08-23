@@ -69,12 +69,10 @@ export class TrackTransitionService implements TrackTransitionStateContext {
     this.playbackSettingsService
       .loadTransitionSettings()
       .subscribe((settings) => {
-        console.log('transition settings', settings);
         this.transitionSettings.next(settings);
       });
 
     this.playbackSettingsService.transitionSettings$.subscribe((settings) => {
-      console.log('transition settings synced', settings);
       this.transitionSettings.next(settings);
     });
   }

@@ -5,7 +5,7 @@ import {
 import { HowlTrack } from '../../../utils/howl-track';
 import { IdleState } from './idle-state';
 import { DestroyRef, inject } from '@angular/core';
-import { filter, forkJoin, Subscription } from 'rxjs';
+import { debounceTime, filter, forkJoin, Subscription } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { PlayingState } from './playing-state';
 import { FadeInState } from './fade-in-state';
@@ -27,7 +27,10 @@ export class CrossfadingToNextState implements TrackTransitionState {
       return;
     }
     this.songFinishedSub = activeTrack.state$
-      .pipe(filter((state) => state === PlayingTrackState.ENDED))
+      .pipe(
+        filter((state) => state === PlayingTrackState.ENDED),
+        debounceTime(3000)
+      )
       .subscribe(async () => {
         if (context.nextTrack.getValue()) {
           return;
@@ -46,6 +49,7 @@ export class CrossfadingToNextState implements TrackTransitionState {
 
   onExit(context: TrackTransitionStateContext): void {
     this.crossfadeFinishSub?.unsubscribe();
+    this.songFinishedSub?.unsubscribe();
   }
 
   async play(
@@ -66,7 +70,6 @@ export class CrossfadingToNextState implements TrackTransitionState {
 
   async stop(context: TrackTransitionStateContext): Promise<void> {
     this.crossfadeFinishSub?.unsubscribe();
-    await context.transitionTo(IdleState);
     return;
   }
 
