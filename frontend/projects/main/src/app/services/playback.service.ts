@@ -1,384 +1,243 @@
-import { effect, inject, Injectable, OnDestroy } from '@angular/core';
-import { BehaviorSubject, map, Observable, Subscription } from 'rxjs';
+import { DestroyRef, inject, Injectable } from '@angular/core';
 import {
-  initialPlaybackState,
+  BehaviorSubject,
+  combineLatest,
+  firstValueFrom,
+  map,
+  pairwise,
+  startWith,
+} from 'rxjs';
+import {
   PlaybackState,
   PlaybackTrackPosition,
   PlayingTrackState,
   PlayMetadata,
-  QueueItem,
 } from '../models/playback.model';
 import { RepeatState, StoredPlayback, Track } from '@shared/models/track.model';
-import { AudioPlayerService } from './audio-player.service';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AudioApiWindow } from '../models/window-api.model';
-import { shuffleList } from '../utils/shuffle-list';
 import { TrackTransitionService } from './track-transition/track-transition.service';
-import { HowlTrack } from '../utils/howl-track';
+import { QueueManager } from './track-transition/queue.manager';
 
 @Injectable({
   providedIn: 'root',
 })
-export class PlaybackService implements OnDestroy {
-  private readonly window = <AudioApiWindow>window;
-  //readonly audioPlayerService = inject(AudioPlayerService);
+export class PlaybackService {
   readonly trackTransitionService = inject(TrackTransitionService);
+  readonly queueManager = inject(QueueManager);
+  readonly destroyRef = inject(DestroyRef);
+  private readonly window = <AudioApiWindow>window;
 
-  private readonly state = new BehaviorSubject<PlaybackState>(
-    initialPlaybackState
+  private readonly PLAY_PREV_POSITON_THRESHOLD_SEC = 15;
+  private initialized: boolean = false;
+
+  private readonly volume = new BehaviorSubject<number>(1);
+  get volume$() {
+    return this.volume.asObservable();
+  }
+  private readonly metadata = new BehaviorSubject<PlayMetadata>({});
+
+  readonly playback$ = combineLatest([
+    this.queueManager.queue$,
+    this.trackTransitionService.activeTrack$,
+    this.trackTransitionService.trackState$,
+    this.queueManager.shuffle$,
+    this.queueManager.repeatState$,
+    this.volume$,
+    this.metadata.asObservable(),
+    this.queueManager.currentTrackIsInjected$,
+  ]).pipe(
+    map((values) => {
+      const [
+        queue,
+        activeTrack,
+        activeTrackState,
+        shuffle,
+        repeatMode,
+        volume,
+        metadata,
+        isInjected,
+      ] = values;
+      return {
+        queue,
+        currentTrack: activeTrack,
+        currentTrackIsInjected: isInjected,
+        isPlaying: activeTrackState === PlayingTrackState.PLAYING,
+        shuffle,
+        repeat: repeatMode,
+        volume,
+        playlistId: metadata.playlistId,
+        sceneId: metadata.sceneId,
+        sessionId: metadata.sessionId,
+      } as PlaybackState;
+    })
   );
-  private readonly trackPosition = new BehaviorSubject<
-    PlaybackTrackPosition | undefined
-  >(undefined);
 
-  readonly playback$: Observable<PlaybackState> = this.state.asObservable();
-  readonly position$: Observable<PlaybackTrackPosition | undefined> =
-    this.trackPosition.asObservable();
-  readonly currentTrackId$ = this.playback$.pipe(
-    map((state) => state.currentTrack?.id ?? null)
-  );
-
-  readonly playerPosition = toSignal(
+  readonly position$ = combineLatest([
+    this.trackTransitionService.activeTrack$,
     this.trackTransitionService.trackPosition$,
-    {
-      initialValue: 0,
-    }
+  ]).pipe(
+    map((values) => {
+      const [track, position] = values;
+      return {
+        position,
+        duration: track?.duration ?? position,
+      } as PlaybackTrackPosition;
+    })
   );
-  private readonly PLAY_PREV_DURATION_BREAKPOINT_SEC = 5;
-  private readonly trackStateSubscription: Subscription;
-  private readonly activeTrackSubscription: Subscription;
+
+  readonly currentTrackId$ = this.playback$.pipe(
+    map((state) => state.currentTrack?.id ?? undefined)
+  );
 
   constructor() {
-    effect(() => {
-      const currentPosition = this.playerPosition();
-      const currentState = this.state.getValue();
-      const currentTrackPos = this.trackPosition.getValue();
-      const duration =
-        currentTrackPos?.duration ??
-        currentState?.currentTrack?.duration ??
-        currentPosition;
-      this.trackPosition.next({ position: currentPosition, duration });
+    this.window.PLAYBACK_API.loadState().then((state) => {
+      this.changeVolume(state.volume);
+      this.shuffle(state.shuffle);
+      this.setRepeat(state.repeat);
+      this.initialized = true;
     });
-    this.trackStateSubscription =
-      this.trackTransitionService.trackState$.subscribe((state) =>
-        this.handleTrackStateChange(state)
-      );
-    this.activeTrackSubscription =
-      this.trackTransitionService.activeTrack$.subscribe((track) => {
-        this.state.next({
-          ...this.state.getValue(),
-          currentTrack: track,
-        });
-        if (track !== null) {
-          const trackPosition = this.trackPosition.getValue();
-          if (trackPosition) {
-            this.trackPosition.next({
-              ...trackPosition,
-              duration: track.duration,
-            });
-          }
+
+    this.trackTransitionService.setPullNextTrackFn(() => {
+      return this.queueManager.peekNext();
+    });
+
+    this.trackTransitionService.activeTrack$
+      .pipe(takeUntilDestroyed(this.destroyRef), startWith(null), pairwise())
+      .subscribe(([prevTrack, activeTrack]) => {
+        if (!activeTrack) {
+          return;
+        }
+        const queueItem = this.queueManager.peekNext();
+
+        if (queueItem && queueItem.id === activeTrack.id) {
+          this.queueManager.advanceNext(prevTrack ?? undefined);
         }
       });
-    this.trackTransitionService.setPullNextTrackFn(() =>
-      this.getNextTrackFromQueue()
-    );
-    this.loadInitState();
-  }
 
-  ngOnDestroy() {
-    this.trackStateSubscription.unsubscribe();
-  }
+    this.playback$
+      .pipe(takeUntilDestroyed(this.destroyRef), startWith(null), pairwise())
+      .subscribe(([prevState, currentState]) => {
+        if (!this.initialized) {
+          return;
+        }
+        if (!prevState || !currentState) {
+          return;
+        }
+        const repeatChanged = prevState.repeat !== currentState.repeat;
+        const volumeChanged = prevState.volume !== currentState.volume;
+        const shuffleChanged = prevState.shuffle !== currentState.shuffle;
 
-  loadInitState() {
-    this.window.PLAYBACK_API.loadState().then((state) => {
-      this.changeVolume(state.volume, false);
-      this.shuffle(state.shuffle, false);
-      this.setRepeat(state.repeat);
-    });
-  }
-
-  /**
-   * Adds the tracks to queue and plays either first one or random based on shuffle state.
-   * @param trackList
-   * @param metadata
-   */
-  async playTracks(trackList: Track[], metadata?: PlayMetadata) {
-    const shuffle = this.state.getValue().shuffle;
-    let track: Track;
-    let queue: Track[];
-    if (shuffle) {
-      const startingTrackIndex = Math.floor(Math.random() * trackList.length);
-      track = trackList[startingTrackIndex];
-      queue = [
-        ...trackList.slice(startingTrackIndex + 1),
-        ...trackList.slice(0, startingTrackIndex),
-      ];
-    } else {
-      track = trackList[0];
-      queue = trackList.slice(1);
-    }
-    console.log('Playing', track, 'Queue', queue);
-    await this.play(track, queue, metadata);
-  }
-
-  async play(track?: Track, queue?: Track[], metadata?: PlayMetadata) {
-    const current = this.state.getValue();
-    if (queue && track) {
-      let newQueue: QueueItem[] = queue.map((t) => ({
-        track: t,
-        isInjected: false,
-      }));
-      if (current.shuffle) {
-        newQueue = shuffleList(newQueue);
-      }
-      this.state.next({
-        ...current,
-        history: [],
-        currentTrack: track,
-        currentTrackIsInjected: false,
-        queue: newQueue,
-        isPlaying: true,
-        playlistId: metadata?.playlistId,
-        sceneId: metadata?.sceneId,
-        sessionId: metadata?.sessionId,
+        if (repeatChanged || volumeChanged || shuffleChanged) {
+          this.updateStoredState(currentState);
+        }
       });
-      this.trackPosition.next({ position: 0, duration: track.duration });
-      await this.trackTransitionService.play(track);
-      return;
-    }
-    if (track) {
-      this.state.next({
-        ...current,
-        currentTrack: track,
-        currentTrackIsInjected: false,
-        isPlaying: true,
-      });
-      this.trackPosition.next({ position: 0, duration: track.duration });
-      await this.trackTransitionService.play(track);
-      return;
-    }
+  }
 
-    if (current.currentTrack) {
-      this.state.next({ ...current, isPlaying: true });
+  async clearState() {
+    this.queueManager.reset();
+    this.metadata.next({});
+    await this.trackTransitionService.stop();
+  }
+
+  async play(
+    track?: Track,
+    queue?: Track[],
+    metadata?: PlayMetadata
+  ): Promise<void> {
+    if (!track) {
       this.trackTransitionService.resume();
-    }
-  }
-
-  pause() {
-    const current = this.state.getValue();
-    this.state.next({ ...current, isPlaying: false });
-    this.trackTransitionService.pause();
-  }
-
-  async togglePlayPause(): Promise<void> {
-    const current = this.state.getValue();
-    if (!current.currentTrack) {
-      return;
-    }
-    if (current.isPlaying) {
-      this.pause();
-    } else {
-      await this.play();
-    }
-  }
-
-  async playNext() {
-    const current = this.state.getValue();
-
-    const newHistory =
-      current.currentTrack && !current.currentTrackIsInjected
-        ? [...current.history, current.currentTrack]
-        : [...current.history];
-
-    if (current.queue.length > 0) {
-      const [next, ...remaining] = current.queue;
-      this.state.next({
-        ...current,
-        history: newHistory,
-        currentTrack: next.track,
-        currentTrackIsInjected: next.isInjected,
-        queue: remaining,
-        isPlaying: true,
-      });
-      await this.trackTransitionService.play(next.track);
-      this.trackPosition.next({ position: 0, duration: next.track.duration });
       return;
     }
 
-    if (current.repeat === RepeatState.ALL) {
-      const recycled: QueueItem[] = newHistory.map((t) => ({
-        track: t,
-        isInjected: false,
-      }));
-      if (recycled.length === 0) {
-        this.pause();
-        return;
-      }
-      const next = recycled[0];
-      this.state.next({
-        ...current,
-        history: [],
-        currentTrack: next.track,
-        currentTrackIsInjected: false,
-        queue: recycled.slice(1),
-        isPlaying: true,
-      });
-      await this.trackTransitionService.play(next.track);
-      this.trackPosition.next({ position: 0, duration: next.track.duration });
-      return;
+    if (queue) {
+      this.queueManager.setQueue([track, ...queue]);
     }
 
-    this.pause();
+    this.metadata.next(metadata ?? {});
+
+    await this.trackTransitionService.play(track);
   }
 
-  clearState() {
-    this.trackTransitionService.stop();
-    const current = this.state.getValue();
-    this.state.next({
-      ...current,
-      queue: [],
-      history: [],
-      isPlaying: false,
-      currentTrack: null,
-      sceneId: undefined,
-      playlistId: undefined,
-    });
-    this.trackPosition.next({ position: 0, duration: 0 });
+  async playTracks(trackList: Track[], metadata?: PlayMetadata): Promise<void> {
+    if (trackList.length === 0) {
+      return;
+    }
+    const firstTrack = this.queueManager.setQueue(trackList);
+
+    if (firstTrack) {
+      await this.trackTransitionService.play(firstTrack);
+      this.metadata.next(metadata ?? {});
+    }
+  }
+
+  async playNext(): Promise<void> {
+    const currentState = await firstValueFrom(this.playback$);
+    const nextTrack = this.queueManager.advanceNext(
+      !currentState.currentTrackIsInjected
+        ? (currentState.currentTrack ?? undefined)
+        : undefined
+    );
+    if (nextTrack) {
+      await this.trackTransitionService.play(nextTrack);
+    }
   }
 
   async playPrev(): Promise<void> {
-    const current = this.state.getValue();
-    const trackPosition = this.trackPosition.getValue();
-    if (!current.currentTrack) {
-      return;
-    }
-    if (
-      trackPosition?.position &&
-      trackPosition.position > this.PLAY_PREV_DURATION_BREAKPOINT_SEC
-    ) {
-      this.seek(0);
-      return;
+    const currentPosition = await firstValueFrom(this.position$);
+    if (currentPosition.position >= this.PLAY_PREV_POSITON_THRESHOLD_SEC) {
+      return this.trackTransitionService.seek(0);
     }
 
-    if (current.history.length > 0) {
-      const prevTrack = current.history[current.history.length - 1];
-      const newHistory = current.history.slice(0, -1);
-      const newQueue: QueueItem[] = [
-        {
-          track: current.currentTrack,
-          isInjected: current.currentTrackIsInjected,
-        },
-        ...current.queue,
-      ];
-      this.state.next({
-        ...current,
-        currentTrack: prevTrack,
-        currentTrackIsInjected: false,
-        history: newHistory,
-        queue: newQueue,
-        isPlaying: true,
-      });
-      this.trackPosition.next({ position: 0, duration: prevTrack.duration });
+    const prevTrack = this.queueManager.advancePrev();
+    if (prevTrack) {
       await this.trackTransitionService.play(prevTrack);
     }
   }
 
-  seek(newPos: number) {
-    const currentPosition = this.trackPosition.getValue();
-    if (!currentPosition) {
-      return;
-    }
-    if (newPos > currentPosition.duration || newPos < 0) {
-      this.trackPosition.next({ ...currentPosition, position: 0 });
-      return;
-    }
-    this.trackPosition.next({ ...currentPosition, position: newPos });
-    this.trackTransitionService.seek(newPos);
+  injectNext(track: Track): void {
+    this.queueManager.injectNextTrack(track);
   }
 
-  changeVolume(volume: number, storeUpdate = true) {
+  pause() {
+    this.trackTransitionService.pause();
+  }
+
+  async togglePlayPause(): Promise<void> {
+    const state = await firstValueFrom(this.playback$);
+    if (!state.currentTrack) {
+      return;
+    }
+    if (state.isPlaying) {
+      return this.trackTransitionService.pause();
+    }
+    await this.play();
+  }
+
+  seek(position: number) {
+    this.trackTransitionService.seek(position);
+  }
+
+  toggleShuffle() {
+    this.queueManager.toggleShuffle();
+  }
+
+  shuffle(enabled: boolean) {
+    this.queueManager.setShuffle(enabled);
+  }
+
+  changeRepeat(): void {
+    this.queueManager.toggleRepeatMode();
+  }
+
+  setRepeat(repeatState: RepeatState) {
+    this.queueManager.setRepeatState(repeatState);
+  }
+
+  changeVolume(volume: number) {
     const volumeNormalized = Math.max(0, Math.min(volume, 1));
-    const current = this.state.getValue();
-    const newState = {
-      ...current,
-      volume: volumeNormalized,
-    };
-    this.trackTransitionService.setVolume(volume);
-    this.state.next(newState);
-    if (storeUpdate) {
-      this.updateStoredState(newState);
-    }
-  }
-
-  changeRepeat() {
-    const current = this.state.getValue();
-    const currentRepeat = current.repeat;
-    let nextRepeat: RepeatState;
-    switch (true) {
-      case currentRepeat === RepeatState.ALL:
-        nextRepeat = RepeatState.NONE;
-        break;
-      case currentRepeat === RepeatState.SINGLE:
-        nextRepeat = RepeatState.ALL;
-        break;
-      default:
-        nextRepeat = RepeatState.SINGLE;
-        break;
-    }
-    const newState = {
-      ...current,
-      repeat: nextRepeat,
-    };
-    this.state.next(newState);
-    this.updateStoredState(newState);
-  }
-
-  private setRepeat(repeat: RepeatState): void {
-    const currentState = this.state.getValue();
-    this.state.next({
-      ...currentState,
-      repeat,
-    });
-  }
-
-  shuffle(enabled: boolean, storeUpdate = true) {
-    const state = this.state.getValue();
-
-    let queue = [...state.queue];
-    if (!state.shuffle && enabled && queue.length > 1) {
-      // only the regular portion of queue is reshuffled
-      const injected = queue.filter((item) => item.isInjected);
-      const regular = queue.filter((item) => !item.isInjected);
-      queue = [...injected, ...shuffleList(regular)];
-    }
-
-    const newState = { ...state, shuffle: enabled, queue };
-    this.state.next(newState);
-    if (storeUpdate) {
-      this.updateStoredState(newState);
-    }
-  }
-
-  /**
-   * @deprecated
-   * @param track
-   * @param playLast
-   */
-  addToQueue(track: Track, playLast: boolean = false) {
-    const state = this.state.getValue();
-    const item: QueueItem = { track, isInjected: false };
-    const newQueue = playLast ? [...state.queue, item] : [item, ...state.queue];
-    this.state.next({ ...state, queue: newQueue });
-  }
-
-  injectNext(track: Track) {
-    const state = this.state.getValue();
-    const item: QueueItem = { track, isInjected: true };
-    this.state.next({ ...state, queue: [item, ...state.queue] });
-  }
-
-  private updateStoredState(state: PlaybackState): void {
-    this.window.PLAYBACK_API.updateState(this.getStoredStateFromState(state));
+    this.volume.next(volumeNormalized);
+    this.trackTransitionService.setVolume(volumeNormalized);
   }
 
   private getStoredStateFromState(state: PlaybackState): StoredPlayback {
@@ -389,25 +248,7 @@ export class PlaybackService implements OnDestroy {
     };
   }
 
-  private async handleTrackStateChange(
-    trackState: PlayingTrackState
-  ): Promise<void> {
-    switch (trackState) {
-      case PlayingTrackState.ENDED:
-        await this.handleTrackEnded();
-        break;
-    }
-  }
-
-  private async handleTrackEnded() {
-    if (this.state.getValue().repeat === RepeatState.SINGLE) {
-      await this.play();
-      this.seek(0);
-      return;
-    }
-  }
-
-  private getNextTrackFromQueue(): Track | undefined {
-    return this.state.getValue().queue[0].track;
+  private updateStoredState(state: PlaybackState): void {
+    this.window.PLAYBACK_API.updateState(this.getStoredStateFromState(state));
   }
 }
