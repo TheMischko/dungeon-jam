@@ -4,7 +4,12 @@ import { BehaviorSubject } from 'rxjs';
 
 export interface TrackTransitionStateContext {
   masterVolume: number;
+  /**
+   * @deprecated
+   */
   fadeDuration: number;
+  readonly fadeInDuration: number;
+  readonly crossFadeDuration: number;
   getNextFn: () => Promise<HowlTrack | undefined>;
   activeTrack: BehaviorSubject<HowlTrack | undefined>;
   nextTrack: BehaviorSubject<HowlTrack | undefined>;

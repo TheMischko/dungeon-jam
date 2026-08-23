@@ -26,7 +26,7 @@ export class FadeInState implements TrackTransitionState {
 
     await track.play();
     this.fadeInSub = track
-      .fade(0, 1, context.fadeDuration * 1000)
+      .fade(0, 1, context.fadeInDuration)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         context.transitionTo(PlayingState);

@@ -22,7 +22,7 @@ export class FadeOutState implements TrackTransitionState {
     }
 
     this.fadeOutSub = activeTrack
-      .fade(1, 0, context.fadeDuration * 1000)
+      .fade(1, 0, context.crossFadeDuration)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         complete: async () => {
