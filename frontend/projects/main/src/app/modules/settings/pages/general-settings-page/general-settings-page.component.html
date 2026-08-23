@@ -33,3 +33,10 @@
     }
   }
 </ng-template>
+
+<ng-template #playbackTemp>
+  <app-playback-transition-section
+    [transitionSettings]="transitionSettings()"
+    (updateSettings)="updateTransitionSettings.emit($event)"
+  ></app-playback-transition-section>
+</ng-template>
