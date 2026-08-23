@@ -29,7 +29,7 @@ export class TrackTransitionService implements TrackTransitionStateContext {
   private readonly injector = inject(Injector);
 
   masterVolume: number = 1;
-  fadeDuration: number = 2.5;
+  fadeDuration: number = 7.5;
   pullNextTrackFn: () => Track | undefined = () => undefined;
   readonly activeTrack = new BehaviorSubject<HowlTrack | undefined>(undefined);
   readonly nextTrack = new BehaviorSubject<HowlTrack | undefined>(undefined);
@@ -55,7 +55,7 @@ export class TrackTransitionService implements TrackTransitionStateContext {
 
   async transitionTo(stateType: Type<TrackTransitionState>): Promise<void> {
     this.transitionQueue = this.transitionQueue.then(() => {
-      this.performTransition(stateType);
+      return this.performTransition(stateType);
     });
     return this.transitionQueue;
   }

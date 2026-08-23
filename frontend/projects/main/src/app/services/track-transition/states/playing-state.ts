@@ -62,8 +62,7 @@ export class PlayingState implements TrackTransitionState {
         take(1)
       )
       .subscribe(async () => {
-        console.log('starting fade');
-        if (context.nextTrack) {
+        if (context.nextTrack.getValue()) {
           await context.transitionTo(CrossfadingToNextState);
         } else {
           await context.transitionTo(FadeOutState);
@@ -80,7 +79,6 @@ export class PlayingState implements TrackTransitionState {
         take(1)
       )
       .subscribe(async () => {
-        console.log('loading next track');
         if (!context.nextTrack.getValue()) {
           const nextTrack = await context.getNextFn();
           context.nextTrack.next(nextTrack);

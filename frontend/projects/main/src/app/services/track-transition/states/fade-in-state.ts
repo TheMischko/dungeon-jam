@@ -6,42 +6,45 @@ import { HowlTrack } from '../../../utils/howl-track';
 import { IdleState } from './idle-state';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DestroyRef, inject } from '@angular/core';
-import { Subscription } from 'rxjs';
 import { PlayingState } from './playing-state';
+import { Subscription } from 'rxjs';
 
-export class FadeOutState implements TrackTransitionState {
-  private readonly destroyRef = inject(DestroyRef);
+/**
+ * Starts playing and fades in current active song.
+ */
+export class FadeInState implements TrackTransitionState {
+  readonly destroyRef = inject(DestroyRef);
 
-  private fadeOutSub: Subscription | undefined;
+  private fadeInSub: Subscription | undefined = undefined;
 
   async onEnter(context: TrackTransitionStateContext): Promise<void> {
-    const activeTrack = context.activeTrack.getValue();
-    if (!activeTrack) {
+    const track = context.activeTrack.getValue();
+    if (!track) {
       await context.transitionTo(IdleState);
       return;
     }
 
-    this.fadeOutSub = activeTrack
-      .fade(1, 0, context.fadeDuration * 1000)
+    await track.play();
+    this.fadeInSub = track
+      .fade(0, 1, context.fadeDuration * 1000)
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        complete: async () => {
-          await context.transitionTo(IdleState);
-        },
+      .subscribe(() => {
+        context.transitionTo(PlayingState);
       });
   }
 
-  onExit(): void {
-    this.fadeOutSub?.unsubscribe();
+  onExit(context: TrackTransitionStateContext): void {
+    this.fadeInSub?.unsubscribe();
   }
 
   async play(
     context: TrackTransitionStateContext,
     howlTrack: HowlTrack
   ): Promise<void> {
+    howlTrack.load();
     context.activeTrack.getValue()?.dispose();
     context.activeTrack.next(howlTrack);
-    await context.transitionTo(PlayingState);
+    await context.transitionTo(FadeInState);
   }
 
   async stop(context: TrackTransitionStateContext): Promise<void> {
@@ -49,6 +52,6 @@ export class FadeOutState implements TrackTransitionState {
   }
 
   toString(): string {
-    return 'FadeOutState';
+    return 'FadeInState';
   }
 }

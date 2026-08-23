@@ -5,23 +5,37 @@ import {
 import { HowlTrack } from '../../../utils/howl-track';
 import { IdleState } from './idle-state';
 import { DestroyRef, inject } from '@angular/core';
-import { forkJoin, Subscription } from 'rxjs';
+import { filter, forkJoin, Subscription } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { PlayingState } from './playing-state';
+import { FadeInState } from './fade-in-state';
+import { PlayingTrackState } from '../../../models/playback.model';
 
+/**
+ * Fades out currently playing song, while starts playing and fades in the next song.
+ */
 export class CrossfadingToNextState implements TrackTransitionState {
   private destroyRef = inject(DestroyRef);
 
   private crossfadeFinishSub: Subscription | undefined;
+  private songFinishedSub: Subscription | undefined;
 
   async onEnter(context: TrackTransitionStateContext): Promise<void> {
-    if (!context.activeTrack.getValue()) {
+    const activeTrack = context.activeTrack.getValue();
+    if (!activeTrack) {
       await context.transitionTo(IdleState);
       return;
     }
+    this.songFinishedSub = activeTrack.state$
+      .pipe(filter((state) => state === PlayingTrackState.ENDED))
+      .subscribe(async () => {
+        if (context.nextTrack.getValue()) {
+          return;
+        }
+        await context.transitionTo(IdleState);
+      });
     const nextTrack = context.nextTrack.getValue();
     if (!nextTrack) {
-      // Fade out
       await context.transitionTo(IdleState);
       return;
     }
@@ -34,9 +48,27 @@ export class CrossfadingToNextState implements TrackTransitionState {
     this.crossfadeFinishSub?.unsubscribe();
   }
 
-  play(context: TrackTransitionStateContext, howlTrack: HowlTrack): void {}
+  async play(
+    context: TrackTransitionStateContext,
+    howlTrack: HowlTrack
+  ): Promise<void> {
+    const formerNextTrack = context.nextTrack?.getValue();
+    if (formerNextTrack && formerNextTrack.track.id === howlTrack.track.id) {
+      return;
+    }
+    howlTrack.load();
+    formerNextTrack?.dispose();
+    context.activeTrack?.getValue()?.dispose();
+    context.nextTrack.next(undefined);
+    context.activeTrack.next(howlTrack);
+    await context.transitionTo(FadeInState);
+  }
 
-  stop(context: TrackTransitionStateContext): void {}
+  async stop(context: TrackTransitionStateContext): Promise<void> {
+    this.crossfadeFinishSub?.unsubscribe();
+    await context.transitionTo(IdleState);
+    return;
+  }
 
   async startCrossfade(context: TrackTransitionStateContext): Promise<void> {
     const currentTrack = context.activeTrack.getValue();
@@ -46,8 +78,10 @@ export class CrossfadingToNextState implements TrackTransitionState {
       await context.transitionTo(IdleState);
       return;
     }
+    context.activeTrack.next(nextTrack);
+    context.nextTrack.next(undefined);
     this.crossfadeFinishSub = forkJoin([
-      currentTrack.fade(1, 0, fadeDuration * 1000),
+      currentTrack.fade(1, 0, this.getFadeOutDuration(context)),
       nextTrack.fade(0, 1, fadeDuration * 1000),
     ])
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -61,5 +95,9 @@ export class CrossfadingToNextState implements TrackTransitionState {
 
   toString(): string {
     return 'CrossfadingToNextState';
+  }
+
+  private getFadeOutDuration(context: TrackTransitionStateContext): number {
+    return Math.floor(context.fadeDuration * 1000 * 0.8);
   }
 }

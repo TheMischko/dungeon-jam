@@ -7,6 +7,7 @@ import {
   of,
   Subject,
   Subscription,
+  take,
   takeWhile,
 } from 'rxjs';
 import { PlayingTrackState } from '../models/playback.model';
@@ -95,10 +96,11 @@ export class HowlTrack {
 
     this.fadeSubscription = animationFrames()
       .pipe(
-        map(({ elapsed }) => elapsed / durationMs),
+        map(({ elapsed }) => Math.min(1, Math.max(0, elapsed / durationMs))),
         takeWhile((progress) => progress < 1, true),
-        map((progress) => Math.min(1, Math.max(0, progress))),
-        map((progress) => startFactor + (endFactor - startFactor) * progress)
+        map((progress) =>
+          this.getEqualPowerFadeProgress(progress, startFactor, endFactor)
+        )
       )
       .subscribe({
         next: (factor) => {
@@ -111,7 +113,7 @@ export class HowlTrack {
         },
       });
 
-    return completionSubject.asObservable();
+    return completionSubject.asObservable().pipe(take(1));
   }
 
   load(): void {
@@ -218,5 +220,19 @@ export class HowlTrack {
     if (this.timerId) {
       clearInterval(this.timerId);
     }
+  }
+
+  private getEqualPowerFadeProgress(
+    progress: number,
+    startFactor: number,
+    endFactor: number
+  ): number {
+    let curvedProgress: number;
+    if (startFactor < endFactor) {
+      curvedProgress = Math.sin((progress * Math.PI) / 2);
+    } else {
+      curvedProgress = 1 - Math.cos((progress * Math.PI) / 2);
+    }
+    return startFactor + (endFactor - startFactor) * curvedProgress;
   }
 }
