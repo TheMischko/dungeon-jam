@@ -87,7 +87,7 @@ export class PlaybackService {
   );
 
   readonly currentTrackId$ = this.playback$.pipe(
-    map((state) => state.currentTrack?.id ?? undefined)
+    map((state) => state.currentTrack?.id ?? null)
   );
 
   constructor() {
