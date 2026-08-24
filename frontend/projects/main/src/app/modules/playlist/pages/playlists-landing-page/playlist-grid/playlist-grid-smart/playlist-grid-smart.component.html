@@ -5,6 +5,7 @@
   [playingPlaylistId]="playingPlaylistId()"
   [loading]="loading()"
   [showControls]="showControls()"
+  [showParentsFilter]="showParentsFilter()"
   (sizeChange)="handleSizeChange($event)"
   (playPlaylist)="playPlaylist($event)"
   (pausePlaylist)="pausePlaylist()"
@@ -13,4 +14,5 @@
   (reorderDrop)="reorderPlaylist($event)"
   (editPlaylist)="openEditModal($event)"
   (deletePlaylist)="deletePlaylist($event)"
+  (parentChange)="updateParent($event)"
 ></app-playlist-grid>

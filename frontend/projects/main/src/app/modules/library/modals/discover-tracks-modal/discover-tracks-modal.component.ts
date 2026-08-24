@@ -9,7 +9,6 @@ import {
 } from '@angular/core';
 import { MatButton } from '@angular/material/button';
 import { SongsTableComponent } from '../../pages/library-landing-page/songs-table/songs-table.component';
-import { TrackService } from '../../../../services/track.service';
 import { Track } from '@shared/models/track.model';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Playlist } from '@shared/models/playlist.model';
@@ -18,6 +17,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { debounceTime, Subscription, take } from 'rxjs';
 import { AudioPlayerService } from '../../../../services/audio-player.service';
 import { PlayingTrackState } from '../../../../models/playback.model';
+import { DiscoverTracksStateService } from '../../../../services/discover-tracks-state.service';
+import { DEFAULT_PAGINATION_PAGES } from '../../../../models/pagination.model';
 
 @Component({
   selector: 'app-discover-tracks-modal',
@@ -28,9 +29,9 @@ import { PlayingTrackState } from '../../../../models/playback.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DiscoverTracksModalComponent implements OnDestroy {
-  readonly tracksApiService = inject(TrackService);
   readonly audioPlayerService = inject(AudioPlayerService);
   readonly destroyRef = inject(DestroyRef);
+  readonly discoverStateService = inject(DiscoverTracksStateService);
 
   readonly dialogRef = inject(MatDialogRef);
   readonly data: DiscoverTracksModalData = inject(MAT_DIALOG_DATA);
@@ -41,7 +42,8 @@ export class DiscoverTracksModalComponent implements OnDestroy {
 
   readonly tracks = signal<Track[]>([]);
   readonly tracksLoading = signal<boolean>(false);
-  readonly tracksQuery = signal<QueryOptions>(this.data?.query ?? {});
+  readonly tracksQuery = signal<QueryOptions>(this.discoverStateService.query);
+  readonly batchSize = signal<number>(this.discoverStateService.batchSize);
   readonly selection = signal<Track[]>([]);
   readonly selectAllState = signal<'checked' | 'unchecked' | 'indeterminate'>(
     'unchecked'
@@ -49,21 +51,15 @@ export class DiscoverTracksModalComponent implements OnDestroy {
   readonly trackIdPlaying = signal<string | null>(null);
   protected trackPlayingSubscription: Subscription | undefined;
 
-  protected readonly PAGE_SIZES = [5, 10, 25, 50];
-  protected readonly batchSize = signal<number>(this.PAGE_SIZES[0]);
+  protected readonly PAGE_SIZES = DEFAULT_PAGINATION_PAGES;
 
   constructor() {
     effect(() => {
       const query = this.tracksQuery();
       const batchSize = this.batchSize();
       this.tracksLoading.set(true);
-      this.tracksApiService
-        .discoverTracks({
-          ...query,
-          random: true,
-          playlistId: this.playlist.id,
-          batchSize,
-        })
+      this.discoverStateService
+        .discoverTracks(this.playlist.id, batchSize, query)
         .pipe(take(1))
         .subscribe({
           next: (tracks) => {
@@ -99,6 +95,13 @@ export class DiscoverTracksModalComponent implements OnDestroy {
   }
 
   saveSelection(again: boolean) {
+    const selectedIds = new Set(this.selection().map((t) => t.id));
+    const unselectedIds = this.tracks()
+      .filter((track) => !selectedIds.has(track.id))
+      .map((track) => track.id);
+
+    this.discoverStateService.excludeIds(unselectedIds);
+
     this.dialogRef.close({
       selectedTracks: this.selection(),
       again,
@@ -130,6 +133,16 @@ export class DiscoverTracksModalComponent implements OnDestroy {
     this.audioPlayerService.stop();
     this.trackIdPlaying.set(null);
     this.trackPlayingSubscription?.unsubscribe();
+  }
+
+  protected updateQuery(query: QueryOptions) {
+    this.discoverStateService.query = query;
+    this.tracksQuery.set(query);
+  }
+
+  protected updatePageSize(pageSize: number) {
+    this.discoverStateService.batchSize = pageSize;
+    this.batchSize.set(pageSize);
   }
 }
 

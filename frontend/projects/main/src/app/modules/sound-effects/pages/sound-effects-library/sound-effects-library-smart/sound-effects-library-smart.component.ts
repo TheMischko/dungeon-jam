@@ -28,6 +28,13 @@ import {
 } from '../../../modals/sound-effect-edit-modal/sound-effect-edit-modal.component';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { AudioFilesService } from '../../../../../services/audio-files.service';
+import { SignalPaginationService } from '@general/services/signal-pagination.service';
+import {
+  DEFAULT_PAGE_SIZE,
+  DEFAULT_PAGINATION_PAGES,
+  PaginationConfig,
+} from '../../../../../models/pagination.model';
+import { PageEvent } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-sound-effects-library-smart',
@@ -45,6 +52,8 @@ export class SoundEffectsLibrarySmartComponent {
   private readonly dialogService = inject(DialogService);
   private readonly audioFilesService = inject(AudioFilesService);
 
+  readonly paginationService!: SignalPaginationService<SoundEffect>;
+
   /**
    * Value of a URL parameter for focusing a certain sound effect on page visit.
    */
@@ -59,11 +68,20 @@ export class SoundEffectsLibrarySmartComponent {
   );
 
   readonly soundEffects = signal<SoundEffect[]>([]);
+  readonly paginatedSoundEffects = computed(() => {
+    return this.paginationService.currentPageData();
+  });
   readonly currentQueryOptions = signal<QueryOptions>({
     sortBy: 'name',
     sortDirection: SortDirection.ASC,
   });
   readonly loading = this.soundEffectStore.loading;
+  readonly paginationConfig = computed<PaginationConfig>(() => ({
+    pageSizeOptions: DEFAULT_PAGINATION_PAGES,
+    pageSize: this.paginationService.pageSize(),
+    totalItems: this.paginationService.totalItems() ?? 0,
+    currentPageIndex: this.paginationService.currentPageIndex() ?? 0,
+  }));
 
   constructor() {
     effect(() => {
@@ -71,6 +89,14 @@ export class SoundEffectsLibrarySmartComponent {
       this.soundEffects.set(soundEffects);
     });
     this.soundEffectStore.loadAll(this.currentQueryOptions);
+
+    this.paginationService = SignalPaginationService.create(this.soundEffects);
+    this.paginationService.pageSize.set(DEFAULT_PAGE_SIZE);
+    effect(() => {
+      if (this.loading()) {
+        this.paginationService.resetPage();
+      }
+    });
   }
 
   createFromFiles(audioTracks?: AudioTrack[]): void {
@@ -176,6 +202,11 @@ export class SoundEffectsLibrarySmartComponent {
       .subscribe((audioFiles: AudioTrack[]) => {
         this.createFromFiles(audioFiles);
       });
+  }
+
+  updatePaginationPage(event: PageEvent): void {
+    this.paginationService.pageSize.set(event.pageSize);
+    this.paginationService.goToPage(event.pageIndex);
   }
 }
 

@@ -70,6 +70,9 @@ export class PlaylistsDetailPageComponent {
   readonly openDiscover = output<void>();
   readonly audioDropped = output<AudioTrack[]>();
 
+  readonly noTracksWarning =
+    'There are no tracks yet. You need to add some from Library or through the Discover mode.';
+
   readonly parentDetailRoute = computed(() => {
     const parent = this.parentPlaylist();
     if (!parent) {

@@ -77,17 +77,21 @@ export class SoundEffectManager {
     );
     ipcMain.handle(
       SoundEffectChannel.CREATE,
-      withAppError(async (_, data: SoundEffectCreateData): Promise<SoundEffect> => {
-        this.logger.log('Creating new sound effect', data);
-        return this.create(data);
-      })
+      withAppError(
+        async (_, data: SoundEffectCreateData): Promise<SoundEffect> => {
+          this.logger.log('Creating new sound effect', data);
+          return this.create(data);
+        }
+      )
     );
     ipcMain.handle(
       SoundEffectChannel.UPDATE,
-      withAppError(async (_, data: SoundEffectUpdateData): Promise<SoundEffect | null> => {
-        this.logger.log('Updating record.', data);
-        return this.update(data);
-      })
+      withAppError(
+        async (_, data: SoundEffectUpdateData): Promise<SoundEffect | null> => {
+          this.logger.log('Updating record.', data);
+          return this.update(data);
+        }
+      )
     );
     ipcMain.handle(
       SoundEffectChannel.DELETE,
@@ -132,7 +136,11 @@ export class SoundEffectManager {
       OrderableEntityType.SoundEffect,
       SoundEffectContextType.Landing
     );
-    if (orderMap.size !== soundEffects.length) {
+    if (
+      orderMap.size !== soundEffects.length &&
+      (!query.search || query.search.length === 0) &&
+      !query.filters
+    ) {
       orderMap = await this.repairOrderRecords(
         soundEffects,
         SoundEffectContextType.Landing
