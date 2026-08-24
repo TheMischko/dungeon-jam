@@ -10,19 +10,23 @@ import {
 import { SoundEffect } from '@shared/models/sound-effect.model';
 import { FilesDropInZoneComponent } from '../../../library/pages/library-landing-page/songs-drop-in-zone/files-drop-in-zone.component';
 import { AudioTrack } from '@shared/models/track.model';
-import { SoundEffectsDisplayComponent } from '../../components/sound-effects-display/sound-effects-display.component';
+import { SoundEffectTableComponent } from '../../components/sound-effect-table/sound-effect-table.component';
+import { SoundEffectCardGridComponent } from '../../components/sound-effect-card-grid/sound-effect-card-grid.component';
 import { SoundEffectVolumeChange } from './sound-effects-library-smart/sound-effects-library-smart.component';
 import { QueryOptions } from '@shared/models/request.model';
 import { SortDirection } from '@shared/models/common.model';
 import { ActionsMenuBaseConfig } from '@general/components/display/actions-menu/actions-menu.component';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { MatButton } from '@angular/material/button';
-import { PaginationConfig } from '../../../../models/pagination.model';
-import { PageEvent } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-sound-effects-library',
-  imports: [FilesDropInZoneComponent, SoundEffectsDisplayComponent, MatButton],
+  imports: [
+    FilesDropInZoneComponent,
+    SoundEffectTableComponent,
+    SoundEffectCardGridComponent,
+    MatButton,
+  ],
   templateUrl: './sound-effects-library.component.html',
   styleUrl: './sound-effects-library.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -32,8 +36,8 @@ export class SoundEffectsLibraryComponent {
   readonly loading = input<boolean>(false);
   readonly playingEffectIds = input<string[]>([]);
   readonly focusSoundEffectId = input<string>();
-  readonly pagination = input<PaginationConfig | undefined>(undefined);
 
+  readonly modeChange = output<'grid' | 'table'>();
   readonly uploadAudioFiles = output<AudioTrack[]>();
   readonly playEffect = output<SoundEffect>();
   readonly stopEffect = output<SoundEffect>();
@@ -44,14 +48,12 @@ export class SoundEffectsLibraryComponent {
   readonly deleteSoundEffect = output<SoundEffect>();
   readonly reorderDrop = output<CdkDragDrop<SoundEffect[]>>();
   readonly openAudioFilesDialog = output<void>();
-  readonly search = output<string>();
-  readonly pageChange = output<PageEvent>();
 
-  readonly currentSearch = signal<string>('');
+  readonly showGrid = signal<boolean>(true);
+  readonly currentSearch = signal<string | undefined>(undefined);
   readonly currentQueryOptions = computed<QueryOptions>(() => {
-    const search = this.currentSearch();
     return {
-      search: search.length > 0 ? search : undefined,
+      search: this.currentSearch(),
       sortBy: 'name',
       sortDirection: SortDirection.ASC,
     };
@@ -87,6 +89,14 @@ export class SoundEffectsLibraryComponent {
         this.focusElementWithId(focusId);
       });
     });
+  }
+
+  readonly viewMode = computed(() => {
+    return this.showGrid() ? 'grid' : 'table';
+  });
+
+  toggleViewMode(mode: 'table' | 'grid'): void {
+    this.showGrid.set(mode === 'grid');
   }
 
   focusElementWithId(soundEffectId: string): void {

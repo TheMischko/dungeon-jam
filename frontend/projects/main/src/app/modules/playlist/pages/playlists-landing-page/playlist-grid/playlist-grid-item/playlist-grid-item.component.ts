@@ -14,16 +14,10 @@ import { PlaylistStore } from '@general/stores/playlist.store';
 import { GridPlaylistSizeConfig } from '../../../../../../models/grid-item-size-config.model';
 import { GridItemComponent } from '../../../../../../components/grid/grid-item/grid-item.component';
 import { ActionsMenuConfig } from '@general/components/display/actions-menu/actions-menu.component';
-import { ScrollOverflowTextDirective } from '@general/directives/scroll-overflow-text.directive';
 
 @Component({
   selector: 'app-playlist-grid-item',
-  imports: [
-    NgStyle,
-    LucideDynamicIcon,
-    GridItemComponent,
-    ScrollOverflowTextDirective,
-  ],
+  imports: [NgStyle, LucideDynamicIcon, GridItemComponent],
   templateUrl: './playlist-grid-item.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './playlist-grid-item.component.scss',

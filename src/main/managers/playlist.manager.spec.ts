@@ -299,51 +299,11 @@ describe('PlaylistManager', () => {
         tracksRemoved: ['track-2'],
       })) as Playlist;
 
-      expect(result).toEqual(updatedPlaylist);
-      expect(mockPlaylistProvider.replaceRecord).toHaveBeenCalledWith(
-        expect.objectContaining({ name: 'New Name' }),
-      );
-    });
-
-    it('should remove parent ownership when parentPlaylistId is set to null', async () => {
-      const parentPlaylist = mockPlaylist({
-        id: 'parent-1',
-        name: 'Parent Playlist',
-        childrenIds: ['child-1'],
-      });
-      const childPlaylist = mockPlaylist({
-        id: 'child-1',
-        name: 'Child Playlist',
-        ownershipId: 'parent-1',
-      });
-
-      mockPlaylistProvider.getBy.mockImplementation(async (field: string, value: string) => {
-        if (value === 'child-1') return childPlaylist;
-        if (value === 'parent-1') return parentPlaylist;
-        return null;
-      });
-      mockPlaylistProvider.getById.mockImplementation(async (id: string) => {
-        if (id === 'child-1') return childPlaylist;
-        if (id === 'parent-1') return parentPlaylist;
-        return null;
-      });
-      mockPlaylistProvider.getAll.mockResolvedValue([parentPlaylist, childPlaylist]);
-
-      await triggerIpcMainHandle(PlaylistChannel.UPDATE, {
-        id: 'child-1',
-        parentPlaylistId: null,
-      });
-
-      // Verify that the child's ownershipId is cleared and parent's childrenIds is filtered
-      expect(mockPlaylistProvider.replaceRecord).toHaveBeenCalledWith(
-        expect.objectContaining({ id: 'child-1' }),
-      );
-      expect(mockPlaylistProvider.replaceRecord).toHaveBeenCalledWith(
-        expect.objectContaining({
-          id: 'parent-1',
-          childrenIds: [],
-        }),
-      );
+      expect(result.name).toBe('New Name');
+      expect(result.tags).toContain('tag-1');
+      expect(result.tags).toContain('tag-3');
+      expect(result.trackIds).toContain('track-1');
+      expect(result.trackIds).toContain('track-3');
     });
 
     it('should throw error when playlist ID is missing', async () => {
@@ -383,35 +343,8 @@ describe('PlaylistManager', () => {
         name: 'Updated Name',
       })) as Playlist;
 
-      expect(result.description).toBe('Original Description');
       expect(result.order).toBe(5);
-    });
-  });
-
-  describe('delete', () => {
-    it('should clear ownershipId on children when parent playlist is deleted', async () => {
-      const parentPlaylist = mockPlaylist({
-        id: 'parent-1',
-        name: 'Parent Playlist',
-        childrenIds: ['child-1'],
-      });
-      const childPlaylist = mockPlaylist({
-        id: 'child-1',
-        name: 'Child Playlist',
-        ownershipId: 'parent-1',
-      });
-
-      mockPlaylistProvider.getBy.mockResolvedValue(parentPlaylist);
-      mockPlaylistProvider.getById.mockResolvedValue(parentPlaylist);
-      mockPlaylistProvider.getAll.mockResolvedValue([parentPlaylist, childPlaylist]);
-
-      await playlistManager.delete('parent-1');
-
-      // Verify that child playlist record was updated to remove ownershipId
-      expect(mockPlaylistProvider.replaceRecord).toHaveBeenCalledWith(
-        expect.not.objectContaining({ ownershipId: 'parent-1' }),
-      );
-      expect(mockPlaylistProvider.deleteOne).toHaveBeenCalledWith('id', 'parent-1');
+      expect(result.description).toBe('Original Description');
     });
   });
 

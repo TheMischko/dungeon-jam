@@ -130,9 +130,9 @@ export class SceneManager {
   }
 
   public async getById(id: string): Promise<Scene | undefined> {
-    let result = (await this.databaseProvider.getBy('id', id)) ?? undefined;
+    const result = (await this.databaseProvider.getBy('id', id)) ?? undefined;
     if (result) {
-      result = this.parseScene(result);
+      this.parseScene(result);
     }
     return result;
   }
@@ -148,7 +148,6 @@ export class SceneManager {
     const scenes = await this.getAll({});
     const result = await this.databaseProvider.create({
       ...scene,
-      playlistId: scene.playlistId ?? null,
       ambience: [],
       stingers: [],
       introTrackIds: [],

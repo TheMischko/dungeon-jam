@@ -19,11 +19,11 @@
       [paginationPages]="PAGE_SIZES"
       [initialPageSize]="batchSize()"
       [initialQuery]="tracksQuery()"
-      (queryChange)="updateQuery($event)"
+      (queryChange)="tracksQuery.set($event)"
       (selectionChange)="selectionChanged($event)"
       (playTrack)="playTrack($event)"
       (pauseTrack)="pauseTrack()"
-      (pageSizeChange)="updatePageSize($event)"
+      (pageSizeChange)="batchSize.set($event)"
     ></app-songs-table>
   </div>
 

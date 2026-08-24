@@ -12,10 +12,6 @@ import { GridPlaylistSizeConfig } from '../../../../../models/grid-item-size-con
 import { CdkDrag, CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop';
 import { GridControlsComponent } from '../../../../../components/grid/grid-controls/grid-controls.component';
 import { ActionsMenuConfig } from '@general/components/display/actions-menu/actions-menu.component';
-import {
-  PlaylistParentFilterChange,
-  PlaylistParentFilterComponent,
-} from '../../../components/playlist-parent-filter/playlist-parent-filter.component';
 
 @Component({
   selector: 'app-playlist-grid',
@@ -25,7 +21,6 @@ import {
     CdkDrag,
     CdkDropList,
     GridControlsComponent,
-    PlaylistParentFilterComponent,
   ],
   templateUrl: './playlist-grid.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
@@ -39,7 +34,6 @@ export class PlaylistGridComponent {
   readonly loading = input<boolean>(false);
   readonly showControls = input<boolean>(true);
   readonly reorderingEnabled = input<boolean>(true);
-  readonly showParentsFilter = input<boolean>(false);
 
   readonly sizeChange = output<number>();
   readonly playPlaylist = output<string>();
@@ -49,7 +43,6 @@ export class PlaylistGridComponent {
   readonly reorderDrop = output<CdkDragDrop<PlaylistWithTagData[]>>();
   readonly editPlaylist = output<PlaylistWithTagData>();
   readonly deletePlaylist = output<PlaylistWithTagData>();
-  readonly parentChange = output<PlaylistParentFilterChange>();
 
   readonly playlistActions: ActionsMenuConfig<PlaylistWithTagData, string>[] = [
     {

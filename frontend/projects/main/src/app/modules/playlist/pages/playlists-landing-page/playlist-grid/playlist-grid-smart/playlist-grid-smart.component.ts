@@ -34,7 +34,6 @@ import {
   ConfirmationDialogComponent,
   ConfirmationDialogData,
 } from '../../../../../../components/dialog/confirmation-dialog/confirmation-dialog.component';
-import { PlaylistParentFilterChange } from '../../../../components/playlist-parent-filter/playlist-parent-filter.component';
 
 @Component({
   selector: 'app-playlist-grid-smart',
@@ -59,7 +58,6 @@ export class PlaylistGridSmartComponent implements OnInit {
   readonly searchFilter = signal<string>('');
   readonly sortDirection = signal<SortDirection>(SortDirection.ASC);
   readonly sortBy = signal<Extract<keyof Playlist, string>>('order');
-  readonly parent = signal<PlaylistParentFilterChange>(null);
 
   readonly playlists = signal<Playlist[]>([]);
   readonly dataSet = computed<PlaylistWithTagData[]>(() => {
@@ -69,7 +67,6 @@ export class PlaylistGridSmartComponent implements OnInit {
     }
     const tags = untracked(() => this.tagsStore.entityMap());
     const playlists = this.playlists();
-    const parent = this.parent();
     return playlists
       .map((playlist) => {
         const playlistTags = playlist.tags
@@ -79,15 +76,6 @@ export class PlaylistGridSmartComponent implements OnInit {
           ...playlist,
           tags: playlistTags,
         };
-      })
-      .filter((playlist) => {
-        if (!parent) {
-          return true;
-        }
-        if (parent === 'no-parent') {
-          return !playlist.ownershipId;
-        }
-        return playlist.ownershipId === parent;
       })
       .slice(0, this.limit() ?? playlists.length);
   });
@@ -102,9 +90,6 @@ export class PlaylistGridSmartComponent implements OnInit {
   readonly queryOptions = computed<QueryRequest>(() => ({
     search: this.searchFilter(),
   }));
-  readonly showParentsFilter = computed<boolean>(() => {
-    return this.playlistStore.allParents().length > 0;
-  });
   readonly playingPlaylistId = toSignal(
     this.playbackService.playback$.pipe(
       map((state) => (state.isPlaying ? state.playlistId : undefined))
@@ -256,10 +241,6 @@ export class PlaylistGridSmartComponent implements OnInit {
       }
       this.playlistStore.deletePlaylist(playlist.id);
     });
-  }
-
-  protected updateParent(parent: PlaylistParentFilterChange) {
-    this.parent.set(parent);
   }
 }
 

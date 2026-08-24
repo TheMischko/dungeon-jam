@@ -5,7 +5,7 @@ import {
   output,
   ChangeDetectionStrategy,
 } from '@angular/core';
-import { ButtonSize, ButtonType } from '../../../models/button.model';
+import { ButtonSize, ButtonType } from '@general';
 import { MatButton } from '@angular/material/button';
 import { NgClass, NgTemplateOutlet } from '@angular/common';
 import { LucideDynamicIcon, LucideIconData } from '@lucide/angular';

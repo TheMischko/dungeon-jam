@@ -67,6 +67,7 @@ export class InputComponent<
 
     if (newValue !== undefined) {
       this.writeValue(emitValue);
+      console.log(emitValue);
       this.inputChange.emit(emitValue);
     }
   }

@@ -39,7 +39,6 @@ import { PlaylistToastService } from '@general/services/toast/playlist-toast.ser
 type PlaylistStoreState = {
   loading: boolean;
   lastLoadQuery: QueryRequest;
-  allParents: Playlist[];
 };
 const initialState: PlaylistStoreState = {
   loading: false,
@@ -47,7 +46,6 @@ const initialState: PlaylistStoreState = {
     sortBy: 'order',
     sortDirection: SortDirection.ASC,
   },
-  allParents: [],
 };
 const playlistConfig = entityConfig({
   entity: type<Playlist>(),
@@ -73,7 +71,6 @@ export const PlaylistStore = signalStore(
             return playlistApiService.getAllPlaylists(query).pipe(
               tap((playlists) => {
                 patchState(store, setAllEntities(playlists));
-                updateParents();
               }),
               catchError((err) => {
                 toastService.showLoadError(err);
@@ -106,37 +103,6 @@ export const PlaylistStore = signalStore(
         )
       );
 
-      const update = rxMethod<void>(
-        pipe(tap(() => load(store.lastLoadQuery())))
-      );
-
-      const updateParents = () => {
-        const playlists = store.entities();
-        const currentParents = store.allParents();
-
-        const updatedParents = currentParents
-          .map((formerParent) => {
-            const currentVersion = playlists.find(
-              (p) => p.id === formerParent.id
-            );
-            return currentVersion ?? formerParent;
-          })
-          .filter((parent) => !!parent.childrenIds?.length);
-
-        const newParents = playlists.filter((p) => {
-          return (
-            !!p.childrenIds?.length &&
-            !updatedParents.some((curr) => curr.id === p.id)
-          );
-        });
-
-        const parents = [...updatedParents, ...newParents].sort((a, b) => {
-          return a.name.localeCompare(b.name);
-        });
-
-        patchState(store, { allParents: parents });
-      };
-
       const updatePlaylist = rxMethod<PlaylistUpdateQuery>(
         pipe(
           tap(() => patchState(store, { loading: true })),
@@ -145,7 +111,6 @@ export const PlaylistStore = signalStore(
               tap((updatedPlaylist) => {
                 toastService.showUpdateSuccess(updatedPlaylist.name);
                 patchState(store, setEntity(updatedPlaylist));
-                update();
               }),
               catchError((err) => {
                 toastService.showUpdateError(err);
@@ -222,7 +187,6 @@ export const PlaylistStore = signalStore(
               tap(() => {
                 toastService.showDeleteSuccess();
                 patchState(store, removeEntity(playlistId));
-                update();
               }),
               catchError((err) => {
                 toastService.showDeleteError(err);

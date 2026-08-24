@@ -4,24 +4,19 @@
   </div>
 
   <div class="content">
-    <app-sound-effects-display
+    <app-sound-effect-table
       class="table"
-      [soundEffects]="paginatedSoundEffects()"
-      [viewMode]="'table'"
-      [hideToggle]="true"
+      [soundEffects]="soundEffects()"
       [selection]="true"
       [initialSelection]="selection()"
       [allSelectedState]="selectAllState()"
       [loading]="loading()"
       [currentlyPlaying]="currentlyPlayingList()"
       [hiddenColumns]="['actions', 'looping', 'volume']"
-      [paginationConfig]="paginationConfig()"
       (selectionChange)="selectionChanged($event)"
       (playEffect)="playEffect($event)"
       (stopEffect)="stopEffect()"
-      (search)="currentSearch.set($event)"
-      (pageChange)="updatePaginationPage($event)"
-    />
+    ></app-sound-effect-table>
   </div>
 
   <div class="footer">

@@ -1,7 +1,6 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  computed,
   forwardRef,
   inject,
   input,
@@ -35,23 +34,12 @@ import {
 })
 export class PlaylistSelectComponent implements OnInit, ControlValueAccessor {
   private readonly playlistStore = inject(PlaylistStore);
-
-  readonly omitPlaylist = input<Playlist | undefined>(undefined);
-
   readonly value = signal<Playlist | null>(null);
   readonly disabled = signal(false);
   readonly label = input('Select Playlist');
 
   readonly playlists = this.playlistStore.entities;
   readonly loading = this.playlistStore.loading;
-
-  readonly playlistOptions = computed<Playlist[]>(() => {
-    const omitPlaylist = this.omitPlaylist();
-    if (omitPlaylist) {
-      return this.playlists().filter((p) => p.id !== omitPlaylist.id);
-    }
-    return this.playlists();
-  });
 
   ngOnInit() {
     if (!this.playlists().length) {

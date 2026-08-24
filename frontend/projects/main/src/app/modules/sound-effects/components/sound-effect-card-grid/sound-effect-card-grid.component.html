@@ -1,27 +1,40 @@
-<div
-  class="grid-content"
-  cdkDropList
-  cdkDropListOrientation="mixed"
-  [cdkDropListData]="soundEffects()"
-  (cdkDropListDropped)="soundEffectDropped($event)"
->
-  @if (loading()) {
-    <lib-loader [center]="true" [size]="'large'"></lib-loader>
-  }
-  @for (soundEffect of soundEffects(); track soundEffect.id) {
-    <app-sound-effect-card
-      cdkDrag
-      cdkDragPreviewClass="dragging"
-      [cdkDragData]="soundEffect"
-      [soundEffect]="soundEffect"
-      [isPlaying]="isPlaying(soundEffect.id)"
-      [sizeConfig]="sizeConfig()"
-      [actionsMenu]="actionsMenu()"
-      [attr.sound-effect-id]="soundEffect.id"
-      (play)="playEffect.emit(soundEffect)"
-      (pause)="stopEffect.emit(soundEffect)"
-      (loopingChange)="toggleEffectLoop.emit(soundEffect)"
-      (volumeChange)="emitVolumeChange(soundEffect, $event)"
-    ></app-sound-effect-card>
-  }
+<div class="wrapper">
+  <app-grid-controls
+    (search)="search.emit($event)"
+    (sizeChange)="cardSize.set($event)"
+  >
+    <app-sound-effect-display-mode-switch
+      class="mode-switcher"
+      [mode]="viewMode()"
+      (modeChange)="modeChange.emit($event)"
+    />
+  </app-grid-controls>
+
+  <div
+    class="grid-content"
+    cdkDropList
+    cdkDropListOrientation="mixed"
+    [cdkDropListData]="soundEffects()"
+    (cdkDropListDropped)="soundEffectDropped($event)"
+  >
+    @if (loading()) {
+      <lib-loader [center]="true" [size]="'large'"></lib-loader>
+    }
+    @for (soundEffect of soundEffects(); track soundEffect.id) {
+      <app-sound-effect-card
+        cdkDrag
+        cdkDragPreviewClass="dragging"
+        [cdkDragData]="soundEffect"
+        [soundEffect]="soundEffect"
+        [isPlaying]="isPlaying(soundEffect.id)"
+        [sizeConfig]="sizeConfig()"
+        [actionsMenu]="actionsMenu()"
+        [attr.sound-effect-id]="soundEffect.id"
+        (play)="playEffect.emit(soundEffect)"
+        (pause)="stopEffect.emit(soundEffect)"
+        (loopingChange)="toggleEffectLoop.emit(soundEffect)"
+        (volumeChange)="emitVolumeChange(soundEffect, $event)"
+      ></app-sound-effect-card>
+    }
+  </div>
 </div>

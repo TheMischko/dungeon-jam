@@ -6,7 +6,6 @@ import { TagsInputComponent } from '@general/components/controls/tags-input/tags
 import { FormField } from '@angular/forms/signals';
 import { PlaylistSelectComponent } from '@general/components/controls/playlist-select/playlist-select.component';
 import { ImageUploadComponent } from '../../components/image/image-upload/image-upload.component';
-import { Playlist } from '@shared/models/playlist.model';
 
 @Component({
   selector: 'app-playlist-form',
@@ -25,7 +24,6 @@ import { Playlist } from '@shared/models/playlist.model';
 })
 export class PlaylistFormComponent {
   readonly form = input(createPlaylistForm());
-  readonly omitParentPlaylistOption = input<Playlist | undefined>();
 
   protected updateImage(event: string | null) {
     // To-DO: Reenable this or remake image upload to form control

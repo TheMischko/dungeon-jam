@@ -5,14 +5,11 @@ import path from 'path';
 import { AppInfoManager } from './main/managers/app-info.manager';
 import pkg from '../package.json';
 
-import { DatabaseWrapper } from './main/database/database';
-
 const ENV = process.env.ENV || 'production';
 const appLogger = new Logger('APP', 'cyanBright');
 let startupManager: StartupManager;
 
 app.name = pkg.name;
-// @ts-ignore
 app.version = pkg.version;
 
 if (!app.isPackaged) {
@@ -52,6 +49,5 @@ app.on('window-all-closed', () => {
 });
 
 app.on('before-quit', async () => {
-  DatabaseWrapper.cleanupTempDb();
   await startupManager.onAppEnd();
 });

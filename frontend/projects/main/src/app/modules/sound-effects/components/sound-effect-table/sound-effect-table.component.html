@@ -1,3 +1,11 @@
+<app-grid-controls [showSizeControl]="false" (search)="search.emit($event)">
+  <app-sound-effect-display-mode-switch
+    class="mode-switcher"
+    [mode]="viewMode()"
+    (modeChange)="modeChange.emit($event)"
+  />
+</app-grid-controls>
+
 <app-smart-table
   [config]="config"
   [dataSet]="soundEffects()"

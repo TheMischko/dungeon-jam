@@ -2,7 +2,6 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  effect,
   inject,
   OnDestroy,
   signal,
@@ -14,20 +13,13 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { SelectSoundEffectsSelection } from './select-sound-effects-modal.types';
 import { FormsModule } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
-import { SoundEffectsDisplayComponent } from '../../components/sound-effects-display/sound-effects-display.component';
+import { SoundEffectTableComponent } from '../../components/sound-effect-table/sound-effect-table.component';
 import { AudioPlayerService } from '../../../../services/audio-player.service';
 import { soundEffectToTrack } from '@general/utils/sound-effect-to-track';
-import { SignalPaginationService } from '@general/services/signal-pagination.service';
-import {
-  DEFAULT_PAGE_SIZE,
-  DEFAULT_PAGINATION_PAGES,
-  PaginationConfig,
-} from '../../../../models/pagination.model';
-import { PageEvent } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-select-sound-effects-modal',
-  imports: [FormsModule, MatButton, SoundEffectsDisplayComponent],
+  imports: [FormsModule, MatButton, SoundEffectTableComponent],
   providers: [AudioPlayerService],
   templateUrl: './select-sound-effects-modal.component.html',
   styleUrl: './select-sound-effects-modal.component.scss',
@@ -40,22 +32,11 @@ export class SelectSoundEffectsModalComponent implements OnDestroy {
     inject<MatDialogRef<SelectSoundEffectsSelection>>(MatDialogRef);
   readonly data = inject<SelectSoundEffectsSelection>(MAT_DIALOG_DATA);
 
-  readonly paginationService!: SignalPaginationService<SoundEffect>;
-
   readonly soundEffects = computed(() => {
     return this.soundEffectStore
       .entities()
       .sort((a, b) => a.name.localeCompare(b.name));
   });
-  readonly paginatedSoundEffects = computed(
-    () => this.paginationService.currentPageData() ?? []
-  );
-  readonly paginationConfig = computed<PaginationConfig>(() => ({
-    pageSizeOptions: DEFAULT_PAGINATION_PAGES,
-    pageSize: this.paginationService.pageSize(),
-    totalItems: this.paginationService.totalItems() ?? 0,
-    currentPageIndex: this.paginationService.currentPageIndex() ?? 0,
-  }));
 
   readonly loading = this.soundEffectStore.loading;
 
@@ -70,12 +51,8 @@ export class SelectSoundEffectsModalComponent implements OnDestroy {
     return current ? [current.id] : [];
   });
 
-  readonly currentSearch = signal<string>('');
   readonly currentQuery = computed<QueryRequest>(() => {
-    const searchValue = this.currentSearch();
-    return {
-      search: searchValue.length > 0 ? searchValue : undefined,
-    };
+    return {};
   });
 
   constructor() {
@@ -83,14 +60,6 @@ export class SelectSoundEffectsModalComponent implements OnDestroy {
     if (this.data.selectedSoundEffects) {
       this.selection.set(this.data.selectedSoundEffects);
     }
-
-    this.paginationService = SignalPaginationService.create(this.soundEffects);
-    this.paginationService.pageSize.set(DEFAULT_PAGE_SIZE);
-    effect(() => {
-      if (this.loading()) {
-        this.paginationService.resetPage();
-      }
-    });
   }
 
   ngOnDestroy() {
@@ -135,10 +104,5 @@ export class SelectSoundEffectsModalComponent implements OnDestroy {
   protected stopEffect() {
     this.audioPlayerService.stop();
     this.currentlyPlaying.set(undefined);
-  }
-
-  protected updatePaginationPage(event: PageEvent) {
-    this.paginationService.pageSize.set(event.pageSize);
-    this.paginationService.goToPage(event.pageIndex);
   }
 }

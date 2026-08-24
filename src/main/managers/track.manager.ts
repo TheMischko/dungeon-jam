@@ -435,10 +435,7 @@ export class TrackManager {
       playlistId: query.playlistId,
       includeChildren: true,
     });
-    const excludedTrackIds = new Set([
-      ...playlistTracks.map((t) => t.id),
-      ...(query?.excludeIds ?? []),
-    ]);
+    const excludedTrackIds = new Set(playlistTracks.map((t) => t.id));
 
     const allTracks = await this.tracksProvider.getAll(query);
     const validTracks = allTracks.filter((t) => !excludedTrackIds.has(t.id));

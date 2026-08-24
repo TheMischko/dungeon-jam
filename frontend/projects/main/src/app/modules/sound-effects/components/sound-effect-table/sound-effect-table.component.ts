@@ -25,6 +25,8 @@ import { MatMenu, MatMenuTrigger } from '@angular/material/menu';
 import { actionsIconSet } from '@general/icons/icons';
 import { VolumeControlComponent } from '../../../../player/player/volume-control/volume-control.component';
 import { RepeatState } from '@shared/models/track.model';
+import { GridControlsComponent } from '../../../../components/grid/grid-controls/grid-controls.component';
+import { SoundEffectDisplayModeSwitchComponent } from '../sound-effect-display-mode-switch/sound-effect-display-mode-switch.component';
 
 @Component({
   selector: 'app-sound-effect-table',
@@ -38,6 +40,8 @@ import { RepeatState } from '@shared/models/track.model';
     MatMenu,
     MatMenuTrigger,
     VolumeControlComponent,
+    GridControlsComponent,
+    SoundEffectDisplayModeSwitchComponent,
   ],
   templateUrl: './sound-effect-table.component.html',
   styleUrl: './sound-effect-table.component.scss',
@@ -48,6 +52,7 @@ export class SoundEffectTableComponent {
   readonly soundEffects = input.required<SoundEffect[]>();
   readonly loading = input<boolean>(false);
   readonly actionsMenu = input<ActionsMenuBaseConfig<SoundEffect>[]>([]);
+  readonly viewMode = input<'grid' | 'table'>('grid');
 
   /**
    * List of currently playing Sound Effect's IDs.
@@ -61,6 +66,8 @@ export class SoundEffectTableComponent {
   );
   readonly hiddenColumns = input<string[]>([]);
 
+  readonly search = output<string>();
+  readonly modeChange = output<'grid' | 'table'>();
   readonly playEffect = output<SoundEffect>();
   readonly stopEffect = output<SoundEffect>();
   readonly toggleEffectLoop = output<SoundEffect>();
