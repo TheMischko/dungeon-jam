@@ -7,34 +7,16 @@
   class="content"
   (audioDropped)="uploadAudioFiles.emit($event)"
 >
-  @if (showGrid()) {
-    <app-sound-effect-card-grid
-      [soundEffects]="dataset()"
-      [loading]="loading()"
-      [currentlyPlaying]="playingEffectIds()"
-      [actionsMenu]="actionMenuConfig"
-      [viewMode]="viewMode()"
-      (playEffect)="playEffect.emit($event)"
-      (stopEffect)="stopEffect.emit($event)"
-      (toggleEffectLoop)="toggleEffectLoop.emit($event)"
-      (effectVolumeChange)="effectVolumeChange.emit($event)"
-      (reorderDrop)="reorderDrop.emit($event)"
-      (search)="currentSearch.set($event)"
-      (modeChange)="toggleViewMode($event)"
-    ></app-sound-effect-card-grid>
-  } @else {
-    <app-sound-effect-table
-      class="effect-table"
-      [soundEffects]="dataset()"
-      [loading]="loading()"
-      [currentlyPlaying]="playingEffectIds()"
-      [actionsMenu]="actionMenuConfig"
-      [viewMode]="viewMode()"
-      (playEffect)="playEffect.emit($event)"
-      (stopEffect)="stopEffect.emit($event)"
-      (toggleEffectLoop)="toggleEffectLoop.emit($event)"
-      (search)="currentSearch.set($event)"
-      (modeChange)="toggleViewMode($event)"
-    ></app-sound-effect-table>
-  }
+  <app-sound-effects-display
+    [soundEffects]="dataset()"
+    [loading]="loading()"
+    [currentlyPlaying]="playingEffectIds()"
+    [actionsMenu]="actionMenuConfig"
+    (playEffect)="playEffect.emit($event)"
+    (stopEffect)="stopEffect.emit($event)"
+    (toggleEffectLoop)="toggleEffectLoop.emit($event)"
+    (effectVolumeChange)="effectVolumeChange.emit($event)"
+    (reorderDrop)="reorderDrop.emit($event)"
+    (search)="currentSearch.set($event)"
+  />
 </app-songs-drop-in-zone>

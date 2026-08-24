@@ -10,8 +10,7 @@ import {
 import { SoundEffect } from '@shared/models/sound-effect.model';
 import { FilesDropInZoneComponent } from '../../../library/pages/library-landing-page/songs-drop-in-zone/files-drop-in-zone.component';
 import { AudioTrack } from '@shared/models/track.model';
-import { SoundEffectTableComponent } from '../../components/sound-effect-table/sound-effect-table.component';
-import { SoundEffectCardGridComponent } from '../../components/sound-effect-card-grid/sound-effect-card-grid.component';
+import { SoundEffectsDisplayComponent } from '../../components/sound-effects-display/sound-effects-display.component';
 import { SoundEffectVolumeChange } from './sound-effects-library-smart/sound-effects-library-smart.component';
 import { QueryOptions } from '@shared/models/request.model';
 import { SortDirection } from '@shared/models/common.model';
@@ -23,8 +22,7 @@ import { MatButton } from '@angular/material/button';
   selector: 'app-sound-effects-library',
   imports: [
     FilesDropInZoneComponent,
-    SoundEffectTableComponent,
-    SoundEffectCardGridComponent,
+    SoundEffectsDisplayComponent,
     MatButton,
   ],
   templateUrl: './sound-effects-library.component.html',
@@ -37,7 +35,6 @@ export class SoundEffectsLibraryComponent {
   readonly playingEffectIds = input<string[]>([]);
   readonly focusSoundEffectId = input<string>();
 
-  readonly modeChange = output<'grid' | 'table'>();
   readonly uploadAudioFiles = output<AudioTrack[]>();
   readonly playEffect = output<SoundEffect>();
   readonly stopEffect = output<SoundEffect>();
@@ -49,7 +46,6 @@ export class SoundEffectsLibraryComponent {
   readonly reorderDrop = output<CdkDragDrop<SoundEffect[]>>();
   readonly openAudioFilesDialog = output<void>();
 
-  readonly showGrid = signal<boolean>(true);
   readonly currentSearch = signal<string | undefined>(undefined);
   readonly currentQueryOptions = computed<QueryOptions>(() => {
     return {
@@ -89,14 +85,6 @@ export class SoundEffectsLibraryComponent {
         this.focusElementWithId(focusId);
       });
     });
-  }
-
-  readonly viewMode = computed(() => {
-    return this.showGrid() ? 'grid' : 'table';
-  });
-
-  toggleViewMode(mode: 'table' | 'grid'): void {
-    this.showGrid.set(mode === 'grid');
   }
 
   focusElementWithId(soundEffectId: string): void {

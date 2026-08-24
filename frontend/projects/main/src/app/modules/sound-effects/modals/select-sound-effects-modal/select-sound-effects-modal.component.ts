@@ -13,13 +13,13 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { SelectSoundEffectsSelection } from './select-sound-effects-modal.types';
 import { FormsModule } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
-import { SoundEffectTableComponent } from '../../components/sound-effect-table/sound-effect-table.component';
+import { SoundEffectsDisplayComponent } from '../../components/sound-effects-display/sound-effects-display.component';
 import { AudioPlayerService } from '../../../../services/audio-player.service';
 import { soundEffectToTrack } from '@general/utils/sound-effect-to-track';
 
 @Component({
   selector: 'app-select-sound-effects-modal',
-  imports: [FormsModule, MatButton, SoundEffectTableComponent],
+  imports: [FormsModule, MatButton, SoundEffectsDisplayComponent],
   providers: [AudioPlayerService],
   templateUrl: './select-sound-effects-modal.component.html',
   styleUrl: './select-sound-effects-modal.component.scss',
