@@ -17,14 +17,12 @@ import { SortDirection } from '@shared/models/common.model';
 import { ActionsMenuBaseConfig } from '@general/components/display/actions-menu/actions-menu.component';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { MatButton } from '@angular/material/button';
+import { PaginationConfig } from '../../../../models/pagination.model';
+import { PageEvent } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-sound-effects-library',
-  imports: [
-    FilesDropInZoneComponent,
-    SoundEffectsDisplayComponent,
-    MatButton,
-  ],
+  imports: [FilesDropInZoneComponent, SoundEffectsDisplayComponent, MatButton],
   templateUrl: './sound-effects-library.component.html',
   styleUrl: './sound-effects-library.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -34,6 +32,7 @@ export class SoundEffectsLibraryComponent {
   readonly loading = input<boolean>(false);
   readonly playingEffectIds = input<string[]>([]);
   readonly focusSoundEffectId = input<string>();
+  readonly pagination = input<PaginationConfig | undefined>(undefined);
 
   readonly uploadAudioFiles = output<AudioTrack[]>();
   readonly playEffect = output<SoundEffect>();
@@ -45,11 +44,14 @@ export class SoundEffectsLibraryComponent {
   readonly deleteSoundEffect = output<SoundEffect>();
   readonly reorderDrop = output<CdkDragDrop<SoundEffect[]>>();
   readonly openAudioFilesDialog = output<void>();
+  readonly search = output<string>();
+  readonly pageChange = output<PageEvent>();
 
-  readonly currentSearch = signal<string | undefined>(undefined);
+  readonly currentSearch = signal<string>('');
   readonly currentQueryOptions = computed<QueryOptions>(() => {
+    const search = this.currentSearch();
     return {
-      search: this.currentSearch(),
+      search: search.length > 0 ? search : undefined,
       sortBy: 'name',
       sortDirection: SortDirection.ASC,
     };

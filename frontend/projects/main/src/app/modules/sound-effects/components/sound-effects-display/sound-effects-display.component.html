@@ -45,4 +45,17 @@
       />
     }
   </div>
+  @let pagination = paginationConfig();
+  @if (pagination) {
+    <div class="footer">
+      <mat-paginator
+        [length]="pagination.totalItems"
+        [pageSize]="pagination.pageSize"
+        [pageSizeOptions]="pagination.pageSizeOptions"
+        [pageIndex]="pagination.currentPageIndex"
+        aria-label="Select page"
+        (page)="pageChange.emit($event)"
+      ></mat-paginator>
+    </div>
+  }
 </div>

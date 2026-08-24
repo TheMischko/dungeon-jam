@@ -12,11 +12,13 @@
     [loading]="loading()"
     [currentlyPlaying]="playingEffectIds()"
     [actionsMenu]="actionMenuConfig"
+    [paginationConfig]="pagination()"
     (playEffect)="playEffect.emit($event)"
     (stopEffect)="stopEffect.emit($event)"
     (toggleEffectLoop)="toggleEffectLoop.emit($event)"
     (effectVolumeChange)="effectVolumeChange.emit($event)"
     (reorderDrop)="reorderDrop.emit($event)"
     (search)="currentSearch.set($event)"
+    (pageChange)="pageChange.emit($event)"
   />
 </app-songs-drop-in-zone>

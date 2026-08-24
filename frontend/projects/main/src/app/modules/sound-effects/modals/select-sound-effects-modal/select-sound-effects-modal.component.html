@@ -6,7 +6,7 @@
   <div class="content">
     <app-sound-effects-display
       class="table"
-      [soundEffects]="soundEffects()"
+      [soundEffects]="paginatedSoundEffects()"
       [viewMode]="'table'"
       [hideToggle]="true"
       [selection]="true"
@@ -15,9 +15,12 @@
       [loading]="loading()"
       [currentlyPlaying]="currentlyPlayingList()"
       [hiddenColumns]="['actions', 'looping', 'volume']"
+      [paginationConfig]="paginationConfig()"
       (selectionChange)="selectionChanged($event)"
       (playEffect)="playEffect($event)"
       (stopEffect)="stopEffect()"
+      (search)="currentSearch.set($event)"
+      (pageChange)="updatePaginationPage($event)"
     />
   </div>
 

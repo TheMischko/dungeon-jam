@@ -14,6 +14,8 @@ import { SoundEffectDisplayModeSwitchComponent } from '../sound-effect-display-m
 import { SoundEffectCardGridComponent } from '../sound-effect-card-grid/sound-effect-card-grid.component';
 import { SoundEffectTableComponent } from '../sound-effect-table/sound-effect-table.component';
 import { SoundEffectVolumeChange } from '../../pages/sound-effects-library/sound-effects-library-smart/sound-effects-library-smart.component';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { PaginationConfig } from '../../../../models/pagination.model';
 
 @Component({
   selector: 'app-sound-effects-display',
@@ -22,6 +24,7 @@ import { SoundEffectVolumeChange } from '../../pages/sound-effects-library/sound
     SoundEffectDisplayModeSwitchComponent,
     SoundEffectCardGridComponent,
     SoundEffectTableComponent,
+    MatPaginator,
   ],
   templateUrl: './sound-effects-display.component.html',
   styleUrl: './sound-effects-display.component.scss',
@@ -34,6 +37,7 @@ export class SoundEffectsDisplayComponent {
   readonly currentlyPlaying = input<string[]>([]);
   readonly viewMode = input<'grid' | 'table'>('grid');
   readonly hideToggle = input<boolean>(false);
+  readonly paginationConfig = input<PaginationConfig | undefined>(undefined);
 
   readonly selection = input<boolean>(false);
   readonly initialSelection = input<SoundEffect[]>();
@@ -50,6 +54,7 @@ export class SoundEffectsDisplayComponent {
   readonly effectVolumeChange = output<SoundEffectVolumeChange>();
   readonly reorderDrop = output<CdkDragDrop<SoundEffect[]>>();
   readonly selectionChange = output<SoundEffect[]>();
+  readonly pageChange = output<PageEvent>();
 
   readonly activeViewMode = linkedSignal(() => this.viewMode());
   readonly cardSize = signal<number>(0.75);
