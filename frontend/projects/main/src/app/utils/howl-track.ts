@@ -147,6 +147,7 @@ export class HowlTrack {
       return;
     }
     this.howl.pause();
+    this.trackStateSubject.next(PlayingTrackState.PAUSED);
   }
 
   resume(): void {
@@ -154,11 +155,13 @@ export class HowlTrack {
       return;
     }
     this.howl.play();
+    this.trackStateSubject.next(PlayingTrackState.PLAYING);
   }
 
   stop(): void {
     this.stopWatchdog();
     this.fadeSubscription?.unsubscribe();
+    this.trackStateSubject.next(PlayingTrackState.NONE);
     if (this.howl) {
       this.howl.stop();
       this.howl.unload();
