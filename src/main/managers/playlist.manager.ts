@@ -129,7 +129,10 @@ export class PlaylistManager {
       OrderableEntityType.Playlist,
       PlaylistOrderContext.Landing
     );
-    if (orderMap.size !== playlists.length) {
+    const noSearch = query?.search === undefined || query?.search?.length === 0;
+    const noFilters =
+      query?.filters === undefined || query?.filters.filters.length === 0;
+    if (orderMap.size !== playlists.length && noSearch && noFilters) {
       orderMap = await this.repairOrderRecords(
         playlists,
         PlaylistOrderContext.Landing

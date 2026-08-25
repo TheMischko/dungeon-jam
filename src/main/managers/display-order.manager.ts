@@ -171,7 +171,7 @@ export class DisplayOrderManager {
       return;
     }
     const anchor: DisplayOrder | undefined = query.anchorEntityId
-      ? orderedEntityList.find((e) => e.entityId === anchor!.id)
+      ? orderedEntityList.find((e) => e.entityId === query.anchorEntityId)
       : undefined;
     if (query.anchorEntityId && !anchor) {
       this.logger.logErrorMessage('Cannot find anchor entity to change order', {
@@ -266,6 +266,15 @@ export class DisplayOrderManager {
     contextType: string,
     contextId?: string
   ): Promise<Map<string, DisplayOrder>> {
+    if (items.length === 0) {
+      this.logger.logErrorMessage(
+        'Refusing to repair collection with empty list of items',
+        {
+          context: { entityType, contextType, contextId },
+        }
+      );
+      return this.getOrderMap(entityType, contextType, contextId);
+    }
     const healedRecords: DisplayOrderBase[] = [];
 
     const currentOrderMap = await this.getOrderMap(

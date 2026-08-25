@@ -35,6 +35,7 @@ import {
 import { QueryRequest } from '@shared/models/request.model';
 import { SortDirection } from '@shared/models/common.model';
 import { PlaylistToastService } from '@general/services/toast/playlist-toast.service';
+import { DisplayOrderPlacement } from '@shared/models/display-order.model';
 
 type PlaylistStoreState = {
   loading: boolean;
@@ -215,6 +216,23 @@ export const PlaylistStore = signalStore(
         )
       );
 
+      const changeRelativeOrder = rxMethod<{
+        playlistId: string;
+        anchorId: string | undefined;
+        placement: DisplayOrderPlacement;
+      }>(
+        pipe(
+          switchMap((query) => {
+            return playlistApiService.reorderPlaylistRelative(
+              query.playlistId,
+              query.anchorId,
+              query.placement,
+              PlaylistOrderContext.Landing
+            );
+          })
+        )
+      );
+
       const deletePlaylist = rxMethod<string>(
         pipe(
           switchMap((playlistId) => {
@@ -240,6 +258,7 @@ export const PlaylistStore = signalStore(
         getParent,
         updatePlaylist,
         changeOrder,
+        changeRelativeOrder,
         deletePlaylist,
       };
     }

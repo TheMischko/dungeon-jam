@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
@@ -7,7 +8,6 @@ import {
   OnInit,
   signal,
   untracked,
-  ChangeDetectionStrategy,
 } from '@angular/core';
 import { PlaylistGridComponent } from '../playlist-grid.component';
 import { Playlist, PlaylistUpdateQuery } from '@shared/models/playlist.model';
@@ -35,6 +35,7 @@ import {
   ConfirmationDialogData,
 } from '../../../../../../components/dialog/confirmation-dialog/confirmation-dialog.component';
 import { PlaylistParentFilterChange } from '../../../../components/playlist-parent-filter/playlist-parent-filter.component';
+import { DisplayOrderPlacement } from '@shared/models/display-order.model';
 
 @Component({
   selector: 'app-playlist-grid-smart',
@@ -199,15 +200,44 @@ export class PlaylistGridSmartComponent implements OnInit {
   }
 
   protected reorderPlaylist(event: CdkDragDrop<PlaylistWithTagData[]>) {
-    const item = this.playlists()[event.previousIndex];
+    const dataSet = this.dataSet();
+    const item = dataSet[event.previousIndex];
+    if (!item) {
+      return;
+    }
+
+    const anchor = dataSet[event.currentIndex];
+    const placement =
+      event.currentIndex > event.previousIndex
+        ? DisplayOrderPlacement.AFTER
+        : DisplayOrderPlacement.BEFORE;
+    this.playlistStore.changeRelativeOrder({
+      playlistId: item.id,
+      anchorId: anchor?.id,
+      placement,
+    });
+
     this.playlists.update((playlists) => {
       const update = [...playlists];
-      moveItemInArray(update, event.previousIndex, event.currentIndex);
+      const fromIndex = update.findIndex((p) => p.id === item.id);
+      if (fromIndex === -1) {
+        return update;
+      }
+
+      let toIndex: number;
+      if (!anchor) {
+        toIndex =
+          placement === DisplayOrderPlacement.BEFORE ? 0 : update.length - 1;
+      } else {
+        const anchorIndex = update.findIndex((p) => p.id === anchor.id);
+        if (anchorIndex === -1) {
+          return update;
+        }
+        toIndex = anchorIndex;
+      }
+
+      moveItemInArray(update, fromIndex, toIndex);
       return update;
-    });
-    this.playlistStore.changeOrder({
-      playlistId: item.id,
-      newOrder: event.currentIndex,
     });
   }
 
