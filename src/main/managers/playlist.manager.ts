@@ -5,6 +5,7 @@ import {
   PlaylistFetchQuery,
   PlaylistInsertQuery,
   PlaylistOrderContext,
+  PlaylistRelativeReorderQuery,
   PlaylistReorderQuery,
   PlaylistUpdateQuery,
 } from '@shared/models/playlist.model';
@@ -110,6 +111,13 @@ export class PlaylistManager {
       withAppError(async (_, id: string) => {
         this.logger.log('Deleting playlist', { id });
         return await this.delete(id);
+      })
+    );
+    ipcMain.handle(
+      PlaylistChannel.CHANGE_RELATIVE_ORDER,
+      withAppError(async (_, query: PlaylistRelativeReorderQuery) => {
+        this.logger.log('Changing relative order of a playlist', { query });
+        return await this.changePlaylistRelativeOrder(query);
       })
     );
   }
@@ -411,6 +419,17 @@ export class PlaylistManager {
     return await this.displayOrderManager.setDisplayOrder(
       query.playlistId,
       query.newOrder,
+      OrderableEntityType.Playlist,
+      query.contextType,
+      query.contextId
+    );
+  }
+
+  async changePlaylistRelativeOrder(
+    query: PlaylistRelativeReorderQuery
+  ): Promise<void> {
+    return await this.displayOrderManager.setRelativeDisplayOrder(
+      query,
       OrderableEntityType.Playlist,
       query.contextType,
       query.contextId

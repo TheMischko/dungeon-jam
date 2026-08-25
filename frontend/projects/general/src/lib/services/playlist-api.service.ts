@@ -9,6 +9,7 @@ import {
   PlaylistOrderContext,
   PlaylistUpdateQuery,
 } from '@shared/models/playlist.model';
+import { DisplayOrderPlacement } from '@shared/models/display-order.model';
 
 @Injectable({
   providedIn: 'root',
@@ -98,6 +99,32 @@ export class PlaylistApiService {
     this.window.PLAYLIST_API.changePlaylistOrder({
       playlistId,
       newOrder,
+      contextType: context,
+      contextId: parentId,
+    })
+      .then(() => {
+        subject.next();
+        subject.complete();
+      })
+      .catch((err) => {
+        subject.error(err);
+        subject.complete();
+      });
+    return subject;
+  }
+
+  reorderPlaylistRelative(
+    playlistId: string,
+    anchorEntityId: string | undefined,
+    placement: DisplayOrderPlacement,
+    context: PlaylistOrderContext,
+    parentId?: string
+  ): Observable<void> {
+    const subject = new Subject<void>();
+    this.window.PLAYLIST_API.changePlaylistRelativeOrder({
+      entityId: playlistId,
+      anchorEntityId,
+      placement,
       contextType: context,
       contextId: parentId,
     })

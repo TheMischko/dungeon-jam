@@ -2,7 +2,9 @@ import { DatabaseProvider } from '../database/database-provider';
 import {
   DisplayOrder,
   DisplayOrderBase,
+  DisplayOrderPlacement,
   OrderableEntityType,
+  RelativeDisplayOrderQuery,
 } from '@shared/models/display-order.model';
 import { DatabaseProviderCreator } from '../database/database-provider-creator';
 import { Logger } from '../utils/logger';
@@ -150,6 +152,48 @@ export class DisplayOrderManager {
     await this.displayOrderProvider.replaceMultiple(changedEntities);
   }
 
+  public async setRelativeDisplayOrder(
+    query: RelativeDisplayOrderQuery,
+    entityType: OrderableEntityType,
+    contextType: string,
+    contextId?: string
+  ): Promise<void> {
+    const orderedEntityList = await this.getMatching(
+      entityType,
+      contextType,
+      contextId
+    );
+    const target = orderedEntityList.find((e) => e.entityId === query.entityId);
+    if (!target) {
+      this.logger.logErrorMessage('Cannot find entity to change order', {
+        query,
+      });
+      return;
+    }
+    const anchor: DisplayOrder | undefined = query.anchorEntityId
+      ? orderedEntityList.find((e) => e.entityId === anchor!.id)
+      : undefined;
+    if (query.anchorEntityId && !anchor) {
+      this.logger.logErrorMessage('Cannot find anchor entity to change order', {
+        query,
+      });
+      return;
+    }
+
+    const newOrder = this.resolveAbsoluteOrder(
+      orderedEntityList,
+      anchor,
+      query.placement
+    );
+    await this.setDisplayOrder(
+      query.entityId,
+      newOrder,
+      entityType,
+      contextType,
+      contextId
+    );
+  }
+
   public async replaceCollection(
     batch: DisplayOrderBase[],
     entityType: OrderableEntityType,
@@ -284,5 +328,20 @@ export class DisplayOrderManager {
       return false;
     }
     return !(contextId && orderItem.contextId !== contextId);
+  }
+
+  private resolveAbsoluteOrder(
+    orderedEntityList: DisplayOrder[],
+    anchor: DisplayOrder | undefined,
+    placement: DisplayOrderPlacement
+  ) {
+    if (!anchor) {
+      return placement === DisplayOrderPlacement.BEFORE
+        ? 0
+        : orderedEntityList.length - 1;
+    }
+    return placement === DisplayOrderPlacement.BEFORE
+      ? anchor.order
+      : anchor.order + 1;
   }
 }

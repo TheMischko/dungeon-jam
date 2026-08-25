@@ -26,6 +26,7 @@ import {
   Playlist,
   PlaylistAddTracksData,
   PlaylistInsertQuery,
+  PlaylistRelativeReorderQuery,
   PlaylistReorderQuery,
   PlaylistUpdateQuery,
 } from '@shared/models/playlist.model';
@@ -122,6 +123,9 @@ declare global {
       ) => Promise<Map<string, Playlist>>;
       updatePlaylist: (query: PlaylistUpdateQuery) => Promise<Playlist>;
       changePlaylistOrder: (query: PlaylistReorderQuery) => Promise<void>;
+      changePlaylistRelativeOrder: (
+        query: PlaylistRelativeReorderQuery,
+      ) => Promise<void>;
     };
     TAG_API: {
       getAllTags: (query: QueryRequest) => Promise<TagData[]>;
@@ -295,6 +299,7 @@ function installWindowApiStubs(): void {
         dateUpdated: new Date(0),
       }),
     changePlaylistOrder: () => Promise.resolve(),
+    changePlaylistRelativeOrder: () => Promise.resolve(),
   };
 
   window.TAG_API = {

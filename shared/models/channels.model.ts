@@ -43,6 +43,7 @@ export enum PlaylistChannel {
   ADD_TRACKS = 'playlists/add-tracks',
   UPDATE = 'playlists/update',
   CHANGE_ORDER = 'playlists/change-order',
+  CHANGE_RELATIVE_ORDER = 'playlists/change-relative-order',
   DELETE = 'playlists/delete',
 }
 

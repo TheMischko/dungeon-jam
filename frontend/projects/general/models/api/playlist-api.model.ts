@@ -3,6 +3,7 @@ import {
   Playlist,
   PlaylistAddTracksData,
   PlaylistInsertQuery,
+  PlaylistRelativeReorderQuery,
   PlaylistReorderQuery,
   PlaylistUpdateQuery,
 } from '@shared/models/playlist.model';
@@ -18,6 +19,9 @@ export type PlaylistApiWindow = Window &
       ) => Promise<Map<string, Playlist>>;
       updatePlaylist: (query: PlaylistUpdateQuery) => Promise<Playlist>;
       changePlaylistOrder: (query: PlaylistReorderQuery) => Promise<void>;
+      changePlaylistRelativeOrder: (
+        query: PlaylistRelativeReorderQuery
+      ) => Promise<void>;
       deletePlaylist: (playlistId: string) => Promise<void>;
     };
   };
