@@ -35,7 +35,10 @@ import {
   ConfirmationDialogData,
 } from '../../../../../../components/dialog/confirmation-dialog/confirmation-dialog.component';
 import { PlaylistParentFilterChange } from '../../../../components/playlist-parent-filter/playlist-parent-filter.component';
-import { DisplayOrderPlacement } from '@shared/models/display-order.model';
+import {
+  DisplayOrder,
+  DisplayOrderPlacement,
+} from '@shared/models/display-order.model';
 
 @Component({
   selector: 'app-playlist-grid-smart',
@@ -61,6 +64,13 @@ export class PlaylistGridSmartComponent implements OnInit {
   readonly sortDirection = signal<SortDirection>(SortDirection.ASC);
   readonly sortBy = signal<Extract<keyof Playlist, string>>('order');
   readonly parent = signal<PlaylistParentFilterChange>(null);
+  readonly parentId = computed<string | undefined>(() => {
+    const parent = this.parent();
+    if (parent === 'no-parent') {
+      return undefined;
+    }
+    return parent ?? undefined;
+  });
 
   readonly playlists = signal<Playlist[]>([]);
   readonly dataSet = computed<PlaylistWithTagData[]>(() => {
@@ -113,9 +123,12 @@ export class PlaylistGridSmartComponent implements OnInit {
   );
 
   constructor() {
+    this.playlistStore.updateOrderMap(this.parentId);
+
     effect(() => {
       const playlists = this.playlistStore.entities();
-      this.playlists.set(playlists);
+      const orderMap = this.playlistStore.latestOrderMap?.();
+      this.playlists.set(this.orderPlaylists(playlists, orderMap));
       if (!playlists?.length) {
         return;
       }
@@ -292,6 +305,22 @@ export class PlaylistGridSmartComponent implements OnInit {
 
   protected updateParent(parent: PlaylistParentFilterChange) {
     this.parent.set(parent);
+  }
+
+  private orderPlaylists(
+    playlists: Playlist[],
+    orderMap: Map<string, DisplayOrder> | undefined
+  ): Playlist[] {
+    if (!orderMap) {
+      return playlists;
+    }
+    return playlists.sort((a, b) => {
+      const orderA =
+        orderMap.get(a.id)?.order ?? a.order ?? Number.MAX_SAFE_INTEGER;
+      const orderB =
+        orderMap.get(b.id)?.order ?? b.order ?? Number.MAX_SAFE_INTEGER;
+      return orderA - orderB;
+    });
   }
 }
 

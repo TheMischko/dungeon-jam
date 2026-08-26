@@ -34,3 +34,10 @@ export enum DisplayOrderPlacement {
   BEFORE = 'before',
   AFTER = 'after',
 }
+
+export interface DisplayOrderMapQuery {
+  entityType: OrderableEntityType;
+  contextType: string;
+  contextId?: string;
+}
+

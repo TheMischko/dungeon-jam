@@ -21,7 +21,10 @@ import { PlaylistHelper } from '../utils/playlist-helper';
 import { ImageEntityType, ImageManager } from './image.manager';
 import { Logger } from '../utils/logger';
 import { DisplayOrderManager } from './display-order.manager';
-import { OrderableEntityType } from '@shared/models/display-order.model';
+import {
+  DisplayOrder,
+  OrderableEntityType,
+} from '@shared/models/display-order.model';
 import { createAppError } from '../utils/create-app-error';
 import { ErrorCode } from '@shared/models/error.model';
 import { withAppError } from '../utils/ipc-handler';
@@ -430,7 +433,7 @@ export class PlaylistManager {
 
   async changePlaylistRelativeOrder(
     query: PlaylistRelativeReorderQuery
-  ): Promise<void> {
+  ): Promise<Map<string, DisplayOrder>> {
     return await this.displayOrderManager.setRelativeDisplayOrder(
       query,
       OrderableEntityType.Playlist,

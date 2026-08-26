@@ -2,6 +2,7 @@ import { DatabaseProvider } from '../database/database-provider';
 import {
   DisplayOrder,
   DisplayOrderBase,
+  DisplayOrderMapQuery,
   DisplayOrderPlacement,
   OrderableEntityType,
   RelativeDisplayOrderQuery,
@@ -9,6 +10,9 @@ import {
 import { DatabaseProviderCreator } from '../database/database-provider-creator';
 import { Logger } from '../utils/logger';
 import { v4 as uuid } from 'uuid';
+import { ipcMain } from 'electron';
+import { DisplayOrderChannel } from '@shared/models/channels.model';
+import { withAppError } from '../utils/ipc-handler';
 
 export class DisplayOrderManager {
   private static instance: DisplayOrderManager;
@@ -27,8 +31,23 @@ export class DisplayOrderManager {
         .setIdColumn('id')
         .complete();
       this.instance = new DisplayOrderManager(databaseProvider);
+      this.instance.registerChannels();
     }
     return this.instance;
+  }
+
+  private registerChannels(): void {
+    ipcMain.handle(
+      DisplayOrderChannel.GET_ORDER_MAP,
+      withAppError((_, query: DisplayOrderMapQuery) => {
+        this.logger.log('Received request to get display order map', { query });
+        return this.getOrderMap(
+          query.entityType,
+          query.contextType,
+          query.contextId
+        );
+      })
+    );
   }
 
   public async getOrderMap(
@@ -157,7 +176,7 @@ export class DisplayOrderManager {
     entityType: OrderableEntityType,
     contextType: string,
     contextId?: string
-  ): Promise<void> {
+  ): Promise<Map<string, DisplayOrder>> {
     const orderedEntityList = await this.getMatching(
       entityType,
       contextType,
@@ -168,7 +187,7 @@ export class DisplayOrderManager {
       this.logger.logErrorMessage('Cannot find entity to change order', {
         query,
       });
-      return;
+      return await this.getOrderMap(entityType, contextType, contextId);
     }
     const anchor: DisplayOrder | undefined = query.anchorEntityId
       ? orderedEntityList.find((e) => e.entityId === query.anchorEntityId)
@@ -177,7 +196,7 @@ export class DisplayOrderManager {
       this.logger.logErrorMessage('Cannot find anchor entity to change order', {
         query,
       });
-      return;
+      return await this.getOrderMap(entityType, contextType, contextId);
     }
 
     const newOrder = this.resolveAbsoluteOrder(
@@ -192,6 +211,7 @@ export class DisplayOrderManager {
       contextType,
       contextId
     );
+    return await this.getOrderMap(entityType, contextType, contextId);
   }
 
   public async replaceCollection(

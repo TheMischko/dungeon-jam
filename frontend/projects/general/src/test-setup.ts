@@ -30,6 +30,10 @@ import {
   PlaylistReorderQuery,
   PlaylistUpdateQuery,
 } from '@shared/models/playlist.model';
+import {
+  DisplayOrder,
+  DisplayOrderMapQuery,
+} from '@shared/models/display-order.model';
 import { Tag, TagData, TagDetail } from '@shared/models/tag.model';
 import {
   SoundEffect,
@@ -125,7 +129,7 @@ declare global {
       changePlaylistOrder: (query: PlaylistReorderQuery) => Promise<void>;
       changePlaylistRelativeOrder: (
         query: PlaylistRelativeReorderQuery,
-      ) => Promise<void>;
+      ) => Promise<Map<string, DisplayOrder>>;
     };
     TAG_API: {
       getAllTags: (query: QueryRequest) => Promise<TagData[]>;
@@ -218,6 +222,11 @@ declare global {
         sessionIds: string[],
       ) => Promise<Record<string, string | null>>;
     };
+    DISPLAY_ORDER_API: {
+      getOrderMap: (
+        query: DisplayOrderMapQuery,
+      ) => Promise<Map<string, DisplayOrder>>;
+    };
   }
 }
 
@@ -299,7 +308,7 @@ function installWindowApiStubs(): void {
         dateUpdated: new Date(0),
       }),
     changePlaylistOrder: () => Promise.resolve(),
-    changePlaylistRelativeOrder: () => Promise.resolve(),
+    changePlaylistRelativeOrder: () => Promise.resolve(new Map()),
   };
 
   window.TAG_API = {
@@ -427,6 +436,10 @@ function installWindowApiStubs(): void {
     deleteSession: () => Promise.resolve(),
     getSessionScenes: () => Promise.resolve([]),
     getSessionImages: () => Promise.resolve({}),
+  };
+
+  window.DISPLAY_ORDER_API = {
+    getOrderMap: () => Promise.resolve(new Map()),
   };
 }
 

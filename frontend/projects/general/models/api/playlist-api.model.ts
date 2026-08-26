@@ -7,6 +7,7 @@ import {
   PlaylistReorderQuery,
   PlaylistUpdateQuery,
 } from '@shared/models/playlist.model';
+import { DisplayOrder } from '@shared/models/display-order.model';
 
 export type PlaylistApiWindow = Window &
   typeof globalThis & {
@@ -21,7 +22,7 @@ export type PlaylistApiWindow = Window &
       changePlaylistOrder: (query: PlaylistReorderQuery) => Promise<void>;
       changePlaylistRelativeOrder: (
         query: PlaylistRelativeReorderQuery
-      ) => Promise<void>;
+      ) => Promise<Map<string, DisplayOrder>>;
       deletePlaylist: (playlistId: string) => Promise<void>;
     };
   };

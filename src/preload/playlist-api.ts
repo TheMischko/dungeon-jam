@@ -9,6 +9,7 @@ import {
   PlaylistReorderQuery,
   PlaylistUpdateQuery,
 } from '@shared/models/playlist.model';
+import { DisplayOrder } from '@shared/models/display-order.model';
 
 const getAllPlaylists = async (options: QueryRequest): Promise<Playlist[]> => {
   return await ipcRenderer.invoke(PlaylistChannel.GET_ALL, options);
@@ -42,7 +43,7 @@ const changePlaylistOrder = async (
 
 const changePlaylistRelativeOrder = async (
   query: PlaylistRelativeReorderQuery
-): Promise<void> => {
+): Promise<Map<string, DisplayOrder>> => {
   return await ipcRenderer.invoke(
     PlaylistChannel.CHANGE_RELATIVE_ORDER,
     query

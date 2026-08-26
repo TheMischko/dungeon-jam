@@ -121,6 +121,10 @@ export enum NotificationChannel {
   PUSH = 'notification/push',
 }
 
+export enum DisplayOrderChannel {
+  GET_ORDER_MAP = 'display-order/get-order-map',
+}
+
 export enum UpdateChannel {
   GET_UPDATE_INFO = 'update/get-info',
   UPDATE_APP = 'update/update-app',
@@ -142,4 +146,6 @@ export type AppChannel =
   | ImageChannel
   | SceneChannel
   | SessionChannel
-  | NotificationChannel;
+  | NotificationChannel
+  | DisplayOrderChannel
+  | UpdateChannel;
