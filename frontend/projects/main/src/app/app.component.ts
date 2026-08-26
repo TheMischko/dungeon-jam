@@ -51,7 +51,10 @@ export class AppComponent {
   title = 'main';
 
   constructor() {
-    this.autoUpdateService.fetchAndShowUpdates();
+    this.autoUpdateService
+      .showUpdatesIfNotSkipped()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe();
     this.routingListenerService.initialize();
     this.keyboardShortcutService.initialize();
     this.keyboardShortcutService.playPauseToggle$

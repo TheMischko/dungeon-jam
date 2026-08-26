@@ -3,20 +3,25 @@ import { Logger } from '../utils/logger';
 import { ipcMain } from 'electron';
 import { UpdateChannel } from '@shared/models/channels.model';
 import { withAppError } from '../utils/ipc-handler';
-import { AppUpdateInfo } from '@shared/models/application.model';
+import {
+  AppUpdateInfo,
+  UpdatePreferences,
+} from '@shared/models/application.model';
+import { DatabaseWrapper } from '../database/database';
 
 export class UpdateManager {
   private static instance: UpdateManager;
   private logger = new Logger('UpdateManager', 'magenta');
   private updateInfo: UpdateInfo | undefined;
 
-  private constructor() {
+  private constructor(private database: DatabaseWrapper) {
     this.setupAutoUpdater();
   }
 
   public static async getInstance(): Promise<UpdateManager> {
     if (!this.instance) {
-      this.instance = new UpdateManager();
+      const database = await DatabaseWrapper.getInstance();
+      this.instance = new UpdateManager(database);
       this.instance.registerHandlers();
     }
     return this.instance;
@@ -30,9 +35,31 @@ export class UpdateManager {
     ipcMain.handle(
       UpdateChannel.UPDATE_APP,
       withAppError(async () => {
+        const version = this.updateInfo?.version;
+        this.logger.log(`Installing version ${version}.`);
         autoUpdater.autoRunAppAfterInstall = true;
         await autoUpdater.downloadUpdate();
+        await this.writeUpdatePreferences({});
         autoUpdater.quitAndInstall();
+      })
+    );
+    ipcMain.handle(
+      UpdateChannel.SKIP_VERSION,
+      withAppError(async () => {
+        const version = this.updateInfo?.version;
+        this.logger.log(`Skipping version ${version}.`);
+        await this.writeUpdatePreferences({
+          skippedVersion: version,
+          skippedVersionDate: new Date().toISOString(),
+        });
+      })
+    );
+    ipcMain.handle(
+      UpdateChannel.GET_PREFERENCES,
+      withAppError(async () => {
+        const preferences = this.readUpdatePreferences();
+        this.logger.log(`Fetching update preferences.`, { preferences });
+        return preferences;
       })
     );
   }
@@ -58,7 +85,6 @@ export class UpdateManager {
     autoUpdater.autoInstallOnAppQuit = false;
     autoUpdater.fullChangelog = true;
     autoUpdater.forceDevUpdateConfig = true;
-
     autoUpdater.on('checking-for-update', () => {
       this.logger.log('Checking for updates...');
     });
@@ -104,5 +130,15 @@ export class UpdateManager {
         error: String(err),
       });
     }
+  }
+
+  private readUpdatePreferences(): UpdatePreferences {
+    return (
+      this.database.readTable<UpdatePreferences>('updatePreferences') ?? {}
+    );
+  }
+
+  private async writeUpdatePreferences(data: UpdatePreferences) {
+    await this.database.updateTable('updatePreferences', data);
   }
 }

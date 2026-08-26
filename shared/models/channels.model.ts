@@ -124,6 +124,8 @@ export enum NotificationChannel {
 export enum UpdateChannel {
   GET_UPDATE_INFO = 'update/get-info',
   UPDATE_APP = 'update/update-app',
+  GET_PREFERENCES = 'update/get-preferences',
+  SKIP_VERSION = 'update/skip-version',
 }
 
 export type AppChannel =
