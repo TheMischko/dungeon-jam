@@ -25,4 +25,8 @@ export class PendingUpdatesModalComponent {
       })) ?? []
     );
   }
+
+  cancel() {
+    this.dialogRef.close();
+  }
 }

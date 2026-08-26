@@ -3,18 +3,17 @@
     <h1>New update available</h1>
   </div>
   <div class="content">
-    @for (update of updates; track update.version){
-      <h2 class="version">Version: {{update.version}}</h2>
-      <div class="notes" [innerHTML]="update.note"></div>
-      @if ($index < updates.length - 1) {
-        <hr />
-      }
+    @for (update of updates; track update.version) {
+      <div class="patch-note">
+        <h3 class="version">{{ update.version }}</h3>
+        <div class="notes" [innerHTML]="update.note"></div>
+      </div>
     }
   </div>
   <div class="footer">
     <div class="buttons">
       <button mat-flat-button color="primary">Install and reload</button>
-      <button mat-flat-button color="neutral">Cancel</button>
+      <button mat-flat-button color="neutral" (click)="cancel()">Cancel</button>
     </div>
   </div>
 </div>

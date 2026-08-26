@@ -21,6 +21,8 @@ export class AutoUpdateService {
           }
 
           const dialog = this.dialogService.open(PendingUpdatesModalComponent, {
+            width: '700px',
+            hasBackdrop: true,
             data: { updates },
           });
           return dialog.afterClosed$.pipe(
