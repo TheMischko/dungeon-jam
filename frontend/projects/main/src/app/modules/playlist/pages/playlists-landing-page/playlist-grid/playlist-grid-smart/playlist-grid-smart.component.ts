@@ -211,10 +211,12 @@ export class PlaylistGridSmartComponent implements OnInit {
       event.currentIndex > event.previousIndex
         ? DisplayOrderPlacement.AFTER
         : DisplayOrderPlacement.BEFORE;
+    const parent = this.parent();
     this.playlistStore.changeRelativeOrder({
       playlistId: item.id,
       anchorId: anchor?.id,
       placement,
+      parentId: parent !== null && parent !== 'no-parent' ? parent : undefined,
     });
 
     this.playlists.update((playlists) => {

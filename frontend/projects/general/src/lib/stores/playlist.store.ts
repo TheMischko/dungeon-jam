@@ -220,6 +220,7 @@ export const PlaylistStore = signalStore(
         playlistId: string;
         anchorId: string | undefined;
         placement: DisplayOrderPlacement;
+        parentId?: string;
       }>(
         pipe(
           switchMap((query) => {
@@ -227,7 +228,10 @@ export const PlaylistStore = signalStore(
               query.playlistId,
               query.anchorId,
               query.placement,
-              PlaylistOrderContext.Landing
+              query.playlistId
+                ? PlaylistOrderContext.Parent
+                : PlaylistOrderContext.Landing,
+              query.parentId
             );
           })
         )
