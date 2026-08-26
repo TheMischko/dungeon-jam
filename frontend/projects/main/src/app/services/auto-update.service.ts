@@ -1,14 +1,7 @@
 import { DestroyRef, inject, Service } from '@angular/core';
 import { UpdateApiWindow } from '@general/models/api/update-api.model';
 import { DialogService } from './dialog.service';
-import {
-  combineLatest,
-  forkJoin,
-  Observable,
-  of,
-  Subject,
-  switchMap,
-} from 'rxjs';
+import { forkJoin, Observable, of, Subject, switchMap } from 'rxjs';
 import {
   AppUpdateInfo,
   UpdatePreferences,
@@ -27,7 +20,7 @@ export class AutoUpdateService {
   fetchAndShowUpdates(): Observable<void> {
     return this.getUpdateInfo().pipe(
       switchMap((updates) => {
-        if (!updates || updates.length > 0) {
+        if (!updates || updates.length === 0) {
           return of(void 0);
         }
         return this.openPendingUpdatesDialog(updates);

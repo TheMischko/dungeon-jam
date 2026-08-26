@@ -12,7 +12,9 @@
   </div>
   <div class="footer">
     <div class="buttons">
-      <button mat-flat-button color="primary">Install and reload</button>
+      <button mat-flat-button color="primary" (click)="confirm()">
+        Install and reload
+      </button>
       <button mat-flat-button color="neutral" (click)="cancel()">Cancel</button>
     </div>
   </div>
