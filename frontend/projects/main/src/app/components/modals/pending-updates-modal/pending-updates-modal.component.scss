@@ -1,0 +1,18 @@
+@use "mixins" as mix;
+@use "typography" as typo;
+
+:host {
+  @include mix.base-dialog();
+
+  h2{
+    @include typo.h2();
+  }
+
+  .notes{
+    @include typo.body1();
+  }
+
+  .wrapper .content {
+    overflow-y: auto;
+  }
+}

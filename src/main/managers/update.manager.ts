@@ -1,9 +1,14 @@
-import { autoUpdater } from 'electron-updater';
+import { autoUpdater, UpdateInfo } from 'electron-updater';
 import { Logger } from '../utils/logger';
+import { ipcMain } from 'electron';
+import { UpdateChannel } from '@shared/models/channels.model';
+import { withAppError } from '../utils/ipc-handler';
+import { AppUpdateInfo } from '@shared/models/application.model';
 
 export class UpdateManager {
   private static instance: UpdateManager;
   private logger = new Logger('UpdateManager', 'magenta');
+  private updateInfo: UpdateInfo | undefined;
 
   private constructor() {
     this.setupAutoUpdater();
@@ -12,14 +17,47 @@ export class UpdateManager {
   public static async getInstance(): Promise<UpdateManager> {
     if (!this.instance) {
       this.instance = new UpdateManager();
+      this.instance.registerHandlers();
     }
     return this.instance;
   }
 
+  private registerHandlers(): void {
+    ipcMain.handle(UpdateChannel.GET_UPDATE_INFO, async () => {
+      await autoUpdater.checkForUpdates();
+      return this.getUpdateData();
+    });
+    ipcMain.handle(
+      UpdateChannel.UPDATE_APP,
+      withAppError(async () => {
+        autoUpdater.autoRunAppAfterInstall = true;
+        await autoUpdater.downloadUpdate();
+        autoUpdater.quitAndInstall();
+      })
+    );
+  }
+
+  getUpdateData(): AppUpdateInfo[] {
+    if (!this.updateInfo) {
+      return [];
+    }
+    if (typeof this.updateInfo.releaseNotes === 'string') {
+      return [
+        {
+          version: this.updateInfo.version,
+          note: this.updateInfo.releaseNotes,
+        },
+      ];
+    }
+    return this.updateInfo.releaseNotes ?? [];
+  }
+
   private setupAutoUpdater(): void {
     autoUpdater.allowPrerelease = true;
-    autoUpdater.autoDownload = true;
-    autoUpdater.autoInstallOnAppQuit = true;
+    autoUpdater.autoDownload = false;
+    autoUpdater.autoInstallOnAppQuit = false;
+    autoUpdater.fullChangelog = true;
+    autoUpdater.forceDevUpdateConfig = true;
 
     autoUpdater.on('checking-for-update', () => {
       this.logger.log('Checking for updates...');
@@ -27,6 +65,7 @@ export class UpdateManager {
 
     autoUpdater.on('update-available', (info) => {
       this.logger.log(`Update available: ${info.version}`);
+      this.updateInfo = info;
     });
 
     autoUpdater.on('update-not-available', () => {

@@ -1,0 +1,20 @@
+<div class="wrapper">
+  <div class="header">
+    <h1>New update available</h1>
+  </div>
+  <div class="content">
+    @for (update of updates; track update.version){
+      <h2 class="version">Version: {{update.version}}</h2>
+      <div class="notes" [innerHTML]="update.note"></div>
+      @if ($index < updates.length - 1) {
+        <hr />
+      }
+    }
+  </div>
+  <div class="footer">
+    <div class="buttons">
+      <button mat-flat-button color="primary">Install and reload</button>
+      <button mat-flat-button color="neutral">Cancel</button>
+    </div>
+  </div>
+</div>
