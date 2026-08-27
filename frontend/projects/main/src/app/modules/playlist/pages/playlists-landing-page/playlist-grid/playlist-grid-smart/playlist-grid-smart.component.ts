@@ -127,7 +127,7 @@ export class PlaylistGridSmartComponent implements OnInit {
 
     effect(() => {
       const playlists = this.playlistStore.entities();
-      const orderMap = this.playlistStore.latestOrderMap?.();
+      const orderMap = this.playlistStore.latestOrderMap();
       this.playlists.set(this.orderPlaylists(playlists, orderMap));
       if (!playlists?.length) {
         return;
@@ -314,7 +314,7 @@ export class PlaylistGridSmartComponent implements OnInit {
     if (!orderMap) {
       return playlists;
     }
-    return playlists.sort((a, b) => {
+    return [...playlists].sort((a, b) => {
       const orderA =
         orderMap.get(a.id)?.order ?? a.order ?? Number.MAX_SAFE_INTEGER;
       const orderB =

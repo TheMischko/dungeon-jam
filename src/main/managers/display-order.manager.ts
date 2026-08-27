@@ -177,26 +177,56 @@ export class DisplayOrderManager {
     contextType: string,
     contextId?: string
   ): Promise<Map<string, DisplayOrder>> {
-    const orderedEntityList = await this.getMatching(
+    let orderedEntityList = await this.getMatching(
       entityType,
       contextType,
       contextId
     );
-    const target = orderedEntityList.find((e) => e.entityId === query.entityId);
+    let target = orderedEntityList.find((e) => e.entityId === query.entityId);
     if (!target) {
-      this.logger.logErrorMessage('Cannot find entity to change order', {
-        query,
-      });
-      return await this.getOrderMap(entityType, contextType, contextId);
+      this.logger.logErrorMessage(
+        'Entity not found in display order context, appending target',
+        {
+          query,
+        }
+      );
+      await this.appendEntity(
+        query.entityId,
+        entityType,
+        contextType,
+        contextId
+      );
+      orderedEntityList = await this.getMatching(
+        entityType,
+        contextType,
+        contextId
+      );
+      target = orderedEntityList.find((e) => e.entityId === query.entityId);
     }
-    const anchor: DisplayOrder | undefined = query.anchorEntityId
+    let anchor: DisplayOrder | undefined = query.anchorEntityId
       ? orderedEntityList.find((e) => e.entityId === query.anchorEntityId)
       : undefined;
     if (query.anchorEntityId && !anchor) {
-      this.logger.logErrorMessage('Cannot find anchor entity to change order', {
-        query,
-      });
-      return await this.getOrderMap(entityType, contextType, contextId);
+      this.logger.logErrorMessage(
+        'Anchor not found in display order context, appending anchor',
+        {
+          query,
+        }
+      );
+      await this.appendEntity(
+        query.anchorEntityId,
+        entityType,
+        contextType,
+        contextId
+      );
+      orderedEntityList = await this.getMatching(
+        entityType,
+        contextType,
+        contextId
+      );
+      anchor = orderedEntityList.find(
+        (e) => e.entityId === query.anchorEntityId
+      );
     }
 
     const newOrder = this.resolveAbsoluteOrder(

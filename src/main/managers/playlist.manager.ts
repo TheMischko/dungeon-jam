@@ -434,6 +434,9 @@ export class PlaylistManager {
   async changePlaylistRelativeOrder(
     query: PlaylistRelativeReorderQuery
   ): Promise<Map<string, DisplayOrder>> {
+    if (query.contextType === PlaylistOrderContext.Parent && query.contextId) {
+      await this.ensureParentOrderContext(query.contextId);
+    }
     return await this.displayOrderManager.setRelativeDisplayOrder(
       query,
       OrderableEntityType.Playlist,
@@ -616,5 +619,31 @@ export class PlaylistManager {
       ...parent,
       childrenIds,
     });
+  }
+
+  private async ensureParentOrderContext(parentId: string) {
+    const allPlaylists = await this.getAll();
+    const childPlaylists = allPlaylists.filter(
+      (p) => p.ownershipId === parentId
+    );
+
+    const orderMap = await this.displayOrderManager.getOrderMap(
+      OrderableEntityType.Playlist,
+      PlaylistOrderContext.Parent,
+      parentId
+    );
+
+    if (orderMap.size !== childPlaylists.length) {
+      this.logger.log('Fixing parent display order', {
+        parentId: parentId,
+        childCount: childPlaylists.length,
+        childNames: childPlaylists.map((p) => p.name),
+      });
+      await this.repairOrderRecords(
+        childPlaylists,
+        PlaylistOrderContext.Parent,
+        parentId
+      );
+    }
   }
 }

@@ -44,7 +44,7 @@ type PlaylistStoreState = {
   loading: boolean;
   lastLoadQuery: QueryRequest;
   allParents: Playlist[];
-  latestOrderMap?: Map<string, DisplayOrder>;
+  latestOrderMap: Map<string, DisplayOrder>;
 };
 const initialState: PlaylistStoreState = {
   loading: false,
@@ -53,6 +53,7 @@ const initialState: PlaylistStoreState = {
     sortDirection: SortDirection.ASC,
   },
   allParents: [],
+  latestOrderMap: new Map(),
 };
 const playlistConfig = entityConfig({
   entity: type<Playlist>(),
@@ -252,7 +253,7 @@ export const PlaylistStore = signalStore(
                 query.playlistId,
                 query.anchorId,
                 query.placement,
-                query.playlistId
+                query.parentId
                   ? PlaylistOrderContext.Parent
                   : PlaylistOrderContext.Landing,
                 query.parentId
