@@ -89,6 +89,7 @@ export enum SoundEffectChannel {
   GET_BY_ID = 'sound-effects/get-by-id',
   GET_ALL = 'sound-effects/get-all',
   CHANGE_ORDER = 'sound-effect/change-order',
+  CHANGE_RELATIVE_ORDER = 'sound-effect/change-relative-order',
 }
 
 export enum ImageChannel {

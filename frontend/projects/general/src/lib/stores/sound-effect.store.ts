@@ -32,15 +32,21 @@ import {
 } from 'rxjs';
 import { inject } from '@angular/core';
 import { SoundEffectService } from '@general/services/sound-effect.service';
+import {
+  DisplayOrder,
+  DisplayOrderPlacement,
+} from '@shared/models/display-order.model';
 
 type SoundEffectStoreState = {
   loading: boolean;
   lastLoadOptions: QueryOptions | null;
+  latestOrderMap: Map<string, DisplayOrder>;
 };
 
 const initialState: SoundEffectStoreState = {
   loading: false,
   lastLoadOptions: null,
+  latestOrderMap: new Map(),
 };
 
 const soundEffectConfig = entityConfig({
@@ -78,6 +84,13 @@ export const SoundEffectStore = signalStore(
             }),
             finalize(() => {
               patchState(store, { loading: false });
+            })
+          );
+        }),
+        switchMap(() => {
+          return soundEffectService.getDisplayOrder().pipe(
+            tap((orderMap) => {
+              patchState(store, { latestOrderMap: orderMap });
             })
           );
         })
@@ -162,17 +175,25 @@ export const SoundEffectStore = signalStore(
       )
     );
 
-    const reorderSoundEffects = rxMethod<{
+    const changeRelativeOrder = rxMethod<{
       soundEffectId: string;
-      newOrder: number;
+      anchorId?: string;
+      placement: DisplayOrderPlacement;
     }>(
       pipe(
-        switchMap((request) => {
-          return soundEffectService.reorderSoundEffect(
-            request.soundEffectId,
-            request.newOrder,
-            SoundEffectContextType.Landing
-          );
+        switchMap((query) => {
+          return soundEffectService
+            .reorderSoundEffectRelative(
+              query.soundEffectId,
+              query.anchorId,
+              query.placement,
+              SoundEffectContextType.Landing
+            )
+            .pipe(
+              tap((orderMap) => {
+                patchState(store, { latestOrderMap: orderMap });
+              })
+            );
         })
       )
     );
@@ -182,7 +203,7 @@ export const SoundEffectStore = signalStore(
       createEffect,
       updateEffect,
       deleteEffect,
-      reorderSoundEffects,
+      changeRelativeOrder,
     };
   })
 );
