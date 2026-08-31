@@ -1,3 +1,5 @@
+import { RelativeDisplayOrderQuery } from '@shared/models/display-order.model';
+
 export interface SoundEffect {
   id: string;
   name: string;
@@ -34,6 +36,11 @@ export enum SoundEffectContextType {
 export interface SoundEffectReorderQuery {
   soundEffectId: string;
   newOrder: number;
+  contextType: SoundEffectContextType;
+  contextId?: string;
+}
+
+export interface SoundEffectRelativeReorderQuery extends RelativeDisplayOrderQuery {
   contextType: SoundEffectContextType;
   contextId?: string;
 }

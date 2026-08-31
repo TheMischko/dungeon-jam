@@ -6,6 +6,7 @@ import { SoundEffect } from '@shared/models/sound-effect.model';
 import { DisplayOrder } from '@shared/models/display-order.model';
 import { Scene } from '@shared/models/scene.model';
 import { SessionData } from '@shared/models/session.model';
+import { UpdatePreferences } from '@shared/models/application.model';
 
 export function initDatabase() {
   return {
@@ -18,6 +19,7 @@ export function initDatabase() {
     displayOrder: initDisplayOrder(),
     scenes: initScenes(),
     sessions: initSessions(),
+    updatePreferences: initUpdatePreferences(),
   };
 }
 export type DatabaseSchema = ReturnType<typeof initDatabase>;
@@ -61,4 +63,8 @@ function initScenes(): Scene[] {
 
 function initSessions(): SessionData[] {
   return [];
+}
+
+function initUpdatePreferences(): UpdatePreferences {
+  return {};
 }

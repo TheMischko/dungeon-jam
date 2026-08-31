@@ -7,6 +7,7 @@ import {
   SoundEffect,
   SoundEffectContextType,
   SoundEffectCreateData,
+  SoundEffectRelativeReorderQuery,
   SoundEffectReorderQuery,
   SoundEffectUpdateData,
 } from '@shared/models/sound-effect.model';
@@ -19,7 +20,10 @@ import { SortDirection } from '@shared/models/common.model';
 import { TagsManager } from './tags.manager';
 import { GetSomeMatch } from '../database/database-provider.model';
 import { DisplayOrderManager } from './display-order.manager';
-import { OrderableEntityType } from '@shared/models/display-order.model';
+import {
+  DisplayOrder,
+  OrderableEntityType,
+} from '@shared/models/display-order.model';
 import { withAppError } from '../utils/ipc-handler';
 
 export class SoundEffectManager {
@@ -77,17 +81,21 @@ export class SoundEffectManager {
     );
     ipcMain.handle(
       SoundEffectChannel.CREATE,
-      withAppError(async (_, data: SoundEffectCreateData): Promise<SoundEffect> => {
-        this.logger.log('Creating new sound effect', data);
-        return this.create(data);
-      })
+      withAppError(
+        async (_, data: SoundEffectCreateData): Promise<SoundEffect> => {
+          this.logger.log('Creating new sound effect', data);
+          return this.create(data);
+        }
+      )
     );
     ipcMain.handle(
       SoundEffectChannel.UPDATE,
-      withAppError(async (_, data: SoundEffectUpdateData): Promise<SoundEffect | null> => {
-        this.logger.log('Updating record.', data);
-        return this.update(data);
-      })
+      withAppError(
+        async (_, data: SoundEffectUpdateData): Promise<SoundEffect | null> => {
+          this.logger.log('Updating record.', data);
+          return this.update(data);
+        }
+      )
     );
     ipcMain.handle(
       SoundEffectChannel.DELETE,
@@ -101,6 +109,13 @@ export class SoundEffectManager {
       withAppError(async (_, query: SoundEffectReorderQuery): Promise<void> => {
         this.logger.log('Changing order of a sound effect', { query });
         return await this.changeSoundEffectOrder(query);
+      })
+    );
+    ipcMain.handle(
+      SoundEffectChannel.CHANGE_RELATIVE_ORDER,
+      withAppError(async (_, query: SoundEffectRelativeReorderQuery) => {
+        this.logger.log('Changing relative order of a sound effect', { query });
+        return await this.changeRelativeOrder(query);
       })
     );
   }
@@ -132,7 +147,11 @@ export class SoundEffectManager {
       OrderableEntityType.SoundEffect,
       SoundEffectContextType.Landing
     );
-    if (orderMap.size !== soundEffects.length) {
+    if (
+      orderMap.size !== soundEffects.length &&
+      (!query.search || query.search.length === 0) &&
+      !query.filters
+    ) {
       orderMap = await this.repairOrderRecords(
         soundEffects,
         SoundEffectContextType.Landing
@@ -267,4 +286,15 @@ export class SoundEffectManager {
     }
     return matchingTags.some((tag) => sfx.tags!.includes(tag.id));
   };
+
+  private async changeRelativeOrder(
+    query: SoundEffectRelativeReorderQuery
+  ): Promise<Map<string, DisplayOrder>> {
+    return await this.displayOrderManager.setRelativeDisplayOrder(
+      query,
+      OrderableEntityType.SoundEffect,
+      query.contextType,
+      query.contextId
+    );
+  }
 }
