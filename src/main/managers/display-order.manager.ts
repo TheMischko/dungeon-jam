@@ -2,11 +2,17 @@ import { DatabaseProvider } from '../database/database-provider';
 import {
   DisplayOrder,
   DisplayOrderBase,
+  DisplayOrderMapQuery,
+  DisplayOrderPlacement,
   OrderableEntityType,
+  RelativeDisplayOrderQuery,
 } from '@shared/models/display-order.model';
 import { DatabaseProviderCreator } from '../database/database-provider-creator';
 import { Logger } from '../utils/logger';
 import { v4 as uuid } from 'uuid';
+import { ipcMain } from 'electron';
+import { DisplayOrderChannel } from '@shared/models/channels.model';
+import { withAppError } from '../utils/ipc-handler';
 
 export class DisplayOrderManager {
   private static instance: DisplayOrderManager;
@@ -25,8 +31,23 @@ export class DisplayOrderManager {
         .setIdColumn('id')
         .complete();
       this.instance = new DisplayOrderManager(databaseProvider);
+      this.instance.registerChannels();
     }
     return this.instance;
+  }
+
+  private registerChannels(): void {
+    ipcMain.handle(
+      DisplayOrderChannel.GET_ORDER_MAP,
+      withAppError((_, query: DisplayOrderMapQuery) => {
+        this.logger.log('Received request to get display order map', { query });
+        return this.getOrderMap(
+          query.entityType,
+          query.contextType,
+          query.contextId
+        );
+      })
+    );
   }
 
   public async getOrderMap(
@@ -150,6 +171,79 @@ export class DisplayOrderManager {
     await this.displayOrderProvider.replaceMultiple(changedEntities);
   }
 
+  public async setRelativeDisplayOrder(
+    query: RelativeDisplayOrderQuery,
+    entityType: OrderableEntityType,
+    contextType: string,
+    contextId?: string
+  ): Promise<Map<string, DisplayOrder>> {
+    let orderedEntityList = await this.getMatching(
+      entityType,
+      contextType,
+      contextId
+    );
+    let target = orderedEntityList.find((e) => e.entityId === query.entityId);
+    if (!target) {
+      this.logger.logErrorMessage(
+        'Entity not found in display order context, appending target',
+        {
+          query,
+        }
+      );
+      await this.appendEntity(
+        query.entityId,
+        entityType,
+        contextType,
+        contextId
+      );
+      orderedEntityList = await this.getMatching(
+        entityType,
+        contextType,
+        contextId
+      );
+      target = orderedEntityList.find((e) => e.entityId === query.entityId);
+    }
+    let anchor: DisplayOrder | undefined = query.anchorEntityId
+      ? orderedEntityList.find((e) => e.entityId === query.anchorEntityId)
+      : undefined;
+    if (query.anchorEntityId && !anchor) {
+      this.logger.logErrorMessage(
+        'Anchor not found in display order context, appending anchor',
+        {
+          query,
+        }
+      );
+      await this.appendEntity(
+        query.anchorEntityId,
+        entityType,
+        contextType,
+        contextId
+      );
+      orderedEntityList = await this.getMatching(
+        entityType,
+        contextType,
+        contextId
+      );
+      anchor = orderedEntityList.find(
+        (e) => e.entityId === query.anchorEntityId
+      );
+    }
+
+    const newOrder = this.resolveAbsoluteOrder(
+      orderedEntityList,
+      anchor,
+      query.placement
+    );
+    await this.setDisplayOrder(
+      query.entityId,
+      newOrder,
+      entityType,
+      contextType,
+      contextId
+    );
+    return await this.getOrderMap(entityType, contextType, contextId);
+  }
+
   public async replaceCollection(
     batch: DisplayOrderBase[],
     entityType: OrderableEntityType,
@@ -222,6 +316,15 @@ export class DisplayOrderManager {
     contextType: string,
     contextId?: string
   ): Promise<Map<string, DisplayOrder>> {
+    if (items.length === 0) {
+      this.logger.logErrorMessage(
+        'Refusing to repair collection with empty list of items',
+        {
+          context: { entityType, contextType, contextId },
+        }
+      );
+      return this.getOrderMap(entityType, contextType, contextId);
+    }
     const healedRecords: DisplayOrderBase[] = [];
 
     const currentOrderMap = await this.getOrderMap(
@@ -284,5 +387,20 @@ export class DisplayOrderManager {
       return false;
     }
     return !(contextId && orderItem.contextId !== contextId);
+  }
+
+  private resolveAbsoluteOrder(
+    orderedEntityList: DisplayOrder[],
+    anchor: DisplayOrder | undefined,
+    placement: DisplayOrderPlacement
+  ) {
+    if (!anchor) {
+      return placement === DisplayOrderPlacement.BEFORE
+        ? 0
+        : orderedEntityList.length - 1;
+    }
+    return placement === DisplayOrderPlacement.BEFORE
+      ? anchor.order
+      : anchor.order + 1;
   }
 }

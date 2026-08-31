@@ -7,6 +7,7 @@ import {
   SoundEffect,
   SoundEffectContextType,
   SoundEffectCreateData,
+  SoundEffectRelativeReorderQuery,
   SoundEffectReorderQuery,
   SoundEffectUpdateData,
 } from '@shared/models/sound-effect.model';
@@ -19,7 +20,10 @@ import { SortDirection } from '@shared/models/common.model';
 import { TagsManager } from './tags.manager';
 import { GetSomeMatch } from '../database/database-provider.model';
 import { DisplayOrderManager } from './display-order.manager';
-import { OrderableEntityType } from '@shared/models/display-order.model';
+import {
+  DisplayOrder,
+  OrderableEntityType,
+} from '@shared/models/display-order.model';
 import { withAppError } from '../utils/ipc-handler';
 
 export class SoundEffectManager {
@@ -105,6 +109,13 @@ export class SoundEffectManager {
       withAppError(async (_, query: SoundEffectReorderQuery): Promise<void> => {
         this.logger.log('Changing order of a sound effect', { query });
         return await this.changeSoundEffectOrder(query);
+      })
+    );
+    ipcMain.handle(
+      SoundEffectChannel.CHANGE_RELATIVE_ORDER,
+      withAppError(async (_, query: SoundEffectRelativeReorderQuery) => {
+        this.logger.log('Changing relative order of a sound effect', { query });
+        return await this.changeRelativeOrder(query);
       })
     );
   }
@@ -275,4 +286,15 @@ export class SoundEffectManager {
     }
     return matchingTags.some((tag) => sfx.tags!.includes(tag.id));
   };
+
+  private async changeRelativeOrder(
+    query: SoundEffectRelativeReorderQuery
+  ): Promise<Map<string, DisplayOrder>> {
+    return await this.displayOrderManager.setRelativeDisplayOrder(
+      query,
+      OrderableEntityType.SoundEffect,
+      query.contextType,
+      query.contextId
+    );
+  }
 }

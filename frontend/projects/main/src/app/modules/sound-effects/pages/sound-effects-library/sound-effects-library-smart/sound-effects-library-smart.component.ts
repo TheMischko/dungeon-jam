@@ -35,6 +35,10 @@ import {
   PaginationConfig,
 } from '../../../../../models/pagination.model';
 import { PageEvent } from '@angular/material/paginator';
+import {
+  DisplayOrder,
+  DisplayOrderPlacement,
+} from '@shared/models/display-order.model';
 
 @Component({
   selector: 'app-sound-effects-library-smart',
@@ -86,7 +90,8 @@ export class SoundEffectsLibrarySmartComponent {
   constructor() {
     effect(() => {
       const soundEffects = this.soundEffectStore.entities();
-      this.soundEffects.set(soundEffects);
+      const orderMap = this.soundEffectStore.latestOrderMap();
+      this.soundEffects.set(this.orderSoundEffects(soundEffects, orderMap));
     });
     this.soundEffectStore.loadAll(this.currentQueryOptions);
 
@@ -181,18 +186,52 @@ export class SoundEffectsLibrarySmartComponent {
   }
 
   protected reorderSoundEffects(event: CdkDragDrop<SoundEffect[]>) {
-    const soundEffect: SoundEffect | undefined = event.item.data;
+    const soundEffects = this.paginatedSoundEffects();
+    const soundEffect: SoundEffect | undefined =
+      soundEffects[event.previousIndex];
     if (!soundEffect) {
       return;
     }
+
+    const anchor = soundEffects[event.currentIndex];
+    const placement =
+      event.currentIndex > event.previousIndex
+        ? DisplayOrderPlacement.AFTER
+        : DisplayOrderPlacement.BEFORE;
+
+    this.soundEffectStore.changeRelativeOrder({
+      soundEffectId: soundEffect.id,
+      anchorId: anchor?.id,
+      placement,
+    });
+
     this.soundEffects.update((soundEffects) => {
       const newSoundEffects = [...soundEffects];
-      moveItemInArray(newSoundEffects, event.previousIndex, event.currentIndex);
+      const fromIndex = newSoundEffects.findIndex(
+        (s) => s.id === soundEffect.id
+      );
+      if (fromIndex === -1) {
+        return newSoundEffects;
+      }
+
+      let toIndex: number;
+      if (!anchor) {
+        toIndex =
+          placement === DisplayOrderPlacement.BEFORE
+            ? 0
+            : newSoundEffects.length - 1;
+      } else {
+        const anchorIndex = newSoundEffects.findIndex(
+          (s) => s.id === anchor.id
+        );
+        if (anchorIndex === -1) {
+          return newSoundEffects;
+        }
+        toIndex = anchorIndex;
+      }
+
+      moveItemInArray(newSoundEffects, fromIndex, toIndex);
       return newSoundEffects;
-    });
-    this.soundEffectStore.reorderSoundEffects({
-      soundEffectId: soundEffect.id,
-      newOrder: event.currentIndex,
     });
   }
 
@@ -207,6 +246,21 @@ export class SoundEffectsLibrarySmartComponent {
   updatePaginationPage(event: PageEvent): void {
     this.paginationService.pageSize.set(event.pageSize);
     this.paginationService.goToPage(event.pageIndex);
+  }
+
+  private orderSoundEffects(
+    soundEffects: SoundEffect[],
+    orderMap: Map<string, DisplayOrder> | undefined
+  ) {
+    if (!orderMap) {
+      return soundEffects;
+    }
+
+    return [...soundEffects].sort((a, b) => {
+      const orderA = orderMap.get(a.id)?.order ?? Number.MAX_SAFE_INTEGER;
+      const orderB = orderMap.get(b.id)?.order ?? Number.MAX_SAFE_INTEGER;
+      return orderA - orderB;
+    });
   }
 }
 

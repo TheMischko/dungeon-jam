@@ -44,6 +44,7 @@ export class GeneralSettingsPageComponent {
   readonly toggleTokenConnection = output<DiscordTokenData>();
   readonly openLogsDir = output<void>();
   readonly updateTransitionSettings = output<StoredTransitionSettings>();
+  readonly checkUpdates = output<void>();
 
   readonly tokenSectionTemp =
     viewChild.required<TemplateRef<{ $implicit: DiscordTokenData[] }>>(

@@ -19,6 +19,7 @@ import { GeneralSettingsService } from '../../../services/general-settings.servi
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { PlaybackSettingsApiService } from '@general/services/playback-settings-api.service';
 import { StoredTransitionSettings } from '@shared/models/track.model';
+import { AutoUpdateService } from '../../../../../services/auto-update.service';
 
 @Component({
   selector: 'app-general-settings-page-smart',
@@ -31,6 +32,7 @@ export class GeneralSettingsPageSmartComponent implements OnInit {
   private readonly dialog = inject(MatDialog);
   private readonly generalSettingsService = inject(GeneralSettingsService);
   private readonly playbackSettingsService = inject(PlaybackSettingsApiService);
+  private readonly autoUpdateService = inject(AutoUpdateService);
   private readonly destroyRef = inject(DestroyRef);
 
   readonly tokens = this.discordTokenStore.entities;
@@ -108,5 +110,12 @@ export class GeneralSettingsPageSmartComponent implements OnInit {
 
   protected async openLogsDir() {
     await this.generalSettingsService.openLogsDirectory();
+  }
+
+  protected checkUpdates() {
+    this.autoUpdateService
+      .fetchAndShowUpdates()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe();
   }
 }
