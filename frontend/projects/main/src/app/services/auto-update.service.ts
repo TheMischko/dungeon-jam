@@ -1,4 +1,4 @@
-import { DestroyRef, inject, Service } from '@angular/core';
+import { DestroyRef, inject, Injectable } from '@angular/core';
 import { UpdateApiWindow } from '@general/models/api/update-api.model';
 import { DialogService } from './dialog.service';
 import { forkJoin, Observable, of, Subject, switchMap } from 'rxjs';
@@ -9,7 +9,9 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { PendingUpdatesModalComponent } from '../components/modals/pending-updates-modal/pending-updates-modal.component';
 
-@Service()
+@Injectable({
+  providedIn: 'root',
+})
 export class AutoUpdateService {
   private readonly window = <UpdateApiWindow>window;
   private readonly destroyRef = inject(DestroyRef);
@@ -73,10 +75,13 @@ export class AutoUpdateService {
   }
 
   private getUpdateInfo(): Observable<AppUpdateInfo[] | null> {
+    if (!this.window?.UPDATE_API) {
+      return of(null);
+    }
     const response = new Subject<AppUpdateInfo[] | null>();
     this.window.UPDATE_API.getUpdateInfo()
       .then((data: AppUpdateInfo[]) => {
-        if (!data.length) {
+        if (!data?.length) {
           response.next(null);
           response.complete();
           return;
@@ -92,6 +97,9 @@ export class AutoUpdateService {
   }
 
   private installUpdates(): Observable<void> {
+    if (!this.window?.UPDATE_API) {
+      return of(void 0);
+    }
     const response = new Subject<void>();
     this.window.UPDATE_API.updateApp()
       .then(() => {
@@ -106,6 +114,9 @@ export class AutoUpdateService {
   }
 
   private getPreferences(): Observable<UpdatePreferences> {
+    if (!this.window?.UPDATE_API) {
+      return of({});
+    }
     const response = new Subject<UpdatePreferences>();
     this.window.UPDATE_API.getPreferences()
       .then((data) => {
@@ -120,6 +131,9 @@ export class AutoUpdateService {
   }
 
   private cancelUpdate(): Observable<void> {
+    if (!this.window?.UPDATE_API) {
+      return of(void 0);
+    }
     const response = new Subject<void>();
     this.window.UPDATE_API.skipVersion()
       .then(() => {
