@@ -29,6 +29,10 @@ export class HowlTrack {
   private readonly currentObjectUrl: string;
   private timerId: number | undefined;
 
+  private isFading: boolean = false;
+  private pausedTime: number | undefined;
+  private pausedTimeAccumulated: number = 0;
+
   constructor(
     trackData: Blob,
     readonly track: Track,
@@ -93,10 +97,14 @@ export class HowlTrack {
     }
 
     const completionSubject = new Subject<void>();
+    this.isFading = true;
 
     this.fadeSubscription = animationFrames()
       .pipe(
-        map(({ elapsed }) => Math.min(1, Math.max(0, elapsed / durationMs))),
+        map(({ elapsed }) => {
+          const effectiveElapsed = this.getEffectiveElapsedTime(elapsed);
+          return Math.min(1, Math.max(0, effectiveElapsed / durationMs));
+        }),
         takeWhile((progress) => progress < 1, true),
         map((progress) =>
           this.getEqualPowerFadeProgress(progress, startFactor, endFactor)
@@ -104,12 +112,18 @@ export class HowlTrack {
       )
       .subscribe({
         next: (factor) => {
+          if (this.trackStateSubject.getValue() === PlayingTrackState.PAUSED) {
+            return;
+          }
           this.fadeFactorSubject.next(factor);
         },
         complete: () => {
           this.fadeFactorSubject.next(endFactor);
           completionSubject.next();
           completionSubject.complete();
+          this.isFading = false;
+          this.pausedTimeAccumulated = 0;
+          this.pausedTime = undefined;
         },
       });
 
@@ -150,6 +164,7 @@ export class HowlTrack {
     }
     this.howl.pause();
     this.trackStateSubject.next(PlayingTrackState.PAUSED);
+    this.pausedTime = Date.now();
   }
 
   resume(): void {
@@ -159,6 +174,11 @@ export class HowlTrack {
     this.setupWatchdog();
     this.howl.play();
     this.trackStateSubject.next(PlayingTrackState.PLAYING);
+    if (this.isFading && this.pausedTime) {
+      const currentDelta = Date.now() - this.pausedTime;
+      this.pausedTimeAccumulated += currentDelta;
+      this.pausedTime = undefined;
+    }
   }
 
   stop(): void {
@@ -243,5 +263,10 @@ export class HowlTrack {
       curvedProgress = 1 - Math.cos((progress * Math.PI) / 2);
     }
     return startFactor + (endFactor - startFactor) * curvedProgress;
+  }
+
+  private getEffectiveElapsedTime(elapsed: number) {
+    const currentDelta = this.pausedTime ? Date.now() - this.pausedTime : 0;
+    return elapsed - currentDelta - this.pausedTimeAccumulated;
   }
 }

@@ -17,6 +17,8 @@ import { PlayingTrackState } from '../../../models/playback.model';
 export class CrossfadingToNextState implements TrackTransitionState {
   private destroyRef = inject(DestroyRef);
 
+  private fadingOutTrack: HowlTrack | undefined;
+
   private crossfadeFinishSub: Subscription | undefined;
   private songFinishedSub: Subscription | undefined;
 
@@ -80,6 +82,7 @@ export class CrossfadingToNextState implements TrackTransitionState {
       await context.transitionTo(IdleState);
       return;
     }
+    this.fadingOutTrack = currentTrack;
     context.activeTrack.next(nextTrack);
     context.nextTrack.next(undefined);
     this.crossfadeFinishSub = forkJoin([
@@ -93,6 +96,18 @@ export class CrossfadingToNextState implements TrackTransitionState {
         context.nextTrack.next(undefined);
         await context.transitionTo(PlayingState);
       });
+  }
+
+  pause(context: TrackTransitionStateContext) {
+    context.activeTrack.getValue()?.pause();
+    context.nextTrack.getValue()?.pause();
+    this.fadingOutTrack?.pause();
+  }
+
+  resume(context: TrackTransitionStateContext) {
+    context.activeTrack.getValue()?.resume();
+    context.nextTrack.getValue()?.resume();
+    this.fadingOutTrack?.resume();
   }
 
   toString(): string {

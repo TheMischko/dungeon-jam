@@ -25,4 +25,6 @@ export interface TrackTransitionState {
     howlTrack: HowlTrack
   ): void | Promise<void>;
   stop(context: TrackTransitionStateContext): void | Promise<void>;
+  pause?(context: TrackTransitionStateContext): void;
+  resume?(context: TrackTransitionStateContext): void;
 }

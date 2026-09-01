@@ -105,11 +105,19 @@ export class TrackTransitionService implements TrackTransitionStateContext {
   }
 
   pause(): void {
+    if (this.currentState.pause) {
+      this.currentState.pause(this);
+      return;
+    }
     this.activeTrack.getValue()?.pause();
     this.nextTrack.getValue()?.pause();
   }
 
   resume(): void {
+    if (this.currentState.resume) {
+      this.currentState.resume(this);
+      return;
+    }
     this.activeTrack.getValue()?.resume();
     this.nextTrack.getValue()?.resume();
   }

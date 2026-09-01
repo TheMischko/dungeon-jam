@@ -27,7 +27,17 @@ export class IdleState implements TrackTransitionState {
     await context.transitionTo(FadeInState);
   }
 
-  stop(context: TrackTransitionStateContext): void {}
+  stop(context: TrackTransitionStateContext): void {
+    return;
+  }
+
+  pause(context: TrackTransitionStateContext): void {
+    return;
+  }
+
+  resume(context: TrackTransitionStateContext): void {
+    return;
+  }
 
   toString(): string {
     return 'IdleState';
