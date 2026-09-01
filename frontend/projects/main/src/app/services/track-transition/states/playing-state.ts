@@ -53,23 +53,6 @@ export class PlayingState implements TrackTransitionState {
     context: TrackTransitionStateContext,
     track: HowlTrack
   ): void {
-    this.trackFadePositionSub = track.position$
-      .pipe(
-        takeUntilDestroyed(this.destroyRef),
-        filter(
-          (position) =>
-            track.track.duration - position <= context.crossFadeDuration / 1000
-        ),
-        take(1)
-      )
-      .subscribe(async () => {
-        if (context.nextTrack.getValue()) {
-          await context.transitionTo(CrossfadingToNextState);
-        } else {
-          await context.transitionTo(FadeOutState);
-        }
-      });
-
     this.preloadNextTrackSub = track.position$
       .pipe(
         takeUntilDestroyed(this.destroyRef),
@@ -89,6 +72,28 @@ export class PlayingState implements TrackTransitionState {
         const nextTrack = context.nextTrack.getValue();
         if (nextTrack) {
           nextTrack.load();
+        }
+      });
+
+    this.trackFadePositionSub = track.position$
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        filter(
+          (position) =>
+            track.track.duration - position <= context.crossFadeDuration / 1000
+        ),
+        take(1)
+      )
+      .subscribe(async () => {
+        const nextTrackCandidate = await context.getNextFn();
+        if (context.nextTrack.getValue()) {
+          await context.transitionTo(CrossfadingToNextState);
+        } else if (nextTrackCandidate) {
+          context.nextTrack.next(nextTrackCandidate);
+          nextTrackCandidate.load();
+          await context.transitionTo(CrossfadingToNextState);
+        } else {
+          await context.transitionTo(FadeOutState);
         }
       });
 

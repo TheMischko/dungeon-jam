@@ -10,6 +10,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { PlayingState } from './playing-state';
 import { FadeInState } from './fade-in-state';
 import { PlayingTrackState } from '../../../models/playback.model';
+import { FadeOutState } from './fade-out-state';
 
 /**
  * Fades out currently playing song, while starts playing and fades in the next song.
@@ -31,7 +32,7 @@ export class CrossfadingToNextState implements TrackTransitionState {
     this.songFinishedSub = activeTrack.state$
       .pipe(
         filter((state) => state === PlayingTrackState.ENDED),
-        debounceTime(3000)
+        debounceTime(context.crossFadeDuration)
       )
       .subscribe(async () => {
         if (context.nextTrack.getValue()) {
@@ -78,10 +79,20 @@ export class CrossfadingToNextState implements TrackTransitionState {
     const currentTrack = context.activeTrack.getValue();
     const nextTrack = context.nextTrack.getValue();
     const fadeDuration = context.crossFadeDuration;
-    if (!currentTrack || !nextTrack) {
+    if (!currentTrack && !nextTrack) {
       await context.transitionTo(IdleState);
       return;
     }
+    if (!nextTrack) {
+      await context.transitionTo(FadeOutState);
+      return;
+    }
+    if (!currentTrack) {
+      context.activeTrack.next(nextTrack);
+      await context.transitionTo(FadeInState);
+      return;
+    }
+
     this.fadingOutTrack = currentTrack;
     context.activeTrack.next(nextTrack);
     context.nextTrack.next(undefined);
