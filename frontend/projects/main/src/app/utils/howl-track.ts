@@ -117,6 +117,9 @@ export class HowlTrack {
   }
 
   load(): void {
+    if (this.howl) {
+      return;
+    }
     this.howl = this.createHowl(this.currentObjectUrl, false);
   }
 
@@ -128,8 +131,6 @@ export class HowlTrack {
   }
 
   async play(): Promise<void> {
-    this.stop();
-
     if (!this.howl) {
       this.howl = this.createHowl(this.currentObjectUrl);
     }
@@ -137,6 +138,7 @@ export class HowlTrack {
     if (this.howl.state() === 'loaded') {
       this.howl.play();
     } else {
+      this.howl.once('load', () => this.howl?.play());
       this.howl.load();
     }
   }
@@ -151,9 +153,10 @@ export class HowlTrack {
   }
 
   resume(): void {
-    if (!this.howl || this.howl.seek() === 0) {
+    if (!this.howl) {
       return;
     }
+    this.setupWatchdog();
     this.howl.play();
     this.trackStateSubject.next(PlayingTrackState.PLAYING);
   }
@@ -179,10 +182,12 @@ export class HowlTrack {
     );
   }
 
+  private HTML5_THRESHOLD = 360;
   private createHowl(src: string, playOnceLoaded: boolean = true): Howl {
+    const html5 = this.track.duration >= this.HTML5_THRESHOLD;
     const howl = new Howl({
       src: [src],
-      html5: true,
+      html5,
       format: 'mp3',
       volume: this.getEffectiveVolume(),
       preload: true,
@@ -222,6 +227,7 @@ export class HowlTrack {
   private stopWatchdog(): void {
     if (this.timerId) {
       clearInterval(this.timerId);
+      this.timerId = undefined;
     }
   }
 

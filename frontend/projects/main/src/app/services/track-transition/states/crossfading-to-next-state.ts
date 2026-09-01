@@ -69,8 +69,7 @@ export class CrossfadingToNextState implements TrackTransitionState {
   }
 
   async stop(context: TrackTransitionStateContext): Promise<void> {
-    this.crossfadeFinishSub?.unsubscribe();
-    return;
+    await context.transitionTo(IdleState);
   }
 
   async startCrossfade(context: TrackTransitionStateContext): Promise<void> {
