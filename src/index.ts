@@ -6,6 +6,7 @@ import { AppInfoManager } from './main/managers/app-info.manager';
 import pkg from '../package.json';
 
 import { DatabaseWrapper } from './main/database/database';
+import { MediaProtocolManager } from './main/managers/media-protocol.manager';
 
 const ENV = process.env.ENV || 'production';
 const appLogger = new Logger('APP', 'cyanBright');
@@ -23,6 +24,8 @@ if (!app.isPackaged) {
 
 Logger.initGlobalErrorHandlers();
 Logger.cleanOldLogs(5);
+
+MediaProtocolManager.RegisterMediaProtocol();
 
 app.on('ready', async () => {
   try {
