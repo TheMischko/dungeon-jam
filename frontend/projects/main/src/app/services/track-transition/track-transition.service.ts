@@ -5,7 +5,6 @@ import {
   Service,
   Type,
 } from '@angular/core';
-import { LoadSoundService } from '../load-sound.service';
 import { HowlTrack } from '../../utils/howl-track';
 import {
   TrackTransitionState,
@@ -26,7 +25,6 @@ import { PlaybackSettingsApiService } from '@general/services/playback-settings-
 
 @Service()
 export class TrackTransitionService implements TrackTransitionStateContext {
-  private readonly loadSoundService = inject(LoadSoundService);
   private readonly injector = inject(Injector);
   private readonly playbackSettingsService = inject(PlaybackSettingsApiService);
 
@@ -95,8 +93,7 @@ export class TrackTransitionService implements TrackTransitionStateContext {
   }
 
   async play(track: Track) {
-    const trackData = await this.loadSoundService.loadTrack(track);
-    const howlTrack = new HowlTrack(trackData, track, this.masterVolume);
+    const howlTrack = new HowlTrack(track, this.masterVolume);
 
     this.transitionQueue = this.transitionQueue.then(() => {
       this.currentState.play(this, howlTrack);
@@ -149,8 +146,7 @@ export class TrackTransitionService implements TrackTransitionStateContext {
       return undefined;
     }
     console.log('Fetching next track:', track.name);
-    const trackData = await this.loadSoundService.loadTrack(track);
-    return new HowlTrack(trackData, track, this.masterVolume);
+    return new HowlTrack(track, this.masterVolume);
   }
 
   private createState(stateType: Type<TrackTransitionState>) {

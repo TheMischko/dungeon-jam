@@ -26,7 +26,7 @@ export class HowlTrack {
   private fadeSubscription?: Subscription;
 
   private howl: Howl | undefined;
-  private readonly currentObjectUrl: string;
+  private readonly trackFileURI: string;
   private timerId: number | undefined;
 
   private isFading: boolean = false;
@@ -34,11 +34,10 @@ export class HowlTrack {
   private pausedTimeAccumulated: number = 0;
 
   constructor(
-    trackData: Blob,
     readonly track: Track,
     initialVolume: number = 1
   ) {
-    this.currentObjectUrl = URL.createObjectURL(trackData);
+    this.trackFileURI = this.buildTrackFileURI(track);
     this.trackVolumeSubject = new BehaviorSubject<number>(initialVolume);
 
     this.volumeSubscription = combineLatest([
@@ -57,7 +56,6 @@ export class HowlTrack {
     this.stop();
     this.fadeSubscription?.unsubscribe();
     this.volumeSubscription.unsubscribe();
-    URL.revokeObjectURL(this.currentObjectUrl);
   }
 
   get position$(): Observable<number> {
@@ -134,7 +132,7 @@ export class HowlTrack {
     if (this.howl) {
       return;
     }
-    this.howl = this.createHowl(this.currentObjectUrl, false);
+    this.howl = this.createHowl(this.trackFileURI, false);
   }
 
   seek(position: number): void {
@@ -146,7 +144,7 @@ export class HowlTrack {
 
   async play(): Promise<void> {
     if (!this.howl) {
-      this.howl = this.createHowl(this.currentObjectUrl);
+      this.howl = this.createHowl(this.trackFileURI);
     }
 
     if (this.howl.state() === 'loaded') {
@@ -232,6 +230,10 @@ export class HowlTrack {
     });
 
     return howl;
+  }
+
+  private buildTrackFileURI(track: Track): string {
+    return `media://tracks/${encodeURIComponent(track.id)}`;
   }
 
   private setupWatchdog(): void {
