@@ -1,12 +1,12 @@
-import { IpcMainInvokeEvent } from 'electron';
+import { IpcMainInvokeEvent, IpcMainEvent } from 'electron';
 import { AppError, ErrorCode } from '@shared/models/error.model';
 import { createAppError } from './create-app-error';
 
 type IpcHandlerFn<T> = (
-  event: IpcMainInvokeEvent,
+  event: IpcMainInvokeEvent | IpcMainEvent,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ...args: any[]
-) => Promise<T>;
+) => Promise<T> | T;
 
 export function isAppError(error: unknown): error is AppError {
   return (

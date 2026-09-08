@@ -1,0 +1,38 @@
+<div class="wrapper">
+  <div class="transition-section">
+    @let fadeInDuration = transitionSettings().fadeInDuration;
+    <h3 class="label">
+      <svg [lucideIcon]="FadeInIcon" class="icon fade-in"></svg>FadeIn duration:
+      {{ fadeInDuration }}s
+    </h3>
+    <div class="note">
+      FadeIn happens when a new songs starts playing and nothing was playing
+      before.
+    </div>
+    <lib-range-slider
+      [value]="fadeInDuration"
+      [stepSize]="0.2"
+      [minValue]="0"
+      [maxValue]="5"
+      (inputChange)="updateFadeInValue($event)"
+    ></lib-range-slider>
+  </div>
+
+  <div class="transition-section">
+    @let crossFadeDuration = transitionSettings().crossFadeDuration;
+    <h3 class="label">
+      <svg [lucideIcon]="CrossFadeIcon" class="icon"></svg>CrossFade duration:
+      {{ crossFadeDuration }}s
+    </h3>
+    <div class="note">
+      CrossFade happens when one song ends and blends into a new song.
+    </div>
+    <lib-range-slider
+      [value]="crossFadeDuration"
+      [stepSize]="0.2"
+      [minValue]="0"
+      [maxValue]="10"
+      (inputChange)="updateCrossFadeValue($event)"
+    ></lib-range-slider>
+  </div>
+</div>

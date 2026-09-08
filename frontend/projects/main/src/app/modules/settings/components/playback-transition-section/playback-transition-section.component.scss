@@ -1,0 +1,36 @@
+@use 'typography' as typo;
+@use 'colors' as col;
+
+.wrapper {
+  width: 100%;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 4rem;
+
+  .transition-section {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .label {
+    @include typo.h3();
+    font-size: 16px;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+  }
+
+  .note {
+    @include typo.body2();
+    margin-bottom: 1rem;
+  }
+
+  .icon {
+    height: 1.5rem;
+    margin-right: 0.5rem;
+  }
+}
