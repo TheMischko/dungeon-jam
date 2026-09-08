@@ -16,6 +16,7 @@ app.name = pkg.name;
 // @ts-ignore
 app.version = pkg.version;
 app.getVersion = () => pkg.version;
+MediaProtocolManager.RegisterMediaProtocol();
 
 if (!app.isPackaged) {
   const appData = app.getPath('appData');
@@ -25,11 +26,12 @@ if (!app.isPackaged) {
 Logger.initGlobalErrorHandlers();
 Logger.cleanOldLogs(5);
 
-MediaProtocolManager.RegisterMediaProtocol();
-
 app.on('ready', async () => {
   try {
     appLogger.log(`Starting DungeonJam v${app.getVersion()}`, { env: ENV });
+    // Must run before any window is created/navigates, otherwise its
+    // webContents won't route media:// requests until the next navigation.
+    MediaProtocolManager.getInstance();
     startupManager = StartupManager.getInstance(__dirname, ENV);
     const managersInitSuccess = await startupManager.initializeAllManagers();
     const resourcesInitSuccess = await startupManager.initializeResources();

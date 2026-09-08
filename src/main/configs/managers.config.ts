@@ -16,7 +16,6 @@ import { DisplayOrderManager } from '../managers/display-order.manager';
 import { SceneManager } from '../managers/scene.manager';
 import { SessionManager } from '../managers/session.manager';
 import { UpdateManager } from '../managers/update.manager';
-import { MediaProtocolManager } from '../managers/media-protocol.manager';
 
 /**
  * Manager initialization configuration
@@ -82,12 +81,6 @@ export function getManagersInitConfig(
       name: 'Track',
       initFunction: async () => {
         await TrackManager.getInstance();
-      },
-    },
-    {
-      name: 'MediaProtocol',
-      initFunction: async () => {
-        await MediaProtocolManager.getInstance();
       },
     },
     {
