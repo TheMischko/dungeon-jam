@@ -1,26 +1,13 @@
-@use 'colors' as col;
+:host {
+  display: block;
+  width: 100%;
+}
 
-.wrapper {
+.grid-content {
   display: flex;
-  flex-direction: column;
-  margin-right: 2rem;
-
-  .controls {
-    width: 100%;
-    display: flex;
-    flex-direction: row-reverse;
-
-    .size-slider {
-      width: 150px;
-    }
-  }
-
-  .grid-content {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 1rem;
-    flex-wrap: wrap;
-  }
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1rem;
+  flex-wrap: wrap;
 }

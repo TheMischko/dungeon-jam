@@ -12,7 +12,7 @@ import {
   DiscordTokenData,
 } from '@shared/models/discord.model';
 import { CollapsibleSectionComponent } from '@general/components/display/collapsible-section/collapsible-section.component';
-import { CollapsibleSectionConfig } from '../../../../../../../general/models/collapsible-section-component.model';
+import { CollapsibleSectionConfig } from '@general/models/collapsible-section-component.model';
 import { MatButton } from '@angular/material/button';
 import { TokenBoxComponent } from '../../components/token-box/token-box.component';
 
@@ -35,6 +35,7 @@ export class GeneralSettingsPageComponent {
   readonly createToken = output<void>();
   readonly toggleTokenConnection = output<DiscordTokenData>();
   readonly openLogsDir = output<void>();
+  readonly checkUpdates = output<void>();
 
   readonly tokenSectionTemp =
     viewChild.required<TemplateRef<{ $implicit: DiscordTokenData[] }>>(

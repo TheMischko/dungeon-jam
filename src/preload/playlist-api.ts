@@ -5,9 +5,11 @@ import {
   Playlist,
   PlaylistAddTracksData,
   PlaylistInsertQuery,
+  PlaylistRelativeReorderQuery,
   PlaylistReorderQuery,
   PlaylistUpdateQuery,
 } from '@shared/models/playlist.model';
+import { DisplayOrder } from '@shared/models/display-order.model';
 
 const getAllPlaylists = async (options: QueryRequest): Promise<Playlist[]> => {
   return await ipcRenderer.invoke(PlaylistChannel.GET_ALL, options);
@@ -39,6 +41,15 @@ const changePlaylistOrder = async (
   return await ipcRenderer.invoke(PlaylistChannel.CHANGE_ORDER, query);
 };
 
+const changePlaylistRelativeOrder = async (
+  query: PlaylistRelativeReorderQuery
+): Promise<Map<string, DisplayOrder>> => {
+  return await ipcRenderer.invoke(
+    PlaylistChannel.CHANGE_RELATIVE_ORDER,
+    query
+  );
+};
+
 const deletePlaylist = async (playlistId: string): Promise<void> => {
   return await ipcRenderer.invoke(PlaylistChannel.DELETE, playlistId);
 };
@@ -50,5 +61,6 @@ export default {
   addTracksToPlaylists,
   updatePlaylist,
   changePlaylistOrder,
+  changePlaylistRelativeOrder,
   deletePlaylist,
 };
