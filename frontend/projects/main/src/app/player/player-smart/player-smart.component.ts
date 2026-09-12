@@ -72,9 +72,11 @@ export class PlayerSmartComponent {
       return;
     }
 
-    this.trackHighlightService.setHighlightedTrackId(activeTrack.id);
-
     if (state.sessionId) {
+      this.trackHighlightService.setSessionHighlightedTrack(
+        activeTrack.id,
+        state.sessionId
+      );
       this.redirectService.triggerRedirect({
         path: RedirectPath.SESSIONS,
         params: {
@@ -85,6 +87,10 @@ export class PlayerSmartComponent {
     }
 
     if (state.sceneId) {
+      this.trackHighlightService.setSceneHighlightedTrack(
+        activeTrack.id,
+        state.sceneId
+      );
       this.redirectService.triggerRedirect({
         path: RedirectPath.SCENES,
         params: {
@@ -95,6 +101,10 @@ export class PlayerSmartComponent {
     }
 
     if (state.playlistId) {
+      this.trackHighlightService.setPlaylistHighlightedTrack(
+        activeTrack.id,
+        state.playlistId
+      );
       this.redirectService.triggerRedirect({
         path: RedirectPath.PLAYLISTS,
         params: {
@@ -104,6 +114,7 @@ export class PlayerSmartComponent {
       return;
     }
 
+    this.trackHighlightService.setLibraryHighlightedTrack(activeTrack.id);
     this.redirectService.triggerRedirect({
       path: RedirectPath.LIBRARY,
     });

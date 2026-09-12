@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { LibraryLandingPageComponent } from './library-landing-page.component';
+import { TrackHighlightType } from '../../../../models/track-highlight.model';
 
 describe('LibraryLandingPageComponent', () => {
   let component: LibraryLandingPageComponent;
@@ -8,9 +9,8 @@ describe('LibraryLandingPageComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [LibraryLandingPageComponent]
-    })
-    .compileComponents();
+      imports: [LibraryLandingPageComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(LibraryLandingPageComponent);
     component = fixture.componentInstance;
@@ -19,5 +19,11 @@ describe('LibraryLandingPageComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should have library highlight context', () => {
+    expect(component.trackHighlightContext).toEqual({
+      type: TrackHighlightType.LIBRARY,
+    });
   });
 });

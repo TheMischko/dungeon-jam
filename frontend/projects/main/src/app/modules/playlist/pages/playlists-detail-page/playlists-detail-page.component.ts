@@ -11,10 +11,7 @@ import { Playlist } from '@shared/models/playlist.model';
 import { AudioTrack, Track } from '@shared/models/track.model';
 import { SongsTableComponent } from '../../../library/pages/library-landing-page/songs-table/songs-table.component';
 import { PlayPauseButtonComponent } from '@general/components/buttons/play-pause-button/play-pause-button.component';
-import {
-  ButtonType,
-  ButtonSize,
-} from '../../../../../../../general/models/button.model';
+import { ButtonType, ButtonSize } from '@general';
 import { ActionsMenuConfig } from '@general/components/display/actions-menu/actions-menu.component';
 import { actionsIconSet } from '@general/icons/icons';
 import { MatButton } from '@angular/material/button';
@@ -27,6 +24,7 @@ import { ChildPlaylistBoxComponent } from './child-playlist-box/child-playlist-b
 import { ChildPlaylistActionsSmartComponent } from './child-playlist-actions/child-playlist-actions-smart/child-playlist-actions-smart.component';
 import { TagListSmartComponent } from '@general/components/display/tag-list/tag-list-smart/tag-list-smart.component';
 import { FilesDropInZoneComponent } from '../../../../components/drag-and-drop/files-drop-in-zone.component';
+import { createPlaylistContext } from '../../../../models/track-highlight.model';
 
 @Component({
   selector: 'app-playlists-detail-page',
@@ -96,6 +94,14 @@ export class PlaylistsDetailPageComponent {
         template: this.childrenSectionTemplate(),
       },
     ];
+  });
+
+  readonly trackHighlightContext = computed(() => {
+    const playlist = this.playlist();
+    if (!playlist) {
+      return;
+    }
+    return createPlaylistContext(playlist.id);
   });
 
   readonly childrenSectionTemplate =
