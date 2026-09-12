@@ -14,6 +14,7 @@ let startupManager: StartupManager;
 app.name = pkg.name;
 // @ts-ignore
 app.version = pkg.version;
+app.getVersion = () => pkg.version;
 
 if (!app.isPackaged) {
   const appData = app.getPath('appData');

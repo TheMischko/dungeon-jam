@@ -5,6 +5,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { initialPlaybackState } from '../../models/playback.model';
 import { RedirectService } from '@general';
 import { RedirectPath } from '@shared/models/redirect.model';
+import { TrackHighlightService } from '../../services/track-highlight.service';
 
 @Component({
   selector: 'app-player-smart',
@@ -16,6 +17,7 @@ import { RedirectPath } from '@shared/models/redirect.model';
 export class PlayerSmartComponent {
   readonly playbackService = inject(PlaybackService);
   readonly redirectService = inject(RedirectService);
+  readonly trackHighlightService = inject(TrackHighlightService);
 
   readonly playBackState = toSignal(this.playbackService.playback$, {
     initialValue: initialPlaybackState,
@@ -65,8 +67,16 @@ export class PlayerSmartComponent {
 
   protected navigateToActiveTrack() {
     const state = this.playBackState();
+    const activeTrack = state.currentTrack;
+    if (!activeTrack) {
+      return;
+    }
 
     if (state.sessionId) {
+      this.trackHighlightService.setSessionHighlightedTrack(
+        activeTrack.id,
+        state.sessionId
+      );
       this.redirectService.triggerRedirect({
         path: RedirectPath.SESSIONS,
         params: {
@@ -77,6 +87,10 @@ export class PlayerSmartComponent {
     }
 
     if (state.sceneId) {
+      this.trackHighlightService.setSceneHighlightedTrack(
+        activeTrack.id,
+        state.sceneId
+      );
       this.redirectService.triggerRedirect({
         path: RedirectPath.SCENES,
         params: {
@@ -87,6 +101,10 @@ export class PlayerSmartComponent {
     }
 
     if (state.playlistId) {
+      this.trackHighlightService.setPlaylistHighlightedTrack(
+        activeTrack.id,
+        state.playlistId
+      );
       this.redirectService.triggerRedirect({
         path: RedirectPath.PLAYLISTS,
         params: {
@@ -96,6 +114,7 @@ export class PlayerSmartComponent {
       return;
     }
 
+    this.trackHighlightService.setLibraryHighlightedTrack(activeTrack.id);
     this.redirectService.triggerRedirect({
       path: RedirectPath.LIBRARY,
     });

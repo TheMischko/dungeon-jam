@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SceneConsoleSmartComponent } from './scene-console-smart.component';
 import { Scene } from '@shared/models/scene.model';
+import { TrackHighlightType } from '../../../../models/track-highlight.model';
 
 describe('SceneConsoleSmartComponent', () => {
   let component: SceneConsoleSmartComponent;
@@ -33,5 +34,22 @@ describe('SceneConsoleSmartComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should create scene context when sessionId is not provided', () => {
+    expect(component.trackHighlightContext()).toEqual({
+      type: TrackHighlightType.SCENE,
+      sceneId: 'scene-1',
+    });
+  });
+
+  it('should create session context when sessionId is provided', () => {
+    fixture.componentRef.setInput('sessionId', 'session-123');
+    fixture.detectChanges();
+
+    expect(component.trackHighlightContext()).toEqual({
+      type: TrackHighlightType.SESSION,
+      sessionId: 'session-123',
+    });
   });
 });
