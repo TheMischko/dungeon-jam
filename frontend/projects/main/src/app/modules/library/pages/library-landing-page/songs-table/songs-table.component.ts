@@ -8,6 +8,8 @@ import {
   TemplateRef,
   viewChild,
   ChangeDetectionStrategy,
+  inject,
+  untracked,
 } from '@angular/core';
 import { Track } from '@shared/models/track.model';
 import { LucideDynamicIcon } from '@lucide/angular';
@@ -40,6 +42,8 @@ import {
   PaginationConfig,
 } from '../../../../../models/pagination.model';
 import { PageEvent } from '@angular/material/paginator';
+import { TrackHighlightService } from '../../../../../services/track-highlight.service';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-songs-table',
@@ -58,6 +62,7 @@ import { PageEvent } from '@angular/material/paginator';
   styleUrl: './songs-table.component.scss',
 })
 export class SongsTableComponent {
+  readonly trackHighlightService = inject(TrackHighlightService);
   readonly paginationService!: SignalPaginationService<Track>;
 
   readonly tracks = input<Track[]>([]);
@@ -89,6 +94,11 @@ export class SongsTableComponent {
   readonly actionMenuClosed = output<MenuCloseReason | string>();
   readonly selectionChange = output<Track[]>();
   readonly pageSizeChange = output<number>();
+
+  readonly highlightTrackId = toSignal(
+    this.trackHighlightService.highlightTrackId$,
+    { initialValue: undefined }
+  );
 
   readonly playColumnTemplate =
     viewChild.required<TemplateRef<{ $implicit: Track }>>('playColumn');
@@ -172,6 +182,14 @@ export class SongsTableComponent {
         this.paginationService.resetPage();
       }
     });
+
+    effect(() => {
+      const highlightTrackId = this.highlightTrackId();
+      if (!highlightTrackId || this.tracks().length === 0 || this.loading()) {
+        return;
+      }
+      untracked(() => this.findTrackWithId(highlightTrackId));
+    });
   }
 
   hoverStart(track: Track) {
@@ -220,5 +238,30 @@ export class SongsTableComponent {
     this.paginationService.pageSize.set(event.pageSize);
     this.paginationService.goToPage(event.pageIndex);
     this.pageSizeChange.emit(event.pageSize);
+  }
+
+  private findTrackWithId(highlightTrackId: string) {
+    const initialPage = this.paginationService.currentPageIndex();
+    this.paginationService.resetPage();
+    let foundTrack: Track | null = null;
+    while (
+      foundTrack === null &&
+      this.paginationService.currentPageIndex() <
+        this.paginationService.totalPages()
+    ) {
+      const currentPage = this.paginationService.currentPageData();
+      const trackIndex = currentPage.findIndex(
+        (track: Track) => track.id === highlightTrackId
+      );
+      if (trackIndex >= 0) {
+        foundTrack = currentPage[trackIndex];
+        this.trackHighlightService.resetHighlightTrackId();
+        break;
+      }
+      this.paginationService.nextPage();
+    }
+    if (!foundTrack) {
+      this.paginationService.goToPage(initialPage);
+    }
   }
 }

@@ -5,6 +5,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { initialPlaybackState } from '../../models/playback.model';
 import { RedirectService } from '@general';
 import { RedirectPath } from '@shared/models/redirect.model';
+import { TrackHighlightService } from '../../services/track-highlight.service';
 
 @Component({
   selector: 'app-player-smart',
@@ -16,6 +17,7 @@ import { RedirectPath } from '@shared/models/redirect.model';
 export class PlayerSmartComponent {
   readonly playbackService = inject(PlaybackService);
   readonly redirectService = inject(RedirectService);
+  readonly trackHighlightService = inject(TrackHighlightService);
 
   readonly playBackState = toSignal(this.playbackService.playback$, {
     initialValue: initialPlaybackState,
@@ -65,6 +67,12 @@ export class PlayerSmartComponent {
 
   protected navigateToActiveTrack() {
     const state = this.playBackState();
+    const activeTrack = state.currentTrack;
+    if (!activeTrack) {
+      return;
+    }
+
+    this.trackHighlightService.setHighlightedTrackId(activeTrack.id);
 
     if (state.sessionId) {
       this.redirectService.triggerRedirect({
