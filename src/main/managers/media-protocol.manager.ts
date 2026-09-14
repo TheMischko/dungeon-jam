@@ -22,6 +22,18 @@ export class MediaProtocolManager {
 
   private registerHandlers(): void {
     protocol.handle('media', async (request) => {
+      // Handle preflight OPTIONS requests if sent
+      if (request.method === 'OPTIONS') {
+        return new Response(null, {
+          status: 204,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, HEAD, OPTIONS',
+            'Access-Control-Allow-Headers': '*',
+          },
+        });
+      }
+
       this.logger.log(`Handling media request for URL: ${request.url}`);
       const url = new URL(request.url);
       const id = decodeURIComponent(url.pathname.replace(/^\/+/, ''));
@@ -88,6 +100,7 @@ export class MediaProtocolManager {
           supportFetchAPI: true,
           stream: true,
           bypassCSP: true,
+          corsEnabled: true,
         },
       },
     ]);
