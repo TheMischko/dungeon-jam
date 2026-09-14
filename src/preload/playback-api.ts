@@ -1,4 +1,7 @@
-import { StoredPlayback } from '@shared/models/track.model';
+import {
+  StoredPlayback,
+  StoredTransitionSettings,
+} from '@shared/models/track.model';
 import { ipcRenderer } from 'electron';
 import { PlaybackChannel } from '@shared/models/channels.model';
 import { CaptureSettings } from '@shared/models/capture.model';
@@ -18,8 +21,34 @@ const updateCaptureSettings = (isLocalMuted: boolean): void => {
   ipcRenderer.send(PlaybackChannel.CAPTURE_SETTINGS, settings);
 };
 
+const loadTransitionSettings = async (): Promise<StoredTransitionSettings> => {
+  return await ipcRenderer.invoke(PlaybackChannel.LOAD_TRANSITION);
+};
+
+const updateTransitionSettings = (
+  newState: StoredTransitionSettings
+): void => {
+  ipcRenderer.send(PlaybackChannel.UPDATE_TRANSITION, newState);
+};
+
+const onTransitionChanged = (
+  callback: (settings: StoredTransitionSettings) => void | Promise<void>
+): void => {
+  ipcRenderer.on(
+    PlaybackChannel.TRANSITION_SYNC,
+    (_, settings: StoredTransitionSettings) => {
+      callback(settings);
+    }
+  );
+};
+
 export default {
   loadState,
   updateState,
   updateCaptureSettings,
+  loadTransitionSettings,
+  updateTransitionSettings,
+  onTransitionChanged,
 };
+
+

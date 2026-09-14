@@ -3,10 +3,12 @@
   [tokensLoading]="tokensLoading()"
   [tokenConnectionMap]="tokenConnectionMap()"
   [appVersion]="appVersion()"
+  [transitionSettings]="transitionSettings()"
   (editToken)="editToken($event)"
   (deleteToken)="deleteToken($event)"
   (createToken)="createToken()"
   (toggleTokenConnection)="toggleTokenState($event)"
   (openLogsDir)="openLogsDir()"
+  (updateTransitionSettings)="updateTransitionSettings($event)"
   (checkUpdates)="checkUpdates()"
 />

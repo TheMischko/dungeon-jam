@@ -14,6 +14,7 @@ import {
   PlaylistTracksQuery,
   RepeatState,
   StoredPlayback,
+  StoredTransitionSettings,
   TaggedTracksQuery,
   Track,
 } from '@shared/models/track.model';
@@ -117,6 +118,11 @@ declare global {
       loadState: () => Promise<StoredPlayback>;
       updateState: (newState: StoredPlayback) => void;
       updateCaptureSettings: (isLocalMuted: boolean) => void;
+      loadTransitionSettings: () => Promise<StoredTransitionSettings>;
+      updateTransitionSettings: (newState: StoredTransitionSettings) => void;
+      onTransitionChanged: (
+        callback: (settings: StoredTransitionSettings) => void | Promise<void>
+      ) => void;
     };
     PLAYLIST_API: {
       getAllPlaylists: (options: QueryRequest) => Promise<Playlist[]>;
@@ -272,6 +278,10 @@ function installWindowApiStubs(): void {
       Promise.resolve({ volume: 1, shuffle: false, repeat: RepeatState.NONE }),
     updateState: () => undefined,
     updateCaptureSettings: () => undefined,
+    loadTransitionSettings: () =>
+      Promise.resolve({ fadeInDuration: 1, crossFadeDuration: 1 }),
+    updateTransitionSettings: () => undefined,
+    onTransitionChanged: () => undefined,
   };
 
   window.PLAYLIST_API = {

@@ -1,7 +1,5 @@
-import { inject, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { SoundEffect } from '@shared/models/sound-effect.model';
-import { LRUCache } from '@general/utils/lru-cache';
-import { LoadSoundService } from './load-sound.service';
 import { Howl } from 'howler';
 import { BehaviorSubject, map, Observable } from 'rxjs';
 
@@ -31,8 +29,6 @@ type SoundEffectInternalState = {
   providedIn: 'root',
 })
 export class SoundEffectsPlayerService {
-  private readonly loadSoundService = inject(LoadSoundService);
-
   // Maps Sound effect ID to a player state
   private readonly stateRecord = new BehaviorSubject<
     Record<string, SoundEffectInternalState>
@@ -41,14 +37,6 @@ export class SoundEffectsPlayerService {
   private readonly positionRecord = new BehaviorSubject<Record<string, number>>(
     {}
   );
-  private effectDataCache = new LRUCache<string, Blob>(10, (effectId, _) => {
-    const url = this.effectObjectURLMap.get(effectId);
-    if (url) {
-      URL.revokeObjectURL(url);
-      this.effectObjectURLMap.delete(effectId);
-    }
-  });
-  private effectObjectURLMap = new Map<string, string>();
   private readonly pendingPlayById = new Map<string, Promise<void>>();
 
   readonly playingEffects$: Observable<ActiveSoundEffect[]> =
@@ -136,23 +124,30 @@ export class SoundEffectsPlayerService {
   }
 
   private async createHowl(soundEffect: SoundEffect): Promise<Howl> {
-    const soundBlobUrl = await this.getBlobUrl(soundEffect);
+    const soundEffectURI = this.buildSoundEffectFileURI(soundEffect);
     const howl = new Howl({
-      src: [soundBlobUrl],
-      html5: true,
-      format: '',
+      src: [soundEffectURI],
+      html5: false,
+      format: 'mp3',
       volume: soundEffect?.volume ?? 1,
       loop: false,
     });
 
     howl.load();
 
-    howl.on('play', () => this.handleHowlPlay(soundEffect.id, howl));
+    howl.on('play', () => {
+      console.log('howl is playing');
+      this.handleHowlPlay(soundEffect.id, howl);
+    });
     howl.on('end', () => this.handleHowlEnd(soundEffect.id));
     howl.on('stop', () => this.handleHowlStop(soundEffect.id));
-    howl.on('playerror', (_, err) =>
-      this.handleHowlPlayError(soundEffect.id, howl, err)
-    );
+    howl.on('playerror', (_, err) => {
+      console.log('playerror', { err });
+      this.handleHowlPlayError(soundEffect.id, howl, err);
+    });
+    howl.on('loaderror', (_, err) => {
+      console.log('loaderror', { err });
+    });
 
     return howl;
   }
@@ -234,50 +229,17 @@ export class SoundEffectsPlayerService {
   private cleanSoundEffectDataById(soundEffectId: string, howl?: Howl): void {
     this.stopWatchdog(soundEffectId);
 
-    const { [soundEffectId]: _, ...remainingPositions } =
-      this.positionRecord.getValue();
-    this.positionRecord.next(remainingPositions);
-
-    const blobUrl = this.effectObjectURLMap.get(soundEffectId);
-    if (blobUrl) {
-      URL.revokeObjectURL(blobUrl);
-      this.effectObjectURLMap.delete(soundEffectId);
-    }
-
     const state = this.stateRecord.getValue()[soundEffectId];
     if (state) {
       state.howl.unload();
       this.removeState(soundEffectId);
       return;
     }
-
     howl?.unload();
   }
 
-  /**
-   * Creates Blob data from sound URL and sync it with URL cache.
-   */
-  private async getBlobUrl(soundEffect: SoundEffect): Promise<string> {
-    if (this.effectObjectURLMap.has(soundEffect.id)) {
-      return this.effectObjectURLMap.get(soundEffect.id)!;
-    }
-    const soundBlob = await this.getEffectData(soundEffect);
-    const soundBlobUrl = URL.createObjectURL(soundBlob);
-    this.effectObjectURLMap.set(soundEffect.id, soundBlobUrl);
-    return soundBlobUrl;
-  }
-
-  /**
-   * Loads the Sound Effect either from cache, or through API and updates cache.
-   */
-  private async getEffectData(soundEffect: SoundEffect): Promise<Blob> {
-    const cacheData = this.effectDataCache.get(soundEffect.id);
-    if (cacheData) {
-      return cacheData;
-    }
-    const data = await this.loadSoundService.loadSoundEffect(soundEffect);
-    this.effectDataCache.put(soundEffect.id, data);
-    return data;
+  private buildSoundEffectFileURI(soundEffect: SoundEffect): string {
+    return `media://sound-effects/${encodeURIComponent(soundEffect.id)}`;
   }
 }
 

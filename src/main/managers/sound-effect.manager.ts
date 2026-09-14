@@ -120,7 +120,7 @@ export class SoundEffectManager {
     );
   }
 
-  private async getById(id: string): Promise<SoundEffect | null> {
+  async getById(id: string): Promise<SoundEffect | null> {
     return (await this.database.getBy('id', id)) ?? null;
   }
 

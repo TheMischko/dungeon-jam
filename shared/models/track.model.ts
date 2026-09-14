@@ -28,6 +28,13 @@ export interface StoredPlayback {
   repeat: RepeatState;
 }
 
+export interface StoredTransitionSettings {
+  crossFadeDuration: number;
+  fadeInDuration: number;
+}
+
+export type PlaybackSettings = StoredPlayback & StoredTransitionSettings;
+
 export interface PlaylistTracksQuery extends QueryRequest {
   playlistId: string;
   includeChildren?: boolean;
