@@ -136,17 +136,16 @@ export class SoundEffectsPlayerService {
     howl.load();
 
     howl.on('play', () => {
-      console.log('howl is playing');
       this.handleHowlPlay(soundEffect.id, howl);
     });
     howl.on('end', () => this.handleHowlEnd(soundEffect.id));
     howl.on('stop', () => this.handleHowlStop(soundEffect.id));
     howl.on('playerror', (_, err) => {
-      console.log('playerror', { err });
+      console.log('sfx playerror', { err });
       this.handleHowlPlayError(soundEffect.id, howl, err);
     });
     howl.on('loaderror', (_, err) => {
-      console.log('loaderror', { err });
+      console.log('sfx loaderror', { err });
     });
 
     return howl;

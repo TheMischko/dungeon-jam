@@ -10,6 +10,7 @@ import { filter, Subscription, take } from 'rxjs';
 import { PlayingTrackState } from '../../../models/playback.model';
 import { CrossfadingToNextState } from './crossfading-to-next-state';
 import { FadeOutState } from './fade-out-state';
+import { FadeInState } from './fade-in-state';
 
 export class PlayingState implements TrackTransitionState {
   private readonly destroyRef = inject(DestroyRef);
@@ -58,20 +59,19 @@ export class PlayingState implements TrackTransitionState {
         takeUntilDestroyed(this.destroyRef),
         filter(
           (position) =>
+            context.crossFadeDuration > 0 &&
             track.track.duration - position <=
-            (context.crossFadeDuration / 1000) * 2
+              (context.crossFadeDuration / 1000) * 2
         ),
         take(1)
       )
       .subscribe(async () => {
         if (!context.nextTrack.getValue()) {
           const nextTrack = await context.getNextFn();
-          context.nextTrack.next(nextTrack);
-        }
-
-        const nextTrack = context.nextTrack.getValue();
-        if (nextTrack) {
-          nextTrack.load();
+          if (nextTrack) {
+            context.nextTrack.next(nextTrack);
+            nextTrack.load();
+          }
         }
       });
 
@@ -80,17 +80,33 @@ export class PlayingState implements TrackTransitionState {
         takeUntilDestroyed(this.destroyRef),
         filter(
           (position) =>
+            context.crossFadeDuration > 0 &&
             track.track.duration - position <= context.crossFadeDuration / 1000
         ),
         take(1)
       )
       .subscribe(async () => {
+        const existingNext = context.nextTrack.getValue();
         const nextTrackCandidate = await context.getNextFn();
-        if (context.nextTrack.getValue()) {
-          await context.transitionTo(CrossfadingToNextState);
+
+        let trackToTransition: HowlTrack | undefined;
+        if (
+          existingNext &&
+          nextTrackCandidate &&
+          existingNext.track.id === nextTrackCandidate.track.id
+        ) {
+          nextTrackCandidate.dispose();
+          trackToTransition = existingNext;
         } else if (nextTrackCandidate) {
+          existingNext?.dispose();
           context.nextTrack.next(nextTrackCandidate);
           nextTrackCandidate.load();
+          trackToTransition = nextTrackCandidate;
+        } else if (existingNext) {
+          trackToTransition = existingNext;
+        }
+
+        if (trackToTransition) {
           await context.transitionTo(CrossfadingToNextState);
         } else {
           await context.transitionTo(FadeOutState);
@@ -104,15 +120,19 @@ export class PlayingState implements TrackTransitionState {
         take(1)
       )
       .subscribe(async () => {
-        const nextTrack = context.nextTrack.getValue();
+        let nextTrack = context.nextTrack.getValue();
+        if (!nextTrack) {
+          nextTrack = await context.getNextFn();
+        }
+
         if (nextTrack) {
-          nextTrack.load();
-          context.activeTrack.getValue()?.dispose();
+          track.dispose();
           context.activeTrack.next(nextTrack);
           context.nextTrack.next(undefined);
-          await context.transitionTo(PlayingState);
+          await context.transitionTo(FadeInState);
           return;
         }
+
         await context.transitionTo(IdleState);
       });
   }

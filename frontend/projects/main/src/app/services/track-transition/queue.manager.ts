@@ -1,4 +1,11 @@
-import { BehaviorSubject, combineLatest, map, Observable } from 'rxjs';
+import {
+  BehaviorSubject,
+  combineLatest,
+  distinctUntilChanged,
+  map,
+  Observable,
+  skip,
+} from 'rxjs';
 import { RepeatState, Track } from '@shared/models/track.model';
 import { QueueItem } from '../../models/playback.model';
 import { shuffleList } from '../../utils/shuffle-list';
@@ -35,24 +42,41 @@ export class QueueManager {
   }
 
   constructor() {
-    combineLatest([this.trackList.asObservable(), this.shuffle$])
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((values) => {
-        const [trackList, shuffle] = values;
+    this.shuffle$
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        distinctUntilChanged(),
+        skip(1)
+      )
+      .subscribe((shuffle) => {
+        const trackList = this.trackList.getValue();
+        if (trackList.length === 0) {
+          return;
+        }
 
         const oldQueue = this.queue.getValue();
         const currentIndex = this.currentIndex.getValue();
         const currentTrack =
           currentIndex !== undefined ? oldQueue[currentIndex] : undefined;
 
-        const newQueue = shuffle ? shuffleList(trackList) : trackList;
-        this.queue.next(newQueue);
-
-        if (currentTrack) {
-          const newIndex = newQueue.findIndex(
-            (track) => track.id === currentTrack.id
-          );
-          this.currentIndex.next(newIndex >= 0 ? newIndex : 0);
+        if (shuffle) {
+          if (currentTrack) {
+            const otherTracks = trackList.filter(
+              (t) => t.id !== currentTrack.id
+            );
+            this.queue.next([currentTrack, ...shuffleList(otherTracks)]);
+            this.currentIndex.next(0);
+          } else {
+            this.queue.next(shuffleList(trackList));
+          }
+        } else {
+          this.queue.next(trackList);
+          if (currentTrack) {
+            const newIndex = trackList.findIndex(
+              (track) => track.id === currentTrack.id
+            );
+            this.currentIndex.next(newIndex >= 0 ? newIndex : 0);
+          }
         }
       });
   }
@@ -91,20 +115,37 @@ export class QueueManager {
     this.isCurrentTrackInjected.next(false);
   }
 
-  setQueue(tracks: Track[], startIndex = 0): Track | undefined {
+  setQueue(tracks: Track[], targetTrackId?: string): Track | undefined {
     this.playNext.next([]);
-    this.trackList.next(tracks);
     this.history.next([]);
     this.isCurrentTrackInjected.next(false);
+    this.trackList.next(tracks);
 
-    const currentQueue = this.currentQueue;
-    if (currentQueue.length === 0) {
+    if (tracks.length === 0) {
+      this.queue.next([]);
       this.currentIndex.next(undefined);
       return undefined;
     }
 
-    this.currentIndex.next(startIndex);
-    return currentQueue[startIndex];
+    const isShuffle = this.shuffle.getValue();
+
+    if (targetTrackId) {
+      const targetTrack =
+        tracks.find((t) => t.id === targetTrackId) ?? tracks[0];
+      const otherTracks = tracks.filter((t) => t.id !== targetTrack.id);
+      const newQueue = isShuffle
+        ? [targetTrack, ...shuffleList(otherTracks)]
+        : [...tracks];
+      this.queue.next(newQueue);
+      const targetIndex = newQueue.findIndex((t) => t.id === targetTrack.id);
+      this.currentIndex.next(targetIndex >= 0 ? targetIndex : 0);
+      return targetTrack;
+    } else {
+      const newQueue = isShuffle ? shuffleList(tracks) : [...tracks];
+      this.queue.next(newQueue);
+      this.currentIndex.next(0);
+      return newQueue[0];
+    }
   }
 
   injectNextTrack(track: Track) {
@@ -212,7 +253,7 @@ export class QueueManager {
     }
 
     const currentIndex = this.currentIndex.getValue();
-    if (currentIndex === undefined) {
+    if (currentIndex === undefined || currentIndex < 0) {
       return 0;
     }
 
