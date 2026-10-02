@@ -151,7 +151,7 @@ export class PlaybackService {
     }
 
     if (queue) {
-      this.queueManager.setQueue([track, ...queue]);
+      this.queueManager.setQueue([track, ...queue], track.id);
     }
 
     this.metadata.next(metadata ?? {});

@@ -13,6 +13,10 @@ describe('PlaybackTransitionSectionComponent', () => {
 
     fixture = TestBed.createComponent(PlaybackTransitionSectionComponent);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('transitionSettings', {
+      fadeInDuration: 1,
+      crossFadeDuration: 1,
+    });
     fixture.detectChanges();
   });
 

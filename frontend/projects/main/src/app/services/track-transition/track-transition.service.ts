@@ -45,7 +45,19 @@ export class TrackTransitionService implements TrackTransitionStateContext {
   });
 
   private currentState: TrackTransitionState = new IdleState();
-  private transitionQueue: Promise<void> = Promise.resolve();
+  private commandQueue: Promise<void> = Promise.resolve();
+
+  private enqueue<T>(task: () => Promise<T>): Promise<T> {
+    const result = this.commandQueue.then(
+      () => task(),
+      () => task()
+    );
+    this.commandQueue = result.then(
+      () => {},
+      () => {}
+    );
+    return result;
+  }
 
   readonly trackPosition$ = this.activeTrack.asObservable().pipe(
     switchMap((track) => track?.position$ ?? of(0)),
@@ -76,10 +88,7 @@ export class TrackTransitionService implements TrackTransitionStateContext {
   }
 
   async transitionTo(stateType: Type<TrackTransitionState>): Promise<void> {
-    this.transitionQueue = this.transitionQueue.then(() => {
-      return this.performTransition(stateType);
-    });
-    return this.transitionQueue;
+    return this.performTransition(stateType);
   }
 
   private async performTransition(
@@ -92,13 +101,12 @@ export class TrackTransitionService implements TrackTransitionStateContext {
     await this.currentState.onEnter(this);
   }
 
-  async play(track: Track) {
+  async play(track: Track): Promise<void> {
     const howlTrack = new HowlTrack(track, this.masterVolume);
 
-    this.transitionQueue = this.transitionQueue.then(() => {
-      this.currentState.play(this, howlTrack);
+    return this.enqueue(async () => {
+      await this.currentState.play(this, howlTrack);
     });
-    return this.transitionQueue;
   }
 
   pause(): void {
@@ -119,11 +127,10 @@ export class TrackTransitionService implements TrackTransitionStateContext {
     this.nextTrack.getValue()?.resume();
   }
 
-  async stop() {
-    this.transitionQueue = this.transitionQueue.then(() => {
-      this.currentState.stop(this);
+  async stop(): Promise<void> {
+    return this.enqueue(async () => {
+      await this.currentState.stop(this);
     });
-    return this.transitionQueue;
   }
 
   seek(position: number) {
