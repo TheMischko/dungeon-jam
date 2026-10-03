@@ -69,6 +69,7 @@
       [playingTrackId]="playingTrackId()"
       [actionsMenuConfig]="songActionsMenuConfig()"
       [noDataText]="noTracksWarning"
+      [highlightContext]="trackHighlightContext()"
       (playTrack)="playTrack.emit($event)"
       (pauseTrack)="pause.emit()"
       (queryChange)="queryChange.emit($event)"

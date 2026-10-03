@@ -73,6 +73,7 @@
             [showActionsColumn]="true"
             [actionsMenuConfig]="trackGridActions"
             [noDataText]="noPlaylistText"
+            [highlightContext]="trackHighlightContext()"
             (queryChange)="trackQueryChange.emit($event)"
             (playTrack)="playTrack.emit($event)"
             (pauseTrack)="pauseTrack.emit()"

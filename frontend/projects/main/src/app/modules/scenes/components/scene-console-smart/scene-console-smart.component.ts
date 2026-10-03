@@ -41,6 +41,11 @@ import {
   EditSceneModalData,
 } from '../../modals/edit-scene-modal/edit-scene-modal.component';
 import { sceneInsertQueryToUpdateQuery } from '../../utils/scene-insert-query-to-update-query';
+import {
+  createSceneContext,
+  createSessionContext,
+  TrackHighlightContext,
+} from '../../../../models/track-highlight.model';
 
 @Component({
   selector: 'app-scene-console-smart',
@@ -131,6 +136,15 @@ export class SceneConsoleSmartComponent implements OnInit {
   readonly playlistTracksQuery$ = toObservable(this.playlistTracksQuery).pipe(
     debounceTime(500)
   );
+
+  readonly trackHighlightContext = computed<TrackHighlightContext>(() => {
+    const scene = this.scene();
+    const sessionId = this.sessionId();
+    if (sessionId) {
+      return createSessionContext(sessionId);
+    }
+    return createSceneContext(scene.id);
+  });
 
   constructor() {
     this.playlistTracksStore.load(

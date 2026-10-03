@@ -8,6 +8,9 @@ import {
   TemplateRef,
   viewChild,
   ChangeDetectionStrategy,
+  inject,
+  untracked,
+  DestroyRef,
 } from '@angular/core';
 import { Track } from '@shared/models/track.model';
 import { LucideDynamicIcon } from '@lucide/angular';
@@ -40,6 +43,10 @@ import {
   PaginationConfig,
 } from '../../../../../models/pagination.model';
 import { PageEvent } from '@angular/material/paginator';
+import { TrackHighlightService } from '../../../../../services/track-highlight.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { TrackHighlightContext } from '../../../../../models/track-highlight.model';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-songs-table',
@@ -58,6 +65,8 @@ import { PageEvent } from '@angular/material/paginator';
   styleUrl: './songs-table.component.scss',
 })
 export class SongsTableComponent {
+  readonly trackHighlightService = inject(TrackHighlightService);
+  readonly destroyRef = inject(DestroyRef);
   readonly paginationService!: SignalPaginationService<Track>;
 
   readonly tracks = input<Track[]>([]);
@@ -89,6 +98,9 @@ export class SongsTableComponent {
   readonly actionMenuClosed = output<MenuCloseReason | string>();
   readonly selectionChange = output<Track[]>();
   readonly pageSizeChange = output<number>();
+
+  readonly highlightContext = input<TrackHighlightContext>();
+  readonly highlightTrackId = signal<string | undefined>(undefined);
 
   readonly playColumnTemplate =
     viewChild.required<TemplateRef<{ $implicit: Track }>>('playColumn');
@@ -160,6 +172,8 @@ export class SongsTableComponent {
     }),
   }));
 
+  private trackHighlightSubscription?: Subscription;
+
   constructor() {
     this.paginationService = SignalPaginationService.create(this.tracks);
     effect(() => {
@@ -171,6 +185,29 @@ export class SongsTableComponent {
       if (this.loading()) {
         this.paginationService.resetPage();
       }
+    });
+
+    effect(() => {
+      this.trackHighlightSubscription?.unsubscribe();
+      const trackHighlightContext = this.highlightContext();
+      if (!trackHighlightContext) {
+        this.highlightTrackId.set(undefined);
+        return;
+      }
+      this.trackHighlightSubscription = this.trackHighlightService
+        .listenForHighlightedTrack(trackHighlightContext)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe((trackId) => {
+          this.highlightTrackId.set(trackId);
+        });
+    });
+
+    effect(() => {
+      const highlightTrackId = this.highlightTrackId();
+      if (!highlightTrackId || this.tracks().length === 0 || this.loading()) {
+        return;
+      }
+      untracked(() => this.findTrackWithId(highlightTrackId));
     });
   }
 
@@ -220,5 +257,18 @@ export class SongsTableComponent {
     this.paginationService.pageSize.set(event.pageSize);
     this.paginationService.goToPage(event.pageIndex);
     this.pageSizeChange.emit(event.pageSize);
+  }
+
+  private findTrackWithId(highlightTrackId: string) {
+    const tracks = this.tracks();
+    const trackIndex = tracks.findIndex(
+      (track: Track) => track.id === highlightTrackId
+    );
+    if (trackIndex >= 0) {
+      const pageSize = this.paginationService.pageSize();
+      const targetPage = Math.floor(trackIndex / pageSize);
+      this.paginationService.goToPage(targetPage);
+    }
+    this.trackHighlightService.resetHighlightTrackId();
   }
 }

@@ -25,6 +25,7 @@ import { actionsIconSet, iconSet } from '@general/icons/icons';
 import { IconButtonComponent } from '@general/components/buttons/icon-button/icon-button.component';
 import { LucideIconData } from '@lucide/angular';
 import { ActionsMenuBaseConfig } from '@general/components/display/actions-menu/actions-menu.component';
+import { TrackHighlightContext } from '../../../../models/track-highlight.model';
 
 @Component({
   selector: 'app-scene-console',
@@ -56,6 +57,7 @@ export class SceneConsoleComponent {
   readonly soundEffectsVolumeMap = input<Record<string, number>>({});
   readonly viewMode = input<boolean>(false);
   readonly initContentHidden = input<boolean>(false);
+  readonly trackHighlightContext = input<TrackHighlightContext>();
 
   readonly playScene = output<void>();
   readonly pauseScene = output<void>();
