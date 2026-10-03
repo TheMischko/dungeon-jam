@@ -40,6 +40,9 @@ npm run test:e2e -- --tags "@search"
 # Sound effects
 npm run test:e2e -- --tags "@sound-effects"
 
+# Auto Update & New Version Available modal
+npm run test:e2e -- --tags "@updates"
+
 # Sidebar navigation
 npm run test:e2e -- --tags "@sidebar"
 ```
@@ -59,6 +62,7 @@ npm run test:e2e -- --tags "@sidebar"
 | [`tests/features/main/create-playlist.feature`](./features/main/create-playlist.feature) | `@playlists` | 1. **User creates a new playlist through the modal** | Playlist creation modal, form inputs, validation, and appearance on the landing page grid. |
 | [`tests/features/main/playlist-tracks.feature`](./features/main/playlist-tracks.feature) | `@playlists`<br>`@library` | 1. **User adds library tracks to a playlist via the add tracks modal** | Multi-track selection modal, assigning tracks to a playlist, and table display. |
 | [`tests/features/main/library-upload.feature`](./features/main/library-upload.feature) | `@library` | 1. **User uploads audio files via drag & drop** | Drag & drop file ingestion using CDP sessions, multi-step metadata upload wizard, and library listing. |
+| [`tests/features/main/auto-update.feature`](./features/main/auto-update.feature) | `@updates` | 1. **User skips an update and the modal does not reappear on reload or restart**<br>2. **User installs an update and modal does not appear after restarting into the new version**<br>3. **A newer version becomes available after user skipped a previous version**<br>4. **Application is up to date and does not display update modal**<br>5. **Modal does not unexpectedly reopen while navigating through application** | Verifies update notification modal lifecycle, skip persistence, upgrade workflow, and prevents infinite reappearance loops. |
 | [`tests/features/sidebar/sidebar-navigation.feature`](./features/sidebar/sidebar-navigation.feature) | `@sidebar` | 1. **User navigates through the sidebar menu** | Navigation between views (`Playlists`, `Library`, `Tags`, `Sound Effects`). |
 
 ---
@@ -71,3 +75,4 @@ npm run test:e2e -- --tags "@sidebar"
 * **Steps (`tests/steps/`)**: TypeScript classes decorated with `@binding([TestContext])` from `cucumber-tsflow`.
 * **Data Preparation (`tests/steps/main/data-preparation.steps.ts`)**: Direct database / IPC helpers for seeding fixtures (`tests/fixtures/sounds/`) without unnecessary UI friction.
 * **Audio Audibility Inspection (`tests/utils/audio-playback-inspector.ts`)**: Injects into Chromium renderer via Playwright `evaluate()` to measure Root Mean Square (RMS) signal from Howler HTML5 `<audio>` elements (`captureStream()`) and Web Audio API nodes. Ensures deterministic audio testing in CI without physical audio hardware.
+* **Mock Update Server (`tests/utils/mock-update-server.ts`)**: In-memory ephemeral HTTP server simulating `electron-updater` generic releases (`latest.yml`) for deterministic and offline auto-update testing.

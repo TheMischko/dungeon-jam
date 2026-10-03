@@ -1,4 +1,4 @@
-import { JSONFilePreset } from 'lowdb/node';
+import { JSONFile } from 'lowdb/node';
 import { Low } from 'lowdb';
 import { DatabaseSchema, DatabaseTable, initDatabase } from './init-database';
 import { app } from 'electron';
@@ -47,7 +47,9 @@ export class DatabaseWrapper {
 
   static async getInstance(): Promise<DatabaseWrapper> {
     if (!DatabaseWrapper._instance) {
-      const db = await JSONFilePreset(DatabaseWrapper.DB_FILE, initDatabase());
+      const adapter = new JSONFile<DatabaseSchema>(DatabaseWrapper.DB_FILE);
+      const db = new Low<DatabaseSchema>(adapter, initDatabase());
+      await db.read();
       await db.write();
       DatabaseWrapper._instance = new DatabaseWrapper(db);
     }
