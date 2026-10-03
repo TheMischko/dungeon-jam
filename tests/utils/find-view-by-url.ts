@@ -13,7 +13,8 @@ export const findViewByUrl = (
     }
   }
 
+  const available = contexts.map((p) => p.url()).join(', ');
   throw new Error(
-    `Cound not find an active View matching snippet "${urlSnippet}"`
+    `Cound not find an active View matching snippet "${urlSnippet}". Available URLs: [${available}]`
   );
 };
