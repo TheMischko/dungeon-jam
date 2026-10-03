@@ -4,6 +4,7 @@ import {
   DestroyRef,
   inject,
   OnInit,
+  signal,
 } from '@angular/core';
 import { DiscordTokenStore } from '@general/stores/discord-token.store';
 import {
@@ -17,6 +18,7 @@ import { EditDiscordTokenModalComponent } from '../../../modals/edit-discord-tok
 import { GeneralSettingsService } from '../../../services/general-settings.service';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { AutoUpdateService } from '../../../../../services/auto-update.service';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-general-settings-page-smart',
@@ -37,6 +39,7 @@ export class GeneralSettingsPageSmartComponent implements OnInit {
   readonly appVersion = toSignal(this.generalSettingsService.getAppVersion(), {
     initialValue: '0.0.0',
   });
+  readonly checkingUpdates = signal<boolean>(false);
 
   ngOnInit() {
     this.discordTokenStore.loadTokens();
@@ -95,9 +98,16 @@ export class GeneralSettingsPageSmartComponent implements OnInit {
   }
 
   protected checkUpdates() {
+    if (this.checkingUpdates()) {
+      return;
+    }
+    this.checkingUpdates.set(true);
     this.autoUpdateService
       .fetchAndShowUpdates()
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.checkingUpdates.set(false))
+      )
       .subscribe();
   }
 }

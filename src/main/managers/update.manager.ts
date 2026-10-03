@@ -28,30 +28,34 @@ export class UpdateManager {
   }
 
   private registerHandlers(): void {
-    ipcMain.handle(UpdateChannel.GET_UPDATE_INFO, async () => {
-      this.logger.log('GET_UPDATE_INFO called');
-      try {
-        const checkResult = await autoUpdater.checkForUpdates();
-        this.logger.log('checkForUpdates result', {
-          hasResult: !!checkResult,
-          isUpdateAvailable: checkResult?.isUpdateAvailable,
-          version: checkResult?.updateInfo?.version,
-        });
-        if (checkResult?.isUpdateAvailable && checkResult?.updateInfo) {
-          this.updateInfo = checkResult.updateInfo;
-        } else {
+    ipcMain.handle(
+      UpdateChannel.GET_UPDATE_INFO,
+      withAppError(async () => {
+        this.logger.log('GET_UPDATE_INFO called');
+        try {
+          const checkResult = await autoUpdater.checkForUpdates();
+          this.logger.log('checkForUpdates result', {
+            hasResult: !!checkResult,
+            isUpdateAvailable: checkResult?.isUpdateAvailable,
+            version: checkResult?.updateInfo?.version,
+          });
+          if (checkResult?.isUpdateAvailable && checkResult?.updateInfo) {
+            this.updateInfo = checkResult.updateInfo;
+          } else {
+            this.updateInfo = undefined;
+          }
+        } catch (err) {
+          this.logger.logWarning('checkForUpdates failed in handler', {
+            error: String(err),
+          });
           this.updateInfo = undefined;
+          throw err;
         }
-      } catch (err) {
-        this.logger.logWarning('checkForUpdates failed in handler', {
-          error: String(err),
-        });
-        this.updateInfo = undefined;
-      }
-      const data = this.getUpdateData();
-      this.logger.log('Returning update data', { data });
-      return data;
-    });
+        const data = this.getUpdateData();
+        this.logger.log('Returning update data', { data });
+        return data;
+      })
+    );
     ipcMain.handle(
       UpdateChannel.UPDATE_APP,
       withAppError(async () => {
@@ -118,6 +122,18 @@ export class UpdateManager {
         provider: 'generic',
         url: process.env.TEST_UPDATE_SERVER_URL,
       });
+    } else {
+      try {
+        autoUpdater.setFeedURL({
+          provider: 'github',
+          owner: 'TheMischko',
+          repo: 'dungeon-jam',
+        });
+      } catch (err) {
+        this.logger.logWarning('Could not set default GitHub feed URL:', {
+          error: String(err),
+        });
+      }
     }
 
     autoUpdater.on('checking-for-update', () => {

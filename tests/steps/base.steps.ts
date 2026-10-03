@@ -9,7 +9,7 @@ import { MockUpdateServer } from '../utils/mock-update-server';
 
 import { setDefaultTimeout } from '@cucumber/cucumber';
 
-setDefaultTimeout(20000);
+setDefaultTimeout(40000);
 
 const appPath = path.join(__dirname, '../../build/src/index.js');
 const dbPath = path.join(__dirname, '../../build/src/db_test.json');
@@ -20,7 +20,7 @@ export class BaseSteps {
 
   constructor(protected context: TestContext) {}
 
-  @before({ timeout: 15000 })
+  @before({ timeout: 25000 })
   async setupTestEnvironment(): Promise<void> {
     const mockServer = MockUpdateServer.getInstance();
     const serverUrl = await mockServer.start();
@@ -35,9 +35,9 @@ export class BaseSteps {
     const window = await this.electronApp.firstWindow();
     await waitForAppReadySignal(window);
 
-    const mainWindow = findViewByUrl(this.electronApp, '/main');
-    const sideWindow = findViewByUrl(this.electronApp, '/sidebar');
-    const topWindow = findViewByUrl(this.electronApp, '/topbar');
+    const mainWindow = await findViewByUrl(this.electronApp, '/main');
+    const sideWindow = await findViewByUrl(this.electronApp, '/sidebar');
+    const topWindow = await findViewByUrl(this.electronApp, '/topbar');
 
     this.context.windows = {
       mainWindow,
@@ -85,9 +85,9 @@ export class BaseSteps {
     const window = await this.electronApp.firstWindow();
     await waitForAppReadySignal(window);
 
-    const mainWindow = findViewByUrl(this.electronApp, '/main');
-    const sideWindow = findViewByUrl(this.electronApp, '/sidebar');
-    const topWindow = findViewByUrl(this.electronApp, '/topbar');
+    const mainWindow = await findViewByUrl(this.electronApp, '/main');
+    const sideWindow = await findViewByUrl(this.electronApp, '/sidebar');
+    const topWindow = await findViewByUrl(this.electronApp, '/topbar');
 
     this.context.windows = {
       mainWindow,

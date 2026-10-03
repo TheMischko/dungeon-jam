@@ -2,6 +2,7 @@ import { binding, given, then, when } from 'cucumber-tsflow';
 import { TestContext } from '../../context/context';
 import { BaseSteps } from '../base.steps';
 import { PendingUpdatesModalPage } from '../../pages/main/pending-updates-modal.page';
+import { SettingsPage } from '../../pages/main/settings.page';
 import { MockUpdateServer } from '../../utils/mock-update-server';
 import { expect } from 'playwright/test';
 import { getUpdatePreferences } from '../../apis/update.api';
@@ -13,11 +14,13 @@ const dbPath = path.join(__dirname, '../../../build/src/db_test.json');
 @binding([TestContext])
 export class AutoUpdateSteps extends BaseSteps {
   private modalPage: PendingUpdatesModalPage;
+  private settingsPage: SettingsPage;
   private mockServer = MockUpdateServer.getInstance();
 
   constructor(protected context: TestContext) {
     super(context);
     this.modalPage = new PendingUpdatesModalPage(this.context);
+    this.settingsPage = new SettingsPage(this.context);
   }
 
   @given('an update to version {string} is available')
@@ -122,5 +125,16 @@ export class AutoUpdateSteps extends BaseSteps {
       this.context.windows.mainWindow
     );
     expect(preferences?.skippedVersion).toBeUndefined();
+  }
+
+  @when('the user clicks on "Check updates" in settings')
+  async clickCheckUpdatesInSettings(): Promise<void> {
+    await this.settingsPage.clickCheckUpdates();
+  }
+
+  @then('a notification stating {string} should be displayed')
+  async verifyNotificationWithText(text: string): Promise<void> {
+    const isVisible = await this.settingsPage.isToastWithTextVisible(text);
+    expect(isVisible).toBe(true);
   }
 }

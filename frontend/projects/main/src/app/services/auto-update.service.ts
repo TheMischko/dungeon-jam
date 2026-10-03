@@ -1,13 +1,14 @@
 import { DestroyRef, inject, Injectable } from '@angular/core';
 import { UpdateApiWindow } from '@general/models/api/update-api.model';
 import { DialogService } from './dialog.service';
-import { forkJoin, Observable, of, Subject, switchMap } from 'rxjs';
+import { catchError, forkJoin, Observable, of, Subject, switchMap } from 'rxjs';
 import {
   AppUpdateInfo,
   UpdatePreferences,
 } from '@shared/models/application.model';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { PendingUpdatesModalComponent } from '../components/modals/pending-updates-modal/pending-updates-modal.component';
+import { UpdateToastService } from '@general/services/toast/update-toast.service';
 
 @Injectable({
   providedIn: 'root',
@@ -16,6 +17,7 @@ export class AutoUpdateService {
   private readonly window = <UpdateApiWindow>window;
   private readonly destroyRef = inject(DestroyRef);
   private readonly dialogService = inject(DialogService);
+  private readonly updateToastService = inject(UpdateToastService);
 
   private readonly MONTH_MILLI = 2592000000;
 
@@ -23,9 +25,14 @@ export class AutoUpdateService {
     return this.getUpdateInfo().pipe(
       switchMap((updates) => {
         if (!updates || updates.length === 0) {
+          this.updateToastService.showUpToDate();
           return of(void 0);
         }
         return this.openPendingUpdatesDialog(updates);
+      }),
+      catchError(() => {
+        this.updateToastService.showCheckFailed();
+        return of(void 0);
       })
     );
   }
@@ -53,7 +60,8 @@ export class AutoUpdateService {
         }
 
         return this.openPendingUpdatesDialog(update);
-      })
+      }),
+      catchError(() => of(void 0))
     );
   }
 
