@@ -5,6 +5,7 @@ import {
   PlaylistFetchQuery,
   PlaylistInsertQuery,
   PlaylistOrderContext,
+  PlaylistRelativeReorderQuery,
   PlaylistReorderQuery,
   PlaylistUpdateQuery,
 } from '@shared/models/playlist.model';
@@ -20,7 +21,10 @@ import { PlaylistHelper } from '../utils/playlist-helper';
 import { ImageEntityType, ImageManager } from './image.manager';
 import { Logger } from '../utils/logger';
 import { DisplayOrderManager } from './display-order.manager';
-import { OrderableEntityType } from '@shared/models/display-order.model';
+import {
+  DisplayOrder,
+  OrderableEntityType,
+} from '@shared/models/display-order.model';
 import { createAppError } from '../utils/create-app-error';
 import { ErrorCode } from '@shared/models/error.model';
 import { withAppError } from '../utils/ipc-handler';
@@ -112,6 +116,13 @@ export class PlaylistManager {
         return await this.delete(id);
       })
     );
+    ipcMain.handle(
+      PlaylistChannel.CHANGE_RELATIVE_ORDER,
+      withAppError(async (_, query: PlaylistRelativeReorderQuery) => {
+        this.logger.log('Changing relative order of a playlist', { query });
+        return await this.changePlaylistRelativeOrder(query);
+      })
+    );
   }
 
   async getAllPlaylists(query?: QueryRequest): Promise<Playlist[]> {
@@ -121,7 +132,10 @@ export class PlaylistManager {
       OrderableEntityType.Playlist,
       PlaylistOrderContext.Landing
     );
-    if (orderMap.size !== playlists.length) {
+    const noSearch = query?.search === undefined || query?.search?.length === 0;
+    const noFilters =
+      query?.filters === undefined || query?.filters.filters.length === 0;
+    if (orderMap.size !== playlists.length && noSearch && noFilters) {
       orderMap = await this.repairOrderRecords(
         playlists,
         PlaylistOrderContext.Landing
@@ -417,6 +431,20 @@ export class PlaylistManager {
     );
   }
 
+  async changePlaylistRelativeOrder(
+    query: PlaylistRelativeReorderQuery
+  ): Promise<Map<string, DisplayOrder>> {
+    if (query.contextType === PlaylistOrderContext.Parent && query.contextId) {
+      await this.ensureParentOrderContext(query.contextId);
+    }
+    return await this.displayOrderManager.setRelativeDisplayOrder(
+      query,
+      OrderableEntityType.Playlist,
+      query.contextType,
+      query.contextId
+    );
+  }
+
   private createNewPlaylist(
     data: PlaylistInsertQuery,
     order: number
@@ -591,5 +619,31 @@ export class PlaylistManager {
       ...parent,
       childrenIds,
     });
+  }
+
+  private async ensureParentOrderContext(parentId: string) {
+    const allPlaylists = await this.getAll();
+    const childPlaylists = allPlaylists.filter(
+      (p) => p.ownershipId === parentId
+    );
+
+    const orderMap = await this.displayOrderManager.getOrderMap(
+      OrderableEntityType.Playlist,
+      PlaylistOrderContext.Parent,
+      parentId
+    );
+
+    if (orderMap.size !== childPlaylists.length) {
+      this.logger.log('Fixing parent display order', {
+        parentId: parentId,
+        childCount: childPlaylists.length,
+        childNames: childPlaylists.map((p) => p.name),
+      });
+      await this.repairOrderRecords(
+        childPlaylists,
+        PlaylistOrderContext.Parent,
+        parentId
+      );
+    }
   }
 }

@@ -17,6 +17,7 @@ import { DiscordTokenStore } from '@general/stores/discord-token.store';
 import { KeyboardShortcutService } from '@general/services/keyboard-shortcut.service';
 import { PlaybackService } from './services/playback.service';
 import { DialogService } from './services/dialog.service';
+import { AutoUpdateService } from './services/auto-update.service';
 
 @Component({
   selector: 'app-root',
@@ -38,6 +39,7 @@ export class AppComponent {
   private readonly keyboardShortcutService = inject(KeyboardShortcutService);
   private readonly playbackService = inject(PlaybackService);
   private readonly dialogService = inject(DialogService);
+  private readonly autoUpdateService = inject(AutoUpdateService);
   private readonly router = inject(Router);
 
   readonly applicationReady = toSignal(
@@ -49,6 +51,10 @@ export class AppComponent {
   title = 'main';
 
   constructor() {
+    this.autoUpdateService
+      .showUpdatesIfNotSkipped()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe();
     this.routingListenerService.initialize();
     this.keyboardShortcutService.initialize();
     this.keyboardShortcutService.playPauseToggle$

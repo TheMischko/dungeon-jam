@@ -1,8 +1,9 @@
 <app-sound-effects-library
-  [dataset]="soundEffects()"
+  [dataset]="paginatedSoundEffects()"
   [loading]="loading()"
   [playingEffectIds]="playingEffectIds()"
   [focusSoundEffectId]="soundEffectId()"
+  [pagination]="paginationConfig()"
   (uploadAudioFiles)="createFromFiles($event)"
   (playEffect)="playEffect($event)"
   (stopEffect)="stopEffect($event)"
@@ -13,4 +14,5 @@
   (deleteSoundEffect)="deleteSoundEffect($event)"
   (reorderDrop)="reorderSoundEffects($event)"
   (openAudioFilesDialog)="beginUploadWithDialogSelection()"
+  (pageChange)="updatePaginationPage($event)"
 />

@@ -21,7 +21,7 @@ export class DialogService {
     dialogConfig?: Partial<MatDialogConfig>
   ): DialogRef<C, R> {
     const config: MatDialogConfig = {
-      hasBackdrop: false,
+      hasBackdrop: true,
       disableClose: true,
       scrollStrategy: new NoopScrollStrategy(),
       data: null,

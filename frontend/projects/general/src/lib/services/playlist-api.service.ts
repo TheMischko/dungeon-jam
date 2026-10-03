@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { PlaylistApiWindow } from '../../../models/api/playlist-api.model';
 import { QueryRequest } from '@shared/models/request.model';
 import { Observable, Subject } from 'rxjs';
@@ -9,12 +9,20 @@ import {
   PlaylistOrderContext,
   PlaylistUpdateQuery,
 } from '@shared/models/playlist.model';
+import {
+  DisplayOrder,
+  DisplayOrderPlacement,
+  OrderableEntityType,
+} from '@shared/models/display-order.model';
+import { DisplayOrderApiService } from '@general';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PlaylistApiService {
   private readonly window = <PlaylistApiWindow>window;
+
+  private readonly displayOrderService = inject(DisplayOrderApiService);
 
   getAllPlaylists(options: QueryRequest): Observable<Playlist[]> {
     const subject = new Subject<Playlist[]>();
@@ -81,6 +89,20 @@ export class PlaylistApiService {
     return subject.asObservable();
   }
 
+  deletePlaylist(playlistId: string): Observable<void> {
+    const subject = new Subject<void>();
+    this.window.PLAYLIST_API.deletePlaylist(playlistId)
+      .then(() => {
+        subject.next();
+        subject.complete();
+      })
+      .catch((err) => {
+        subject.error(err);
+        subject.complete();
+      });
+    return subject.asObservable();
+  }
+
   removeTracks(playlistId: string, trackIds: string[]): Observable<Playlist> {
     return this.updatePlaylist({
       id: playlistId,
@@ -112,11 +134,23 @@ export class PlaylistApiService {
     return subject;
   }
 
-  deletePlaylist(playlistId: string): Observable<void> {
-    const subject = new Subject<void>();
-    this.window.PLAYLIST_API.deletePlaylist(playlistId)
-      .then(() => {
-        subject.next();
+  reorderPlaylistRelative(
+    playlistId: string,
+    anchorEntityId: string | undefined,
+    placement: DisplayOrderPlacement,
+    context: PlaylistOrderContext,
+    parentId?: string
+  ): Observable<Map<string, DisplayOrder>> {
+    const subject = new Subject<Map<string, DisplayOrder>>();
+    this.window.PLAYLIST_API.changePlaylistRelativeOrder({
+      entityId: playlistId,
+      anchorEntityId,
+      placement,
+      contextType: context,
+      contextId: parentId,
+    })
+      .then((orderMap) => {
+        subject.next(orderMap);
         subject.complete();
       })
       .catch((err) => {
@@ -124,5 +158,15 @@ export class PlaylistApiService {
         subject.complete();
       });
     return subject.asObservable();
+  }
+
+  getDisplayOrder(parentId?: string) {
+    return this.displayOrderService.getOrderMap({
+      entityType: OrderableEntityType.Playlist,
+      contextType: parentId
+        ? PlaylistOrderContext.Parent
+        : PlaylistOrderContext.Landing,
+      contextId: parentId,
+    });
   }
 }

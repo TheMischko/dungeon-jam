@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { SoundEffectApiWindow } from '../../../models/api/sound-effect-api.model';
 import { QueryOptions } from '@shared/models/request.model';
 import { Observable, Subject } from 'rxjs';
@@ -6,13 +6,22 @@ import {
   SoundEffect,
   SoundEffectContextType,
   SoundEffectCreateData,
+  SoundEffectRelativeReorderQuery,
   SoundEffectUpdateData,
 } from '@shared/models/sound-effect.model';
+import {
+  DisplayOrder,
+  DisplayOrderPlacement,
+  OrderableEntityType,
+} from '@shared/models/display-order.model';
+import { DisplayOrderApiService } from '@general';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SoundEffectService {
+  private readonly displayOrderService = inject(DisplayOrderApiService);
+
   private readonly window: SoundEffectApiWindow = <SoundEffectApiWindow>window;
 
   public getAll(query: QueryOptions): Observable<SoundEffect[]> {
@@ -104,5 +113,44 @@ export class SoundEffectService {
         subject.complete();
       });
     return subject.asObservable();
+  }
+
+  public reorderSoundEffectRelative(
+    soundEffectId: string,
+    anchorEntityId: string | undefined,
+    placement: DisplayOrderPlacement,
+    contextType: SoundEffectContextType = SoundEffectContextType.Landing,
+    contextId?: string
+  ): Observable<Map<string, DisplayOrder>> {
+    return this.changeRelativeOrder({
+      entityId: soundEffectId,
+      anchorEntityId,
+      placement,
+      contextType,
+      contextId,
+    });
+  }
+
+  public changeRelativeOrder(
+    query: SoundEffectRelativeReorderQuery
+  ): Observable<Map<string, DisplayOrder>> {
+    const subject = new Subject<Map<string, DisplayOrder>>();
+    this.window.SOUND_EFFECT_API.changeSoundEffectRelativeOrder(query)
+      .then((orderMap) => {
+        subject.next(orderMap);
+        subject.complete();
+      })
+      .catch((err) => {
+        subject.error(err);
+        subject.complete();
+      });
+    return subject.asObservable();
+  }
+
+  public getDisplayOrder(): Observable<Map<string, DisplayOrder>> {
+    return this.displayOrderService.getOrderMap({
+      entityType: OrderableEntityType.SoundEffect,
+      contextType: SoundEffectContextType.Landing,
+    });
   }
 }

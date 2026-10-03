@@ -16,6 +16,7 @@ export function getDefaultViewConfig(buildPath: string): ViewConfig {
       contextIsolation: true,
       nodeIntegration: false,
       preload: getPreloadPath(buildPath),
+      backgroundThrottling: false,
     },
     indexHTML: getSoundCaptureIndexPath(buildPath),
   };
