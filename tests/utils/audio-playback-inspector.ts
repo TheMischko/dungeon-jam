@@ -10,7 +10,7 @@ export interface AudioInspectionResult {
 /**
  * Measures whether audio is currently playing and audible in the given page/window.
  * Inspects both HTML5 Audio instances (created by Howler with html5: true)
- * and Web Audio API nodes.
+ * and Web Audio API nodes (Howler masterGain / ctx with html5: false).
  */
 export async function measureAudioOutput(
   page: Page,
@@ -24,9 +24,13 @@ export async function measureAudioOutput(
 
       // 1. Collect HTML5 audio elements managed by Howler (_howls)
       const howlDetails: any[] = [];
+      let anyHowlPlaying = false;
       if (howler?._howls) {
         for (const howl of howler._howls) {
           const soundsInfo: any[] = [];
+          if (typeof howl.playing === 'function' && howl.playing()) {
+            anyHowlPlaying = true;
+          }
           for (const sound of howl._sounds || []) {
             if (sound._node && sound._node instanceof HTMLAudioElement) {
               audioElements.push(sound._node);
@@ -40,7 +44,12 @@ export async function measureAudioOutput(
               });
             }
           }
-          howlDetails.push({ state: howl.state(), playing: howl.playing(), sounds: soundsInfo });
+          howlDetails.push({
+            state: typeof howl.state === 'function' ? howl.state() : undefined,
+            playing: typeof howl.playing === 'function' ? howl.playing() : undefined,
+            volume: typeof howl.volume === 'function' ? howl.volume() : undefined,
+            sounds: soundsInfo,
+          });
         }
       }
 
@@ -57,7 +66,7 @@ export async function measureAudioOutput(
         });
       });
 
-      // Filter active, playing elements
+      // Filter active, playing HTML5 elements
       const activeElements = audioElements.filter(
         (el) => !el.paused && !el.muted && el.volume > 0 && el.currentTime > 0
       );
@@ -68,6 +77,7 @@ export async function measureAudioOutput(
       const debug = {
         hasHowler: !!howler,
         howlsCount: howler?._howls?.length ?? 0,
+        anyHowlPlaying,
         howlDetails,
         domAudioInfo,
         activeElementsCount: activeElements.length,
@@ -75,7 +85,7 @@ export async function measureAudioOutput(
       };
 
       // If nothing is playing and no running audio context exists -> silence
-      if (activeElements.length === 0 && !hasWebAudioRunning) {
+      if (activeElements.length === 0 && !hasWebAudioRunning && !anyHowlPlaying) {
         return {
           isAudible: false,
           maxRms: 0,
@@ -84,21 +94,24 @@ export async function measureAudioOutput(
         };
       }
 
-
       // 3. Set up Web Audio Analyser
+      // If Howler has an active AudioContext, use it so we can connect to howler.masterGain directly
       const AudioCtxClass =
         window.AudioContext || (window as any).webkitAudioContext;
-      const ctx = new AudioCtxClass();
+      const ctx = howler?.ctx || new AudioCtxClass();
       if (ctx.state === 'suspended') {
-        await ctx.resume();
+        try {
+          await ctx.resume();
+        } catch (_) {}
       }
 
       const analyser = ctx.createAnalyser();
       analyser.fftSize = 512;
       const buffer = new Float32Array(analyser.fftSize);
-      const sourcesToDisconnect: { disconnect: () => void }[] = [];
+      const cleanups: (() => void)[] = [];
 
       try {
+        // Connect HTML5 active elements
         for (const el of activeElements) {
           try {
             const captureFn =
@@ -107,22 +120,31 @@ export async function measureAudioOutput(
               const stream = captureFn.call(el);
               const source = ctx.createMediaStreamSource(stream);
               source.connect(analyser);
-              sourcesToDisconnect.push(source);
+              cleanups.push(() => {
+                try {
+                  source.disconnect(analyser);
+                } catch (_) {}
+              });
             }
-          } catch (_) {
-            // captureStream may fail on cross-origin or certain blob formats
-          }
-        }
-
-        if (howler?.masterGain) {
-          try {
-            howler.masterGain.connect(analyser);
-            sourcesToDisconnect.push(howler.masterGain);
           } catch (_) {}
         }
 
+        // Connect Howler masterGain if on the same AudioContext
+        if (howler?.masterGain && howler?.ctx === ctx) {
+          try {
+            howler.masterGain.connect(analyser);
+            cleanups.push(() => {
+              try {
+                howler.masterGain.disconnect(analyser);
+              } catch (_) {}
+            });
+          } catch (e) {
+            (debug as any).masterGainConnectError = String(e);
+          }
+        }
+
         let maxRms = 0;
-        if (sourcesToDisconnect.length > 0) {
+        if (cleanups.length > 0) {
           const startTime = performance.now();
           while (performance.now() - startTime < samplingMs) {
             analyser.getFloatTimeDomainData(buffer);
@@ -142,24 +164,30 @@ export async function measureAudioOutput(
           await new Promise((r) => setTimeout(r, samplingMs));
           const t1 = activeElements[0].currentTime;
           if (t1 > t0 + 0.05) {
-            maxRms = 0.1; // Media playback is actively progressing
+            maxRms = 0.1;
           }
+        } else if (anyHowlPlaying && hasWebAudioRunning) {
+          // Web Audio fallback: Howl is actively playing inside running AudioContext
+          maxRms = 0.1;
         }
 
         return {
           isAudible: maxRms >= rmsThreshold,
           maxRms,
-          activeElementsCount: activeElements.length,
+          activeElementsCount: activeElements.length + (anyHowlPlaying ? 1 : 0),
+          debugInfo: debug,
         };
       } finally {
-        for (const s of sourcesToDisconnect) {
+        for (const cleanup of cleanups) {
           try {
-            s.disconnect();
+            cleanup();
           } catch (_) {}
         }
-        try {
-          await ctx.close();
-        } catch (_) {}
+        if (ctx !== howler?.ctx) {
+          try {
+            await ctx.close();
+          } catch (_) {}
+        }
       }
     },
     { samplingMs, rmsThreshold }

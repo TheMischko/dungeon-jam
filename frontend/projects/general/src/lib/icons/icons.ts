@@ -3,6 +3,7 @@ import {
   LucideChevronDown,
   LucideChevronUp,
   LucideCopy,
+  LucideCornerUpRight,
   LucideEllipsisVertical,
   LucideGrid2x2,
   LucideGrid3x3,
@@ -62,6 +63,7 @@ export const actionsIconSet = {
   CollapsedArrowIcon: LucideChevronDown.icon,
   ExpandedArrowIcon: LucideChevronUp.icon,
   ShuffleIcon: LucideShuffle.icon,
+  FadeInIcon: LucideCornerUpRight.icon,
   UploadImageIcon: LucideImageUp.icon,
   CloseAppIcon: LucideX.icon,
   MinimizeIcon: LucideMinus.icon,
@@ -75,4 +77,3 @@ export const volumeIconSet = {
   LowIcon: LucideVolume1.icon,
   NormalIcon: LucideVolume2.icon,
 };
-

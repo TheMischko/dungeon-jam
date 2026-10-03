@@ -169,13 +169,15 @@ export class LibraryLandingPageComponent implements OnInit {
   }
 
   playTrack(track: Track) {
-    const trackIndex = this.tracks().findIndex(
+    const currentTracks = this.displayTracks();
+    const trackIndex = currentTracks.findIndex(
       (libraryTrack) => libraryTrack.id === track.id
     );
-    this.playbackService.play(
-      track,
-      this.displayTracks().slice(trackIndex + 1)
-    );
+
+    this.playbackService.play(track, [
+      ...currentTracks.slice(trackIndex + 1),
+      ...currentTracks.slice(0, trackIndex),
+    ]);
   }
 
   pauseTrack() {

@@ -34,6 +34,9 @@ export enum PlaybackChannel {
   LOAD = 'playback/load',
   UPDATE = 'playback/update',
   CAPTURE_SETTINGS = 'playback/capture-settings',
+  LOAD_TRANSITION = 'playback/load-transition',
+  UPDATE_TRANSITION = 'playback/update-transition',
+  TRANSITION_SYNC = 'playback/transition-sync',
 }
 
 export enum PlaylistChannel {

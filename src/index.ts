@@ -7,6 +7,7 @@ import { AppInfoManager } from './main/managers/app-info.manager';
 import pkg from '../package.json';
 
 import { DatabaseWrapper } from './main/database/database';
+import { MediaProtocolManager } from './main/managers/media-protocol.manager';
 
 const ENV = process.env.ENV || 'production';
 const appLogger = new Logger('APP', 'cyanBright');
@@ -22,6 +23,7 @@ app.name = pkg.name;
 // @ts-ignore
 app.version = pkg.version;
 app.getVersion = () => pkg.version;
+MediaProtocolManager.RegisterMediaProtocol();
 
 if (!app.isPackaged) {
   const appData = app.getPath('appData');
@@ -45,6 +47,9 @@ app.on('ready', async () => {
     powerSaveBlockerId = powerSaveBlocker.start('prevent-app-suspension');
 
     appLogger.log(`Starting DungeonJam v${app.getVersion()}`, { env: ENV });
+    // Must run before any window is created/navigates, otherwise its
+    // webContents won't route media:// requests until the next navigation.
+    MediaProtocolManager.getInstance();
     startupManager = StartupManager.getInstance(__dirname, ENV);
     const managersInitSuccess = await startupManager.initializeAllManagers();
     const resourcesInitSuccess = await startupManager.initializeResources();

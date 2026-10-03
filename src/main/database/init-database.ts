@@ -1,4 +1,8 @@
-import { RepeatState, StoredPlayback, Track } from '@shared/models/track.model';
+import {
+  PlaybackSettings,
+  RepeatState,
+  Track,
+} from '@shared/models/track.model';
 import { Playlist } from '@shared/models/playlist.model';
 import { TagData } from '@shared/models/tag.model';
 import { DiscordTokenData } from '@shared/models/discord.model';
@@ -29,11 +33,13 @@ function initTracks(): Track[] {
   return [];
 }
 
-function initPlayback(): StoredPlayback {
+function initPlayback(): PlaybackSettings {
   return {
     volume: 1,
     shuffle: false,
     repeat: RepeatState.NONE,
+    crossFadeDuration: 1,
+    fadeInDuration: 1,
   };
 }
 
