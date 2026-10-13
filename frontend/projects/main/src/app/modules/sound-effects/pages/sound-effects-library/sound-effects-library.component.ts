@@ -19,6 +19,7 @@ import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { MatButton } from '@angular/material/button';
 import { PaginationConfig } from '../../../../models/pagination.model';
 import { PageEvent } from '@angular/material/paginator';
+import { showHighlightedElement } from '../../../../utils/table-highlight.utils';
 
 @Component({
   selector: 'app-sound-effects-library',
@@ -92,12 +93,6 @@ export class SoundEffectsLibraryComponent {
   focusElementWithId(soundEffectId: string): void {
     const selector = `[sound-effect-id="${soundEffectId}"]`;
     const element = document.querySelector(selector);
-    if (!element) {
-      return;
-    }
-    element.scrollIntoView({
-      block: 'center',
-    });
-    element.classList.add('highlight-focus');
+    showHighlightedElement(element);
   }
 }

@@ -10,6 +10,7 @@ import {
   ChangeDetectionStrategy,
   inject,
   untracked,
+  ElementRef,
 } from '@angular/core';
 import { Track } from '@shared/models/track.model';
 import { LucideDynamicIcon } from '@lucide/angular';
@@ -44,6 +45,10 @@ import {
 import { PageEvent } from '@angular/material/paginator';
 import { TrackHighlightService } from '../../../../../services/track-highlight.service';
 import { toSignal } from '@angular/core/rxjs-interop';
+import {
+  getRowWithTrackById,
+  showHighlightedElement,
+} from '../../../../../utils/table-highlight.utils';
 
 @Component({
   selector: 'app-songs-table',
@@ -106,6 +111,10 @@ export class SongsTableComponent {
     viewChild.required<TemplateRef<{ $implicit: Track }>>('tagColumn');
   readonly actionsColumnTemplate =
     viewChild.required<TemplateRef<{ $implicit: Track }>>('actionsColumn');
+
+  readonly smartTableRef = viewChild.required('smartTable', {
+    read: ElementRef<HTMLElement>,
+  });
 
   readonly durationPipe = new TrackDurationPipe();
   readonly trackByTrackId: TableTrackByFn<Track> = (_: number, item: Track) =>
@@ -245,9 +254,8 @@ export class SongsTableComponent {
     this.paginationService.resetPage();
     let foundTrack: Track | null = null;
     while (
-      foundTrack === null &&
       this.paginationService.currentPageIndex() <
-        this.paginationService.totalPages()
+      this.paginationService.totalPages()
     ) {
       const currentPage = this.paginationService.currentPageData();
       const trackIndex = currentPage.findIndex(
@@ -258,10 +266,32 @@ export class SongsTableComponent {
         this.trackHighlightService.resetHighlightTrackId();
         break;
       }
+      const currentPageIndex = this.paginationService.currentPageIndex();
       this.paginationService.nextPage();
+      if (this.paginationService.currentPageIndex() === currentPageIndex) {
+        // Break if stuck on last page
+        break;
+      }
     }
     if (!foundTrack) {
       this.paginationService.goToPage(initialPage);
+      return;
     }
+
+    this.showAndHighlightTrackRow(highlightTrackId);
+  }
+
+  private showAndHighlightTrackRow(trackId: string): void {
+    requestAnimationFrame(() => {
+      const rowElement = getRowWithTrackById(trackId);
+      const tableElement = this.smartTableRef().nativeElement;
+      console.log('Table', tableElement);
+      if (rowElement && tableElement) {
+        tableElement.scrollIntoView({
+          block: 'center',
+        });
+        showHighlightedElement(rowElement);
+      }
+    });
   }
 }
