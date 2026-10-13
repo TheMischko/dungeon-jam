@@ -283,16 +283,18 @@ export class SongsTableComponent {
   }
 
   private showAndHighlightTrackRow(trackId: string): void {
-    requestAnimationFrame(() => {
-      const rowElement = getRowWithTrackById(trackId);
-      const tableElement = this.smartTableRef().nativeElement;
-      console.log('Table', tableElement);
-      if (rowElement && tableElement) {
-        tableElement.scrollIntoView({
-          block: 'center',
-        });
-        showHighlightedElement(rowElement);
-      }
-    });
+    setTimeout(() => {
+      requestAnimationFrame(() => {
+        const rowElement = getRowWithTrackById(trackId);
+        const tableElement = this.smartTableRef().nativeElement;
+        if (rowElement && tableElement) {
+          tableElement.scrollIntoView({
+            block: 'center',
+          });
+          showHighlightedElement(rowElement);
+          this.highlightTrackId.set(undefined);
+        }
+      });
+    }, 200);
   }
 }
