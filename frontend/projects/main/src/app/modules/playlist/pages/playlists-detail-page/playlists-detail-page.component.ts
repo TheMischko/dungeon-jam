@@ -25,7 +25,8 @@ import { ChildPlaylistActionsSmartComponent } from './child-playlist-actions/chi
 import { TagListSmartComponent } from '@general/components/display/tag-list/tag-list-smart/tag-list-smart.component';
 import { FilesDropInZoneComponent } from '../../../../components/drag-and-drop/files-drop-in-zone.component';
 import { createPlaylistContext } from '../../../../models/track-highlight.model';
-
+import { CdkDrag, CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop';
+import { MenuCloseReason } from '@angular/material/menu';
 @Component({
   selector: 'app-playlists-detail-page',
   imports: [
@@ -40,6 +41,8 @@ import { createPlaylistContext } from '../../../../models/track-highlight.model'
     ChildPlaylistActionsSmartComponent,
     TagListSmartComponent,
     FilesDropInZoneComponent,
+    CdkDrag,
+    CdkDropList,
   ],
   templateUrl: './playlists-detail-page.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
@@ -67,6 +70,8 @@ export class PlaylistsDetailPageComponent {
   readonly deletePlaylist = output<void>();
   readonly openDiscover = output<void>();
   readonly audioDropped = output<AudioTrack[]>();
+  readonly reorderChildren = output<CdkDragDrop<Playlist[]>>();
+  readonly actionMenuClosed = output<MenuCloseReason | string>();
 
   readonly noTracksWarning =
     'There are no tracks yet. You need to add some from Library or through the Discover mode.';
@@ -80,7 +85,7 @@ export class PlaylistsDetailPageComponent {
   });
 
   readonly childrenSectionConfig = computed(() => {
-    if (!this.childrenPlaylists() || this.childrenPlaylists().length === 0) {
+    if (!this.playlist()) {
       return [] as {
         value: Playlist[];
         title: string;
@@ -125,5 +130,9 @@ export class PlaylistsDetailPageComponent {
 
   protected toggleIncludeChildren(include: boolean) {
     this.includeChildren.emit(include);
+  }
+
+  protected childPlaylistDropped(event: CdkDragDrop<Playlist[]>) {
+    this.reorderChildren.emit(event);
   }
 }

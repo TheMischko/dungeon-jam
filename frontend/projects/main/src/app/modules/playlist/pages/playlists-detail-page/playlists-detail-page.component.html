@@ -73,22 +73,35 @@
       (playTrack)="playTrack.emit($event)"
       (pauseTrack)="pause.emit()"
       (queryChange)="queryChange.emit($event)"
+      (actionMenuClosed)="actionMenuClosed.emit($event)"
     ></app-songs-table>
   </div>
 </app-files-drop-in-zone>
+
 
 <ng-template #childrenTemplate>
   <div class="child-playlists-section">
     @if (playlist(); as playlist) {
       <app-child-playlist-actions-smart [parent]="playlist" />
     }
-    <div class="playlists">
+    <div
+      class="playlists"
+      cdkDropList
+      cdkDropListOrientation="mixed"
+      [cdkDropListData]="childrenPlaylists()"
+      (cdkDropListDropped)="childPlaylistDropped($event)"
+    >
       @for (child of childrenPlaylists(); track child.id) {
         @if (child) {
-          <a [routerLink]="['../', child.id]">
+          <a [routerLink]="['../', child.id]" cdkDrag [cdkDragData]="child" cdkDragPreviewClass="dragging">
             <app-child-playlist-box [playlist]="child" />
           </a>
         }
+      }
+      @if (childrenPlaylists().length === 0) {
+        <p class="no-children-text">
+          No child playlists yet. Use "Create new playlist" to add one.
+        </p>
       }
     </div>
   </div>

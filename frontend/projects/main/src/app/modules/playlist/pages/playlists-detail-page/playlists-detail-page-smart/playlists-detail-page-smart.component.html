@@ -17,4 +17,6 @@
   (editPlaylist)="openEditPlaylistModal()"
   (deletePlaylist)="openDeletePlaylistModal()"
   (audioDropped)="onTracksDropped($event)"
+  (reorderChildren)="reorderChildPlaylist($event)"
+  (actionMenuClosed)="actionsClosed($event)"
 ></app-playlists-detail-page>

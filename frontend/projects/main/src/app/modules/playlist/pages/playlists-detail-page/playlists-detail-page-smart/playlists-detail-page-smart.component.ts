@@ -23,7 +23,10 @@ import { Playlist, PlaylistUpdateQuery } from '@shared/models/playlist.model';
 import { PlaylistsDetailPageComponent } from '../playlists-detail-page.component';
 import { PlaybackService } from '../../../../../services/playback.service';
 import { PlaybackState } from '../../../../../models/playback.model';
-import { ActionsMenuConfig } from '@general/components/display/actions-menu/actions-menu.component';
+import {
+  ActionsMenuConfig,
+  ActionsMenuDataConfig,
+} from '@general/components/display/actions-menu/actions-menu.component';
 import { actionsIconSet } from '@general/icons/icons';
 import { DialogService } from '../../../../../services/dialog.service';
 import {
@@ -57,6 +60,9 @@ import {
   ConfirmationDialogData,
 } from '../../../../../components/dialog/confirmation-dialog/confirmation-dialog.component';
 import { DiscoverTracksStateService } from '../../../../../services/discover-tracks-state.service';
+import { CdkDragDrop } from '@angular/cdk/drag-drop';
+import { DisplayOrderPlacement } from '@shared/models/display-order.model';
+import { MenuCloseReason } from '@angular/material/menu';
 
 @Component({
   selector: 'app-playlists-detail-page-smart',
@@ -105,7 +111,15 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
       return [];
     }
     const playlistMap = this.playlistStore.entityMap();
-    return childIds.map((id) => playlistMap[id]).filter((p: Playlist) => !!p);
+    const orderMap = this.playlistStore.latestOrderMap();
+    const children = childIds
+      .map((id) => playlistMap[id])
+      .filter((p: Playlist) => !!p);
+    return [...children].sort((a, b) => {
+      const orderA = orderMap.get(a.id)?.order ?? Number.MAX_SAFE_INTEGER;
+      const orderB = orderMap.get(b.id)?.order ?? Number.MAX_SAFE_INTEGER;
+      return orderA - orderB;
+    });
   });
 
   readonly playbackState = toSignal<PlaybackState | null>(
@@ -128,6 +142,7 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
   );
   readonly currentIncludeChildren = signal<boolean>(false);
   readonly currentFilters = signal<FilterQuery>(new FilterQuery());
+  readonly showMoveToChild = signal<boolean>(false);
 
   readonly loadQuery = computed<PlaylistTracksQuery>(() => ({
     search: this.currentFilter(),
@@ -137,9 +152,36 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
     filters: this.currentFilters(),
     includeChildren: this.currentIncludeChildren(),
   }));
-  songActionsMenuConfig = computed<ActionsMenuConfig<Track, Playlist>[]>(() => {
+
+  readonly moveToChildActions = computed<
+    ActionsMenuDataConfig<Track, Playlist>[]
+  >(() => {
+    return this.childPlaylists().map((child) => ({
+      text: child.name,
+      data: child,
+      keepOpen: false,
+      onSelected: (track: Track, config: ActionsMenuDataConfig<Track, Playlist>) => {
+        this.moveTrackToChildPlaylist(track, config.data!);
+      },
+    }));
+  });
+
+  readonly defaultSongActionsMenuConfig = computed<
+    ActionsMenuConfig<Track, Playlist>[]
+  >(() => {
+    const hasChildren = this.childPlaylists().length > 0;
     return this.defaultActionsService.createActions({
       appendActions: [
+        ...(hasChildren
+          ? [
+              {
+                text: 'Move to child playlist',
+                icon: actionsIconSet.AddIcon,
+                onSelected: () => this.showMoveToChild.set(true),
+                keepOpen: true,
+              },
+            ]
+          : []),
         {
           text: 'Remove from playlist',
           icon: actionsIconSet.DeleteIcon,
@@ -150,6 +192,13 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
       ],
       excludeActions: ['delete'],
     });
+  });
+
+  songActionsMenuConfig = computed<ActionsMenuConfig<Track, Playlist>[]>(() => {
+    if (this.showMoveToChild()) {
+      return this.moveToChildActions();
+    }
+    return this.defaultSongActionsMenuConfig();
   });
 
   constructor() {
@@ -173,6 +222,16 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
     effect(() => {
       this.playlistId();
       this.discoverStateService.reset();
+    });
+
+    effect(() => {
+      const playlistId = this.playlistId();
+      // Track childrenIds length so order map refreshes when children are added/removed
+      this.playlist()?.childrenIds?.length;
+      if (!playlistId) {
+        return;
+      }
+      this.playlistStore.updateOrderMap(playlistId);
     });
   }
 
@@ -356,5 +415,40 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
           this.openDiscoverModal();
         }
       });
+  }
+
+  protected reorderChildPlaylist(event: CdkDragDrop<Playlist[]>) {
+    const children = this.childPlaylists();
+    const item = children[event.previousIndex];
+    if (!item) {
+      return;
+    }
+    const anchor = children[event.currentIndex];
+    const placement =
+      event.currentIndex > event.previousIndex
+        ? DisplayOrderPlacement.AFTER
+        : DisplayOrderPlacement.BEFORE;
+    this.playlistStore.changeRelativeOrder({
+      playlistId: item.id,
+      anchorId: anchor?.id,
+      placement,
+      parentId: this.playlistId(),
+    });
+  }
+
+  protected actionsClosed(reason: MenuCloseReason | string) {
+    if (reason !== 'click' || this.showMoveToChild()) {
+      setTimeout(() => {
+        this.showMoveToChild.set(false);
+      }, 250);
+    }
+  }
+
+  private moveTrackToChildPlaylist(track: Track, child: Playlist) {
+    this.playlistStore.addNewTracks({
+      [child.id]: [track.id],
+    });
+    this.removeTrackFromPlaylist(track);
+    this.showMoveToChild.set(false);
   }
 }
