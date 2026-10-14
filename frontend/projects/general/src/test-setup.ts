@@ -1,5 +1,9 @@
 import { RedirectRequest } from '@shared/models/redirect.model';
-import { OperatingSystem } from '@shared/models/application.model';
+import {
+  AppUpdateInfo,
+  OperatingSystem,
+  UpdatePreferences,
+} from '@shared/models/application.model';
 import {
   DiscordState,
   DiscordTokenActiveUpdate,
@@ -233,6 +237,12 @@ declare global {
         query: DisplayOrderMapQuery,
       ) => Promise<Map<string, DisplayOrder>>;
     };
+    UPDATE_API: {
+      getUpdateInfo: () => Promise<AppUpdateInfo[]>;
+      updateApp: () => Promise<void>;
+      skipVersion: () => Promise<void>;
+      getPreferences: () => Promise<UpdatePreferences>;
+    };
   }
 }
 
@@ -450,6 +460,12 @@ function installWindowApiStubs(): void {
 
   window.DISPLAY_ORDER_API = {
     getOrderMap: () => Promise.resolve(new Map()),
+  };
+  window.UPDATE_API = {
+    getUpdateInfo: () => Promise.resolve([]),
+    updateApp: () => Promise.resolve(),
+    skipVersion: () => Promise.resolve(),
+    getPreferences: () => Promise.resolve({}),
   };
 }
 

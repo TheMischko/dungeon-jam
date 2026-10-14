@@ -20,6 +20,7 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { PlaybackSettingsApiService } from '@general/services/playback-settings-api.service';
 import { StoredTransitionSettings } from '@shared/models/track.model';
 import { AutoUpdateService } from '../../../../../services/auto-update.service';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-general-settings-page-smart',
@@ -45,6 +46,7 @@ export class GeneralSettingsPageSmartComponent implements OnInit {
     fadeInDuration: 1,
     crossFadeDuration: 1,
   });
+  readonly checkingUpdates = signal<boolean>(false);
   ngOnInit() {
     this.discordTokenStore.loadTokens();
     this.playbackSettingsService
@@ -113,9 +115,16 @@ export class GeneralSettingsPageSmartComponent implements OnInit {
   }
 
   protected checkUpdates() {
+    if (this.checkingUpdates()) {
+      return;
+    }
+    this.checkingUpdates.set(true);
     this.autoUpdateService
       .fetchAndShowUpdates()
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.checkingUpdates.set(false))
+      )
       .subscribe();
   }
 }

@@ -4,10 +4,11 @@ import { Locator, Page } from 'playwright';
 import { MainSelectors } from '../../selectors/main/main.selectors';
 
 export class BaseMainPage extends BasePage {
-  public readonly page: Page;
+  get page(): Page {
+    return this.context.windows.mainWindow;
+  }
   constructor(protected context: TestContext) {
     super(context);
-    this.page = context.windows.mainWindow;
   }
 
   get pageTitle(): Locator {

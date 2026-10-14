@@ -46,6 +46,12 @@
       "DELETE_SUCCESS_TITLE": "Session deleted",
       "DELETE_SUCCESS_MESSAGE": "Session was successfully deleted.",
       "GENERIC_ERROR_MESSAGE": "An unknown error occurred."
+    },
+    "UPDATE": {
+      "UP_TO_DATE_TITLE": "Application is up to date",
+      "UP_TO_DATE_MESSAGE": "You are running the latest version of Dungeon Jam.",
+      "CHECK_FAILED_TITLE": "Update check failed",
+      "CHECK_FAILED_MESSAGE": "Could not check for updates. Please try again later."
     }
   }
 }

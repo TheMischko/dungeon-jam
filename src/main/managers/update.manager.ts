@@ -28,16 +28,44 @@ export class UpdateManager {
   }
 
   private registerHandlers(): void {
-    ipcMain.handle(UpdateChannel.GET_UPDATE_INFO, async () => {
-      await autoUpdater.checkForUpdates();
-      return this.getUpdateData();
-    });
+    ipcMain.handle(
+      UpdateChannel.GET_UPDATE_INFO,
+      withAppError(async () => {
+        this.logger.log('GET_UPDATE_INFO called');
+        try {
+          const checkResult = await autoUpdater.checkForUpdates();
+          this.logger.log('checkForUpdates result', {
+            hasResult: !!checkResult,
+            isUpdateAvailable: checkResult?.isUpdateAvailable,
+            version: checkResult?.updateInfo?.version,
+          });
+          if (checkResult?.isUpdateAvailable && checkResult?.updateInfo) {
+            this.updateInfo = checkResult.updateInfo;
+          } else {
+            this.updateInfo = undefined;
+          }
+        } catch (err) {
+          this.logger.logWarning('checkForUpdates failed in handler', {
+            error: String(err),
+          });
+          this.updateInfo = undefined;
+          throw err;
+        }
+        const data = this.getUpdateData();
+        this.logger.log('Returning update data', { data });
+        return data;
+      })
+    );
     ipcMain.handle(
       UpdateChannel.UPDATE_APP,
       withAppError(async () => {
         const version = this.updateInfo?.version;
         this.logger.log(`Installing version ${version}.`);
         autoUpdater.autoRunAppAfterInstall = true;
+        if (process.env.ENV === 'test') {
+          await this.writeUpdatePreferences({});
+          return;
+        }
         await autoUpdater.downloadUpdate();
         await this.writeUpdatePreferences({});
         autoUpdater.quitAndInstall();
@@ -85,6 +113,29 @@ export class UpdateManager {
     autoUpdater.autoInstallOnAppQuit = false;
     autoUpdater.fullChangelog = true;
     autoUpdater.forceDevUpdateConfig = true;
+
+    if (process.env.ENV === 'test' && process.env.TEST_UPDATE_SERVER_URL) {
+      this.logger.log(
+        `Configuring test update feed: ${process.env.TEST_UPDATE_SERVER_URL}`
+      );
+      autoUpdater.setFeedURL({
+        provider: 'generic',
+        url: process.env.TEST_UPDATE_SERVER_URL,
+      });
+    } else {
+      try {
+        autoUpdater.setFeedURL({
+          provider: 'github',
+          owner: 'TheMischko',
+          repo: 'dungeon-jam',
+        });
+      } catch (err) {
+        this.logger.logWarning('Could not set default GitHub feed URL:', {
+          error: String(err),
+        });
+      }
+    }
+
     autoUpdater.on('checking-for-update', () => {
       this.logger.log('Checking for updates...');
     });
@@ -96,6 +147,7 @@ export class UpdateManager {
 
     autoUpdater.on('update-not-available', () => {
       this.logger.log('Application is up to date.');
+      this.updateInfo = undefined;
     });
 
     autoUpdater.on('error', (err) => {
@@ -103,6 +155,7 @@ export class UpdateManager {
         'Auto-updater encountered an error (expected if no releases published on GitHub yet):',
         { error: String(err) }
       );
+      this.updateInfo = undefined;
     });
 
     autoUpdater.on('download-progress', (progressObj) => {
