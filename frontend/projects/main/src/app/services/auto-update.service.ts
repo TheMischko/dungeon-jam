@@ -83,7 +83,7 @@ export class AutoUpdateService {
   }
 
   private getUpdateInfo(): Observable<AppUpdateInfo[] | null> {
-    if (!this.window?.UPDATE_API) {
+    if (!this.window?.UPDATE_API?.getUpdateInfo) {
       return of(null);
     }
     const response = new Subject<AppUpdateInfo[] | null>();
@@ -105,7 +105,7 @@ export class AutoUpdateService {
   }
 
   private installUpdates(): Observable<void> {
-    if (!this.window?.UPDATE_API) {
+    if (!this.window?.UPDATE_API?.updateApp) {
       return of(void 0);
     }
     const response = new Subject<void>();
@@ -122,7 +122,7 @@ export class AutoUpdateService {
   }
 
   private getPreferences(): Observable<UpdatePreferences> {
-    if (!this.window?.UPDATE_API) {
+    if (!this.window?.UPDATE_API?.getPreferences) {
       return of({});
     }
     const response = new Subject<UpdatePreferences>();
@@ -139,7 +139,7 @@ export class AutoUpdateService {
   }
 
   private cancelUpdate(): Observable<void> {
-    if (!this.window?.UPDATE_API) {
+    if (!this.window?.UPDATE_API?.skipVersion) {
       return of(void 0);
     }
     const response = new Subject<void>();
