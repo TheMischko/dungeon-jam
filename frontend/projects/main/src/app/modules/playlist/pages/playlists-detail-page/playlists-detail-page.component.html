@@ -91,17 +91,19 @@
       [cdkDropListData]="childrenPlaylists()"
       (cdkDropListDropped)="childPlaylistDropped($event)"
     >
-      @for (child of childrenPlaylists(); track child.id) {
-        @if (child) {
-          <a [routerLink]="['../', child.id]" cdkDrag [cdkDragData]="child" cdkDragPreviewClass="dragging">
-            <app-child-playlist-box [playlist]="child" />
-          </a>
-        }
-      }
       @if (childrenPlaylists().length === 0) {
         <p class="no-children-text">
           No child playlists yet. Use "Create new playlist" to add one.
         </p>
+      } @else {
+        <app-playlist-grid
+          [dataSet]="childrenPlaylistsTagged()"
+          [playlistImageMap]="childrenPlaylistImageMap()"
+          [sizeConfig]="childrenGridConfig"
+          [showControls]="false"
+          [showParentsFilter]="false"
+          (playlistClick)="navigateToChildPlaylist($event)"
+        ></app-playlist-grid>
       }
     </div>
   </div>

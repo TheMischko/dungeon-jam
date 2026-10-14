@@ -63,6 +63,7 @@ import { DiscoverTracksStateService } from '../../../../../services/discover-tra
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { DisplayOrderPlacement } from '@shared/models/display-order.model';
 import { MenuCloseReason } from '@angular/material/menu';
+import { forkJoin, map, Observable, of, tap } from 'rxjs';
 
 @Component({
   selector: 'app-playlists-detail-page-smart',
@@ -143,6 +144,9 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
   readonly currentIncludeChildren = signal<boolean>(false);
   readonly currentFilters = signal<FilterQuery>(new FilterQuery());
   readonly showMoveToChild = signal<boolean>(false);
+  protected readonly childPlaylistImageMap = signal<
+    Record<string, string | null>
+  >({});
 
   readonly loadQuery = computed<PlaylistTracksQuery>(() => ({
     search: this.currentFilter(),
@@ -160,7 +164,10 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
       text: child.name,
       data: child,
       keepOpen: false,
-      onSelected: (track: Track, config: ActionsMenuDataConfig<Track, Playlist>) => {
+      onSelected: (
+        track: Track,
+        config: ActionsMenuDataConfig<Track, Playlist>
+      ) => {
         this.moveTrackToChildPlaylist(track, config.data!);
       },
     }));
@@ -233,6 +240,42 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
       }
       this.playlistStore.updateOrderMap(playlistId);
     });
+
+    effect(() => {
+      const children = this.childPlaylists();
+      if (!children.length) {
+        this.childPlaylistImageMap.set({});
+        return;
+      }
+      const sub = this.updateChildPlaylistImageMap(children).subscribe();
+      return () => {
+        sub?.unsubscribe();
+      };
+    });
+  }
+
+  private updateChildPlaylistImageMap(playlists: Playlist[]): Observable<void> {
+    const imageRequests = playlists.map((playlist) => {
+      if (playlist.imageUrl) {
+        return this.imageApiService
+          .fetchImage(playlist.imageUrl)
+          .pipe(map((imageUrl) => ({ playlistId: playlist.id, imageUrl })));
+      }
+      return of({ playlistId: playlist.id, imageUrl: null });
+    });
+    return forkJoin(imageRequests).pipe(
+      tap((responses) => {
+        const imageMap = responses.reduce(
+          (map, response) => ({
+            ...map,
+            [response.playlistId]: response.imageUrl,
+          }),
+          {} as Record<string, string | null>
+        );
+        this.childPlaylistImageMap.set(imageMap);
+      }),
+      map(() => void 0)
+    );
   }
 
   ngOnInit() {

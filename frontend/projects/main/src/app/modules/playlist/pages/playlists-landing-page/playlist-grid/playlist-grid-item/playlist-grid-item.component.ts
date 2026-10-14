@@ -37,6 +37,9 @@ export class PlaylistGridItemComponent {
   readonly actions = input<ActionsMenuConfig<PlaylistWithTagData, string>[]>(
     []
   );
+  readonly hideParentInfo = computed<boolean>(() => {
+    return this.sizeConfig().hideParentInfo ?? false;
+  });
 
   readonly playlistClick = output<string>();
   readonly playPlaylist = output<string>();

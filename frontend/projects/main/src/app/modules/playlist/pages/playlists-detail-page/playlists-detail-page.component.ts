@@ -6,6 +6,7 @@ import {
   TemplateRef,
   viewChild,
   ChangeDetectionStrategy,
+  inject,
 } from '@angular/core';
 import { Playlist } from '@shared/models/playlist.model';
 import { AudioTrack, Track } from '@shared/models/track.model';
@@ -18,15 +19,18 @@ import { MatButton } from '@angular/material/button';
 import { LucideDynamicIcon } from '@lucide/angular';
 import { QueryOptions } from '@shared/models/request.model';
 import { SwitchComponent } from '@general/components/controls/switch/switch.component';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CollapsibleSectionComponent } from '@general/components/display/collapsible-section/collapsible-section.component';
-import { ChildPlaylistBoxComponent } from './child-playlist-box/child-playlist-box.component';
 import { ChildPlaylistActionsSmartComponent } from './child-playlist-actions/child-playlist-actions-smart/child-playlist-actions-smart.component';
 import { TagListSmartComponent } from '@general/components/display/tag-list/tag-list-smart/tag-list-smart.component';
 import { FilesDropInZoneComponent } from '../../../../components/drag-and-drop/files-drop-in-zone.component';
 import { createPlaylistContext } from '../../../../models/track-highlight.model';
-import { CdkDrag, CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop';
+import { CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop';
 import { MenuCloseReason } from '@angular/material/menu';
+import { PlaylistGridComponent } from '../playlists-landing-page/playlist-grid/playlist-grid.component';
+import { PlaylistWithTagData } from '@general/models/playlist.model';
+import { GridPlaylistSizeConfig } from '../../../../models/grid-item-size-config.model';
+import { MediumSizeGridItemConfig } from '../../../../models/grid.model';
 @Component({
   selector: 'app-playlists-detail-page',
   imports: [
@@ -37,18 +41,20 @@ import { MenuCloseReason } from '@angular/material/menu';
     SwitchComponent,
     RouterLink,
     CollapsibleSectionComponent,
-    ChildPlaylistBoxComponent,
     ChildPlaylistActionsSmartComponent,
     TagListSmartComponent,
     FilesDropInZoneComponent,
-    CdkDrag,
     CdkDropList,
+    PlaylistGridComponent,
   ],
   templateUrl: './playlists-detail-page.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './playlists-detail-page.component.scss',
 })
 export class PlaylistsDetailPageComponent {
+  readonly router = inject(Router);
+  readonly currentRoute = inject(ActivatedRoute);
+
   readonly playlist = input.required<Playlist | null>();
   readonly playlistImageUrl = input<string | null>();
   readonly tracks = input.required<Track[]>();
@@ -59,6 +65,7 @@ export class PlaylistsDetailPageComponent {
   );
   readonly parentPlaylist = input<Playlist | null>(null);
   readonly childrenPlaylists = input<Playlist[]>([]);
+  readonly childrenPlaylistImageMap = input<Record<string, string | null>>({});
 
   readonly playPlaylist = output();
   readonly playTrack = output<Track>();
@@ -75,6 +82,15 @@ export class PlaylistsDetailPageComponent {
 
   readonly noTracksWarning =
     'There are no tracks yet. You need to add some from Library or through the Discover mode.';
+
+  readonly childrenPlaylistsTagged = computed<PlaylistWithTagData[]>(() => {
+    return this.childrenPlaylists().map(
+      (playlist: Playlist): PlaylistWithTagData => ({
+        ...playlist,
+        tags: [],
+      })
+    );
+  });
 
   readonly parentDetailRoute = computed(() => {
     const parent = this.parentPlaylist();
@@ -120,6 +136,13 @@ export class PlaylistsDetailPageComponent {
     return this.playlistPlaying() ? 'pause' : 'play';
   });
   readonly addTracksIcon = actionsIconSet.AddIcon;
+  protected childrenGridConfig: GridPlaylistSizeConfig = {
+    ...MediumSizeGridItemConfig,
+    titleBold: false,
+    showTags: false,
+    hideTracks: false,
+    hideParentInfo: true,
+  };
 
   playPauseClicked(state: 'play' | 'pause') {
     if (state === 'play') {
@@ -134,5 +157,11 @@ export class PlaylistsDetailPageComponent {
 
   protected childPlaylistDropped(event: CdkDragDrop<Playlist[]>) {
     this.reorderChildren.emit(event);
+  }
+
+  protected async navigateToChildPlaylist(playlistId: string) {
+    await this.router.navigate(['../', playlistId], {
+      relativeTo: this.currentRoute,
+    });
   }
 }
