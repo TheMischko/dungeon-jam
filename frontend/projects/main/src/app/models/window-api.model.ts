@@ -3,6 +3,7 @@ import {
   FileBase64,
   PlaylistTracksQuery,
   StoredPlayback,
+  StoredTransitionSettings,
   TaggedTracksQuery,
   Track,
 } from '@shared/models/track.model';
@@ -46,5 +47,10 @@ export type AudioApiWindow = Window &
       loadState: () => Promise<StoredPlayback>;
       updateState: (newState: StoredPlayback) => void;
       updateCaptureSettings: (isLocalMuted: boolean) => void;
+      loadTransitionSettings: () => Promise<StoredTransitionSettings>;
+      updateTransitionSettings: (newState: StoredTransitionSettings) => void;
+      onTransitionChanged: (
+        callback: (settings: StoredTransitionSettings) => void | Promise<void>
+      ) => void;
     };
   };

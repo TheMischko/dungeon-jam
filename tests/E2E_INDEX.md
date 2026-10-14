@@ -44,7 +44,6 @@ npm run test:e2e -- --tags "@sound-effects"
 npm run test:e2e -- --tags "@updates"
 
 # Sidebar navigation
-npm run test:e2e -- --tags "@sidebar"
 ```
 
 ---

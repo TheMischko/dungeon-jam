@@ -9,7 +9,7 @@ import { SoundEffect } from '@shared/models/sound-effect.model';
 import { EMPTY, from, map, Observable, of, switchMap } from 'rxjs';
 import { Track } from '@shared/models/track.model';
 import { ToastService } from '@general/services/toast.service';
-import { ToastType } from '../../../../general/models/toast.model';
+import { ToastType } from '@general/models/toast.model';
 import { PlayMetadata } from '../models/playback.model';
 
 @Injectable({
@@ -85,7 +85,10 @@ export class ScenePlayerService {
   ): Observable<void> {
     const currentlyPlayingScene = this.playingScene();
     if (currentlyPlayingScene) {
-      this.stopScene(currentlyPlayingScene, ambience);
+      this.stopAmbience(currentlyPlayingScene, ambience);
+      if (tracks.length === 0) {
+        this.playbackService.clearState();
+      }
     }
 
     this.playingScene.set(scene);
@@ -112,6 +115,10 @@ export class ScenePlayerService {
   public stopScene(scene: Scene, omitAmbience: SoundEffect[] = []): void {
     this.playbackService.clearState();
     this.playingScene.set(undefined);
+    this.stopAmbience(scene, omitAmbience);
+  }
+
+  public stopAmbience(scene: Scene, omitAmbience: SoundEffect[] = []): void {
     const omitAmbienceIds = omitAmbience.map((a) => a.id);
     const ambienceToStop = scene.ambience.filter(
       (a) => !omitAmbienceIds.includes(a.soundEffectId)

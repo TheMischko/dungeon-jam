@@ -45,7 +45,9 @@ export class PlaybackAudioSteps extends BaseSteps {
   }
 
   @then(
-    'the application should be producing audible sound within {int} seconds'
+    'the application should be producing audible sound within {int} seconds',
+    undefined,
+    15000
   )
   async assertAudioIsAudible(timeoutSeconds: number): Promise<void> {
     const page = this.context.windows.mainWindow;

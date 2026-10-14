@@ -60,7 +60,7 @@ export class PlayerSmartComponent {
   }
 
   shuffle() {
-    this.playbackService.shuffle(!this.playBackState().shuffle);
+    this.playbackService.toggleShuffle();
   }
 
   protected navigateToActiveTrack() {
