@@ -84,13 +84,7 @@
     @if (playlist(); as playlist) {
       <app-child-playlist-actions-smart [parent]="playlist" />
     }
-    <div
-      class="playlists"
-      cdkDropList
-      cdkDropListOrientation="mixed"
-      [cdkDropListData]="childrenPlaylists()"
-      (cdkDropListDropped)="childPlaylistDropped($event)"
-    >
+    <div class="playlists">
       @if (childrenPlaylists().length === 0) {
         <p class="no-children-text">
           No child playlists yet. Use "Create new playlist" to add one.
@@ -103,6 +97,7 @@
           [showControls]="false"
           [showParentsFilter]="false"
           (playlistClick)="navigateToChildPlaylist($event)"
+          (reorderDrop)="childPlaylistDropped($event)"
         ></app-playlist-grid>
       }
     </div>

@@ -20,6 +20,7 @@ import { PlaylistTracksStore } from '../../../../../stores/playlist-tracks.store
 import { PlaylistApiService } from '@general/services/playlist-api.service';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { Playlist, PlaylistUpdateQuery } from '@shared/models/playlist.model';
+import { PlaylistWithTagData } from '@general/models/playlist.model';
 import { PlaylistsDetailPageComponent } from '../playlists-detail-page.component';
 import { PlaybackService } from '../../../../../services/playback.service';
 import { PlaybackState } from '../../../../../models/playback.model';
@@ -460,7 +461,7 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
       });
   }
 
-  protected reorderChildPlaylist(event: CdkDragDrop<Playlist[]>) {
+  protected reorderChildPlaylist(event: CdkDragDrop<PlaylistWithTagData[]>) {
     const children = this.childPlaylists();
     const item = children[event.previousIndex];
     if (!item) {

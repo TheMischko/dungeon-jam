@@ -25,7 +25,7 @@ import { ChildPlaylistActionsSmartComponent } from './child-playlist-actions/chi
 import { TagListSmartComponent } from '@general/components/display/tag-list/tag-list-smart/tag-list-smart.component';
 import { FilesDropInZoneComponent } from '../../../../components/drag-and-drop/files-drop-in-zone.component';
 import { createPlaylistContext } from '../../../../models/track-highlight.model';
-import { CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop';
+import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { MenuCloseReason } from '@angular/material/menu';
 import { PlaylistGridComponent } from '../playlists-landing-page/playlist-grid/playlist-grid.component';
 import { PlaylistWithTagData } from '@general/models/playlist.model';
@@ -44,7 +44,6 @@ import { MediumSizeGridItemConfig } from '../../../../models/grid.model';
     ChildPlaylistActionsSmartComponent,
     TagListSmartComponent,
     FilesDropInZoneComponent,
-    CdkDropList,
     PlaylistGridComponent,
   ],
   templateUrl: './playlists-detail-page.component.html',
@@ -77,7 +76,7 @@ export class PlaylistsDetailPageComponent {
   readonly deletePlaylist = output<void>();
   readonly openDiscover = output<void>();
   readonly audioDropped = output<AudioTrack[]>();
-  readonly reorderChildren = output<CdkDragDrop<Playlist[]>>();
+  readonly reorderChildren = output<CdkDragDrop<PlaylistWithTagData[]>>();
   readonly actionMenuClosed = output<MenuCloseReason | string>();
 
   readonly noTracksWarning =
@@ -155,7 +154,7 @@ export class PlaylistsDetailPageComponent {
     this.includeChildren.emit(include);
   }
 
-  protected childPlaylistDropped(event: CdkDragDrop<Playlist[]>) {
+  protected childPlaylistDropped(event: CdkDragDrop<PlaylistWithTagData[]>) {
     this.reorderChildren.emit(event);
   }
 
