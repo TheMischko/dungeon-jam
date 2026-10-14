@@ -14,7 +14,7 @@
     "build:electron:prod": "node esbuild.config.mjs",
     "build:dir": "electron-builder --dir",
     "build:dist": "electron-builder",
-    "rebuild:dir": "shx rm -rf build && npm run compile:prod && npm run build:dir",
+    "rebuild:dir": "rimraf build && npm run compile:prod && npm run build:dir",
     "compile:dev": "npm run build:electron:dev && npm run copyfiles:basic && npm run build:frontend",
     "compile:prod": "npm run build:electron:prod && npm run copyfiles:basic && npm run build:frontend",
     "start": "npm run build:electron:dev && npm run copyfiles:basic && electron build/src/index.js",
@@ -109,10 +109,13 @@
     "esbuild-node-externals": "^1.23.1",
     "playwright": "^1.63.0",
     "prettier": "^3.9.6",
-    "shx": "^0.4.0",
+    "rimraf": "^6.0.1",
     "ts-node": "^10.9.2",
     "typescript": "^6.0.3",
     "vite": "^8.3.0",
     "vitest": "^4.1.11"
+  },
+  "overrides": {
+    "@electron/get": "^5.1.0"
   }
 }
