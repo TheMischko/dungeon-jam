@@ -1,5 +1,6 @@
 import { TagData } from '@shared/models/tag.model';
 import { QueryRequest } from '@shared/models/request.model';
+import { RelativeDisplayOrderQuery } from '@shared/models/display-order.model';
 
 export interface Playlist {
   id: string;
@@ -49,6 +50,11 @@ export type PlaylistAddTracksData = { [playlistId: string]: string[] };
 export interface PlaylistReorderQuery {
   playlistId: string;
   newOrder: number;
+  contextType: PlaylistOrderContext;
+  contextId?: string;
+}
+
+export interface PlaylistRelativeReorderQuery extends RelativeDisplayOrderQuery {
   contextType: PlaylistOrderContext;
   contextId?: string;
 }

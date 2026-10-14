@@ -1,0 +1,21 @@
+<div class="wrapper">
+  <div class="header">
+    <h1>New update available</h1>
+  </div>
+  <div class="content">
+    @for (update of updates; track update.version) {
+      <div class="patch-note">
+        <h3 class="version">{{ update.version }}</h3>
+        <div class="notes" [innerHTML]="update.note"></div>
+      </div>
+    }
+  </div>
+  <div class="footer">
+    <div class="buttons">
+      <button mat-flat-button color="primary" (click)="confirm()">
+        Install and reload
+      </button>
+      <button mat-flat-button color="neutral" (click)="cancel()">Cancel</button>
+    </div>
+  </div>
+</div>

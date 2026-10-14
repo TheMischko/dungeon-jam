@@ -2,7 +2,15 @@ import { TestBed } from '@angular/core/testing';
 import { firstValueFrom } from 'rxjs';
 import { vi } from 'vitest';
 import { PlaylistApiService } from './playlist-api.service';
-import { Playlist } from '@shared/models/playlist.model';
+import {
+  Playlist,
+  PlaylistOrderContext,
+} from '@shared/models/playlist.model';
+import {
+  DisplayOrder,
+  DisplayOrderPlacement,
+  OrderableEntityType,
+} from '@shared/models/display-order.model';
 import { QueryRequest } from '@shared/models/request.model';
 import { SortDirection } from '@shared/models/common.model';
 import { PlaylistApiWindow } from '../../../models/api/playlist-api.model';
@@ -53,6 +61,7 @@ describe('PlaylistApiService', () => {
       addTracksToPlaylists: vi.fn(),
       updatePlaylist: vi.fn(),
       changePlaylistOrder: vi.fn(),
+      changePlaylistRelativeOrder: vi.fn().mockResolvedValue(new Map()),
       deletePlaylist: vi.fn().mockResolvedValue(undefined),
     };
   });
@@ -91,5 +100,52 @@ describe('PlaylistApiService', () => {
     expect(getPlaylistApi().deletePlaylist).toHaveBeenCalledWith(
       'playlist-123'
     );
+  });
+
+  it('should call window.PLAYLIST_API.changePlaylistRelativeOrder and return orderMap', async () => {
+    const mockOrderMap = new Map<string, DisplayOrder>([
+      [
+        'playlist-1',
+        {
+          id: 'order-1',
+          entityId: 'playlist-1',
+          order: 0,
+          entityType: OrderableEntityType.Playlist,
+          contextType: PlaylistOrderContext.Landing,
+        },
+      ],
+      [
+        'playlist-2',
+        {
+          id: 'order-2',
+          entityId: 'playlist-2',
+          order: 1,
+          entityType: OrderableEntityType.Playlist,
+          contextType: PlaylistOrderContext.Landing,
+        },
+      ],
+    ]);
+
+    vi.spyOn(getPlaylistApi(), 'changePlaylistRelativeOrder').mockResolvedValue(
+      mockOrderMap
+    );
+
+    const result = await firstValueFrom(
+      service.reorderPlaylistRelative(
+        'playlist-2',
+        'playlist-1',
+        DisplayOrderPlacement.BEFORE,
+        PlaylistOrderContext.Landing
+      )
+    );
+
+    expect(getPlaylistApi().changePlaylistRelativeOrder).toHaveBeenCalledWith({
+      entityId: 'playlist-2',
+      anchorEntityId: 'playlist-1',
+      placement: DisplayOrderPlacement.BEFORE,
+      contextType: PlaylistOrderContext.Landing,
+      contextId: undefined,
+    });
+    expect(result).toBe(mockOrderMap);
   });
 });

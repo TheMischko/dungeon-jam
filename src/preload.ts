@@ -14,7 +14,8 @@ import ImageApi from './preload/image-api';
 import SceneApi from './preload/scene-api';
 import NotificationApi from './preload/notification-api';
 import SessionApi from './preload/session-api';
-
+import UpdateApi from './preload/update-api';
+import DisplayOrderApi from './preload/display-order-api';
 const generalApi = {
   triggerRedirect(request: RedirectRequest) {
     ipcRenderer.send(GeneralChannels.REDIRECT, request);
@@ -79,6 +80,8 @@ declare global {
     SCENE_API: typeof SceneApi;
     NOTIFICATION_API: typeof NotificationApi;
     SESSION_API: typeof SessionApi;
+    UPDATE_API: typeof UpdateApi;
+    DISPLAY_ORDER_API: typeof DisplayOrderApi;
   }
 }
 
@@ -95,3 +98,5 @@ contextBridge.exposeInMainWorld('IMAGE_API', ImageApi);
 contextBridge.exposeInMainWorld('SCENE_API', SceneApi);
 contextBridge.exposeInMainWorld('NOTIFICATION_API', NotificationApi);
 contextBridge.exposeInMainWorld('SESSION_API', SessionApi);
+contextBridge.exposeInMainWorld('UPDATE_API', UpdateApi);
+contextBridge.exposeInMainWorld('DISPLAY_ORDER_API', DisplayOrderApi);

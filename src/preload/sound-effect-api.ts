@@ -2,11 +2,13 @@ import { QueryRequest } from '@shared/models/request.model';
 import {
   SoundEffect,
   SoundEffectCreateData,
+  SoundEffectRelativeReorderQuery,
   SoundEffectReorderQuery,
   SoundEffectUpdateData,
 } from '@shared/models/sound-effect.model';
 import { ipcRenderer } from 'electron';
 import { SoundEffectChannel } from '@shared/models/channels.model';
+import { DisplayOrder } from '@shared/models/display-order.model';
 
 const getAll = async (query: QueryRequest): Promise<SoundEffect[]> => {
   return await ipcRenderer.invoke(SoundEffectChannel.GET_ALL, query);
@@ -36,6 +38,15 @@ const changeSoundEffectOrder = async (
   return await ipcRenderer.invoke(SoundEffectChannel.CHANGE_ORDER, request);
 };
 
+const changeSoundEffectRelativeOrder = async (
+  request: SoundEffectRelativeReorderQuery
+): Promise<Map<string, DisplayOrder>> => {
+  return await ipcRenderer.invoke(
+    SoundEffectChannel.CHANGE_RELATIVE_ORDER,
+    request
+  );
+};
+
 export default {
   getAll,
   getById,
@@ -43,4 +54,5 @@ export default {
   update,
   deleteById,
   changeSoundEffectOrder,
+  changeSoundEffectRelativeOrder,
 };

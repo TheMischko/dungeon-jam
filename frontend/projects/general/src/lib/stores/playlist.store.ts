@@ -35,11 +35,16 @@ import {
 import { QueryRequest } from '@shared/models/request.model';
 import { SortDirection } from '@shared/models/common.model';
 import { PlaylistToastService } from '@general/services/toast/playlist-toast.service';
+import {
+  DisplayOrder,
+  DisplayOrderPlacement,
+} from '@shared/models/display-order.model';
 
 type PlaylistStoreState = {
   loading: boolean;
   lastLoadQuery: QueryRequest;
   allParents: Playlist[];
+  latestOrderMap: Map<string, DisplayOrder>;
 };
 const initialState: PlaylistStoreState = {
   loading: false,
@@ -48,6 +53,7 @@ const initialState: PlaylistStoreState = {
     sortDirection: SortDirection.ASC,
   },
   allParents: [],
+  latestOrderMap: new Map(),
 };
 const playlistConfig = entityConfig({
   entity: type<Playlist>(),
@@ -83,6 +89,13 @@ export const PlaylistStore = signalStore(
                 patchState(store, { loading: false });
               })
             );
+          }),
+          switchMap(() => {
+            return playlistApiService.getDisplayOrder().pipe(
+              tap((orderMap) => {
+                patchState(store, { latestOrderMap: orderMap });
+              })
+            );
           })
         )
       );
@@ -108,6 +121,18 @@ export const PlaylistStore = signalStore(
 
       const update = rxMethod<void>(
         pipe(tap(() => load(store.lastLoadQuery())))
+      );
+
+      const updateOrderMap = rxMethod<string | undefined>(
+        pipe(
+          switchMap((parentId) => {
+            return playlistApiService.getDisplayOrder(parentId).pipe(
+              tap((orderMap) => {
+                patchState(store, { latestOrderMap: orderMap });
+              })
+            );
+          })
+        )
       );
 
       const updateParents = () => {
@@ -215,6 +240,33 @@ export const PlaylistStore = signalStore(
         )
       );
 
+      const changeRelativeOrder = rxMethod<{
+        playlistId: string;
+        anchorId: string | undefined;
+        placement: DisplayOrderPlacement;
+        parentId?: string;
+      }>(
+        pipe(
+          switchMap((query) => {
+            return playlistApiService
+              .reorderPlaylistRelative(
+                query.playlistId,
+                query.anchorId,
+                query.placement,
+                query.parentId
+                  ? PlaylistOrderContext.Parent
+                  : PlaylistOrderContext.Landing,
+                query.parentId
+              )
+              .pipe(
+                tap((orderMap) => {
+                  patchState(store, { latestOrderMap: orderMap });
+                })
+              );
+          })
+        )
+      );
+
       const deletePlaylist = rxMethod<string>(
         pipe(
           switchMap((playlistId) => {
@@ -240,7 +292,9 @@ export const PlaylistStore = signalStore(
         getParent,
         updatePlaylist,
         changeOrder,
+        changeRelativeOrder,
         deletePlaylist,
+        updateOrderMap,
       };
     }
   )

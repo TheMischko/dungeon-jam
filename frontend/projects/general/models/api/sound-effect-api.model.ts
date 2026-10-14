@@ -1,7 +1,9 @@
+import { DisplayOrder } from '@shared/models/display-order.model';
 import { QueryRequest } from '@shared/models/request.model';
 import {
   SoundEffect,
   SoundEffectCreateData,
+  SoundEffectRelativeReorderQuery,
   SoundEffectReorderQuery,
   SoundEffectUpdateData,
 } from '@shared/models/sound-effect.model';
@@ -17,5 +19,8 @@ export type SoundEffectApiWindow = Window &
       changeSoundEffectOrder: (
         request: SoundEffectReorderQuery
       ) => Promise<void>;
+      changeSoundEffectRelativeOrder: (
+        request: SoundEffectRelativeReorderQuery
+      ) => Promise<Map<string, DisplayOrder>>;
     };
   };

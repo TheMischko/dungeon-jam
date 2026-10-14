@@ -10,7 +10,7 @@ const sharedConfig = {
   sourcemap: true,
   target: 'node20',
   define: {
-    'process.env.ENV': JSON.stringify(envType),
+    'process.env.DEFAULT_ENV': JSON.stringify(envType),
   },
   plugins: [nodeExternalsPlugin()],
   external: ['electron', 'prism-media', 'opusscript', 'lowdb'],

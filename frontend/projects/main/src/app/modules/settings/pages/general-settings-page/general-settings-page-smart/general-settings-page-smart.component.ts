@@ -1,8 +1,10 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   inject,
   OnInit,
+  signal,
 } from '@angular/core';
 import { DiscordTokenStore } from '@general/stores/discord-token.store';
 import {
@@ -14,7 +16,9 @@ import { GeneralSettingsPageComponent } from '../general-settings-page.component
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { EditDiscordTokenModalComponent } from '../../../modals/edit-discord-token-modal/edit-discord-token-modal.component';
 import { GeneralSettingsService } from '../../../services/general-settings.service';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { AutoUpdateService } from '../../../../../services/auto-update.service';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-general-settings-page-smart',
@@ -26,6 +30,8 @@ export class GeneralSettingsPageSmartComponent implements OnInit {
   private readonly discordTokenStore = inject(DiscordTokenStore);
   private readonly dialog = inject(MatDialog);
   private readonly generalSettingsService = inject(GeneralSettingsService);
+  private readonly autoUpdateService = inject(AutoUpdateService);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly tokens = this.discordTokenStore.entities;
   readonly tokensLoading = this.discordTokenStore.loading;
@@ -33,6 +39,7 @@ export class GeneralSettingsPageSmartComponent implements OnInit {
   readonly appVersion = toSignal(this.generalSettingsService.getAppVersion(), {
     initialValue: '0.0.0',
   });
+  readonly checkingUpdates = signal<boolean>(false);
 
   ngOnInit() {
     this.discordTokenStore.loadTokens();
@@ -88,5 +95,19 @@ export class GeneralSettingsPageSmartComponent implements OnInit {
 
   protected async openLogsDir() {
     await this.generalSettingsService.openLogsDirectory();
+  }
+
+  protected checkUpdates() {
+    if (this.checkingUpdates()) {
+      return;
+    }
+    this.checkingUpdates.set(true);
+    this.autoUpdateService
+      .fetchAndShowUpdates()
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.checkingUpdates.set(false))
+      )
+      .subscribe();
   }
 }

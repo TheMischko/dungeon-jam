@@ -15,6 +15,7 @@ import { AppInfoManager } from '../managers/app-info.manager';
 import { DisplayOrderManager } from '../managers/display-order.manager';
 import { SceneManager } from '../managers/scene.manager';
 import { SessionManager } from '../managers/session.manager';
+import { UpdateManager } from '../managers/update.manager';
 
 /**
  * Manager initialization configuration
@@ -25,6 +26,12 @@ export function getManagersInitConfig(
 ): { name: string; initFunction: (env: string) => Promise<void> }[] {
   const viewConfig = getDefaultViewConfig(buildPath);
   return [
+    {
+      name: 'UpdateManager',
+      initFunction: async () => {
+        await UpdateManager.getInstance();
+      },
+    },
     {
       name: 'StoredPlayback',
       initFunction: async () => {

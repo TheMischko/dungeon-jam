@@ -20,3 +20,24 @@ export enum OrderableEntityType {
   Playlist = 'playlist',
   SoundEffect = 'sound-effect',
 }
+
+export interface RelativeDisplayOrderQuery {
+  // Entity being moved.
+  entityId: string;
+  // ID of the entity to position relative to. Undefined is used for placing an
+  // item to very end or very beginning.
+  anchorEntityId?: string;
+  placement: DisplayOrderPlacement;
+}
+
+export enum DisplayOrderPlacement {
+  BEFORE = 'before',
+  AFTER = 'after',
+}
+
+export interface DisplayOrderMapQuery {
+  entityType: OrderableEntityType;
+  contextType: string;
+  contextId?: string;
+}
+

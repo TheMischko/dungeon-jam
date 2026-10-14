@@ -43,6 +43,7 @@ export enum PlaylistChannel {
   ADD_TRACKS = 'playlists/add-tracks',
   UPDATE = 'playlists/update',
   CHANGE_ORDER = 'playlists/change-order',
+  CHANGE_RELATIVE_ORDER = 'playlists/change-relative-order',
   DELETE = 'playlists/delete',
 }
 
@@ -88,6 +89,7 @@ export enum SoundEffectChannel {
   GET_BY_ID = 'sound-effects/get-by-id',
   GET_ALL = 'sound-effects/get-all',
   CHANGE_ORDER = 'sound-effect/change-order',
+  CHANGE_RELATIVE_ORDER = 'sound-effect/change-relative-order',
 }
 
 export enum ImageChannel {
@@ -120,6 +122,17 @@ export enum NotificationChannel {
   PUSH = 'notification/push',
 }
 
+export enum DisplayOrderChannel {
+  GET_ORDER_MAP = 'display-order/get-order-map',
+}
+
+export enum UpdateChannel {
+  GET_UPDATE_INFO = 'update/get-info',
+  UPDATE_APP = 'update/update-app',
+  GET_PREFERENCES = 'update/get-preferences',
+  SKIP_VERSION = 'update/skip-version',
+}
+
 export type AppChannel =
   | GeneralChannels
   | TrackChannel
@@ -134,4 +147,6 @@ export type AppChannel =
   | ImageChannel
   | SceneChannel
   | SessionChannel
-  | NotificationChannel;
+  | NotificationChannel
+  | DisplayOrderChannel
+  | UpdateChannel;

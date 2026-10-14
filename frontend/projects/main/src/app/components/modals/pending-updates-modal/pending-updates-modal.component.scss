@@ -1,0 +1,34 @@
+@use 'mixins' as mix;
+@use 'typography' as typo;
+@use 'colors' as col;
+
+:host {
+  @include mix.base-dialog();
+  width: 700px;
+
+  h3 {
+    @include typo.h3();
+  }
+
+  .version {
+    display: inline-block;
+    color: col.$text-main;
+    background: col.$primary;
+    border-radius: 6rem;
+    padding: 0.5rem 1rem;
+    width: auto;
+  }
+
+  .notes {
+    @include typo.body1();
+  }
+
+  .patch-note {
+    margin-bottom: 2rem;
+  }
+
+  .wrapper .content {
+    overflow-y: auto;
+    padding-top: 1rem;
+  }
+}
