@@ -622,7 +622,7 @@ export class PlaylistManager {
   }
 
   private async ensureParentOrderContext(parentId: string) {
-    const allPlaylists = await this.getAll();
+    const allPlaylists = await this.playlistProvider.getAll();
     const childPlaylists = allPlaylists.filter(
       (p) => p.ownershipId === parentId
     );
