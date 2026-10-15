@@ -49,6 +49,7 @@ import {
 import {
   Scene,
   SceneInsertQuery,
+  ScenesRelativeDisplayOrderQuery,
   SceneUpdateQuery,
 } from '@shared/models/scene.model';
 import {
@@ -70,7 +71,7 @@ declare global {
     GENERAL_API: {
       triggerRedirect: (request: RedirectRequest) => void;
       registerRedirect: (
-        callback: (request: RedirectRequest) => void | Promise<void>,
+        callback: (request: RedirectRequest) => void | Promise<void>
       ) => void;
       onApplicationReady: (callback: () => void | Promise<void>) => void;
       closeApp: () => Promise<void>;
@@ -78,10 +79,10 @@ declare global {
       maximizeApp: () => Promise<void>;
       unmaximizeApp: () => Promise<void>;
       onAppMinimized: (
-        callback: (isMinimized: boolean) => void | Promise<void>,
+        callback: (isMinimized: boolean) => void | Promise<void>
       ) => void;
       onAppMaximized: (
-        callback: (isMaximized: boolean) => void | Promise<void>,
+        callback: (isMaximized: boolean) => void | Promise<void>
       ) => void;
       getOS: () => Promise<OperatingSystem>;
       openLogsFolder: () => Promise<void>;
@@ -96,23 +97,19 @@ declare global {
         url: string,
         duration: number,
         author?: string,
-        tags?: string[],
+        tags?: string[]
       ) => Promise<Track>;
       updateTrack: (track: Track) => Promise<Track>;
       deleteTrack: (id: string) => Promise<boolean>;
       getTaggedTracks: (query: TaggedTracksQuery) => Promise<Track[]>;
-      discoverTracks: (
-        query: PlaylistDiscoverBatchRequest,
-      ) => Promise<Track[]>;
+      discoverTracks: (query: PlaylistDiscoverBatchRequest) => Promise<Track[]>;
     };
     AUDIO_FILES_API: {
       fetchAudioData: (paths: string[]) => Promise<AudioTrack[]>;
-      registerAudioFileDrop: (
-        callback: (tracks: AudioTrack[]) => void,
-      ) => void;
+      registerAudioFileDrop: (callback: (tracks: AudioTrack[]) => void) => void;
       registerFileDrop: (
         accept: string,
-        callback: (paths: string[]) => void,
+        callback: (paths: string[]) => void
       ) => void;
       uploadTracks: (tracks: AudioTrack[]) => Promise<Track[]>;
       loadFileBase64: (filePath: string) => Promise<FileBase64>;
@@ -133,19 +130,19 @@ declare global {
       getPlaylistById: (playlistId: string) => Promise<Playlist>;
       insertPlaylist: (data: PlaylistInsertQuery) => Promise<Playlist>;
       addTracksToPlaylists: (
-        data: PlaylistAddTracksData,
+        data: PlaylistAddTracksData
       ) => Promise<Map<string, Playlist>>;
       updatePlaylist: (query: PlaylistUpdateQuery) => Promise<Playlist>;
       changePlaylistOrder: (query: PlaylistReorderQuery) => Promise<void>;
       changePlaylistRelativeOrder: (
-        query: PlaylistRelativeReorderQuery,
+        query: PlaylistRelativeReorderQuery
       ) => Promise<Map<string, DisplayOrder>>;
     };
     TAG_API: {
       getAllTags: (query: QueryRequest) => Promise<TagData[]>;
       getSubsetOfTags: (
         column: keyof TagData,
-        values: [],
+        values: []
       ) => Promise<TagData[]>;
       insertTag: (data: Tag) => Promise<TagData>;
       getTagSuggestion: (titlePart: string) => Promise<TagData[]>;
@@ -160,14 +157,14 @@ declare global {
       joinChannel: (
         guildId: string,
         channelId: string,
-        tokenId: string,
+        tokenId: string
       ) => Promise<void>;
       disconnect: () => Promise<void>;
       onStateUpdate: (
-        callback: (state: DiscordState) => void | Promise<void>,
+        callback: (state: DiscordState) => void | Promise<void>
       ) => void;
       onActiveTokensUpdate: (
-        callback: (update: DiscordTokenActiveUpdate) => void | Promise<void>,
+        callback: (update: DiscordTokenActiveUpdate) => void | Promise<void>
       ) => void;
       connectToken: (tokenId: string) => Promise<boolean>;
       disconnectToken: (tokenId: string) => Promise<boolean>;
@@ -175,13 +172,11 @@ declare global {
       getTokenChannels: (tokenId: string) => Promise<GuildWithChannels[]>;
     };
     DISCORD_TOKEN_API: {
-      createToken: (
-        data: DiscordTokenUpdateData,
-      ) => Promise<DiscordTokenData>;
+      createToken: (data: DiscordTokenUpdateData) => Promise<DiscordTokenData>;
       getAllTokens: () => Promise<DiscordTokenData[]>;
       updateToken: (
         id: string,
-        newData: DiscordTokenUpdateData,
+        newData: DiscordTokenUpdateData
       ) => Promise<DiscordTokenData>;
       deleteToken: (id: string) => Promise<boolean>;
     };
@@ -192,7 +187,7 @@ declare global {
       update: (data: SoundEffectUpdateData) => Promise<SoundEffect | null>;
       deleteById: (id: string) => Promise<boolean>;
       changeSoundEffectOrder: (
-        request: SoundEffectReorderQuery,
+        request: SoundEffectReorderQuery
       ) => Promise<void>;
     };
     IMAGE_API: {
@@ -200,7 +195,7 @@ declare global {
       openPicker: () => Promise<string | null>;
       processAndSave: (
         imagePath: string,
-        entityType: string,
+        entityType: string
       ) => Promise<string>;
       deleteImage: (imagePath: string) => Promise<void>;
     };
@@ -210,31 +205,29 @@ declare global {
       insertScene: (data: SceneInsertQuery) => Promise<Scene>;
       updateScene: (data: SceneUpdateQuery) => Promise<Scene>;
       deleteScene: (id: string) => Promise<void>;
-      changeScenesOrder: (sceneIds: string[]) => Promise<Scene[]>;
+      changeScenesOrder: (
+        query: ScenesRelativeDisplayOrderQuery
+      ) => Promise<Map<string, DisplayOrder>>;
     };
     NOTIFICATION_API: {
       onNotification: (
-        callback: (notification: AppNotification) => void,
+        callback: (notification: AppNotification) => void
       ) => void;
     };
     SESSION_API: {
       getAllSessions: (query: QueryOptions) => Promise<SessionData[]>;
       getSessionById: (sessionId: string) => Promise<SessionData | null>;
-      insertSession: (
-        insertQuery: SessionInsertQuery,
-      ) => Promise<SessionData>;
-      updateSession: (
-        updateQuery: SessionUpdateQuery,
-      ) => Promise<SessionData>;
+      insertSession: (insertQuery: SessionInsertQuery) => Promise<SessionData>;
+      updateSession: (updateQuery: SessionUpdateQuery) => Promise<SessionData>;
       deleteSession: (sessionId: string) => Promise<void>;
       getSessionScenes: (query: SessionScenesQuery) => Promise<Scene[]>;
       getSessionImages: (
-        sessionIds: string[],
+        sessionIds: string[]
       ) => Promise<Record<string, string | null>>;
     };
     DISPLAY_ORDER_API: {
       getOrderMap: (
-        query: DisplayOrderMapQuery,
+        query: DisplayOrderMapQuery
       ) => Promise<Map<string, DisplayOrder>>;
     };
     UPDATE_API: {
@@ -381,9 +374,14 @@ function installWindowApiStubs(): void {
   window.SOUND_EFFECT_API = {
     getAll: () => Promise.resolve([]),
     getById: () => Promise.resolve(null),
-    create: (data) =>
-      Promise.resolve({ id: 'stub-sound-effect', ...data }),
-    update: (data) => Promise.resolve({ id: data.id, name: data.name ?? '', url: data.url ?? '', duration: data.duration ?? 0 }),
+    create: (data) => Promise.resolve({ id: 'stub-sound-effect', ...data }),
+    update: (data) =>
+      Promise.resolve({
+        id: data.id,
+        name: data.name ?? '',
+        url: data.url ?? '',
+        duration: data.duration ?? 0,
+      }),
     deleteById: () => Promise.resolve(true),
     changeSoundEffectOrder: () => Promise.resolve(),
   };
@@ -425,7 +423,7 @@ function installWindowApiStubs(): void {
         dateUpdated: new Date(0),
       }),
     deleteScene: () => Promise.resolve(),
-    changeScenesOrder: () => Promise.resolve([]),
+    changeScenesOrder: () => Promise.resolve(new Map()),
   };
 
   window.NOTIFICATION_API = {
@@ -490,7 +488,8 @@ function installResizeObserverStub(): void {
     }
   }
 
-  globalThis.ResizeObserver = ResizeObserverStub as unknown as typeof ResizeObserver;
+  globalThis.ResizeObserver =
+    ResizeObserverStub as unknown as typeof ResizeObserver;
 }
 
 installWindowApiStubs();

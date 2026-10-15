@@ -9,7 +9,13 @@
     ></app-grid-controls>
   }
 
-  <div class="scenes-grid">
+  <div
+    class="scenes-grid"
+    cdkDropList
+    cdkDropListOrientation="mixed"
+    [cdkDropListData]="scenes()"
+    (cdkDropListDropped)="emitSceneDropped($event)"
+  >
     @for (scene of scenes(); track scene.id) {
       @let image = getSceneImage(scene);
       @let tags = getSceneTags(scene);
@@ -17,6 +23,10 @@
       @let playable = itemPlayable();
       @let selectable = itemSelectable();
       <app-grid-item
+        cdkDrag
+        cdkDragPreviewClass="dragging"
+        [cdkDragData]="scene"
+        [cdkDragDisabled]="!reorderingEnabled()"
         [title]="scene.name"
         [image]="image"
         [noImageIcon]="SceneIcon"

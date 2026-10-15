@@ -25,6 +25,7 @@ import { PlaylistApiService } from '@general/services/playlist-api.service';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import {
   catchError,
+  concatMap,
   debounceTime,
   EMPTY,
   finalize,
@@ -247,7 +248,7 @@ export const PlaylistStore = signalStore(
         parentId?: string;
       }>(
         pipe(
-          switchMap((query) => {
+          concatMap((query) => {
             return playlistApiService
               .reorderPlaylistRelative(
                 query.playlistId,

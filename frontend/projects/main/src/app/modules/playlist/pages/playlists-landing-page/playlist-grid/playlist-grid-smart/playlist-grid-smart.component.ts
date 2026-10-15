@@ -213,6 +213,9 @@ export class PlaylistGridSmartComponent implements OnInit {
   }
 
   protected reorderPlaylist(event: CdkDragDrop<PlaylistWithTagData[]>) {
+    if (event.currentIndex === event.previousIndex) {
+      return;
+    }
     const dataSet = this.dataSet();
     const item = dataSet[event.previousIndex];
     if (!item) {
@@ -220,15 +223,11 @@ export class PlaylistGridSmartComponent implements OnInit {
     }
 
     const anchor = dataSet[event.currentIndex];
-    const placement =
-      event.currentIndex > event.previousIndex
-        ? DisplayOrderPlacement.AFTER
-        : DisplayOrderPlacement.BEFORE;
     const parent = this.parent();
     this.playlistStore.changeRelativeOrder({
       playlistId: item.id,
       anchorId: anchor?.id,
-      placement,
+      placement: DisplayOrderPlacement.BEFORE,
       parentId: parent !== null && parent !== 'no-parent' ? parent : undefined,
     });
 
@@ -241,8 +240,7 @@ export class PlaylistGridSmartComponent implements OnInit {
 
       let toIndex: number;
       if (!anchor) {
-        toIndex =
-          placement === DisplayOrderPlacement.BEFORE ? 0 : update.length - 1;
+        toIndex = 0;
       } else {
         const anchorIndex = update.findIndex((p) => p.id === anchor.id);
         if (anchorIndex === -1) {
