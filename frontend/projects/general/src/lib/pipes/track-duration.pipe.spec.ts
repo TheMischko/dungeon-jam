@@ -31,4 +31,10 @@ describe('TrackDurationPipe', () => {
     expect(pipe.transform(0.4)).toEqual('00:00');
     expect(pipe.transform(0.5)).toEqual('00:01');
   });
+
+  it('should format minute transitions cleanly without showing 60 seconds', () => {
+    expect(pipe.transform(59.4)).toEqual('00:59');
+    expect(pipe.transform(59.6)).toEqual('01:00');
+    expect(pipe.transform(119.7)).toEqual('02:00');
+  });
 });

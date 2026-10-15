@@ -1,11 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { signal } from '@angular/core';
 import { PlayerSmartComponent } from './player-smart.component';
 import { TrackHighlightService } from '../../services/track-highlight.service';
 import { RedirectService } from '@general';
 import { PlaybackService } from '../../services/playback.service';
-import { initialPlaybackState } from '../../models/playback.model';
+import { initialPlaybackState, PlaybackState } from '../../models/playback.model';
 import { Track } from '@shared/models/track.model';
 import { RedirectPath } from '@shared/models/redirect.model';
+
+function setPlaybackState(
+  component: PlayerSmartComponent,
+  state: PlaybackState,
+): void {
+  (component as unknown as { playBackState: ReturnType<typeof signal> }).playBackState =
+    signal(state);
+}
 
 describe('PlayerSmartComponent', () => {
   let component: PlayerSmartComponent;
@@ -58,7 +67,7 @@ describe('PlayerSmartComponent', () => {
       );
       const redirectSpy = vi.spyOn(redirectService, 'triggerRedirect');
 
-      (playbackService as any).state.next({
+      setPlaybackState(component, {
         ...initialPlaybackState,
         currentTrack: null,
       });
@@ -80,7 +89,7 @@ describe('PlayerSmartComponent', () => {
       );
       const redirectSpy = vi.spyOn(redirectService, 'triggerRedirect');
 
-      (playbackService as any).state.next({
+      setPlaybackState(component, {
         ...initialPlaybackState,
         currentTrack: mockTrack,
         sessionId: 'session-123',
@@ -103,7 +112,7 @@ describe('PlayerSmartComponent', () => {
       );
       const redirectSpy = vi.spyOn(redirectService, 'triggerRedirect');
 
-      (playbackService as any).state.next({
+      setPlaybackState(component, {
         ...initialPlaybackState,
         currentTrack: mockTrack,
         sceneId: 'scene-123',
@@ -126,7 +135,7 @@ describe('PlayerSmartComponent', () => {
       );
       const redirectSpy = vi.spyOn(redirectService, 'triggerRedirect');
 
-      (playbackService as any).state.next({
+      setPlaybackState(component, {
         ...initialPlaybackState,
         currentTrack: mockTrack,
         playlistId: 'playlist-123',
@@ -149,7 +158,7 @@ describe('PlayerSmartComponent', () => {
       );
       const redirectSpy = vi.spyOn(redirectService, 'triggerRedirect');
 
-      (playbackService as any).state.next({
+      setPlaybackState(component, {
         ...initialPlaybackState,
         currentTrack: mockTrack,
         sessionId: undefined,

@@ -4,6 +4,7 @@ import {
   DestroyRef,
   inject,
   OnInit,
+  signal,
 } from '@angular/core';
 import { DiscordTokenStore } from '@general/stores/discord-token.store';
 import {
@@ -16,7 +17,10 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { EditDiscordTokenModalComponent } from '../../../modals/edit-discord-token-modal/edit-discord-token-modal.component';
 import { GeneralSettingsService } from '../../../services/general-settings.service';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { PlaybackSettingsApiService } from '@general/services/playback-settings-api.service';
+import { StoredTransitionSettings } from '@shared/models/track.model';
 import { AutoUpdateService } from '../../../../../services/auto-update.service';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-general-settings-page-smart',
@@ -28,6 +32,7 @@ export class GeneralSettingsPageSmartComponent implements OnInit {
   private readonly discordTokenStore = inject(DiscordTokenStore);
   private readonly dialog = inject(MatDialog);
   private readonly generalSettingsService = inject(GeneralSettingsService);
+  private readonly playbackSettingsService = inject(PlaybackSettingsApiService);
   private readonly autoUpdateService = inject(AutoUpdateService);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -37,9 +42,19 @@ export class GeneralSettingsPageSmartComponent implements OnInit {
   readonly appVersion = toSignal(this.generalSettingsService.getAppVersion(), {
     initialValue: '0.0.0',
   });
-
+  readonly transitionSettings = signal<StoredTransitionSettings>({
+    fadeInDuration: 1,
+    crossFadeDuration: 1,
+  });
+  readonly checkingUpdates = signal<boolean>(false);
   ngOnInit() {
     this.discordTokenStore.loadTokens();
+    this.playbackSettingsService
+      .loadTransitionSettings()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((transitionSettings) => {
+        this.transitionSettings.set(transitionSettings);
+      });
   }
 
   editToken(token: DiscordTokenData): void {
@@ -81,6 +96,11 @@ export class GeneralSettingsPageSmartComponent implements OnInit {
     this.discordTokenStore.connectToken(token);
   }
 
+  updateTransitionSettings(transitions: StoredTransitionSettings): void {
+    this.playbackSettingsService.updateTransitionSettings(transitions);
+    this.transitionSettings.set(transitions);
+  }
+
   private createDiscordTokenDialog(
     data?: DiscordTokenUpdateData
   ): MatDialogRef<EditDiscordTokenModalComponent> {
@@ -95,9 +115,16 @@ export class GeneralSettingsPageSmartComponent implements OnInit {
   }
 
   protected checkUpdates() {
+    if (this.checkingUpdates()) {
+      return;
+    }
+    this.checkingUpdates.set(true);
     this.autoUpdateService
       .fetchAndShowUpdates()
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.checkingUpdates.set(false))
+      )
       .subscribe();
   }
 }

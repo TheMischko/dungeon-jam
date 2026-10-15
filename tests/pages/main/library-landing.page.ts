@@ -14,6 +14,35 @@ export class LibraryLandingPage extends BaseMainPage {
       .first();
   }
 
+  getTrackRowsLocator(): Locator {
+    return this.page.locator(LibraryLandingSelectors.TRACK_ROWS);
+  }
+
+  getNoDataLocator(): Locator {
+    return this.page.locator(LibraryLandingSelectors.NO_DATA_MESSAGE).first();
+  }
+
+  async searchTrack(query: string): Promise<void> {
+    const input = this.page.locator(LibraryLandingSelectors.SEARCH_INPUT).first();
+    await input.waitFor({ state: 'visible' });
+    await input.fill(query);
+  }
+
+  async clearSearch(): Promise<void> {
+    const input = this.page.locator(LibraryLandingSelectors.SEARCH_INPUT).first();
+    await input.waitFor({ state: 'visible' });
+    await input.fill('');
+  }
+
+  async hoverAndPlayTrack(title: string): Promise<void> {
+    const row = this.getTrackRow(title);
+    await row.waitFor({ state: 'visible' });
+    await row.hover();
+    const playBtn = row.locator('.mat-column-play button');
+    await playBtn.waitFor({ state: 'visible', timeout: 5000 });
+    await playBtn.click();
+  }
+
   async dropFiles(filePaths: string[]): Promise<void> {
     const dropZone = this.page.locator(LibraryLandingSelectors.DROP_ZONE);
     await dropZone.waitFor({ state: 'visible' });

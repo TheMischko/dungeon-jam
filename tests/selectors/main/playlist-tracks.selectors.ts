@@ -8,5 +8,10 @@ export class PlaylistTracksSelectors {
   static readonly MODAL_SAVE_BUTTON = `${PlaylistTracksSelectors.MODAL_OVERLAY} button:has-text("Save")`;
 
   static readonly DETAIL_TRACK_ROW_WITH_TEXT = (title: string) =>
-    `div.content mat-row:has-text("${title}")`;
+    `app-playlists-detail-page div.content mat-row:has-text("${title}")`;
+
+  static readonly PLAYLIST_HEADER_PLAY_BUTTON =
+    'div.header-controls lib-play-pause-button button';
 }
+
+
