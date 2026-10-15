@@ -13,7 +13,7 @@
     @for (scene of currentSelection(); track scene.id){
       <app-assigned-scene-box
         cdkDrag
-        cdkDragPreviewClass="dragging"
+        cdkDragPreviewClass="ordered-item-drag-preview"
         cdkDragBoundary=".assigned-scenes"
         [scene]="scene"
         [order]="$index+1"

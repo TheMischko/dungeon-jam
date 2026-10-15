@@ -6,7 +6,9 @@
   [availableSizes]="availableSizes()"
   [currentSizeIndex]="currentSizeIndex()"
   [imageMap]="sessionImages()"
+  [reorderingEnabled]="reorderingEnabled()"
   (sessionClick)="navigateToDetail($event)"
   (sizeChange)="handleSizeChange($event)"
   (search)="searchFilter.set($event)"
+  (reorderDrop)="reorderSession($event)"
 ></app-sessions-grid>

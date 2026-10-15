@@ -55,6 +55,7 @@ import {
 import {
   SessionData,
   SessionInsertQuery,
+  SessionRelativeDisplayOrderQuery,
   SessionScenesQuery,
   SessionUpdateQuery,
 } from '@shared/models/session.model';
@@ -224,6 +225,9 @@ declare global {
       getSessionImages: (
         sessionIds: string[]
       ) => Promise<Record<string, string | null>>;
+      changeSessionsOrder: (
+        query: SessionRelativeDisplayOrderQuery
+      ) => Promise<Map<string, DisplayOrder>>;
     };
     DISPLAY_ORDER_API: {
       getOrderMap: (
@@ -454,6 +458,7 @@ function installWindowApiStubs(): void {
     deleteSession: () => Promise.resolve(),
     getSessionScenes: () => Promise.resolve([]),
     getSessionImages: () => Promise.resolve({}),
+    changeSessionsOrder: () => Promise.resolve(new Map()),
   };
 
   window.DISPLAY_ORDER_API = {

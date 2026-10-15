@@ -2,7 +2,11 @@ import { TestBed } from '@angular/core/testing';
 import { firstValueFrom } from 'rxjs';
 import { vi } from 'vitest';
 import { SessionApiService } from './session-api.service';
-import { SessionData } from '@shared/models/session.model';
+import {
+  SessionData,
+  SessionOrderContext,
+} from '@shared/models/session.model';
+import { DisplayOrderPlacement } from '@shared/models/display-order.model';
 
 describe('SessionApiService', () => {
   let service: SessionApiService;
@@ -19,6 +23,7 @@ describe('SessionApiService', () => {
       deleteSession: vi.fn(),
       getSessionScenes: vi.fn(),
       getSessionImages: vi.fn(),
+      changeSessionsOrder: vi.fn(),
     };
   });
 
@@ -56,5 +61,27 @@ describe('SessionApiService', () => {
       name: 'Updated Session Name',
     });
     expect(result).toEqual(updatedSession);
+  });
+
+  it('should call window.SESSION_API.changeSessionsOrder when changeOrder is called', async () => {
+    const orderMap = new Map();
+    vi.spyOn(
+      (window as any).SESSION_API,
+      'changeSessionsOrder'
+    ).mockResolvedValue(orderMap);
+
+    const query = {
+      entityId: 'session-123',
+      anchorEntityId: 'session-456',
+      placement: DisplayOrderPlacement.BEFORE,
+      contextType: SessionOrderContext.Landing,
+    } as const;
+
+    const result = await firstValueFrom(service.changeOrder(query));
+
+    expect(
+      (window as any).SESSION_API.changeSessionsOrder
+    ).toHaveBeenCalledWith(query);
+    expect(result).toBe(orderMap);
   });
 });

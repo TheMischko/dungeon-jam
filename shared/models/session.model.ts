@@ -1,4 +1,5 @@
 import { QueryOptions } from '@shared/models/request.model';
+import { RelativeDisplayOrderQuery } from '@shared/models/display-order.model';
 
 export interface SessionData {
   id: string;
@@ -31,6 +32,16 @@ export interface SessionUpdateQuery {
 export interface SessionScenesQuery {
   sessionId: string;
   query: QueryOptions;
+}
+
+export enum SessionOrderContext {
+  Landing = 'landing',
+}
+
+export interface SessionRelativeDisplayOrderQuery
+  extends RelativeDisplayOrderQuery {
+  contextType: SessionOrderContext;
+  contextId?: string;
 }
 
 export interface SessionSceneRef {

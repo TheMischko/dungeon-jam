@@ -24,7 +24,7 @@
       @let selectable = itemSelectable();
       <app-grid-item
         cdkDrag
-        cdkDragPreviewClass="dragging"
+        cdkDragPreviewClass="ordered-item-drag-preview"
         [cdkDragData]="scene"
         [cdkDragDisabled]="!reorderingEnabled()"
         [title]="scene.name"
