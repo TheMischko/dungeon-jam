@@ -25,7 +25,7 @@
       @for (playlist of dataSet(); track trackPlaylist(playlist)) {
         <app-playlist-grid-item
           cdkDrag
-          cdkDragPreviewClass="dragging"
+          cdkDragPreviewClass="ordered-item-drag-preview"
           [cdkDragData]="playlist"
           [cdkDragDisabled]="!reorderingEnabled()"
           class="grid-item"

@@ -11,7 +11,7 @@
   @for (soundEffect of soundEffects(); track soundEffect.id) {
     <app-sound-effect-card
       cdkDrag
-      cdkDragPreviewClass="dragging"
+      cdkDragPreviewClass="ordered-item-drag-preview"
       [cdkDragData]="soundEffect"
       [soundEffect]="soundEffect"
       [isPlaying]="isPlaying(soundEffect.id)"

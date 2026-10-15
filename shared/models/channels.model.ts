@@ -119,6 +119,7 @@ export enum SessionChannel {
   DELETE = 'session/delete',
   GET_SESSION_SCENES = 'session/get-scenes',
   GET_IMAGES = 'session/get-images',
+  CHANGE_ORDER = 'session/change-order',
 }
 
 export enum NotificationChannel {
