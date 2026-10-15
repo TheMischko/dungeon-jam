@@ -1,3 +1,5 @@
+import { RelativeDisplayOrderQuery } from '@shared/models/display-order.model';
+
 export interface Scene {
   id: string;
   name: string;
@@ -41,4 +43,13 @@ export interface SceneUpdateQuery {
   stingerVolumeUpdate?: SceneSoundEffectRef;
   tagsAdded?: string[];
   tagsRemoved?: string[];
+}
+
+export enum SceneOrderContext {
+  Landing = 'landing',
+}
+
+export interface ScenesRelativeDisplayOrderQuery extends RelativeDisplayOrderQuery {
+  contextType: SceneOrderContext;
+  contextId?: string;
 }

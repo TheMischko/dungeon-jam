@@ -27,6 +27,11 @@ import {
   AllSizeGridItemConfigs,
   GridItemSizeConfig,
 } from '../../../../models/grid.model';
+import {
+  DisplayOrder,
+  DisplayOrderPlacement,
+} from '@shared/models/display-order.model';
+import { CdkDragDrop } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-scenes-grid-smart',
@@ -51,6 +56,7 @@ export class ScenesGridSmartComponent implements OnInit {
   readonly availableSizes = input<GridItemSizeConfig[]>(AllSizeGridItemConfigs);
   readonly initialSizeIndex = input<number>(0);
   readonly initialSelection = input<Scene[]>();
+  readonly reorderingEnabled = input<boolean>(false);
 
   readonly selected = output<Scene[]>();
 
@@ -83,7 +89,10 @@ export class ScenesGridSmartComponent implements OnInit {
 
     effect(() => {
       const scenes = this.scenesStore.entities();
-      this.scenes.set(scenes);
+      const orderMap = this.scenesStore.latestOrderMap();
+      this.scenes.set(
+        scenes.sort((a, b) => this.sortScenesByDisplayOrder(orderMap, a, b))
+      );
       if (!scenes?.length) {
         return;
       }
@@ -161,5 +170,34 @@ export class ScenesGridSmartComponent implements OnInit {
 
   protected stopScene(scene: Scene) {
     this.scenePlayerService.stopScene(scene);
+  }
+
+  private sortScenesByDisplayOrder(
+    orderMap: Map<string, DisplayOrder>,
+    a: Scene,
+    b: Scene
+  ): number {
+    const orderA = orderMap.get(a.id)?.order ?? 0;
+    const orderB = orderMap.get(b.id)?.order ?? 0;
+    return orderA - orderB;
+  }
+
+  protected reorderScene(event: CdkDragDrop<Scene[]>) {
+    if (event.previousIndex === event.currentIndex) {
+      return;
+    }
+    const scenes = this.scenes();
+    const item = scenes[event.previousIndex];
+    if (!item) {
+      return;
+    }
+
+    const anchor = scenes[event.currentIndex];
+
+    this.scenesStore.changeRelativeOrder({
+      entityId: item.id,
+      anchorEntityId: anchor.id,
+      placement: DisplayOrderPlacement.BEFORE,
+    });
   }
 }

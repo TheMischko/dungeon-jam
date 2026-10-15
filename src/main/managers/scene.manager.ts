@@ -2,6 +2,8 @@ import { DatabaseProvider } from '../database/database-provider';
 import {
   Scene,
   SceneInsertQuery,
+  SceneOrderContext,
+  ScenesRelativeDisplayOrderQuery,
   SceneUpdateQuery,
 } from '@shared/models/scene.model';
 import { DatabaseProviderCreator } from '../database/database-provider-creator';
@@ -14,6 +16,11 @@ import { ImageEntityType, ImageManager } from './image.manager';
 import { withAppError } from '../utils/ipc-handler';
 import { TagsManager } from './tags.manager';
 import { GetSomeMatch } from '../database/database-provider.model';
+import { DisplayOrderManager } from './display-order.manager';
+import {
+  DisplayOrder,
+  OrderableEntityType,
+} from '@shared/models/display-order.model';
 
 export class SceneManager {
   private static _instance: SceneManager;
@@ -22,7 +29,8 @@ export class SceneManager {
   constructor(
     private databaseProvider: DatabaseProvider<Scene>,
     private soundEffectManager: SoundEffectManager,
-    private imageManager: ImageManager
+    private imageManager: ImageManager,
+    private displayOrderManager: DisplayOrderManager
   ) {}
 
   public static async getInstance(): Promise<SceneManager> {
@@ -35,10 +43,12 @@ export class SceneManager {
         .complete();
       const soundEffectManager = await SoundEffectManager.getInstance();
       const imageManager = await ImageManager.getInstance();
+      const displayOrderManager = await DisplayOrderManager.getInstance();
       this._instance = new SceneManager(
         database,
         soundEffectManager,
-        imageManager
+        imageManager,
+        displayOrderManager
       );
       this._instance.registerChannels();
     }
@@ -83,10 +93,9 @@ export class SceneManager {
     );
     ipcMain.handle(
       SceneChannel.CHANGE_ORDER,
-      withAppError((_, sceneIds: string[]) => {
-        this.logger.log('Received request to change order', { sceneIds });
-        this.logger.logWarning('Change order is not implemented');
-        return this.getAll({});
+      withAppError((_, query: ScenesRelativeDisplayOrderQuery) => {
+        this.logger.log('Received request to change order', { query });
+        return this.changeRelativeOrder(query);
       })
     );
   }
@@ -94,6 +103,26 @@ export class SceneManager {
   public async getAll(query: QueryRequest): Promise<Scene[]> {
     const scenes = await this.databaseProvider.getAll(query);
     this.logger.log(`Fetched ${scenes.length} scenes from database`);
+    let orderMap = await this.displayOrderManager.getOrderMap(
+      OrderableEntityType.Scene,
+      SceneOrderContext.Landing
+    );
+    if (orderMap.size !== scenes.length && !query.search && !query.filters) {
+      orderMap = await this.repairOrderRecords(
+        scenes,
+        SceneOrderContext.Landing
+      );
+    }
+
+    if (!query.sortBy) {
+      scenes.sort((a, b) => {
+        const orderA = orderMap.get(a.id);
+        const orderB = orderMap.get(b.id);
+
+        return (orderA?.order ?? 0) - (orderB?.order ?? 0);
+      });
+    }
+
     return scenes.map((scene) => this.parseScene(scene));
   }
 
@@ -157,6 +186,11 @@ export class SceneManager {
       dateCreated: new Date(),
       dateUpdated: new Date(),
     });
+    await this.displayOrderManager.appendEntity(
+      result.id,
+      OrderableEntityType.Scene,
+      SceneOrderContext.Landing
+    );
     return this.parseScene(result);
   }
 
@@ -285,5 +319,35 @@ export class SceneManager {
       playlistId: scene.playlistId ?? null,
       introTrackIds: scene.introTrackIds ?? [],
     };
+  }
+
+  private async repairOrderRecords(
+    scenes: Scene[],
+    contextType: string,
+    contextId?: string
+  ): Promise<Map<string, DisplayOrder>> {
+    return this.displayOrderManager.repairCollection(
+      scenes,
+      'id',
+      (a, mapOrderA, b, mapOrderB) => {
+        const orderA = mapOrderA ?? a.order ?? 0;
+        const orderB = mapOrderB ?? b.order ?? 0;
+        return orderA - orderB;
+      },
+      OrderableEntityType.Scene,
+      contextType,
+      contextId
+    );
+  }
+
+  private changeRelativeOrder(
+    query: ScenesRelativeDisplayOrderQuery
+  ): Promise<Map<string, DisplayOrder>> {
+    return this.displayOrderManager.setRelativeDisplayOrder(
+      query,
+      OrderableEntityType.Scene,
+      query.contextType,
+      query.contextId
+    );
   }
 }
