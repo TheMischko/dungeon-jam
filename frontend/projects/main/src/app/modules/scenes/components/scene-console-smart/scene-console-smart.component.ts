@@ -30,7 +30,7 @@ import {
   toObservable,
   toSignal,
 } from '@angular/core/rxjs-interop';
-import { debounceTime, map, Observable } from 'rxjs';
+import { debounceTime, map, Observable, of } from 'rxjs';
 import { SoundEffectVolumeChange } from '../../../../models/sound-effect.model';
 import { PlaybackService } from '../../../../services/playback.service';
 import { SoundEffectsPlayerService } from '../../../../services/sound-effects-player.service';
@@ -228,17 +228,12 @@ export class SceneConsoleSmartComponent implements OnInit {
 
     effect(() => {
       const scene = this.scene();
-      if (!scene || !scene.imageUrl) {
+      if (!scene) {
         return;
       }
-      const imageSub = this.imageApiService
-        .fetchImage(scene.imageUrl)
-        .subscribe((image) => {
-          if (!image) {
-            return;
-          }
-          this.sceneImageUrl.set(image);
-        });
+      const imageSub = this.loadSceneImage(scene).subscribe((image) => {
+        this.sceneImageUrl.set(image ?? undefined);
+      });
 
       return () => {
         imageSub.unsubscribe();
@@ -469,5 +464,24 @@ export class SceneConsoleSmartComponent implements OnInit {
 
   protected playTrackNext(track: Track) {
     this.playbackService.injectNext(track);
+  }
+
+  private loadSceneImage(scene: Scene): Observable<string | null> {
+    if (!scene) {
+      return of(null);
+    }
+
+    if (!scene.imageUrl) {
+      if (scene.playlistId) {
+        const playlistMap = this.playlistStore.entityMap();
+        const playlist = playlistMap[scene.playlistId];
+        if (playlist && playlist.imageUrl) {
+          return this.imageApiService.fetchImage(playlist.imageUrl);
+        }
+      }
+      return of(null);
+    }
+
+    return this.imageApiService.fetchImage(scene.imageUrl);
   }
 }

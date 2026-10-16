@@ -32,6 +32,7 @@ import {
   DisplayOrderPlacement,
 } from '@shared/models/display-order.model';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
+import { PlaylistStore } from '@general/stores/playlist.store';
 
 @Component({
   selector: 'app-scenes-grid-smart',
@@ -48,6 +49,7 @@ export class ScenesGridSmartComponent implements OnInit {
   private readonly playbackService = inject(PlaybackService);
   private readonly scenePlayerService = inject(ScenePlayerService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly playlistStore = inject(PlaylistStore);
 
   readonly itemPlayable = input<boolean>(true);
   readonly itemSelectable = input<boolean>(false);
@@ -109,6 +111,13 @@ export class ScenesGridSmartComponent implements OnInit {
     if (!this.tagsStore.initialized) {
       this.tagsStore.loadAll({});
     }
+
+    if (
+      this.playlistStore.entities().length === 0 &&
+      !this.playlistStore.loading()
+    ) {
+      this.playlistStore.load({});
+    }
   }
 
   handleSizeChange(newIndex: number) {
@@ -130,10 +139,10 @@ export class ScenesGridSmartComponent implements OnInit {
   private updateImageMap(scenes: Scene[]): Observable<void> {
     const imageRequests = scenes.map((scene) => {
       if (!scene.imageUrl) {
-        return of({
-          sceneId: scene.id,
-          imageUrl: null,
-        });
+        if (scene.playlistId) {
+          return this.usePlaylistImage(scene);
+        }
+        return this.getNoImageSceneMapRecord(scene);
       }
 
       return this.imageApiService.fetchImage(scene.imageUrl).pipe(
@@ -199,5 +208,29 @@ export class ScenesGridSmartComponent implements OnInit {
       anchorEntityId: anchor.id,
       placement: DisplayOrderPlacement.BEFORE,
     });
+  }
+
+  private getNoImageSceneMapRecord(scene: Scene) {
+    return of({
+      sceneId: scene.id,
+      imageUrl: null,
+    });
+  }
+
+  private usePlaylistImage(scene: Scene) {
+    if (!scene.playlistId) {
+      return this.getNoImageSceneMapRecord(scene);
+    }
+    const playlistMap = this.playlistStore.entityMap();
+    const playlist = playlistMap[scene.playlistId];
+    if (!playlist || !playlist.imageUrl) {
+      return this.getNoImageSceneMapRecord(scene);
+    }
+    return this.imageApiService.fetchImage(playlist.imageUrl).pipe(
+      map((imageUrl) => ({
+        sceneId: scene.id,
+        imageUrl,
+      }))
+    );
   }
 }
