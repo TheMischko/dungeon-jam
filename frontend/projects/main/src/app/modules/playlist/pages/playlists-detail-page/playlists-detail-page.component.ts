@@ -38,6 +38,9 @@ import {
   SectionToggleEvent,
   ToggledState,
 } from '@general/models/collapsible-section-component.model';
+import { routesStrings } from '../../../../routes-strings';
+import { playlistRouteStrings } from '../../playlist-route-strings';
+import { scrollPageUp } from '@general/utils/scroll-page-up';
 
 @Component({
   selector: 'app-playlists-detail-page',
@@ -107,6 +110,11 @@ export class PlaylistsDetailPageComponent implements AfterViewInit {
     return ['../', parent.id];
   });
 
+  protected playlistLandingRoute = [
+    routesStrings.playlists,
+    playlistRouteStrings.playlists,
+  ];
+
   readonly childrenSectionConfig = computed(() => {
     if (!this.playlist()) {
       return [] as {
@@ -150,11 +158,13 @@ export class PlaylistsDetailPageComponent implements AfterViewInit {
     hideTracks: false,
     hideParentInfo: true,
   };
+  protected readonly SCROLL_TIMEOUT = 250;
 
   constructor() {
-    effect(() => {
+    effect(async () => {
       this.playlist();
       this.addScrollingToChildPlaylistGrid();
+      await scrollPageUp(this.SCROLL_TIMEOUT);
     });
   }
 
@@ -186,7 +196,7 @@ export class PlaylistsDetailPageComponent implements AfterViewInit {
   protected addScrollingToChildPlaylistGrid(): void {
     setTimeout(() => {
       addXAxisScrolling('.wrapper .grid-content');
-    }, 250);
+    }, this.SCROLL_TIMEOUT);
   }
 
   protected updateOnSectionToggle(event: SectionToggleEvent) {

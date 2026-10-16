@@ -4,18 +4,21 @@
   }
   <div class="header-content">
     <div class="header-info">
+      <div class="header-parent-playlist">
+        <span>Back to </span>
+        @if (parentPlaylist()) {
+          <a [routerLink]="parentDetailRoute()">{{ parentPlaylist()?.name }}</a>
+        } @else {
+          <a [routerLink]="playlistLandingRoute" [relativeTo]="null"
+            >Playlists</a
+          >
+        }
+      </div>
       <h1 class="playlist-name">{{ playlist()?.name }}</h1>
       @if (playlist()?.description) {
         <h2 class="playlist-description">{{ playlist()?.description }}</h2>
       }
     </div>
-
-    @if (parentPlaylist()) {
-      <div class="header-parent-playlist">
-        <a [routerLink]="parentDetailRoute()">{{ parentPlaylist()?.name }}</a>
-        <span>Back to </span>
-      </div>
-    }
   </div>
   <div class="header-bottom">
     <div class="header-controls">
