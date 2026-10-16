@@ -3,9 +3,9 @@
 
 :host {
   @include mix.base-dialog();
+  width: 600px;
 
   .wrapper {
-    width: 600px;
     min-height: 350px;
     padding: 1.5rem;
 
