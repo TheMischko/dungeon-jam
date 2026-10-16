@@ -22,14 +22,15 @@
   }
 
   .header-parent-playlist {
+    @include typo.body2();
     display: flex;
-    flex-direction: row-reverse;
+    flex-direction: row;
     align-items: flex-start;
     justify-content: flex-end;
-    margin: 8px;
+    margin: 0 0 8px;
+    padding: 1px 2px !important;
     & > * {
-      background: rgba(0, 0, 0, 0.35);
-      padding: 4px;
+      padding: 2px;
     }
   }
 
@@ -38,12 +39,12 @@
     flex-direction: column;
     align-items: flex-start;
     justify-content: flex-start;
-    padding: 0.25rem 1rem;
+    padding: 0.25rem 0.5rem;
     min-height: 200px;
 
     & > * {
-      background: rgba(0, 0, 0, 0.35);
-      padding: 4px;
+      background: rgba(0, 0, 0, 0.75);
+      padding: 4px 8px;
     }
 
     .playlist-name {
@@ -122,9 +123,19 @@
     align-items: center;
     flex-wrap: wrap;
     gap: 6px;
+    min-height: 40px;
+  }
+  .no-children-text {
+    opacity: 0.7;
   }
 }
 
 :host ::ng-deep .playlist-tags lib-tag-list {
   justify-content: flex-end;
+}
+
+:host ::ng-deep .wrapper .grid-content {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  max-width: 95vw;
 }

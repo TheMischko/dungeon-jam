@@ -18,7 +18,7 @@
         }}</span>
       </div>
     }
-    @if (parentPlaylist()) {
+    @if (parentPlaylist() && !hideParentInfo()) {
       <div
         class="parent-overlay small-overlay"
         libScrollOverflowText

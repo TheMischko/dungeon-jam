@@ -232,7 +232,8 @@ export class DisplayOrderManager {
     const newOrder = this.resolveAbsoluteOrder(
       orderedEntityList,
       anchor,
-      query.placement
+      query.placement,
+      target
     );
     await this.setDisplayOrder(
       query.entityId,
@@ -392,15 +393,19 @@ export class DisplayOrderManager {
   private resolveAbsoluteOrder(
     orderedEntityList: DisplayOrder[],
     anchor: DisplayOrder | undefined,
-    placement: DisplayOrderPlacement
+    placement: DisplayOrderPlacement,
+    target?: DisplayOrder
   ) {
     if (!anchor) {
       return placement === DisplayOrderPlacement.BEFORE
         ? 0
         : orderedEntityList.length - 1;
     }
+
+    const anchorEffectiveOrder =
+      target && target.order < anchor.order ? anchor.order - 1 : anchor.order;
     return placement === DisplayOrderPlacement.BEFORE
-      ? anchor.order
-      : anchor.order + 1;
+      ? anchorEffectiveOrder
+      : anchorEffectiveOrder + 1;
   }
 }

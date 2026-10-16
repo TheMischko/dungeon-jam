@@ -4,6 +4,7 @@ export interface GridPlaylistSizeConfig extends GridItemSizeConfig {
   trackCountSize?: number;
   titleBold?: boolean;
   hideTracks?: boolean;
+  hideParentInfo?: boolean;
 }
 
 export interface GridSoundEffectSizeConfig extends GridItemSizeConfig {

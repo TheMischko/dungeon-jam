@@ -1,24 +1,35 @@
-import { ChangeDetectionStrategy, Component, effect, input, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  input,
+  output,
+  signal,
+} from '@angular/core';
 import { CdkAccordionModule } from '@angular/cdk/accordion';
 import { NgTemplateOutlet } from '@angular/common';
 import { actionsIconSet } from '@general/icons/icons';
 import { LucideDynamicIcon } from '@lucide/angular';
-import { CollapsibleSectionConfig } from '../../../../../models/collapsible-section-component.model';
+import {
+  CollapsibleSectionConfig,
+  SectionToggleEvent,
+  ToggledState,
+} from '../../../../../models/collapsible-section-component.model';
 
 @Component({
   selector: 'lib-collapsible-section',
-  imports: [
-    NgTemplateOutlet,
-    CdkAccordionModule,
-    LucideDynamicIcon,
-  ],
+  imports: [NgTemplateOutlet, CdkAccordionModule, LucideDynamicIcon],
   templateUrl: './collapsible-section.component.html',
   styleUrl: './collapsible-section.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CollapsibleSectionComponent<T> {
   readonly data = input.required<CollapsibleSectionConfig<T>[]>();
-  readonly trackBy = input<(index: number, item: T) => string>((index, _) => index.toString());
+  readonly trackBy = input<(index: number, item: T) => string>((index, _) =>
+    index.toString()
+  );
+
+  readonly toggled = output<SectionToggleEvent>();
 
   readonly expandedMap = signal<Record<string, boolean>>({});
 
@@ -32,18 +43,21 @@ export class CollapsibleSectionComponent<T> {
         return;
       }
       const items = data
-        .map(item => item.value)
-        .reduce((map, item, index, __) => {
-          return {
-            ...map,
-            [this.trackBy()(index, item)]: index === 0,
-          }
-        }, {} as Record<string, boolean>);
+        .map((item) => item.value)
+        .reduce(
+          (map, item, index, __) => {
+            return {
+              ...map,
+              [this.trackBy()(index, item)]: index === 0,
+            };
+          },
+          {} as Record<string, boolean>
+        );
 
       this.expandedMap.update((current) => ({
         ...items,
-        ...current
-      }))
+        ...current,
+      }));
     });
   }
 
@@ -53,11 +67,19 @@ export class CollapsibleSectionComponent<T> {
   }
 
   toggleExpanded(item: T, index: number) {
+    const currentMap = this.expandedMap();
     const key = this.trackBy()(index, item);
-    this.expandedMap.update((current) => ({
-      ...current,
-      [key]: !current[key],
-    }))
+    const nextState = !currentMap[key];
+
+    this.toggled.emit({
+      state: nextState ? ToggledState.Expanded : ToggledState.Collapsed,
+      trackById: key,
+    });
+
+    this.expandedMap.set({
+      ...currentMap,
+      [key]: nextState,
+    });
   }
 
   protected getExpandedIcon(expanded: boolean) {
