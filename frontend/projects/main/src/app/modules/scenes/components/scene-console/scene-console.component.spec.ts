@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SceneConsoleComponent } from './scene-console.component';
+import { createSceneContext } from '../../../../models/track-highlight.model';
 
 describe('SceneConsoleComponent', () => {
   let component: SceneConsoleComponent;
@@ -18,5 +19,13 @@ describe('SceneConsoleComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should accept trackHighlightContext input', () => {
+    const context = createSceneContext('scene-1');
+    fixture.componentRef.setInput('trackHighlightContext', context);
+    fixture.detectChanges();
+
+    expect(component.trackHighlightContext()).toEqual(context);
   });
 });

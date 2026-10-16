@@ -20,10 +20,14 @@ import { PlaylistTracksStore } from '../../../../../stores/playlist-tracks.store
 import { PlaylistApiService } from '@general/services/playlist-api.service';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { Playlist, PlaylistUpdateQuery } from '@shared/models/playlist.model';
+import { PlaylistWithTagData } from '@general/models/playlist.model';
 import { PlaylistsDetailPageComponent } from '../playlists-detail-page.component';
 import { PlaybackService } from '../../../../../services/playback.service';
 import { PlaybackState } from '../../../../../models/playback.model';
-import { ActionsMenuConfig } from '@general/components/display/actions-menu/actions-menu.component';
+import {
+  ActionsMenuConfig,
+  ActionsMenuDataConfig,
+} from '@general/components/display/actions-menu/actions-menu.component';
 import { actionsIconSet } from '@general/icons/icons';
 import { DialogService } from '../../../../../services/dialog.service';
 import {
@@ -57,6 +61,10 @@ import {
   ConfirmationDialogData,
 } from '../../../../../components/dialog/confirmation-dialog/confirmation-dialog.component';
 import { DiscoverTracksStateService } from '../../../../../services/discover-tracks-state.service';
+import { CdkDragDrop } from '@angular/cdk/drag-drop';
+import { DisplayOrderPlacement } from '@shared/models/display-order.model';
+import { MenuCloseReason } from '@angular/material/menu';
+import { forkJoin, map, Observable, of, tap } from 'rxjs';
 
 @Component({
   selector: 'app-playlists-detail-page-smart',
@@ -105,7 +113,15 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
       return [];
     }
     const playlistMap = this.playlistStore.entityMap();
-    return childIds.map((id) => playlistMap[id]).filter((p: Playlist) => !!p);
+    const orderMap = this.playlistStore.latestOrderMap();
+    const children = childIds
+      .map((id) => playlistMap[id])
+      .filter((p: Playlist) => !!p);
+    return [...children].sort((a, b) => {
+      const orderA = orderMap.get(a.id)?.order ?? Number.MAX_SAFE_INTEGER;
+      const orderB = orderMap.get(b.id)?.order ?? Number.MAX_SAFE_INTEGER;
+      return orderA - orderB;
+    });
   });
 
   readonly playbackState = toSignal<PlaybackState | null>(
@@ -128,6 +144,10 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
   );
   readonly currentIncludeChildren = signal<boolean>(false);
   readonly currentFilters = signal<FilterQuery>(new FilterQuery());
+  readonly showMoveToChild = signal<boolean>(false);
+  protected readonly childPlaylistImageMap = signal<
+    Record<string, string | null>
+  >({});
 
   readonly loadQuery = computed<PlaylistTracksQuery>(() => ({
     search: this.currentFilter(),
@@ -137,9 +157,39 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
     filters: this.currentFilters(),
     includeChildren: this.currentIncludeChildren(),
   }));
-  songActionsMenuConfig = computed<ActionsMenuConfig<Track, Playlist>[]>(() => {
+
+  readonly moveToChildActions = computed<
+    ActionsMenuDataConfig<Track, Playlist>[]
+  >(() => {
+    return this.childPlaylists().map((child) => ({
+      text: child.name,
+      data: child,
+      keepOpen: false,
+      onSelected: (
+        track: Track,
+        config: ActionsMenuDataConfig<Track, Playlist>
+      ) => {
+        this.moveTrackToChildPlaylist(track, config.data!);
+      },
+    }));
+  });
+
+  readonly defaultSongActionsMenuConfig = computed<
+    ActionsMenuConfig<Track, Playlist>[]
+  >(() => {
+    const hasChildren = this.childPlaylists().length > 0;
     return this.defaultActionsService.createActions({
       appendActions: [
+        ...(hasChildren
+          ? [
+              {
+                text: 'Move to child playlist',
+                icon: actionsIconSet.AddIcon,
+                onSelected: () => this.showMoveToChild.set(true),
+                keepOpen: true,
+              },
+            ]
+          : []),
         {
           text: 'Remove from playlist',
           icon: actionsIconSet.DeleteIcon,
@@ -150,6 +200,13 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
       ],
       excludeActions: ['delete'],
     });
+  });
+
+  songActionsMenuConfig = computed<ActionsMenuConfig<Track, Playlist>[]>(() => {
+    if (this.showMoveToChild()) {
+      return this.moveToChildActions();
+    }
+    return this.defaultSongActionsMenuConfig();
   });
 
   constructor() {
@@ -174,6 +231,52 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
       this.playlistId();
       this.discoverStateService.reset();
     });
+
+    effect(() => {
+      const playlistId = this.playlistId();
+      // Track childrenIds length so order map refreshes when children are added/removed
+      this.playlist()?.childrenIds?.length;
+      if (!playlistId) {
+        return;
+      }
+      this.playlistStore.updateOrderMap(playlistId);
+    });
+
+    effect(() => {
+      const children = this.childPlaylists();
+      if (!children.length) {
+        this.childPlaylistImageMap.set({});
+        return;
+      }
+      const sub = this.updateChildPlaylistImageMap(children).subscribe();
+      return () => {
+        sub?.unsubscribe();
+      };
+    });
+  }
+
+  private updateChildPlaylistImageMap(playlists: Playlist[]): Observable<void> {
+    const imageRequests = playlists.map((playlist) => {
+      if (playlist.imageUrl) {
+        return this.imageApiService
+          .fetchImage(playlist.imageUrl)
+          .pipe(map((imageUrl) => ({ playlistId: playlist.id, imageUrl })));
+      }
+      return of({ playlistId: playlist.id, imageUrl: null });
+    });
+    return forkJoin(imageRequests).pipe(
+      tap((responses) => {
+        const imageMap = responses.reduce(
+          (map, response) => ({
+            ...map,
+            [response.playlistId]: response.imageUrl,
+          }),
+          {} as Record<string, string | null>
+        );
+        this.childPlaylistImageMap.set(imageMap);
+      }),
+      map(() => void 0)
+    );
   }
 
   ngOnInit() {
@@ -356,5 +459,40 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
           this.openDiscoverModal();
         }
       });
+  }
+
+  protected reorderChildPlaylist(event: CdkDragDrop<PlaylistWithTagData[]>) {
+    const children = this.childPlaylists();
+    const item = children[event.previousIndex];
+    if (!item) {
+      return;
+    }
+    const anchor = children[event.currentIndex];
+    const placement =
+      event.currentIndex > event.previousIndex
+        ? DisplayOrderPlacement.AFTER
+        : DisplayOrderPlacement.BEFORE;
+    this.playlistStore.changeRelativeOrder({
+      playlistId: item.id,
+      anchorId: anchor?.id,
+      placement,
+      parentId: this.playlistId(),
+    });
+  }
+
+  protected actionsClosed(reason: MenuCloseReason | string) {
+    if (reason !== 'click' || this.showMoveToChild()) {
+      setTimeout(() => {
+        this.showMoveToChild.set(false);
+      }, 250);
+    }
+  }
+
+  private moveTrackToChildPlaylist(track: Track, child: Playlist) {
+    this.playlistStore.addNewTracks({
+      [child.id]: [track.id],
+    });
+    this.removeTrackFromPlaylist(track);
+    this.showMoveToChild.set(false);
   }
 }

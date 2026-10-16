@@ -4,18 +4,21 @@
   }
   <div class="header-content">
     <div class="header-info">
+      <div class="header-parent-playlist">
+        <span>Back to </span>
+        @if (parentPlaylist()) {
+          <a [routerLink]="parentDetailRoute()">{{ parentPlaylist()?.name }}</a>
+        } @else {
+          <a [routerLink]="playlistLandingRoute" [relativeTo]="null"
+            >Playlists</a
+          >
+        }
+      </div>
       <h1 class="playlist-name">{{ playlist()?.name }}</h1>
       @if (playlist()?.description) {
         <h2 class="playlist-description">{{ playlist()?.description }}</h2>
       }
     </div>
-
-    @if (parentPlaylist()) {
-      <div class="header-parent-playlist">
-        <a [routerLink]="parentDetailRoute()">{{ parentPlaylist()?.name }}</a>
-        <span>Back to </span>
-      </div>
-    }
   </div>
   <div class="header-bottom">
     <div class="header-controls">
@@ -46,6 +49,7 @@
 <div class="sections">
   <lib-collapsible-section
     [data]="childrenSectionConfig()"
+    (toggled)="updateOnSectionToggle($event)"
   ></lib-collapsible-section>
 </div>
 
@@ -69,9 +73,11 @@
       [playingTrackId]="playingTrackId()"
       [actionsMenuConfig]="songActionsMenuConfig()"
       [noDataText]="noTracksWarning"
+      [highlightContext]="trackHighlightContext()"
       (playTrack)="playTrack.emit($event)"
       (pauseTrack)="pause.emit()"
       (queryChange)="queryChange.emit($event)"
+      (actionMenuClosed)="actionMenuClosed.emit($event)"
     ></app-songs-table>
   </div>
 </app-files-drop-in-zone>
@@ -82,12 +88,20 @@
       <app-child-playlist-actions-smart [parent]="playlist" />
     }
     <div class="playlists">
-      @for (child of childrenPlaylists(); track child.id) {
-        @if (child) {
-          <a [routerLink]="['../', child.id]">
-            <app-child-playlist-box [playlist]="child" />
-          </a>
-        }
+      @if (childrenPlaylists().length === 0) {
+        <p class="no-children-text">
+          No child playlists yet. Use "Create new playlist" to add one.
+        </p>
+      } @else {
+        <app-playlist-grid
+          [dataSet]="childrenPlaylistsTagged()"
+          [playlistImageMap]="childrenPlaylistImageMap()"
+          [sizeConfig]="childrenGridConfig"
+          [showControls]="false"
+          [showParentsFilter]="false"
+          (playlistClick)="navigateToChildPlaylist($event)"
+          (reorderDrop)="childPlaylistDropped($event)"
+        ></app-playlist-grid>
       }
     </div>
   </div>
