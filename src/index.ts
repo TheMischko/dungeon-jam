@@ -7,12 +7,12 @@ import { AppInfoManager } from './main/managers/app-info.manager';
 import pkg from '../package.json';
 
 import { DatabaseWrapper } from './main/database/database';
+import { MediaProtocolManager } from './main/managers/media-protocol.manager';
 
 const ENV = process.env.ENV || process.env.DEFAULT_ENV || 'production';
 const appLogger = new Logger('APP', 'cyanBright');
 let startupManager: StartupManager;
 let powerSaveBlockerId: number | null = null;
-
 // Prevent Chromium from throttling renderers and timers when window is minimized or hidden on Windows
 app.commandLine.appendSwitch('disable-renderer-backgrounding');
 app.commandLine.appendSwitch('disable-background-timer-throttling');
@@ -26,6 +26,7 @@ app.name = pkg.name;
 // @ts-ignore
 app.version = appVersion;
 app.getVersion = () => appVersion;
+MediaProtocolManager.RegisterMediaProtocol();
 
 if (!app.isPackaged) {
   const appData = app.getPath('appData');
@@ -51,6 +52,9 @@ app.on('ready', async () => {
     appLogger.log(`Starting DungeonJam v${app.getVersion()}`, {
       env: ENV,
     });
+    // Must run before any window is created/navigates, otherwise its
+    // webContents won't route media:// requests until the next navigation.
+    MediaProtocolManager.getInstance();
     startupManager = StartupManager.getInstance(__dirname, ENV);
     const managersInitSuccess = await startupManager.initializeAllManagers();
     const resourcesInitSuccess = await startupManager.initializeResources();

@@ -99,7 +99,8 @@
         appCustomTableRowAttr
         [customRowAttribute]="customRowAttributeName()"
         [customRowAttributeValue]="customRowAttributeValueFn()?.(row)"
-        *matRowDef="let row; columns: columnNames()"
+        *matRowDef="let row; columns: columnNames(); let i = index"
+        [attr.track-by-id]="trackBy()(i, row)"
         (mouseenter)="hoverStart.emit(row)"
         (mouseleave)="hoverEnd.emit(row)"
       ></mat-row>

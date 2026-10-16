@@ -38,6 +38,7 @@ export enum PlayingTrackState {
   NONE = 'NONE',
   LOADED = 'LOADED',
   PLAYING = 'PLAYING',
+  PAUSED = 'PAUSED',
   ENDING_SOON = 'ENDING_SOON',
   ENDED = 'ENDED',
 }

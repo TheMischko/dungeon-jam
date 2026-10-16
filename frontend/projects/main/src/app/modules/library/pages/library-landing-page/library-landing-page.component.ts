@@ -17,11 +17,10 @@ import {
 } from '../../../../models/playback.model';
 import { PlaylistStore } from '@general/stores/playlist.store';
 import {
-  ActionsMenuBaseConfig,
   ActionsMenuConfig,
   ActionsMenuDataConfig,
 } from '@general/components/display/actions-menu/actions-menu.component';
-import { actionsIconSet, iconSet } from '@general/icons/icons';
+import { actionsIconSet } from '@general/icons/icons';
 import { Playlist } from '@shared/models/playlist.model';
 import { MenuCloseReason } from '@angular/material/menu';
 import { QueryOptions } from '@shared/models/request.model';
@@ -42,6 +41,7 @@ import {
   ConfirmationDialogComponent,
   ConfirmationDialogData,
 } from '../../../../components/dialog/confirmation-dialog/confirmation-dialog.component';
+import { createLibraryContext } from '../../../../models/track-highlight.model';
 
 @Component({
   selector: 'app-library-landing-page',
@@ -127,29 +127,8 @@ export class LibraryLandingPageComponent implements OnInit {
       },
     ],
   });
-  readonly defaultSongActions: ActionsMenuBaseConfig<Track>[] = [
-    {
-      text: 'Play next',
-      icon: iconSet.PlayNextIcon,
-      onSelected: (track: Track) => this.playNext(track),
-    },
-    {
-      text: 'Add to playlist',
-      icon: actionsIconSet.AddIcon,
-      onSelected: () => this.addToPlaylist(),
-      keepOpen: true,
-    },
-    {
-      text: 'Edit',
-      icon: actionsIconSet.EditIcon,
-      onSelected: (track: Track) => this.editTrack(track),
-    },
-    {
-      text: 'Delete',
-      icon: actionsIconSet.DeleteIcon,
-      onSelected: (track: Track) => this.deleteTrack(track),
-    },
-  ];
+
+  readonly trackHighlightContext = createLibraryContext();
 
   ngOnInit() {
     this.trackStore.load(this.currentQuery);
@@ -169,13 +148,15 @@ export class LibraryLandingPageComponent implements OnInit {
   }
 
   playTrack(track: Track) {
-    const trackIndex = this.tracks().findIndex(
+    const currentTracks = this.displayTracks();
+    const trackIndex = currentTracks.findIndex(
       (libraryTrack) => libraryTrack.id === track.id
     );
-    this.playbackService.play(
-      track,
-      this.displayTracks().slice(trackIndex + 1)
-    );
+
+    this.playbackService.play(track, [
+      ...currentTracks.slice(trackIndex + 1),
+      ...currentTracks.slice(0, trackIndex),
+    ]);
   }
 
   pauseTrack() {
@@ -188,11 +169,6 @@ export class LibraryLandingPageComponent implements OnInit {
         this.showPlaylists.set(false);
       }, 250);
     }
-  }
-
-  private playNext(track: Track) {
-    console.log(`Play next: ${track.name}`);
-    return undefined;
   }
 
   private deleteTrack(track: Track | undefined) {
