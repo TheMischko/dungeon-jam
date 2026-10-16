@@ -46,6 +46,7 @@
 <div class="sections">
   <lib-collapsible-section
     [data]="childrenSectionConfig()"
+    (toggled)="updateOnSectionToggle($event)"
   ></lib-collapsible-section>
 </div>
 
@@ -77,7 +78,6 @@
     ></app-songs-table>
   </div>
 </app-files-drop-in-zone>
-
 
 <ng-template #childrenTemplate>
   <div class="child-playlists-section">

@@ -25,3 +25,4 @@ Obviously the project is WIP, so there is just a list of small missing features 
 - [x] Scene has playing state even if one random sound effect that is part of it plays from elsewhere
 - [ ] Show "Play next" song in Queue popup
 - [ ] Clicking on effect didn't work
+- [ ] Drag-and-dropping Image into Create Playlist modal does not save the Image on the playlist

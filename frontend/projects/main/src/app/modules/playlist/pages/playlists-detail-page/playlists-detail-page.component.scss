@@ -132,3 +132,9 @@
 :host ::ng-deep .playlist-tags lib-tag-list {
   justify-content: flex-end;
 }
+
+:host ::ng-deep .wrapper .grid-content {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  max-width: 95vw;
+}

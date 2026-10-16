@@ -1,18 +1,20 @@
 import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
+  inject,
   input,
   output,
   TemplateRef,
   viewChild,
-  ChangeDetectionStrategy,
-  inject,
 } from '@angular/core';
 import { Playlist } from '@shared/models/playlist.model';
 import { AudioTrack, Track } from '@shared/models/track.model';
 import { SongsTableComponent } from '../../../library/pages/library-landing-page/songs-table/songs-table.component';
 import { PlayPauseButtonComponent } from '@general/components/buttons/play-pause-button/play-pause-button.component';
-import { ButtonType, ButtonSize } from '@general';
+import { ButtonSize, ButtonType } from '@general';
 import { ActionsMenuConfig } from '@general/components/display/actions-menu/actions-menu.component';
 import { actionsIconSet } from '@general/icons/icons';
 import { MatButton } from '@angular/material/button';
@@ -31,6 +33,12 @@ import { PlaylistGridComponent } from '../playlists-landing-page/playlist-grid/p
 import { PlaylistWithTagData } from '@general/models/playlist.model';
 import { GridPlaylistSizeConfig } from '../../../../models/grid-item-size-config.model';
 import { MediumSizeGridItemConfig } from '../../../../models/grid.model';
+import { addXAxisScrolling } from '@general/utils/add-x-axis-scrolling';
+import {
+  SectionToggleEvent,
+  ToggledState,
+} from '@general/models/collapsible-section-component.model';
+
 @Component({
   selector: 'app-playlists-detail-page',
   imports: [
@@ -50,7 +58,7 @@ import { MediumSizeGridItemConfig } from '../../../../models/grid.model';
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './playlists-detail-page.component.scss',
 })
-export class PlaylistsDetailPageComponent {
+export class PlaylistsDetailPageComponent implements AfterViewInit {
   readonly router = inject(Router);
   readonly currentRoute = inject(ActivatedRoute);
 
@@ -143,6 +151,17 @@ export class PlaylistsDetailPageComponent {
     hideParentInfo: true,
   };
 
+  constructor() {
+    effect(() => {
+      this.playlist();
+      this.addScrollingToChildPlaylistGrid();
+    });
+  }
+
+  ngAfterViewInit() {
+    this.addScrollingToChildPlaylistGrid();
+  }
+
   playPauseClicked(state: 'play' | 'pause') {
     if (state === 'play') {
       return this.playPlaylist.emit();
@@ -162,5 +181,18 @@ export class PlaylistsDetailPageComponent {
     await this.router.navigate(['../', playlistId], {
       relativeTo: this.currentRoute,
     });
+  }
+
+  protected addScrollingToChildPlaylistGrid(): void {
+    setTimeout(() => {
+      addXAxisScrolling('.wrapper .grid-content');
+    }, 250);
+  }
+
+  protected updateOnSectionToggle(event: SectionToggleEvent) {
+    if (event.state === ToggledState.Collapsed) {
+      return;
+    }
+    this.addScrollingToChildPlaylistGrid();
   }
 }
