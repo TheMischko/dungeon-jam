@@ -1,19 +1,25 @@
 <mat-form-field class="wrapper" appearance="outline">
   <mat-label>{{ label() }}</mat-label>
-  <mat-select
-    [value]="value()"
-    (selectionChange)="setValueFromSelect($event)"
-    [disabled]="disabled()"
-  >
+  <input type="text" matInput [formControl]="textControl" [matAutocomplete]="auto" (blur)="onBlur()">
+  <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn" (optionSelected)="setValueFromSelect($event)">
     @if (!loading()) {
       @if (!playlists().length) {
         <mat-option [disabled]="true">There are no playlists yet.</mat-option>
       } @else {
         <mat-option [value]="null">None</mat-option>
       }
-      @for (playlist of playlistOptions(); track playlist.id) {
-        <mat-option [value]="playlist">{{ playlist.name }}</mat-option>
+      @for (option of playlistOptions(); track option.playlist.id) {
+        <mat-option [value]="option.playlist">
+          @let parent = getPlaylistParent(option.playlist);
+          <div class="playlist-option">
+            <span class="depth-spacer" [ngStyle]="getDepthIndent(option.depth)"></span>
+            <div class="playlist-name">{{ option.playlist.name }}</div>
+            @if (parent) {
+              <div class="parent-name">({{parent.name}})</div>
+            }
+          </div>
+        </mat-option>
       }
     }
-  </mat-select>
+  </mat-autocomplete>
 </mat-form-field>
