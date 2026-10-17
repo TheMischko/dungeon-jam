@@ -10,7 +10,11 @@ import {
   output,
   signal,
 } from '@angular/core';
-import { Scene, SceneInsertQuery } from '@shared/models/scene.model';
+import {
+  Scene,
+  SceneInsertQuery,
+  SceneUpdateQuery,
+} from '@shared/models/scene.model';
 import { PlaylistStore } from '@general/stores/playlist.store';
 import { PlaylistTracksStore } from '../../../../stores/playlist-tracks.store';
 import { SoundEffectStore } from '@general/stores/sound-effect.store';
@@ -46,6 +50,10 @@ import {
   createSessionContext,
   TrackHighlightContext,
 } from '../../../../models/track-highlight.model';
+import {
+  PlaylistSelectionModalComponent,
+  PlaylistSelectionModalData,
+} from '../../../playlist/modals/playlist-selection-modal/playlist-selection-modal.component';
 
 @Component({
   selector: 'app-scene-console-smart',
@@ -77,17 +85,26 @@ export class SceneConsoleSmartComponent implements OnInit {
 
   readonly tagsMap = this.tagsStore.entityMap;
   readonly playlist = signal<Playlist | null | undefined>(undefined);
-  readonly tracks = signal<Track[]>([]);
   readonly ambience = signal<SoundEffect[]>([]);
   readonly stingers = signal<SoundEffect[]>([]);
   readonly sceneImageUrl = signal<string | undefined>(undefined);
   readonly soundEffectsVolumeMap = signal<Record<string, number>>({});
   readonly tracksQuery = signal<QueryOptions>({});
+  readonly includeChildrenTracks = signal<boolean>(false);
   readonly playingSoundEffects = toSignal(
     this.soundEffectsPlayerService.playingEffects$,
     { initialValue: [] }
   );
   private readonly playbackState = toSignal(this.playbackService.playback$);
+
+  readonly tracks = computed<Track[]>(() => {
+    if (!this.playlist()) {
+      return [];
+    }
+
+    return this.playlistTracksStore.entities();
+  });
+
   readonly playingTrack = computed(() => {
     const playbackState = this.playbackState();
     if (
@@ -131,6 +148,7 @@ export class SceneConsoleSmartComponent implements OnInit {
 
   readonly playlistTracksQuery = computed<PlaylistTracksQuery>(() => ({
     playlistId: this.playlist()?.id ?? '',
+    includeChildren: this.includeChildrenTracks(),
     ...this.tracksQuery(),
   }));
   readonly playlistTracksQuery$ = toObservable(this.playlistTracksQuery).pipe(
@@ -166,11 +184,6 @@ export class SceneConsoleSmartComponent implements OnInit {
         return;
       }
       this.playlist.set(playlist);
-    });
-
-    effect(() => {
-      const playlistTracks = this.playlistTracksStore.entities();
-      this.tracks.set(playlistTracks);
     });
 
     effect(() => {
@@ -231,6 +244,7 @@ export class SceneConsoleSmartComponent implements OnInit {
       if (!scene) {
         return;
       }
+      this.includeChildrenTracks.set(scene.includeChildrenTracks ?? false);
       const imageSub = this.loadSceneImage(scene).subscribe((image) => {
         this.sceneImageUrl.set(image ?? undefined);
       });
@@ -483,5 +497,57 @@ export class SceneConsoleSmartComponent implements OnInit {
     }
 
     return this.imageApiService.fetchImage(scene.imageUrl);
+  }
+
+  protected toggleIncludeChildrenTrack(value: boolean) {
+    this.includeChildrenTracks.set(value);
+    const updateQuery: SceneUpdateQuery = {
+      id: this.scene().id,
+      includeChildrenTracks: value,
+    };
+    this.scenesStore.update(updateQuery);
+  }
+
+  protected openSelectPlaylistDialog() {
+    const data: PlaylistSelectionModalData = {
+      selectedPlaylist: this.playlist() ?? null,
+    };
+
+    const dialogRef = this.dialogService.open<
+      PlaylistSelectionModalComponent,
+      Playlist | null
+    >(PlaylistSelectionModalComponent, { data });
+
+    dialogRef.afterClosed$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((result) => {
+        console.log('Selected playlist: ', result);
+        this.handlePlaylistSelected(result);
+      });
+  }
+
+  private handlePlaylistSelected(playlist: undefined | null | Playlist): void {
+    if (playlist === undefined) {
+      return;
+    }
+
+    const currentPlaylist = this.playlist();
+    if (playlist === null && currentPlaylist === null) {
+      return;
+    }
+
+    if (
+      currentPlaylist &&
+      playlist !== null &&
+      playlist.id === currentPlaylist.id
+    ) {
+      return;
+    }
+
+    const scene = this.scene();
+    this.scenesStore.update({
+      id: scene.id,
+      playlistId: !!playlist ? playlist.id : playlist,
+    });
   }
 }

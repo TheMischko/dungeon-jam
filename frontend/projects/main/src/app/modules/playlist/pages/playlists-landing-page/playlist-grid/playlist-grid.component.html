@@ -1,6 +1,7 @@
 <div class="wrapper">
   @if (showControls()) {
     <app-grid-controls
+      [currentValue]="sizeSliderValue()"
       (search)="search.emit($event)"
       (sizeChange)="sizeChange.emit($event)"
     >
@@ -33,7 +34,9 @@
           [playlistImageUrl]="getPlaylistImageUrl(playlist)"
           [sizeConfig]="sizeConfig()"
           [isPlaying]="isPlaying(playlist.id)"
-          [actions]="showControls() ? playlistActions : []"
+          [playable]="itemPlayable()"
+          [selected]="selectedPlaylistId() === playlist.id"
+          [actions]="showControls() && showActions() ? playlistActions : []"
           (playlistClick)="playlistClick.emit($event)"
           (playPlaylist)="playPlaylist.emit($event)"
           (pausePlaylist)="pausePlaylist.emit($event)"

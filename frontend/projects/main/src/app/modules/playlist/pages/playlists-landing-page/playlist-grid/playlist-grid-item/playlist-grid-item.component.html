@@ -7,6 +7,7 @@
   [sizeConfig]="sizeConfig()"
   [actions]="actions()"
   [dataItem]="playlistItem"
+  [outlined]="selected()"
   (clicked)="onPlaylistClick()"
 >
   <div ngProjectAs="content" style="display: contents">
@@ -27,7 +28,7 @@
         {{ parentPlaylist()!.name }}
       </div>
     }
-    @if (isPlaying()) {
+    @if (playable() && isPlaying()) {
       <div class="is-playing-overlay small-overlay">
         <svg
           [lucideIcon]="playingIcon"
@@ -36,13 +37,15 @@
       </div>
     }
   </div>
-  <div ngProjectAs="hovering-content" style="display: contents">
-    <div class="hover-overlay">
-      <svg
-        class="icon"
-        [lucideIcon]="overlayIcon()!"
-        (click)="onOverlayButtonClick($event)"
-      ></svg>
+  @if (playable()) {
+    <div ngProjectAs="hovering-content" style="display: contents">
+      <div class="hover-overlay">
+        <svg
+          class="icon"
+          [lucideIcon]="overlayIcon()!"
+          (click)="onOverlayButtonClick($event)"
+        ></svg>
+      </div>
     </div>
-  </div>
+  }
 </app-grid-item>

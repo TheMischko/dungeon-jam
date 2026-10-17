@@ -62,14 +62,28 @@
           <div class="section-header">
             <h2>Music</h2>
             <div class="header-playlist-section">
-              <span class="playlist-name"
-                >Playlist: {{ playlist()?.name }}
-              </span>
+              <div class="playlist-name">
+                @if (playlist(); as playlist) {
+                  <span>Playlist: {{ playlist.name }}</span>
+                  <lib-icon-button
+                    class="edit-playlist-button"
+                    size="small"
+                    [icon]="EditIcon"
+                    (clicked)="assignPlaylist.emit()"
+                  />
+                } @else {
+                  <span></span>
+                }
+              </div>
               <div class="include-children-wrapper">
-                <lib-switch
-                  label="Include tracks from children"
-                  size="small"
-                ></lib-switch>
+                @if (!!playlist()?.childrenIds?.length) {
+                  <lib-switch
+                    label="Include tracks from children"
+                    size="small"
+                    [value]="scene()?.includeChildrenTracks ?? false"
+                    (valueChange)="includeChildrenToggle.emit($event)"
+                  ></lib-switch>
+                }
               </div>
             </div>
           </div>
@@ -82,12 +96,21 @@
             [showFilters]="false"
             [showActionsColumn]="true"
             [actionsMenuConfig]="trackGridActions"
-            [noDataText]="noPlaylistText"
+            [noDataText]="noPlaylistText()"
             [highlightContext]="trackHighlightContext()"
             (queryChange)="trackQueryChange.emit($event)"
             (playTrack)="playTrack.emit($event)"
             (pauseTrack)="pauseTrack.emit()"
           ></app-songs-table>
+          @if (!playlist() && !viewMode()) {
+            <button
+              mat-flat-button
+              class="assign-playlist-button"
+              (click)="assignPlaylist.emit()"
+            >
+              Select playlist
+            </button>
+          }
         </div>
         <div class="sound-effects-sector">
           <div class="ambience sound-effects-sector-item">

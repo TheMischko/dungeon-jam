@@ -24,6 +24,11 @@
   &:hover {
     background-color: rgba(#000, 0.25);
   }
+
+  &.outlined {
+    outline: 2px solid col.$primary;
+    outline-offset: -2px;
+  }
 }
 
 .image-wrapper {

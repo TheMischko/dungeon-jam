@@ -47,6 +47,7 @@ export class GridItemComponent<T> {
   readonly sizeConfig = input<GridItemSizeConfig>(BigSizeGridItemConfig);
   readonly dataItem = input<T>();
   readonly actions = input<ActionsMenuConfig<T, unknown>[]>([]);
+  readonly outlined = input<boolean>(false);
 
   readonly clicked = output<void>();
 

@@ -183,6 +183,7 @@ export class SceneManager {
       introTrackIds: [],
       order: scenes.length,
       imageUrl: imagePath,
+      includeChildrenTracks: false,
       dateCreated: new Date(),
       dateUpdated: new Date(),
     });
@@ -302,6 +303,9 @@ export class SceneManager {
       ...(updateData.introTrackIds !== undefined && {
         introTrackIds: updateData.introTrackIds,
       }),
+      ...(updateData.includeChildrenTracks !== undefined && {
+        includeChildrenTracks: updateData.includeChildrenTracks,
+      }),
       dateUpdated: new Date(),
     });
   }
@@ -318,6 +322,7 @@ export class SceneManager {
       tags: scene.tags ?? [],
       playlistId: scene.playlistId ?? null,
       introTrackIds: scene.introTrackIds ?? [],
+      includeChildrenTracks: scene.includeChildrenTracks ?? false,
     };
   }
 

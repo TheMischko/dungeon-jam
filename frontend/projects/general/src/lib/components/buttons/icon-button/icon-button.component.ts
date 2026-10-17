@@ -55,7 +55,7 @@ export class IconButtonComponent {
     const size = this.size();
     switch (size) {
       case 'small':
-        return 20;
+        return 17;
       case 'large':
         return 28;
       default:

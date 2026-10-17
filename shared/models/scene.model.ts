@@ -13,6 +13,7 @@ export interface Scene {
   order: number;
   dateCreated: Date;
   dateUpdated: Date;
+  includeChildrenTracks?: boolean;
 }
 
 export interface SceneSoundEffectRef {
@@ -43,6 +44,7 @@ export interface SceneUpdateQuery {
   stingerVolumeUpdate?: SceneSoundEffectRef;
   tagsAdded?: string[];
   tagsRemoved?: string[];
+  includeChildrenTracks?: boolean;
 }
 
 export enum SceneOrderContext {

@@ -109,10 +109,23 @@ app-root {
 }
 
 button.mdc-button.button-small {
-  height: 26px;
-  width: 26px;
-  min-width: 26px;
+  height: 28px;
+  width: 28px;
+  min-width: 28px;
   padding-top: 3px;
+
+  .mat-mdc-button-touch-target {
+    height: 32px;
+  }
+
+  &:has(.button-icon) {
+    margin-bottom: -3px;
+  }
+
+  .button-icon {
+    margin-top: -3px;
+    margin-right: -1px;
+  }
 }
 button.mdc-button.button-regular {
   height: 42px;
