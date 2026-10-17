@@ -1,8 +1,14 @@
 import { Injectable } from '@angular/core';
 import { SceneApiWindow } from '../../../models/api/scene-api.model';
 import { Observable, Subject } from 'rxjs';
-import { Scene, SceneInsertQuery, SceneUpdateQuery } from '@shared/models/scene.model';
+import {
+  Scene,
+  SceneInsertQuery,
+  ScenesRelativeDisplayOrderQuery,
+  SceneUpdateQuery,
+} from '@shared/models/scene.model';
 import { QueryOptions } from '@shared/models/request.model';
+import { DisplayOrder } from '@shared/models/display-order.model';
 
 @Injectable({
   providedIn: 'root',
@@ -90,12 +96,14 @@ export class SceneApiService {
     return subject.asObservable();
   }
 
-  public changeOrder(sceneIds: string[]): Observable<Scene[]> {
-    const subject = new Subject<Scene[]>();
+  public changeOrder(
+    query: ScenesRelativeDisplayOrderQuery
+  ): Observable<Map<string, DisplayOrder>> {
+    const subject = new Subject<Map<string, DisplayOrder>>();
 
-    this.window.SCENE_API.changeScenesOrder(sceneIds)
-      .then((scenes) => {
-        subject.next(scenes);
+    this.window.SCENE_API.changeScenesOrder(query)
+      .then((orderMap) => {
+        subject.next(orderMap);
         subject.complete();
       })
       .catch((err) => {

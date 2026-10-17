@@ -40,6 +40,10 @@ export class PlaylistGridComponent {
   readonly showControls = input<boolean>(true);
   readonly reorderingEnabled = input<boolean>(true);
   readonly showParentsFilter = input<boolean>(false);
+  readonly itemPlayable = input<boolean>(true);
+  readonly showActions = input<boolean>(true);
+  readonly selectedPlaylistId = input<string | null>(null);
+  readonly sizeSliderValue = input<number>(75);
 
   readonly sizeChange = output<number>();
   readonly playPlaylist = output<string>();

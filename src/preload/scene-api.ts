@@ -2,10 +2,12 @@ import { QueryOptions } from '@shared/models/request.model';
 import {
   Scene,
   SceneInsertQuery,
+  ScenesRelativeDisplayOrderQuery,
   SceneUpdateQuery,
 } from '@shared/models/scene.model';
 import { ipcRenderer } from 'electron';
 import { SceneChannel } from '@shared/models/channels.model';
+import { DisplayOrder } from '@shared/models/display-order.model';
 
 const getAllScenes = async (query: QueryOptions): Promise<Scene[]> => {
   return await ipcRenderer.invoke(SceneChannel.GET_ALL, query);
@@ -27,8 +29,10 @@ const deleteScene = async (id: string): Promise<void> => {
   return await ipcRenderer.invoke(SceneChannel.DELETE, id);
 };
 
-const changeScenesOrder = async (sceneIds: string[]): Promise<Scene[]> => {
-  return await ipcRenderer.invoke(SceneChannel.CHANGE_ORDER, sceneIds);
+const changeScenesOrder = async (
+  query: ScenesRelativeDisplayOrderQuery
+): Promise<Map<string, DisplayOrder>> => {
+  return await ipcRenderer.invoke(SceneChannel.CHANGE_ORDER, query);
 };
 
 export default {

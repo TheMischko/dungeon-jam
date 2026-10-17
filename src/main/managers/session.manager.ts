@@ -5,6 +5,8 @@ import {
   SessionInsertQuery,
   SessionSceneRef,
   SessionScenesQuery,
+  SessionOrderContext,
+  SessionRelativeDisplayOrderQuery,
   SessionUpdateQuery,
 } from '@shared/models/session.model';
 import { DatabaseProviderCreator } from '../database/database-provider-creator';
@@ -19,6 +21,11 @@ import { SceneManager } from './scene.manager';
 import { SortDirection } from '@shared/models/common.model';
 import { combineImagesFromUrls } from '../utils/combine-images-from-urls';
 import { LRUCache } from '../../../frontend/projects/general/src/lib/utils/lru-cache';
+import {
+  DisplayOrder,
+  OrderableEntityType,
+} from '@shared/models/display-order.model';
+import { DisplayOrderManager } from './display-order.manager';
 
 export class SessionManager {
   private static _instance: SessionManager;
@@ -26,7 +33,10 @@ export class SessionManager {
   private readonly logger = new Logger('SessionManager', 'greenBright');
   private readonly imageCache = new LRUCache<string, string | null>(16);
 
-  constructor(private readonly database: DatabaseProvider<SessionData>) {}
+  constructor(
+    private readonly database: DatabaseProvider<SessionData>,
+    private readonly displayOrderManager: DisplayOrderManager
+  ) {}
 
   public static async getInstance(): Promise<SessionManager> {
     if (!this._instance) {
@@ -39,7 +49,8 @@ export class SessionManager {
           SessionManager.SortFn(itemA, itemB, sortBy, direction)
         )
         .complete();
-      this._instance = new SessionManager(database);
+      const displayOrderManager = await DisplayOrderManager.getInstance();
+      this._instance = new SessionManager(database, displayOrderManager);
       this._instance.registerHandlers();
     }
     return this._instance;
@@ -107,10 +118,33 @@ export class SessionManager {
         return await this.getSessionImages(sessionIds);
       })
     );
+
+    ipcMain.handle(
+      SessionChannel.CHANGE_ORDER,
+      withAppError(async (_, query: SessionRelativeDisplayOrderQuery) => {
+        this.logger.log('Changing relative order of a session.', { query });
+        return await this.changeRelativeOrder(query);
+      })
+    );
   }
 
   public async getAll(query: QueryRequest): Promise<SessionData[]> {
-    return await this.database.getAll(query);
+    const sessions = await this.database.getAll(query);
+    let orderMap = await this.displayOrderManager.getOrderMap(
+      OrderableEntityType.Session,
+      SessionOrderContext.Landing
+    );
+    if (orderMap.size !== sessions.length && !query.search && !query.filters) {
+      orderMap = await this.repairOrderRecords(sessions);
+    }
+    if (!query.sortBy) {
+      sessions.sort(
+        (a, b) =>
+          (orderMap.get(a.id)?.order ?? 0) -
+          (orderMap.get(b.id)?.order ?? 0)
+      );
+    }
+    return sessions;
   }
 
   public async getById(sessionId: string): Promise<SessionData | null> {
@@ -140,7 +174,13 @@ export class SessionManager {
       dateUpdated: currentDate,
     };
 
-    return await this.database.create(data);
+    const result = await this.database.create(data);
+    await this.displayOrderManager.appendEntity(
+      result.id,
+      OrderableEntityType.Session,
+      SessionOrderContext.Landing
+    );
+    return result;
   }
 
   public async update(updateData: SessionUpdateQuery): Promise<SessionData> {
@@ -208,6 +248,30 @@ export class SessionManager {
   public async getTotalCount(): Promise<number> {
     const all = await this.getAll({});
     return all.length;
+  }
+
+  private async repairOrderRecords(
+    sessions: SessionData[]
+  ): Promise<Map<string, DisplayOrder>> {
+    return this.displayOrderManager.repairCollection(
+      sessions,
+      'id',
+      (a, mapOrderA, b, mapOrderB) =>
+        (mapOrderA ?? a.order ?? 0) - (mapOrderB ?? b.order ?? 0),
+      OrderableEntityType.Session,
+      SessionOrderContext.Landing
+    );
+  }
+
+  private changeRelativeOrder(
+    query: SessionRelativeDisplayOrderQuery
+  ): Promise<Map<string, DisplayOrder>> {
+    return this.displayOrderManager.setRelativeDisplayOrder(
+      query,
+      OrderableEntityType.Session,
+      query.contextType,
+      query.contextId
+    );
   }
 
   public async getSessionScenes(query: SessionScenesQuery): Promise<Scene[]> {

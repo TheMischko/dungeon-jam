@@ -37,6 +37,8 @@ export class PlaylistGridItemComponent {
   readonly actions = input<ActionsMenuConfig<PlaylistWithTagData, string>[]>(
     []
   );
+  readonly selected = input<boolean>(false);
+  readonly playable = input<boolean>(true);
   readonly hideParentInfo = computed<boolean>(() => {
     return this.sizeConfig().hideParentInfo ?? false;
   });

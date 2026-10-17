@@ -18,6 +18,7 @@ import {
   GridItemSizeConfig,
 } from '../../../../models/grid.model';
 import { GridControlsComponent } from '../../../../components/grid/grid-controls/grid-controls.component';
+import { CdkDrag, CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-scenes-grid',
@@ -26,6 +27,8 @@ import { GridControlsComponent } from '../../../../components/grid/grid-controls
     LucideDynamicIcon,
     MatCheckbox,
     GridControlsComponent,
+    CdkDropList,
+    CdkDrag,
   ],
   templateUrl: './scenes-grid.component.html',
   styleUrl: './scenes-grid.component.scss',
@@ -45,6 +48,7 @@ export class ScenesGridComponent {
   readonly availableSizes = input<GridItemSizeConfig[]>(AllSizeGridItemConfigs);
   readonly currentSizeIndex = input<number>(0);
   readonly initialSelection = input<Scene[]>();
+  readonly reorderingEnabled = input<boolean>(false);
 
   readonly showDetail = output<Scene>();
   readonly playScene = output<Scene>();
@@ -52,6 +56,7 @@ export class ScenesGridComponent {
   readonly sizeChange = output<number>();
   readonly search = output<string>();
   readonly selected = output<Scene[]>();
+  readonly reorderDrop = output<CdkDragDrop<Scene[]>>();
 
   readonly maxSizeIndex = computed<number>(() => {
     return Math.max((this.availableSizes().length - 1) * 25, 0);
@@ -157,5 +162,9 @@ export class ScenesGridComponent {
       return;
     }
     this.showDetail.emit(scene);
+  }
+
+  protected emitSceneDropped(event: CdkDragDrop<Scene[]>) {
+    this.reorderDrop.emit(event);
   }
 }

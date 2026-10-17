@@ -27,6 +27,12 @@ import {
   AllSizeGridItemConfigs,
   GridItemSizeConfig,
 } from '../../../../models/grid.model';
+import {
+  DisplayOrder,
+  DisplayOrderPlacement,
+} from '@shared/models/display-order.model';
+import { CdkDragDrop } from '@angular/cdk/drag-drop';
+import { PlaylistStore } from '@general/stores/playlist.store';
 
 @Component({
   selector: 'app-scenes-grid-smart',
@@ -43,6 +49,7 @@ export class ScenesGridSmartComponent implements OnInit {
   private readonly playbackService = inject(PlaybackService);
   private readonly scenePlayerService = inject(ScenePlayerService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly playlistStore = inject(PlaylistStore);
 
   readonly itemPlayable = input<boolean>(true);
   readonly itemSelectable = input<boolean>(false);
@@ -51,6 +58,7 @@ export class ScenesGridSmartComponent implements OnInit {
   readonly availableSizes = input<GridItemSizeConfig[]>(AllSizeGridItemConfigs);
   readonly initialSizeIndex = input<number>(0);
   readonly initialSelection = input<Scene[]>();
+  readonly reorderingEnabled = input<boolean>(false);
 
   readonly selected = output<Scene[]>();
 
@@ -83,7 +91,10 @@ export class ScenesGridSmartComponent implements OnInit {
 
     effect(() => {
       const scenes = this.scenesStore.entities();
-      this.scenes.set(scenes);
+      const orderMap = this.scenesStore.latestOrderMap();
+      this.scenes.set(
+        scenes.sort((a, b) => this.sortScenesByDisplayOrder(orderMap, a, b))
+      );
       if (!scenes?.length) {
         return;
       }
@@ -99,6 +110,13 @@ export class ScenesGridSmartComponent implements OnInit {
     this.scenesStore.loadAll(this.currentQuery);
     if (!this.tagsStore.initialized) {
       this.tagsStore.loadAll({});
+    }
+
+    if (
+      this.playlistStore.entities().length === 0 &&
+      !this.playlistStore.loading()
+    ) {
+      this.playlistStore.load({});
     }
   }
 
@@ -121,10 +139,10 @@ export class ScenesGridSmartComponent implements OnInit {
   private updateImageMap(scenes: Scene[]): Observable<void> {
     const imageRequests = scenes.map((scene) => {
       if (!scene.imageUrl) {
-        return of({
-          sceneId: scene.id,
-          imageUrl: null,
-        });
+        if (scene.playlistId) {
+          return this.usePlaylistImage(scene);
+        }
+        return this.getNoImageSceneMapRecord(scene);
       }
 
       return this.imageApiService.fetchImage(scene.imageUrl).pipe(
@@ -161,5 +179,58 @@ export class ScenesGridSmartComponent implements OnInit {
 
   protected stopScene(scene: Scene) {
     this.scenePlayerService.stopScene(scene);
+  }
+
+  private sortScenesByDisplayOrder(
+    orderMap: Map<string, DisplayOrder>,
+    a: Scene,
+    b: Scene
+  ): number {
+    const orderA = orderMap.get(a.id)?.order ?? 0;
+    const orderB = orderMap.get(b.id)?.order ?? 0;
+    return orderA - orderB;
+  }
+
+  protected reorderScene(event: CdkDragDrop<Scene[]>) {
+    if (event.previousIndex === event.currentIndex) {
+      return;
+    }
+    const scenes = this.scenes();
+    const item = scenes[event.previousIndex];
+    if (!item) {
+      return;
+    }
+
+    const anchor = scenes[event.currentIndex];
+
+    this.scenesStore.changeRelativeOrder({
+      entityId: item.id,
+      anchorEntityId: anchor.id,
+      placement: DisplayOrderPlacement.BEFORE,
+    });
+  }
+
+  private getNoImageSceneMapRecord(scene: Scene) {
+    return of({
+      sceneId: scene.id,
+      imageUrl: null,
+    });
+  }
+
+  private usePlaylistImage(scene: Scene) {
+    if (!scene.playlistId) {
+      return this.getNoImageSceneMapRecord(scene);
+    }
+    const playlistMap = this.playlistStore.entityMap();
+    const playlist = playlistMap[scene.playlistId];
+    if (!playlist || !playlist.imageUrl) {
+      return this.getNoImageSceneMapRecord(scene);
+    }
+    return this.imageApiService.fetchImage(playlist.imageUrl).pipe(
+      map((imageUrl) => ({
+        sceneId: scene.id,
+        imageUrl,
+      }))
+    );
   }
 }

@@ -2,8 +2,10 @@ import { QueryOptions } from '@shared/models/request.model';
 import {
   Scene,
   SceneInsertQuery,
+  ScenesRelativeDisplayOrderQuery,
   SceneUpdateQuery,
 } from '@shared/models/scene.model';
+import { DisplayOrder } from '@shared/models/display-order.model';
 
 export type SceneApiWindow = Window &
   typeof globalThis & {
@@ -13,6 +15,8 @@ export type SceneApiWindow = Window &
       insertScene: (data: SceneInsertQuery) => Promise<Scene>;
       updateScene: (data: SceneUpdateQuery) => Promise<Scene>;
       deleteScene: (id: string) => Promise<void>;
-      changeScenesOrder: (sceneIds: string[]) => Promise<Scene[]>;
+      changeScenesOrder: (
+        query: ScenesRelativeDisplayOrderQuery
+      ) => Promise<Map<string, DisplayOrder>>;
     };
   };

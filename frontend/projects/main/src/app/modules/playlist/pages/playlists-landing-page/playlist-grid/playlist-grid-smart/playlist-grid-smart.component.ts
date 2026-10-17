@@ -6,6 +6,7 @@ import {
   inject,
   input,
   OnInit,
+  output,
   signal,
   untracked,
 } from '@angular/core';
@@ -57,9 +58,19 @@ export class PlaylistGridSmartComponent implements OnInit {
 
   readonly showControls = input<boolean>(true);
   readonly limit = input<number | undefined>(undefined);
+  readonly itemPlayable = input<boolean>(true);
+  readonly itemSelectable = input<boolean>(false);
+  readonly itemDetailNavigation = input<boolean>(true);
+  readonly reorderingEnabled = input<boolean>(true);
+  readonly showActions = input<boolean>(true);
+  readonly initialSize = input<number>(0.75);
+  readonly initialSelection = input<Playlist | null>(null);
+
+  readonly selected = output<Playlist | null>();
 
   readonly playlistImageMap = signal<Record<string, string | null>>({});
   readonly sizeSliderValue = signal<number>(0.75);
+  readonly selectedPlaylist = signal<Playlist | null>(null);
   readonly searchFilter = signal<string>('');
   readonly sortDirection = signal<SortDirection>(SortDirection.ASC);
   readonly sortBy = signal<Extract<keyof Playlist, string>>('order');
@@ -126,6 +137,14 @@ export class PlaylistGridSmartComponent implements OnInit {
     this.playlistStore.updateOrderMap(this.parentId);
 
     effect(() => {
+      this.sizeSliderValue.set(this.initialSize());
+    });
+
+    effect(() => {
+      this.selectedPlaylist.set(this.initialSelection() ?? null);
+    });
+
+    effect(() => {
       const playlists = this.playlistStore.entities();
       const orderMap = this.playlistStore.latestOrderMap();
       this.playlists.set(this.orderPlaylists(playlists, orderMap));
@@ -171,6 +190,22 @@ export class PlaylistGridSmartComponent implements OnInit {
     this.playbackService.pause();
   }
 
+  async onPlaylistClick(playlistId: string) {
+    if (this.itemSelectable()) {
+      const next =
+        this.selectedPlaylist()?.id === playlistId
+          ? null
+          : (this.playlistStore.entityMap()[playlistId] ??
+            this.playlists().find((p) => p.id === playlistId) ??
+            null);
+      this.selectedPlaylist.set(next);
+      this.selected.emit(next);
+    }
+    if (this.itemDetailNavigation()) {
+      await this.showPlaylistDetails(playlistId);
+    }
+  }
+
   async showPlaylistDetails(playlistId: string) {
     await this.router.navigate([
       playlistRouteStrings.playlists,
@@ -213,6 +248,9 @@ export class PlaylistGridSmartComponent implements OnInit {
   }
 
   protected reorderPlaylist(event: CdkDragDrop<PlaylistWithTagData[]>) {
+    if (event.currentIndex === event.previousIndex) {
+      return;
+    }
     const dataSet = this.dataSet();
     const item = dataSet[event.previousIndex];
     if (!item) {
@@ -220,15 +258,11 @@ export class PlaylistGridSmartComponent implements OnInit {
     }
 
     const anchor = dataSet[event.currentIndex];
-    const placement =
-      event.currentIndex > event.previousIndex
-        ? DisplayOrderPlacement.AFTER
-        : DisplayOrderPlacement.BEFORE;
     const parent = this.parent();
     this.playlistStore.changeRelativeOrder({
       playlistId: item.id,
       anchorId: anchor?.id,
-      placement,
+      placement: DisplayOrderPlacement.BEFORE,
       parentId: parent !== null && parent !== 'no-parent' ? parent : undefined,
     });
 
@@ -241,8 +275,7 @@ export class PlaylistGridSmartComponent implements OnInit {
 
       let toIndex: number;
       if (!anchor) {
-        toIndex =
-          placement === DisplayOrderPlacement.BEFORE ? 0 : update.length - 1;
+        toIndex = 0;
       } else {
         const anchorIndex = update.findIndex((p) => p.id === anchor.id);
         if (anchorIndex === -1) {

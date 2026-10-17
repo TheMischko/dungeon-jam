@@ -194,15 +194,11 @@ export class SoundEffectsLibrarySmartComponent {
     }
 
     const anchor = soundEffects[event.currentIndex];
-    const placement =
-      event.currentIndex > event.previousIndex
-        ? DisplayOrderPlacement.AFTER
-        : DisplayOrderPlacement.BEFORE;
 
     this.soundEffectStore.changeRelativeOrder({
       soundEffectId: soundEffect.id,
       anchorId: anchor?.id,
-      placement,
+      placement: DisplayOrderPlacement.BEFORE,
     });
 
     this.soundEffects.update((soundEffects) => {
@@ -216,10 +212,7 @@ export class SoundEffectsLibrarySmartComponent {
 
       let toIndex: number;
       if (!anchor) {
-        toIndex =
-          placement === DisplayOrderPlacement.BEFORE
-            ? 0
-            : newSoundEffects.length - 1;
+        toIndex = 0;
       } else {
         const anchorIndex = newSoundEffects.findIndex(
           (s) => s.id === anchor.id

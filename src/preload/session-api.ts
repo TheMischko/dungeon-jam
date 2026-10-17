@@ -3,11 +3,13 @@ import {
   SessionData,
   SessionInsertQuery,
   SessionScenesQuery,
+  SessionRelativeDisplayOrderQuery,
   SessionUpdateQuery,
 } from '@shared/models/session.model';
 import { ipcRenderer } from 'electron';
 import { SessionChannel } from '@shared/models/channels.model';
 import { Scene } from '@shared/models/scene.model';
+import { DisplayOrder } from '@shared/models/display-order.model';
 
 const getAllSessions = async (query: QueryOptions): Promise<SessionData[]> => {
   return await ipcRenderer.invoke(SessionChannel.GET_ALL, query);
@@ -47,6 +49,12 @@ const getSessionImages = async (
   return await ipcRenderer.invoke(SessionChannel.GET_IMAGES, sessionIds);
 };
 
+const changeSessionsOrder = async (
+  query: SessionRelativeDisplayOrderQuery
+): Promise<Map<string, DisplayOrder>> => {
+  return await ipcRenderer.invoke(SessionChannel.CHANGE_ORDER, query);
+};
+
 export default {
   getAllSessions,
   getSessionById,
@@ -55,4 +63,5 @@ export default {
   deleteSession,
   getSessionScenes,
   getSessionImages,
+  changeSessionsOrder,
 };

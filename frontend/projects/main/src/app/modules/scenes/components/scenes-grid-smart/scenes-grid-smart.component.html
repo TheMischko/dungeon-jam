@@ -12,10 +12,12 @@
   [availableSizes]="availableSizes()"
   [currentSizeIndex]="currentSizeIndex()"
   [initialSelection]="initialSelection()"
+  [reorderingEnabled]="reorderingEnabled()"
   (showDetail)="navigateToDetail($event)"
   (playScene)="playScene($event)"
   (pauseScene)="stopScene($event)"
   (sizeChange)="handleSizeChange($event)"
   (search)="searchFilter.set($event)"
   (selected)="selected.emit($event)"
+  (reorderDrop)="reorderScene($event)"
 ></app-scenes-grid>

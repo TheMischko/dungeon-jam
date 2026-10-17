@@ -26,6 +26,8 @@ import { IconButtonComponent } from '@general/components/buttons/icon-button/ico
 import { LucideIconData } from '@lucide/angular';
 import { ActionsMenuBaseConfig } from '@general/components/display/actions-menu/actions-menu.component';
 import { TrackHighlightContext } from '../../../../models/track-highlight.model';
+import { SwitchComponent } from '@general/components/controls/switch/switch.component';
+import { MatButton } from '@angular/material/button';
 
 @Component({
   selector: 'app-scene-console',
@@ -37,6 +39,8 @@ import { TrackHighlightContext } from '../../../../models/track-highlight.model'
     SceneSoundEffectsListComponent,
     AddSoundEffectsSectionComponent,
     IconButtonComponent,
+    SwitchComponent,
+    MatButton,
   ],
   templateUrl: './scene-console.component.html',
   styleUrl: './scene-console.component.scss',
@@ -75,6 +79,8 @@ export class SceneConsoleComponent {
   readonly editScene = output<Scene>();
   readonly deleteScene = output<Scene>();
   readonly playTrackNext = output<Track>();
+  readonly includeChildrenToggle = output<boolean>();
+  readonly assignPlaylist = output<void>();
 
   readonly hiddenContent = signal<boolean>(false);
 
@@ -132,7 +138,22 @@ export class SceneConsoleComponent {
     return this.hiddenContent() ? this.CollapsedIcon : this.ExpandedIcon;
   });
 
-  readonly noPlaylistText = 'This scene has no playlist attached yet.';
+  readonly noPlaylistText = computed(() => {
+    const scene = this.scene();
+    if (!scene || this.loading()) {
+      return '';
+    }
+    if (scene.playlistId === null) {
+      return 'This scene has no playlist attached yet.';
+    }
+
+    const playlist = this.playlist();
+    if (playlist && playlist.trackIds.length === 0) {
+      return 'The assigned playlist is empty.';
+    }
+
+    return 'No playlist data available.';
+  });
 
   constructor() {
     effect(() => {

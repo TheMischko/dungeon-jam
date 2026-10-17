@@ -3,9 +3,11 @@ import {
   SessionData,
   SessionInsertQuery,
   SessionScenesQuery,
+  SessionRelativeDisplayOrderQuery,
   SessionUpdateQuery,
 } from '@shared/models/session.model';
 import { Scene } from '@shared/models/scene.model';
+import { DisplayOrder } from '@shared/models/display-order.model';
 
 export type SessionWindow = Window &
   typeof globalThis & {
@@ -19,5 +21,8 @@ export type SessionWindow = Window &
       getSessionImages: (
         sessionIds: string[]
       ) => Promise<Record<string, string | null>>;
+      changeSessionsOrder: (
+        query: SessionRelativeDisplayOrderQuery
+      ) => Promise<Map<string, DisplayOrder>>;
     };
   };
