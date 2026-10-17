@@ -59,10 +59,20 @@
         animate.leave="slide-out-animation"
       >
         <div class="music-sector">
-          <h2 class="section-header">
-            Music
-            <span class="playlist-name">Playlist: {{ playlist()?.name }}</span>
-          </h2>
+          <div class="section-header">
+            <h2>Music</h2>
+            <div class="header-playlist-section">
+              <span class="playlist-name"
+                >Playlist: {{ playlist()?.name }}
+              </span>
+              <div class="include-children-wrapper">
+                <lib-switch
+                  label="Include tracks from children"
+                  size="small"
+                ></lib-switch>
+              </div>
+            </div>
+          </div>
 
           <app-songs-table
             [tracks]="tracks()"

@@ -26,6 +26,7 @@ import { IconButtonComponent } from '@general/components/buttons/icon-button/ico
 import { LucideIconData } from '@lucide/angular';
 import { ActionsMenuBaseConfig } from '@general/components/display/actions-menu/actions-menu.component';
 import { TrackHighlightContext } from '../../../../models/track-highlight.model';
+import { SwitchComponent } from '@general/components/controls/switch/switch.component';
 
 @Component({
   selector: 'app-scene-console',
@@ -37,6 +38,7 @@ import { TrackHighlightContext } from '../../../../models/track-highlight.model'
     SceneSoundEffectsListComponent,
     AddSoundEffectsSectionComponent,
     IconButtonComponent,
+    SwitchComponent,
   ],
   templateUrl: './scene-console.component.html',
   styleUrl: './scene-console.component.scss',

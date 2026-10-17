@@ -1,0 +1,59 @@
+@use '@angular/material' as mat;
+
+:host {
+  display: inline-flex;
+  align-items: center;
+
+  // Margin formula:
+  // unselected: 0 <inset>  (where inset = (track-height - handle-size) / 2)
+  // selected:   0 (track-width - handle-size - inset)
+  .small {
+    @include mat.slide-toggle-overrides(
+      (
+        track-width: 32px,
+        track-height: 16px,
+        selected-handle-size: 12px,
+        with-icon-handle-size: 12px,
+        unselected-handle-size: 10px,
+        pressed-handle-size: 14px,
+        selected-icon-size: 8px,
+        unselected-icon-size: 8px,
+        state-layer-size: 22px,
+        touch-target-size: 16px,
+        unselected-handle-horizontal-margin: 0 3px,
+        unselected-with-icon-handle-horizontal-margin: 0 2px,
+        unselected-pressed-handle-horizontal-margin: 0 1px,
+        selected-handle-horizontal-margin: 0 18px,
+        selected-with-icon-handle-horizontal-margin: 0 18px,
+        selected-pressed-handle-horizontal-margin: 0 17px,
+      )
+    );
+  }
+
+  .regular {
+    @include mat.slide-toggle-overrides(
+      (
+        track-width: 50px,
+        track-height: 26px,
+        selected-handle-size: 18px,
+        with-icon-handle-size: 18px,
+        unselected-handle-size: 14px,
+        pressed-handle-size: 20px,
+        selected-icon-size: 12px,
+        unselected-icon-size: 12px,
+        state-layer-size: 34px,
+        touch-target-size: 26px,
+        unselected-handle-horizontal-margin: 0 6px,
+        unselected-with-icon-handle-horizontal-margin: 0 4px,
+        unselected-pressed-handle-horizontal-margin: 0 3px,
+        selected-handle-horizontal-margin: 0 29px,
+        selected-with-icon-handle-horizontal-margin: 0 29px,
+        selected-pressed-handle-horizontal-margin: 0 27px,
+      )
+    );
+  }
+}
+
+:host ::ng-deep .mdc-switch {
+  margin-right: 0.25rem;
+}
