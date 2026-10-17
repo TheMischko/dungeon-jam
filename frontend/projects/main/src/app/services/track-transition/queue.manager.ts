@@ -148,6 +148,13 @@ export class QueueManager {
     }
   }
 
+  replaceUpcomingQueue(tracks: Track[]) {
+    this.trackList.next(tracks);
+    this.queue.next(this.currentShuffle ? shuffleList(tracks) : [...tracks]);
+    this.currentIndex.next(undefined);
+    this.history.next([]);
+  }
+
   injectNextTrack(track: Track) {
     this.playNext.next([...this.playNext.getValue(), track]);
   }

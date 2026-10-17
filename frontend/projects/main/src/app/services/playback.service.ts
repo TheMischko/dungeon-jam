@@ -171,6 +171,17 @@ export class PlaybackService {
     }
   }
 
+  async replaceQueue(tracks: Track[], metadata?: PlayMetadata) {
+    this.trackTransitionService.nextTrack.getValue()?.dispose();
+    this.trackTransitionService.nextTrack.next(undefined);
+    this.metadata.next(metadata ?? {});
+    if (this.trackTransitionService.activeTrack.getValue()) {
+      this.queueManager.replaceUpcomingQueue(tracks);
+    } else {
+      await this.playTracks(tracks, metadata);
+    }
+  }
+
   async playNext(): Promise<void> {
     const currentState = await firstValueFrom(this.playback$);
     const nextTrack = this.queueManager.advanceNext(

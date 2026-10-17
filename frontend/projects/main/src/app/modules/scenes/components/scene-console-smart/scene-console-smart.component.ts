@@ -470,9 +470,17 @@ export class SceneConsoleSmartComponent implements OnInit {
           return;
         }
 
+        const currentScene = this.scene();
+        const nextPlaylistId = result.playlistId ?? null;
         this.scenesStore.update(
-          sceneInsertQueryToUpdateQuery(result, this.scene())
+          sceneInsertQueryToUpdateQuery(result, currentScene)
         );
+        if (nextPlaylistId !== currentScene.playlistId && this.scenePlaying()) {
+          void this.scenePlayerService.continueWithNewPlaylist(
+            { ...currentScene, playlistId: nextPlaylistId },
+            this.sessionId()
+          );
+        }
       });
   }
 
@@ -501,11 +509,18 @@ export class SceneConsoleSmartComponent implements OnInit {
 
   protected toggleIncludeChildrenTrack(value: boolean) {
     this.includeChildrenTracks.set(value);
+    const scene = this.scene();
     const updateQuery: SceneUpdateQuery = {
-      id: this.scene().id,
+      id: scene.id,
       includeChildrenTracks: value,
     };
     this.scenesStore.update(updateQuery);
+    if (scene.playlistId && this.scenePlaying()) {
+      void this.scenePlayerService.continueWithNewPlaylist(
+        { ...scene, includeChildrenTracks: value },
+        this.sessionId()
+      );
+    }
   }
 
   protected openSelectPlaylistDialog() {
@@ -545,9 +560,16 @@ export class SceneConsoleSmartComponent implements OnInit {
     }
 
     const scene = this.scene();
+    const nextPlaylistId = !!playlist ? playlist.id : playlist;
     this.scenesStore.update({
       id: scene.id,
-      playlistId: !!playlist ? playlist.id : playlist,
+      playlistId: nextPlaylistId,
     });
+    if (this.scenePlaying()) {
+      void this.scenePlayerService.continueWithNewPlaylist(
+        { ...scene, playlistId: nextPlaylistId },
+        this.sessionId()
+      );
+    }
   }
 }

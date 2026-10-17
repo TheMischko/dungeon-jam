@@ -17,6 +17,7 @@ describe('ScenePlayerService', () => {
   let mockPlaybackService: {
     playTracks: ReturnType<typeof vi.fn>;
     clearState: ReturnType<typeof vi.fn>;
+    replaceQueue: ReturnType<typeof vi.fn>;
   };
   let mockSoundEffectsPlayerService: {
     playEffect: ReturnType<typeof vi.fn>;
@@ -79,6 +80,7 @@ describe('ScenePlayerService', () => {
     mockPlaybackService = {
       playTracks: vi.fn().mockResolvedValue(undefined),
       clearState: vi.fn().mockResolvedValue(undefined),
+      replaceQueue: vi.fn().mockResolvedValue(undefined),
     };
     mockSoundEffectsPlayerService = {
       playEffect: vi.fn().mockResolvedValue(undefined),
@@ -188,5 +190,22 @@ describe('ScenePlayerService', () => {
     expect(mockSoundEffectsPlayerService.stopEffect).toHaveBeenCalledWith(
       'sfx-1'
     );
+  });
+
+  it('should fetch playlist tracks and replace queue when continueWithNewPlaylist is called', async () => {
+    await service.continueWithNewPlaylist(scene1, 'session-99');
+
+    expect(mockPlaybackService.replaceQueue).toHaveBeenCalledWith([track1], {
+      sceneId: 'scene-1',
+      sessionId: 'session-99',
+    });
+  });
+
+  it('should replace queue with empty tracks when continueWithNewPlaylist is called without playlistId', async () => {
+    await service.continueWithNewPlaylist(sceneNoTracks);
+
+    expect(mockPlaybackService.replaceQueue).toHaveBeenCalledWith([], {
+      sceneId: 'scene-no-tracks',
+    });
   });
 });
