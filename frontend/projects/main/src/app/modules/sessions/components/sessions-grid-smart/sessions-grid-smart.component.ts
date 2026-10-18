@@ -107,7 +107,10 @@ export class SessionsGridSmartComponent implements OnInit {
     this.sessionStore.changeRelativeOrder({
       entityId: item.id,
       anchorEntityId: anchor.id,
-      placement: DisplayOrderPlacement.BEFORE,
+      placement:
+        event.currentIndex > event.previousIndex
+          ? DisplayOrderPlacement.AFTER
+          : DisplayOrderPlacement.BEFORE,
     });
   }
 
@@ -116,6 +119,10 @@ export class SessionsGridSmartComponent implements OnInit {
     a: SessionData,
     b: SessionData
   ): number {
-    return (orderMap.get(a.id)?.order ?? 0) - (orderMap.get(b.id)?.order ?? 0);
+    const orderA =
+      orderMap.get(a.id)?.order ?? a.order ?? Number.MAX_SAFE_INTEGER;
+    const orderB =
+      orderMap.get(b.id)?.order ?? b.order ?? Number.MAX_SAFE_INTEGER;
+    return orderA - orderB;
   }
 }

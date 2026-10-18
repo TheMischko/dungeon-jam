@@ -25,7 +25,7 @@ describe('SessionsGridSmartComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should translate a downward drop into a before reorder request', () => {
+  it('should translate a downward drop into an after reorder request', () => {
     const sessions = [createSession('session-1'), createSession('session-2')];
     const sessionsStore = TestBed.inject(SessionStore);
     const reorderSession = (
@@ -43,6 +43,28 @@ describe('SessionsGridSmartComponent', () => {
     expect(sessionsStore.changeRelativeOrder).toHaveBeenCalledWith({
       entityId: 'session-1',
       anchorEntityId: 'session-2',
+      placement: DisplayOrderPlacement.AFTER,
+    });
+  });
+
+  it('should translate an upward drop into a before reorder request', () => {
+    const sessions = [createSession('session-1'), createSession('session-2')];
+    const sessionsStore = TestBed.inject(SessionStore);
+    const reorderSession = (
+      component as unknown as {
+        reorderSession: (event: CdkDragDrop<SessionData[]>) => void;
+      }
+    ).reorderSession.bind(component);
+    component.sessions.set(sessions);
+
+    vi.spyOn(sessionsStore, 'changeRelativeOrder');
+    reorderSession(
+      { previousIndex: 1, currentIndex: 0 } as CdkDragDrop<SessionData[]>
+    );
+
+    expect(sessionsStore.changeRelativeOrder).toHaveBeenCalledWith({
+      entityId: 'session-2',
+      anchorEntityId: 'session-1',
       placement: DisplayOrderPlacement.BEFORE,
     });
   });

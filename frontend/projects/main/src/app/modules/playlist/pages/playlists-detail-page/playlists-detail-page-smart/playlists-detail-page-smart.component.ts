@@ -462,6 +462,9 @@ export class PlaylistsDetailPageSmartComponent implements OnInit {
   }
 
   protected reorderChildPlaylist(event: CdkDragDrop<PlaylistWithTagData[]>) {
+    if (event.previousIndex === event.currentIndex) {
+      return;
+    }
     const children = this.childPlaylists();
     const item = children[event.previousIndex];
     if (!item) {

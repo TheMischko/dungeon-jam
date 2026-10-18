@@ -152,6 +152,11 @@ export class SessionManager {
   }
 
   public async delete(sessionId: string): Promise<void> {
+    await this.displayOrderManager.removeFromCollection(
+      sessionId,
+      OrderableEntityType.Session,
+      SessionOrderContext.Landing
+    );
     await this.database.deleteOne('id', sessionId);
   }
 

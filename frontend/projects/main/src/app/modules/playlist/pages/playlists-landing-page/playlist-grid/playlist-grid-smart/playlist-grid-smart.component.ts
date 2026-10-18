@@ -258,11 +258,15 @@ export class PlaylistGridSmartComponent implements OnInit {
     }
 
     const anchor = dataSet[event.currentIndex];
+    const placement =
+      event.currentIndex > event.previousIndex
+        ? DisplayOrderPlacement.AFTER
+        : DisplayOrderPlacement.BEFORE;
     const parent = this.parent();
     this.playlistStore.changeRelativeOrder({
       playlistId: item.id,
       anchorId: anchor?.id,
-      placement: DisplayOrderPlacement.BEFORE,
+      placement,
       parentId: parent !== null && parent !== 'no-parent' ? parent : undefined,
     });
 
@@ -275,7 +279,8 @@ export class PlaylistGridSmartComponent implements OnInit {
 
       let toIndex: number;
       if (!anchor) {
-        toIndex = 0;
+        toIndex =
+          placement === DisplayOrderPlacement.BEFORE ? 0 : update.length - 1;
       } else {
         const anchorIndex = update.findIndex((p) => p.id === anchor.id);
         if (anchorIndex === -1) {

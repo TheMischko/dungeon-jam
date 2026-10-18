@@ -18,6 +18,7 @@ export class DisplayOrderManager {
   private static instance: DisplayOrderManager;
 
   private logger = new Logger('DisplayOrder', 'magenta');
+  private replaceQueue: Promise<unknown> = Promise.resolve();
 
   constructor(
     private readonly displayOrderProvider: DatabaseProvider<DisplayOrder>
@@ -251,29 +252,34 @@ export class DisplayOrderManager {
     contextType: string,
     contextId?: string
   ) {
-    this.logger.log('Replacing collection of orders', {
-      entityType,
-      contextType,
-      contextId,
-      data: batch,
-    });
-    await this.displayOrderProvider.deleteMultiple((item) =>
-      this.matchingFunction(item, entityType, contextType, contextId)
-    );
-    this.logger.log('Old data deleted for replace', {
-      entityType,
-      contextType,
-      contextId,
-    });
-    return await this.displayOrderProvider.createMultiple(
-      batch.map((base) => ({
-        ...base,
+    const run = async () => {
+      this.logger.log('Replacing collection of orders', {
         entityType,
         contextType,
         contextId,
-        id: uuid(),
-      }))
-    );
+        data: batch,
+      });
+      await this.displayOrderProvider.deleteMultiple((item) =>
+        this.matchingFunction(item, entityType, contextType, contextId)
+      );
+      this.logger.log('Old data deleted for replace', {
+        entityType,
+        contextType,
+        contextId,
+      });
+      return await this.displayOrderProvider.createMultiple(
+        batch.map((base) => ({
+          ...base,
+          entityType,
+          contextType,
+          contextId,
+          id: uuid(),
+        }))
+      );
+    };
+    const next = this.replaceQueue.then(run, run);
+    this.replaceQueue = next;
+    return await next;
   }
 
   public async removeFromCollection(
@@ -365,11 +371,41 @@ export class DisplayOrderManager {
     contextType: string,
     contextId?: string
   ): Promise<DisplayOrder[]> {
+    await this.replaceQueue;
     const matching = await this.displayOrderProvider.getMatching((orderItem) =>
       this.matchingFunction(orderItem, entityType, contextType, contextId)
     );
 
-    return matching.sort((a, b) => a.order - b.order);
+    const sorted = matching.sort((a, b) => a.order - b.order);
+    const seen = new Set<string>();
+    const unique: DisplayOrder[] = [];
+    let needsRepair = false;
+
+    for (const item of sorted) {
+      if (seen.has(item.entityId)) {
+        needsRepair = true;
+        continue;
+      }
+      if (item.order !== unique.length) {
+        needsRepair = true;
+      }
+      seen.add(item.entityId);
+      unique.push(item);
+    }
+
+    if (needsRepair) {
+      return await this.replaceCollection(
+        unique.map((item, index) => ({
+          entityId: item.entityId,
+          order: index,
+        })),
+        entityType,
+        contextType,
+        contextId
+      );
+    }
+
+    return unique;
   }
 
   /**

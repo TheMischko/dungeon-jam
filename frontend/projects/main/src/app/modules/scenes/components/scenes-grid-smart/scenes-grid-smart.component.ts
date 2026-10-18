@@ -93,7 +93,9 @@ export class ScenesGridSmartComponent implements OnInit {
       const scenes = this.scenesStore.entities();
       const orderMap = this.scenesStore.latestOrderMap();
       this.scenes.set(
-        scenes.sort((a, b) => this.sortScenesByDisplayOrder(orderMap, a, b))
+        [...scenes].sort((a, b) =>
+          this.sortScenesByDisplayOrder(orderMap, a, b)
+        )
       );
       if (!scenes?.length) {
         return;
@@ -186,8 +188,10 @@ export class ScenesGridSmartComponent implements OnInit {
     a: Scene,
     b: Scene
   ): number {
-    const orderA = orderMap.get(a.id)?.order ?? 0;
-    const orderB = orderMap.get(b.id)?.order ?? 0;
+    const orderA =
+      orderMap.get(a.id)?.order ?? a.order ?? Number.MAX_SAFE_INTEGER;
+    const orderB =
+      orderMap.get(b.id)?.order ?? b.order ?? Number.MAX_SAFE_INTEGER;
     return orderA - orderB;
   }
 
@@ -197,16 +201,18 @@ export class ScenesGridSmartComponent implements OnInit {
     }
     const scenes = this.scenes();
     const item = scenes[event.previousIndex];
-    if (!item) {
+    const anchor = scenes[event.currentIndex];
+    if (!item || !anchor) {
       return;
     }
-
-    const anchor = scenes[event.currentIndex];
 
     this.scenesStore.changeRelativeOrder({
       entityId: item.id,
       anchorEntityId: anchor.id,
-      placement: DisplayOrderPlacement.BEFORE,
+      placement:
+        event.currentIndex > event.previousIndex
+          ? DisplayOrderPlacement.AFTER
+          : DisplayOrderPlacement.BEFORE,
     });
   }
 

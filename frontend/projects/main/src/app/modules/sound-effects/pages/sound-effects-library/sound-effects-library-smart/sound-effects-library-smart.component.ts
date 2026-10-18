@@ -186,6 +186,9 @@ export class SoundEffectsLibrarySmartComponent {
   }
 
   protected reorderSoundEffects(event: CdkDragDrop<SoundEffect[]>) {
+    if (event.previousIndex === event.currentIndex) {
+      return;
+    }
     const soundEffects = this.paginatedSoundEffects();
     const soundEffect: SoundEffect | undefined =
       soundEffects[event.previousIndex];
@@ -194,11 +197,15 @@ export class SoundEffectsLibrarySmartComponent {
     }
 
     const anchor = soundEffects[event.currentIndex];
+    const placement =
+      event.currentIndex > event.previousIndex
+        ? DisplayOrderPlacement.AFTER
+        : DisplayOrderPlacement.BEFORE;
 
     this.soundEffectStore.changeRelativeOrder({
       soundEffectId: soundEffect.id,
       anchorId: anchor?.id,
-      placement: DisplayOrderPlacement.BEFORE,
+      placement,
     });
 
     this.soundEffects.update((soundEffects) => {
@@ -212,7 +219,10 @@ export class SoundEffectsLibrarySmartComponent {
 
       let toIndex: number;
       if (!anchor) {
-        toIndex = 0;
+        toIndex =
+          placement === DisplayOrderPlacement.BEFORE
+            ? 0
+            : newSoundEffects.length - 1;
       } else {
         const anchorIndex = newSoundEffects.findIndex(
           (s) => s.id === anchor.id

@@ -41,6 +41,26 @@ describe('ScenesGridSmartComponent', () => {
     expect(scenesStore.changeRelativeOrder).toHaveBeenCalledWith({
       entityId: 'scene-1',
       anchorEntityId: 'scene-2',
+      placement: DisplayOrderPlacement.AFTER,
+    });
+  });
+
+  it('should translate an upward drop into a before reorder request', () => {
+    const scenes = [createScene('scene-1'), createScene('scene-2')];
+    const scenesStore = TestBed.inject(ScenesStore);
+    const reorderScene = (
+      component as unknown as {
+        reorderScene: (event: CdkDragDrop<Scene[]>) => void;
+      }
+    ).reorderScene.bind(component);
+    component.scenes.set(scenes);
+
+    vi.spyOn(scenesStore, 'changeRelativeOrder');
+    reorderScene({ previousIndex: 1, currentIndex: 0 } as CdkDragDrop<Scene[]>);
+
+    expect(scenesStore.changeRelativeOrder).toHaveBeenCalledWith({
+      entityId: 'scene-2',
+      anchorEntityId: 'scene-1',
       placement: DisplayOrderPlacement.BEFORE,
     });
   });

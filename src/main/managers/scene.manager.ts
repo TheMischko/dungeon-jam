@@ -311,6 +311,11 @@ export class SceneManager {
   }
 
   public async deleteById(id: string): Promise<boolean> {
+    await this.displayOrderManager.removeFromCollection(
+      id,
+      OrderableEntityType.Scene,
+      SceneOrderContext.Landing
+    );
     return this.databaseProvider.deleteOne('id', id);
   }
 
