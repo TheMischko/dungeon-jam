@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   inject,
   signal,
 } from '@angular/core';
@@ -32,6 +33,14 @@ export class PlaylistSelectionModalComponent {
   readonly currentSelection = signal<Playlist | null>(
     this.data?.selectedPlaylist ?? null
   );
+
+  readonly selectedPlaylistText = computed(() => {
+    const selection = this.currentSelection();
+    if (!selection) {
+      return 'Nothing';
+    }
+    return selection.name;
+  });
 
   updateSelection(playlist: Playlist | null): void {
     this.currentSelection.set(playlist);

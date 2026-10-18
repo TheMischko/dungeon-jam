@@ -17,6 +17,9 @@
   </div>
 
   <div class="footer">
+    <div class="current-selection">
+      Currently selected: {{ selectedPlaylistText() }}
+    </div>
     <div class="buttons">
       <button mat-flat-button (click)="save()">Save</button>
       <button mat-flat-button (click)="cancel()" color="neutral">Cancel</button>

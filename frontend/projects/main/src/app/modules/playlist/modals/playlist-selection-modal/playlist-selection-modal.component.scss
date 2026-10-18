@@ -8,4 +8,15 @@
   .wrapper .content {
     overflow-y: auto;
   }
+
+  .footer {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+
+    .current-selection {
+      margin-left: 1rem;
+      text-wrap: nowrap;
+    }
+  }
 }
