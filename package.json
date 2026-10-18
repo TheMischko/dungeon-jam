@@ -106,7 +106,7 @@
     "electron": "^41.10.7",
     "electron-builder": "^26.15.3",
     "esbuild": "^0.28.2",
-    "esbuild-node-externals": "^1.23.1",
+    "esbuild-node-externals": "^2.0.0",
     "playwright": "^1.63.0",
     "prettier": "^3.9.6",
     "rimraf": "^6.0.1",
