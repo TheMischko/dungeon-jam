@@ -54,6 +54,8 @@ import {
   PlaylistSelectionModalComponent,
   PlaylistSelectionModalData,
 } from '../../../playlist/modals/playlist-selection-modal/playlist-selection-modal.component';
+import { RedirectService } from '@general';
+import { RedirectPath } from '@shared/models/redirect.model';
 
 @Component({
   selector: 'app-scene-console-smart',
@@ -75,6 +77,7 @@ export class SceneConsoleSmartComponent implements OnInit {
   readonly playbackService = inject(PlaybackService);
   readonly soundEffectsPlayerService = inject(SoundEffectsPlayerService);
   readonly scenePlayerService = inject(ScenePlayerService);
+  readonly redirectService = inject(RedirectService);
 
   readonly scene = input.required<Scene>();
   readonly viewMode = input<boolean>(false);
@@ -571,5 +574,16 @@ export class SceneConsoleSmartComponent implements OnInit {
         this.sessionId()
       );
     }
+  }
+
+  protected navigateToCurrentPlaylist() {
+    const playlist = this.playlist();
+    if (!playlist) {
+      return;
+    }
+    this.redirectService.triggerRedirect({
+      path: RedirectPath.PLAYLISTS,
+      params: { playlistId: playlist.id },
+    });
   }
 }

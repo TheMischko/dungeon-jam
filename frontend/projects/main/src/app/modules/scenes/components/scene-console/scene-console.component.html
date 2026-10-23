@@ -64,13 +64,15 @@
             <div class="header-playlist-section">
               <div class="playlist-name">
                 @if (playlist(); as playlist) {
-                  <span>Playlist: {{ playlist.name }}</span>
-                  <lib-icon-button
-                    class="edit-playlist-button"
-                    size="small"
-                    [icon]="EditIcon"
-                    (clicked)="assignPlaylist.emit()"
-                  />
+                  <a class="playlist-title" (click)="navigateToPlaylist.emit()">Playlist: {{ playlist.name }}</a>
+                  @if (!viewMode()){
+                    <lib-icon-button
+                      class="edit-playlist-button"
+                      size="small"
+                      [icon]="EditIcon"
+                      (clicked)="assignPlaylist.emit()"
+                    />
+                  }
                 } @else {
                   <span></span>
                 }

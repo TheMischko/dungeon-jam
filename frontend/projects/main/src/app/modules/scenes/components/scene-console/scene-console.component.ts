@@ -81,6 +81,7 @@ export class SceneConsoleComponent {
   readonly playTrackNext = output<Track>();
   readonly includeChildrenToggle = output<boolean>();
   readonly assignPlaylist = output<void>();
+  readonly navigateToPlaylist = output<void>();
 
   readonly hiddenContent = signal<boolean>(false);
 
