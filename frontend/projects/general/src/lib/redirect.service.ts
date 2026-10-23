@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import { BehaviorSubject, map, Observable, Subject } from 'rxjs';
 import { RedirectRequest } from '@shared/models/redirect.model';
 
 @Injectable({
@@ -7,9 +7,17 @@ import { RedirectRequest } from '@shared/models/redirect.model';
 })
 export class RedirectService {
   private redirectSubject = new Subject<RedirectRequest | null>();
+  private historySubject = new BehaviorSubject<RedirectRequest[]>([]);
 
   private lastRedirectRequest: RedirectRequest | null = null;
-  private history: RedirectRequest[] = [];
+
+  get latestHistoryRecord$(): Observable<RedirectRequest | null> {
+    return this.historySubject.asObservable().pipe(
+      map((history) => {
+        return history[0] ?? null;
+      })
+    );
+  }
 
   constructor() {
     (window as unknown as GeneralApiWindow).GENERAL_API.registerRedirect(
@@ -28,22 +36,22 @@ export class RedirectService {
   }
 
   navigateBack(): void {
-    const recentRedirect = this.history.splice(0, 1)?.[0];
+    const recentRedirect = this.historySubject.getValue()[0];
     if (!recentRedirect) {
       return;
     }
     this.lastRedirectRequest = null;
+    this.historySubject.next(this.historySubject.getValue().slice(1));
     this.triggerRedirect(recentRedirect);
-  }
-
-  getLatestHistoryRecord(): RedirectRequest | null {
-    return this.history.splice(0, 1)?.[0] ?? null;
   }
 
   private handleRedirect(request: RedirectRequest): void {
     this.redirectSubject.next(request);
     if (this.lastRedirectRequest) {
-      this.history.unshift({ ...this.lastRedirectRequest });
+      this.historySubject.next([
+        { ...this.lastRedirectRequest },
+        ...this.historySubject.value,
+      ]);
     }
     this.lastRedirectRequest = request;
     // Reset to null after a short delay to allow effects to complete

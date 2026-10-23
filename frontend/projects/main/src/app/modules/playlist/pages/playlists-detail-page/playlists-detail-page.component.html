@@ -5,7 +5,7 @@
   <div class="header-content">
     <div class="header-info">
       <div class="header-parent-playlist">
-        <a (click)="navigateBack()">Navigate Back</a>
+        <app-return-back-button [showBackdrop]="true" [noHistoryNavigation]="backToParentNavigation()" />
       </div>
       <h1 class="playlist-name">{{ playlist()?.name }}</h1>
       @if (playlist()?.description) {

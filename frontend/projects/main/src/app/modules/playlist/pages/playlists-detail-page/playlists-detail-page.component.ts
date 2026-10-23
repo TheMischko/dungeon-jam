@@ -39,6 +39,8 @@ import {
 } from '@general/models/collapsible-section-component.model';
 import { scrollPageUp } from '@general/utils/scroll-page-up';
 import { RedirectPath } from '@shared/models/redirect.model';
+import { ReturnBackButtonComponent } from '../../../../components/return-back-button/return-back-button.component';
+import { NoHistoryNavigation } from '../../../../components/return-back-button/return-back-button.types';
 
 @Component({
   selector: 'app-playlists-detail-page',
@@ -53,6 +55,7 @@ import { RedirectPath } from '@shared/models/redirect.model';
     TagListSmartComponent,
     FilesDropInZoneComponent,
     PlaylistGridComponent,
+    ReturnBackButtonComponent,
   ],
   templateUrl: './playlists-detail-page.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
@@ -123,6 +126,24 @@ export class PlaylistsDetailPageComponent implements AfterViewInit {
     return createPlaylistContext(playlist.id);
   });
 
+  readonly backToParentNavigation = computed<NoHistoryNavigation | undefined>(
+    () => {
+      const parentPlaylist = this.parentPlaylist();
+      if (!parentPlaylist) {
+        return;
+      }
+      return {
+        redirect: {
+          path: RedirectPath.PLAYLISTS,
+          params: {
+            playlistId: parentPlaylist.id,
+          },
+        },
+        text: `Back to ${parentPlaylist.name}`,
+      };
+    }
+  );
+
   readonly childrenSectionTemplate =
     viewChild.required<TemplateRef<{ $implicit: Playlist[] }>>(
       'childrenTemplate'
@@ -177,10 +198,6 @@ export class PlaylistsDetailPageComponent implements AfterViewInit {
         playlistId,
       },
     });
-  }
-
-  protected navigateBack(): void {
-    this.redirectService.navigateBack();
   }
 
   protected addScrollingToChildPlaylistGrid(): void {

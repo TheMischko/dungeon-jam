@@ -109,7 +109,7 @@ export class ScenesGridSmartComponent implements OnInit {
     this.currentSizeIndex.set(newIndex);
   }
 
-  async navigateToDetail(scene: Scene): Promise<void> {
+  navigateToDetail(scene: Scene): void {
     this.redirectService.triggerRedirect({
       path: RedirectPath.SCENES,
       params: { sceneId: scene.id },

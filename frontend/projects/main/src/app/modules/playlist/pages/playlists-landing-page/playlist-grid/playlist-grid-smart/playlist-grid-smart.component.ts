@@ -14,7 +14,6 @@ import { Playlist, PlaylistUpdateQuery } from '@shared/models/playlist.model';
 import { SortDirection } from '@shared/models/common.model';
 import { QueryRequest } from '@shared/models/request.model';
 import { PlaylistStore } from '@general/stores/playlist.store';
-import { playlistRouteStrings } from '../../../../playlist-route-strings';
 import { PlaybackService } from '../../../../../../services/playback.service';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { forkJoin, map, Observable, of, take, tap } from 'rxjs';
@@ -172,7 +171,7 @@ export class PlaylistGridSmartComponent implements OnInit {
     this.playbackService.pause();
   }
 
-  async showPlaylistDetails(playlistId: string) {
+  showPlaylistDetails(playlistId: string) {
     this.redirectService.triggerRedirect({
       path: RedirectPath.PLAYLISTS,
       params: { playlistId },

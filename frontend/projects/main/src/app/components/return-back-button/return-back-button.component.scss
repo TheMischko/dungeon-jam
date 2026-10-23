@@ -1,0 +1,15 @@
+@use "typography" as typo;
+
+:host {
+  @include typo.body1();
+  user-select: none;
+  -ms-user-select: none;
+  -moz-user-select: none;
+  & > a {
+    padding: 4px 8px;
+  }
+}
+
+.backdrop{
+  background: rgba(0, 0, 0, 0.75);
+}
