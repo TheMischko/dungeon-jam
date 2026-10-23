@@ -14,14 +14,13 @@ import { Playlist } from '@shared/models/playlist.model';
 import { AudioTrack, Track } from '@shared/models/track.model';
 import { SongsTableComponent } from '../../../library/pages/library-landing-page/songs-table/songs-table.component';
 import { PlayPauseButtonComponent } from '@general/components/buttons/play-pause-button/play-pause-button.component';
-import { ButtonSize, ButtonType } from '@general';
+import { ButtonSize, ButtonType, RedirectService } from '@general';
 import { ActionsMenuConfig } from '@general/components/display/actions-menu/actions-menu.component';
 import { actionsIconSet } from '@general/icons/icons';
 import { MatButton } from '@angular/material/button';
 import { LucideDynamicIcon } from '@lucide/angular';
 import { QueryOptions } from '@shared/models/request.model';
 import { SwitchComponent } from '@general/components/controls/switch/switch.component';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CollapsibleSectionComponent } from '@general/components/display/collapsible-section/collapsible-section.component';
 import { ChildPlaylistActionsSmartComponent } from './child-playlist-actions/child-playlist-actions-smart/child-playlist-actions-smart.component';
 import { TagListSmartComponent } from '@general/components/display/tag-list/tag-list-smart/tag-list-smart.component';
@@ -38,9 +37,8 @@ import {
   SectionToggleEvent,
   ToggledState,
 } from '@general/models/collapsible-section-component.model';
-import { routesStrings } from '../../../../routes-strings';
-import { playlistRouteStrings } from '../../playlist-route-strings';
 import { scrollPageUp } from '@general/utils/scroll-page-up';
+import { RedirectPath } from '@shared/models/redirect.model';
 
 @Component({
   selector: 'app-playlists-detail-page',
@@ -50,7 +48,6 @@ import { scrollPageUp } from '@general/utils/scroll-page-up';
     MatButton,
     LucideDynamicIcon,
     SwitchComponent,
-    RouterLink,
     CollapsibleSectionComponent,
     ChildPlaylistActionsSmartComponent,
     TagListSmartComponent,
@@ -62,8 +59,7 @@ import { scrollPageUp } from '@general/utils/scroll-page-up';
   styleUrl: './playlists-detail-page.component.scss',
 })
 export class PlaylistsDetailPageComponent implements AfterViewInit {
-  readonly router = inject(Router);
-  readonly currentRoute = inject(ActivatedRoute);
+  readonly redirectService = inject(RedirectService);
 
   readonly playlist = input.required<Playlist | null>();
   readonly playlistImageUrl = input<string | null>();
@@ -101,19 +97,6 @@ export class PlaylistsDetailPageComponent implements AfterViewInit {
       })
     );
   });
-
-  readonly parentDetailRoute = computed(() => {
-    const parent = this.parentPlaylist();
-    if (!parent) {
-      return null;
-    }
-    return ['../', parent.id];
-  });
-
-  protected playlistLandingRoute = [
-    routesStrings.playlists,
-    playlistRouteStrings.playlists,
-  ];
 
   readonly childrenSectionConfig = computed(() => {
     if (!this.playlist()) {
@@ -187,10 +170,17 @@ export class PlaylistsDetailPageComponent implements AfterViewInit {
     this.reorderChildren.emit(event);
   }
 
-  protected async navigateToChildPlaylist(playlistId: string) {
-    await this.router.navigate(['../', playlistId], {
-      relativeTo: this.currentRoute,
+  protected navigateToChildPlaylist(playlistId: string) {
+    this.redirectService.triggerRedirect({
+      path: RedirectPath.PLAYLISTS,
+      params: {
+        playlistId,
+      },
     });
+  }
+
+  protected navigateBack(): void {
+    this.redirectService.navigateBack();
   }
 
   protected addScrollingToChildPlaylistGrid(): void {

@@ -5,14 +5,7 @@
   <div class="header-content">
     <div class="header-info">
       <div class="header-parent-playlist">
-        <span>Back to </span>
-        @if (parentPlaylist()) {
-          <a [routerLink]="parentDetailRoute()">{{ parentPlaylist()?.name }}</a>
-        } @else {
-          <a [routerLink]="playlistLandingRoute" [relativeTo]="null"
-            >Playlists</a
-          >
-        }
+        <a (click)="navigateBack()">Navigate Back</a>
       </div>
       <h1 class="playlist-name">{{ playlist()?.name }}</h1>
       @if (playlist()?.description) {

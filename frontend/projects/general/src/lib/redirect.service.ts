@@ -8,6 +8,9 @@ import { RedirectRequest } from '@shared/models/redirect.model';
 export class RedirectService {
   private redirectSubject = new Subject<RedirectRequest | null>();
 
+  private lastRedirectRequest: RedirectRequest | null = null;
+  private history: RedirectRequest[] = [];
+
   constructor() {
     (window as unknown as GeneralApiWindow).GENERAL_API.registerRedirect(
       (request: RedirectRequest) => this.handleRedirect(request)
@@ -24,8 +27,25 @@ export class RedirectService {
     );
   }
 
+  navigateBack(): void {
+    const recentRedirect = this.history.splice(0, 1)?.[0];
+    if (!recentRedirect) {
+      return;
+    }
+    this.lastRedirectRequest = null;
+    this.triggerRedirect(recentRedirect);
+  }
+
+  getLatestHistoryRecord(): RedirectRequest | null {
+    return this.history.splice(0, 1)?.[0] ?? null;
+  }
+
   private handleRedirect(request: RedirectRequest): void {
     this.redirectSubject.next(request);
+    if (this.lastRedirectRequest) {
+      this.history.unshift({ ...this.lastRedirectRequest });
+    }
+    this.lastRedirectRequest = request;
     // Reset to null after a short delay to allow effects to complete
     setTimeout(() => this.redirectSubject.next(null), 100);
   }
