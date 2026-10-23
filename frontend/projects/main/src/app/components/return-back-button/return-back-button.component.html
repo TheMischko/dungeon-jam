@@ -1,0 +1,4 @@
+@let text = backToText();
+@if (text) {
+  <a [ngClass]="cssClasses()" (click)="returnBack()">{{ text }}</a>
+}

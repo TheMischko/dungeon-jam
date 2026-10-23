@@ -14,8 +14,6 @@ import { Playlist, PlaylistUpdateQuery } from '@shared/models/playlist.model';
 import { SortDirection } from '@shared/models/common.model';
 import { QueryRequest } from '@shared/models/request.model';
 import { PlaylistStore } from '@general/stores/playlist.store';
-import { Router } from '@angular/router';
-import { playlistRouteStrings } from '../../../../playlist-route-strings';
 import { PlaybackService } from '../../../../../../services/playback.service';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { forkJoin, map, Observable, of, take, tap } from 'rxjs';
@@ -39,6 +37,8 @@ import {
   DisplayOrder,
   DisplayOrderPlacement,
 } from '@shared/models/display-order.model';
+import { RedirectService } from '@general';
+import { RedirectPath } from '@shared/models/redirect.model';
 
 @Component({
   selector: 'app-playlist-grid-smart',
@@ -52,7 +52,7 @@ export class PlaylistGridSmartComponent implements OnInit {
   readonly tagsStore = inject(TagsStore);
   readonly playbackService = inject(PlaybackService);
   readonly trackService = inject(TrackService);
-  readonly router = inject(Router);
+  readonly redirectService = inject(RedirectService);
   readonly imageApiService = inject(ImageApiService);
 
   readonly showControls = input<boolean>(true);
@@ -171,12 +171,11 @@ export class PlaylistGridSmartComponent implements OnInit {
     this.playbackService.pause();
   }
 
-  async showPlaylistDetails(playlistId: string) {
-    await this.router.navigate([
-      playlistRouteStrings.playlists,
-      playlistRouteStrings.detail,
-      playlistId,
-    ]);
+  showPlaylistDetails(playlistId: string) {
+    this.redirectService.triggerRedirect({
+      path: RedirectPath.PLAYLISTS,
+      params: { playlistId },
+    });
   }
 
   private updateImageMap(playlists: Playlist[]): Observable<void> {

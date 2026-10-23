@@ -17,9 +17,6 @@ import { ImageApiService } from '@general/services/image-api.service';
 import { Scene } from '@shared/models/scene.model';
 import { forkJoin, map, Observable, of, tap } from 'rxjs';
 import { TagsStore } from '@general/stores/tags.store';
-import { Router } from '@angular/router';
-import { routesStrings } from '../../../../routes-strings';
-import { scenesRouteStrings } from '../../scenes-route-strings';
 import { PlaybackService } from '../../../../services/playback.service';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ScenePlayerService } from '../../../../services/scene-player.service';
@@ -27,6 +24,8 @@ import {
   AllSizeGridItemConfigs,
   GridItemSizeConfig,
 } from '../../../../models/grid.model';
+import { RedirectService } from '@general';
+import { RedirectPath } from '@shared/models/redirect.model';
 
 @Component({
   selector: 'app-scenes-grid-smart',
@@ -39,7 +38,7 @@ export class ScenesGridSmartComponent implements OnInit {
   private readonly scenesStore = inject(ScenesStore);
   private readonly imageApiService = inject(ImageApiService);
   private readonly tagsStore = inject(TagsStore);
-  private readonly router = inject(Router);
+  private readonly redirectService = inject(RedirectService);
   private readonly playbackService = inject(PlaybackService);
   private readonly scenePlayerService = inject(ScenePlayerService);
   private readonly destroyRef = inject(DestroyRef);
@@ -110,12 +109,11 @@ export class ScenesGridSmartComponent implements OnInit {
     this.currentSizeIndex.set(newIndex);
   }
 
-  async navigateToDetail(scene: Scene): Promise<void> {
-    await this.router.navigate([
-      routesStrings.scenes,
-      scenesRouteStrings.sceneDetail,
-      scene.id,
-    ]);
+  navigateToDetail(scene: Scene): void {
+    this.redirectService.triggerRedirect({
+      path: RedirectPath.SCENES,
+      params: { sceneId: scene.id },
+    });
   }
 
   private updateImageMap(scenes: Scene[]): Observable<void> {

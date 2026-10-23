@@ -1,30 +1,46 @@
 import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
+  inject,
   input,
   output,
   TemplateRef,
   viewChild,
-  ChangeDetectionStrategy,
 } from '@angular/core';
 import { Playlist } from '@shared/models/playlist.model';
 import { AudioTrack, Track } from '@shared/models/track.model';
 import { SongsTableComponent } from '../../../library/pages/library-landing-page/songs-table/songs-table.component';
 import { PlayPauseButtonComponent } from '@general/components/buttons/play-pause-button/play-pause-button.component';
-import { ButtonType, ButtonSize } from '@general';
+import { ButtonSize, ButtonType, RedirectService } from '@general';
 import { ActionsMenuConfig } from '@general/components/display/actions-menu/actions-menu.component';
 import { actionsIconSet } from '@general/icons/icons';
 import { MatButton } from '@angular/material/button';
 import { LucideDynamicIcon } from '@lucide/angular';
 import { QueryOptions } from '@shared/models/request.model';
 import { SwitchComponent } from '@general/components/controls/switch/switch.component';
-import { RouterLink } from '@angular/router';
 import { CollapsibleSectionComponent } from '@general/components/display/collapsible-section/collapsible-section.component';
-import { ChildPlaylistBoxComponent } from './child-playlist-box/child-playlist-box.component';
 import { ChildPlaylistActionsSmartComponent } from './child-playlist-actions/child-playlist-actions-smart/child-playlist-actions-smart.component';
 import { TagListSmartComponent } from '@general/components/display/tag-list/tag-list-smart/tag-list-smart.component';
 import { FilesDropInZoneComponent } from '../../../../components/drag-and-drop/files-drop-in-zone.component';
 import { createPlaylistContext } from '../../../../models/track-highlight.model';
+import { CdkDragDrop } from '@angular/cdk/drag-drop';
+import { MenuCloseReason } from '@angular/material/menu';
+import { PlaylistGridComponent } from '../playlists-landing-page/playlist-grid/playlist-grid.component';
+import { PlaylistWithTagData } from '@general/models/playlist.model';
+import { GridPlaylistSizeConfig } from '../../../../models/grid-item-size-config.model';
+import { MediumSizeGridItemConfig } from '../../../../models/grid.model';
+import { addXAxisScrolling } from '@general/utils/add-x-axis-scrolling';
+import {
+  SectionToggleEvent,
+  ToggledState,
+} from '@general/models/collapsible-section-component.model';
+import { scrollPageUp } from '@general/utils/scroll-page-up';
+import { RedirectPath } from '@shared/models/redirect.model';
+import { ReturnBackButtonComponent } from '../../../../components/return-back-button/return-back-button.component';
+import { NoHistoryNavigation } from '../../../../components/return-back-button/return-back-button.types';
 
 @Component({
   selector: 'app-playlists-detail-page',
@@ -34,18 +50,20 @@ import { createPlaylistContext } from '../../../../models/track-highlight.model'
     MatButton,
     LucideDynamicIcon,
     SwitchComponent,
-    RouterLink,
     CollapsibleSectionComponent,
-    ChildPlaylistBoxComponent,
     ChildPlaylistActionsSmartComponent,
     TagListSmartComponent,
     FilesDropInZoneComponent,
+    PlaylistGridComponent,
+    ReturnBackButtonComponent,
   ],
   templateUrl: './playlists-detail-page.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './playlists-detail-page.component.scss',
 })
-export class PlaylistsDetailPageComponent {
+export class PlaylistsDetailPageComponent implements AfterViewInit {
+  readonly redirectService = inject(RedirectService);
+
   readonly playlist = input.required<Playlist | null>();
   readonly playlistImageUrl = input<string | null>();
   readonly tracks = input.required<Track[]>();
@@ -56,6 +74,7 @@ export class PlaylistsDetailPageComponent {
   );
   readonly parentPlaylist = input<Playlist | null>(null);
   readonly childrenPlaylists = input<Playlist[]>([]);
+  readonly childrenPlaylistImageMap = input<Record<string, string | null>>({});
 
   readonly playPlaylist = output();
   readonly playTrack = output<Track>();
@@ -67,20 +86,23 @@ export class PlaylistsDetailPageComponent {
   readonly deletePlaylist = output<void>();
   readonly openDiscover = output<void>();
   readonly audioDropped = output<AudioTrack[]>();
+  readonly reorderChildren = output<CdkDragDrop<PlaylistWithTagData[]>>();
+  readonly actionMenuClosed = output<MenuCloseReason | string>();
 
   readonly noTracksWarning =
     'There are no tracks yet. You need to add some from Library or through the Discover mode.';
 
-  readonly parentDetailRoute = computed(() => {
-    const parent = this.parentPlaylist();
-    if (!parent) {
-      return null;
-    }
-    return ['../', parent.id];
+  readonly childrenPlaylistsTagged = computed<PlaylistWithTagData[]>(() => {
+    return this.childrenPlaylists().map(
+      (playlist: Playlist): PlaylistWithTagData => ({
+        ...playlist,
+        tags: [],
+      })
+    );
   });
 
   readonly childrenSectionConfig = computed(() => {
-    if (!this.childrenPlaylists() || this.childrenPlaylists().length === 0) {
+    if (!this.playlist()) {
       return [] as {
         value: Playlist[];
         title: string;
@@ -104,6 +126,24 @@ export class PlaylistsDetailPageComponent {
     return createPlaylistContext(playlist.id);
   });
 
+  readonly backToParentNavigation = computed<NoHistoryNavigation | undefined>(
+    () => {
+      const parentPlaylist = this.parentPlaylist();
+      if (!parentPlaylist) {
+        return;
+      }
+      return {
+        redirect: {
+          path: RedirectPath.PLAYLISTS,
+          params: {
+            playlistId: parentPlaylist.id,
+          },
+        },
+        text: `Back to ${parentPlaylist.name}`,
+      };
+    }
+  );
+
   readonly childrenSectionTemplate =
     viewChild.required<TemplateRef<{ $implicit: Playlist[] }>>(
       'childrenTemplate'
@@ -115,6 +155,26 @@ export class PlaylistsDetailPageComponent {
     return this.playlistPlaying() ? 'pause' : 'play';
   });
   readonly addTracksIcon = actionsIconSet.AddIcon;
+  protected childrenGridConfig: GridPlaylistSizeConfig = {
+    ...MediumSizeGridItemConfig,
+    titleBold: false,
+    showTags: false,
+    hideTracks: false,
+    hideParentInfo: true,
+  };
+  protected readonly SCROLL_TIMEOUT = 250;
+
+  constructor() {
+    effect(async () => {
+      this.playlist();
+      this.addScrollingToChildPlaylistGrid();
+      await scrollPageUp(this.SCROLL_TIMEOUT);
+    });
+  }
+
+  ngAfterViewInit() {
+    this.addScrollingToChildPlaylistGrid();
+  }
 
   playPauseClicked(state: 'play' | 'pause') {
     if (state === 'play') {
@@ -125,5 +185,31 @@ export class PlaylistsDetailPageComponent {
 
   protected toggleIncludeChildren(include: boolean) {
     this.includeChildren.emit(include);
+  }
+
+  protected childPlaylistDropped(event: CdkDragDrop<PlaylistWithTagData[]>) {
+    this.reorderChildren.emit(event);
+  }
+
+  protected navigateToChildPlaylist(playlistId: string) {
+    this.redirectService.triggerRedirect({
+      path: RedirectPath.PLAYLISTS,
+      params: {
+        playlistId,
+      },
+    });
+  }
+
+  protected addScrollingToChildPlaylistGrid(): void {
+    setTimeout(() => {
+      addXAxisScrolling('.wrapper .grid-content');
+    }, this.SCROLL_TIMEOUT);
+  }
+
+  protected updateOnSectionToggle(event: SectionToggleEvent) {
+    if (event.state === ToggledState.Collapsed) {
+      return;
+    }
+    this.addScrollingToChildPlaylistGrid();
   }
 }
