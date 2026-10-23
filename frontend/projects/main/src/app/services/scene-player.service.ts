@@ -6,7 +6,7 @@ import { TrackService } from './track.service';
 import { SoundEffectStore } from '@general/stores/sound-effect.store';
 import { Scene, SceneSoundEffectRef } from '@shared/models/scene.model';
 import { SoundEffect } from '@shared/models/sound-effect.model';
-import { EMPTY, from, map, Observable, of, switchMap } from 'rxjs';
+import { EMPTY, firstValueFrom, from, map, Observable, of, switchMap } from 'rxjs';
 import { Track } from '@shared/models/track.model';
 import { ToastService } from '@general/services/toast.service';
 import { ToastType } from '@general/models/toast.model';
@@ -104,6 +104,25 @@ export class ScenePlayerService {
       switchMap(() =>
         !!ambience?.length ? from(this.playAmbience(ambience)) : of(void 0)
       )
+    );
+  }
+
+  public async continueWithNewPlaylist(
+    scene: Scene,
+    sessionId?: string
+  ): Promise<void> {
+    const tracks = scene.playlistId
+      ? await firstValueFrom(
+          this.trackService.getTracksByPlaylist({
+            playlistId: scene.playlistId,
+            includeChildren: scene.includeChildrenTracks,
+          })
+        )
+      : [];
+
+    await this.playbackService.replaceQueue(
+      tracks,
+      this.getPlayMetadata(scene, sessionId)
     );
   }
 

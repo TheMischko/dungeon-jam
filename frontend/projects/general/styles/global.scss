@@ -109,10 +109,23 @@ app-root {
 }
 
 button.mdc-button.button-small {
-  height: 26px;
-  width: 26px;
-  min-width: 26px;
+  height: 28px;
+  width: 28px;
+  min-width: 28px;
   padding-top: 3px;
+
+  .mat-mdc-button-touch-target {
+    height: 32px;
+  }
+
+  &:has(.button-icon) {
+    margin-bottom: -3px;
+  }
+
+  .button-icon {
+    margin-top: -3px;
+    margin-right: -1px;
+  }
 }
 button.mdc-button.button-regular {
   height: 42px;
@@ -310,10 +323,28 @@ a {
   }
 }
 
-.dragging {
+.ordered-item-drag-preview {
   background: col.$background-deep;
   color: col.$text-main;
   opacity: 0.75;
+}
+
+.cdk-drag-preview {
+  border: none;
+  box-sizing: border-box;
+  border-radius: 4px;
+  box-shadow:
+    0 5px 5px -3px rgba(0, 0, 0, 0.2),
+    0 8px 10px 1px rgba(0, 0, 0, 0.14),
+    0 3px 14px 2px rgba(0, 0, 0, 0.12);
+}
+
+.cdk-drag-placeholder {
+  opacity: 0;
+}
+
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }
 
 .mat-mdc-snack-bar-container.notification-animation {

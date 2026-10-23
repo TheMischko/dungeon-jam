@@ -19,6 +19,8 @@ export interface DisplayOrderBase {
 export enum OrderableEntityType {
   Playlist = 'playlist',
   SoundEffect = 'sound-effect',
+  Scene = 'scene',
+  Session = 'session',
 }
 
 export interface RelativeDisplayOrderQuery {
@@ -40,4 +42,3 @@ export interface DisplayOrderMapQuery {
   contextType: string;
   contextId?: string;
 }
-

@@ -22,6 +22,7 @@ import {
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import {
   catchError,
+  concatMap,
   debounceTime,
   EMPTY,
   finalize,
@@ -181,7 +182,7 @@ export const SoundEffectStore = signalStore(
       placement: DisplayOrderPlacement;
     }>(
       pipe(
-        switchMap((query) => {
+        concatMap((query) => {
           return soundEffectService
             .reorderSoundEffectRelative(
               query.soundEffectId,

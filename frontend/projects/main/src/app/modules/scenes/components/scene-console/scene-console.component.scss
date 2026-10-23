@@ -1,5 +1,6 @@
 @use 'colors' as col;
 @use 'typography' as typo;
+@use 'mixins' as mix;
 
 :host {
   width: 100%;
@@ -74,6 +75,38 @@
   object-position: 40% 40%;
 }
 
+.section-header {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  user-select: none;
+
+  margin-bottom: -3rem;
+
+  .header-playlist-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    z-index: 2;
+  }
+
+  h2 {
+    margin: 0;
+  }
+
+  .include-children-wrapper {
+    opacity: 0.85;
+    min-height: 20px;
+  }
+}
+
+.assign-playlist-button {
+  margin: -1rem auto 0;
+  max-width: 40%;
+}
+
 .console-content {
   flex: 1;
   display: grid;
@@ -92,14 +125,30 @@
   padding-right: 1rem;
 
   .playlist-name {
-    float: right;
     @include typo.body1();
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+
+    .playlist-title{
+      cursor: pointer;
+    }
+
+    .edit-playlist-button {
+      margin-top: -0.5rem;
+      opacity: 0;
+      transition: opacity 0.1s mix.$animation-fn;
+    }
   }
 
   app-songs-table {
     flex: 1;
     min-height: 0;
   }
+}
+
+.music-sector:hover .playlist-name .edit-playlist-button {
+  opacity: 1;
 }
 
 .sound-effects-sector {

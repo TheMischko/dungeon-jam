@@ -186,6 +186,9 @@ export class SoundEffectsLibrarySmartComponent {
   }
 
   protected reorderSoundEffects(event: CdkDragDrop<SoundEffect[]>) {
+    if (event.previousIndex === event.currentIndex) {
+      return;
+    }
     const soundEffects = this.paginatedSoundEffects();
     const soundEffect: SoundEffect | undefined =
       soundEffects[event.previousIndex];

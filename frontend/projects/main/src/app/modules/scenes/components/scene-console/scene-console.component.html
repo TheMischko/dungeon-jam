@@ -59,10 +59,36 @@
         animate.leave="slide-out-animation"
       >
         <div class="music-sector">
-          <h2 class="section-header">
-            Music
-            <span class="playlist-name">Playlist: {{ playlist()?.name }}</span>
-          </h2>
+          <div class="section-header">
+            <h2>Music</h2>
+            <div class="header-playlist-section">
+              <div class="playlist-name">
+                @if (playlist(); as playlist) {
+                  <a class="playlist-title" (click)="navigateToPlaylist.emit()">Playlist: {{ playlist.name }}</a>
+                  @if (!viewMode()){
+                    <lib-icon-button
+                      class="edit-playlist-button"
+                      size="small"
+                      [icon]="EditIcon"
+                      (clicked)="assignPlaylist.emit()"
+                    />
+                  }
+                } @else {
+                  <span></span>
+                }
+              </div>
+              <div class="include-children-wrapper">
+                @if (!!playlist()?.childrenIds?.length) {
+                  <lib-switch
+                    label="Include tracks from children"
+                    size="small"
+                    [value]="scene()?.includeChildrenTracks ?? false"
+                    (valueChange)="includeChildrenToggle.emit($event)"
+                  ></lib-switch>
+                }
+              </div>
+            </div>
+          </div>
 
           <app-songs-table
             [tracks]="tracks()"
@@ -72,12 +98,21 @@
             [showFilters]="false"
             [showActionsColumn]="true"
             [actionsMenuConfig]="trackGridActions"
-            [noDataText]="noPlaylistText"
+            [noDataText]="noPlaylistText()"
             [highlightContext]="trackHighlightContext()"
             (queryChange)="trackQueryChange.emit($event)"
             (playTrack)="playTrack.emit($event)"
             (pauseTrack)="pauseTrack.emit()"
           ></app-songs-table>
+          @if (!playlist() && !viewMode()) {
+            <button
+              mat-flat-button
+              class="assign-playlist-button"
+              (click)="assignPlaylist.emit()"
+            >
+              Select playlist
+            </button>
+          }
         </div>
         <div class="sound-effects-sector">
           <div class="ambience sound-effects-sector-item">

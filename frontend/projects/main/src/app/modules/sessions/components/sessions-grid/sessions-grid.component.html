@@ -9,10 +9,21 @@
     ></app-grid-controls>
   }
 
-  <div class="sessions-grid">
+  <div
+    class="sessions-grid"
+    cdkDropList
+    cdkDropListOrientation="mixed"
+    [cdkDropListData]="sessions()"
+    [cdkDropListDisabled]="!reorderingEnabled()"
+    (cdkDropListDropped)="reorderDrop.emit($event)"
+  >
     @for (session of sessions(); track session.id) {
       @let image = getSessionImage(session);
       <app-grid-item
+        cdkDrag
+        cdkDragPreviewClass="ordered-item-drag-preview"
+        [cdkDragData]="session"
+        [cdkDragDisabled]="!reorderingEnabled()"
         [title]="session.name"
         [image]="image"
         [noImageIcon]="SessionIcon"

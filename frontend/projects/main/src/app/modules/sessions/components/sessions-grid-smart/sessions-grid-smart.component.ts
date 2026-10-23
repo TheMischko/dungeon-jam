@@ -8,6 +8,7 @@ import {
   OnInit,
   signal,
 } from '@angular/core';
+import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { SessionStore } from '@general/stores/session.store';
 import { QueryOptions } from '@shared/models/request.model';
 import { SessionsGridComponent } from '../sessions-grid/sessions-grid.component';
@@ -19,6 +20,10 @@ import {
   AllSizeGridItemConfigs,
   GridItemSizeConfig,
 } from '../../../../models/grid.model';
+import {
+  DisplayOrder,
+  DisplayOrderPlacement,
+} from '@shared/models/display-order.model';
 
 @Component({
   selector: 'app-sessions-grid-smart',
@@ -32,12 +37,14 @@ export class SessionsGridSmartComponent implements OnInit {
   private readonly router = inject(Router);
 
   readonly showControls = input<boolean>(true);
+  readonly reorderingEnabled = input<boolean>(false);
   readonly availableSizes = input<GridItemSizeConfig[]>(AllSizeGridItemConfigs);
   readonly initialSizeIndex = input<number>(0);
 
-  readonly sessions = this.sessionStore.entities;
+  readonly sessions = signal<SessionData[]>([]);
   readonly sessionsLoading = this.sessionStore.loading;
   readonly sessionImages = this.sessionStore.sessionImages;
+  readonly orderMap = this.sessionStore.latestOrderMap;
   readonly searchFilter = signal<string>('');
   readonly currentSizeIndex = signal<number>(0);
   readonly currentQuery = computed<QueryOptions>(() => {
@@ -54,6 +61,14 @@ export class SessionsGridSmartComponent implements OnInit {
   constructor() {
     effect(() => {
       this.currentSizeIndex.set(this.initialSizeIndex());
+    });
+    effect(() => {
+      const orderMap = this.orderMap();
+      this.sessions.set(
+        [...this.sessionStore.entities()].sort((a, b) =>
+          this.sortSessionsByDisplayOrder(orderMap, a, b)
+        )
+      );
     });
   }
 
@@ -76,5 +91,38 @@ export class SessionsGridSmartComponent implements OnInit {
       sessionsRouteStrings.sessionDetail,
       session.id,
     ]);
+  }
+
+  protected reorderSession(event: CdkDragDrop<SessionData[]>): void {
+    if (event.previousIndex === event.currentIndex) {
+      return;
+    }
+    const sessions = this.sessions();
+    const item = sessions[event.previousIndex];
+    const anchor = sessions[event.currentIndex];
+    if (!item || !anchor) {
+      return;
+    }
+
+    this.sessionStore.changeRelativeOrder({
+      entityId: item.id,
+      anchorEntityId: anchor.id,
+      placement:
+        event.currentIndex > event.previousIndex
+          ? DisplayOrderPlacement.AFTER
+          : DisplayOrderPlacement.BEFORE,
+    });
+  }
+
+  private sortSessionsByDisplayOrder(
+    orderMap: Map<string, DisplayOrder>,
+    a: SessionData,
+    b: SessionData
+  ): number {
+    const orderA =
+      orderMap.get(a.id)?.order ?? a.order ?? Number.MAX_SAFE_INTEGER;
+    const orderB =
+      orderMap.get(b.id)?.order ?? b.order ?? Number.MAX_SAFE_INTEGER;
+    return orderA - orderB;
   }
 }

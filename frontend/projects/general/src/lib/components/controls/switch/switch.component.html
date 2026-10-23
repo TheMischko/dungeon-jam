@@ -1,6 +1,9 @@
 <mat-slide-toggle
+  [class]="size()"
   [checked]="value()"
   [disabled]="disabled()"
+  [hideIcon]="!value() || size() === 'small'"
   (change)="toggle($event)"
-  >{{ label() }}</mat-slide-toggle
 >
+  {{ label() }}
+</mat-slide-toggle>

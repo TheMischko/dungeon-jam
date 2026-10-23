@@ -6,9 +6,11 @@ import {
   SessionData,
   SessionInsertQuery,
   SessionScenesQuery,
+  SessionRelativeDisplayOrderQuery,
   SessionUpdateQuery,
 } from '@shared/models/session.model';
 import { Scene } from '@shared/models/scene.model';
+import { DisplayOrder } from '@shared/models/display-order.model';
 
 @Injectable({
   providedIn: 'root',
@@ -111,6 +113,22 @@ export class SessionApiService {
       })
       .catch((e) => {
         subject.error(e);
+        subject.complete();
+      });
+    return subject.asObservable();
+  }
+
+  changeOrder(
+    query: SessionRelativeDisplayOrderQuery
+  ): Observable<Map<string, DisplayOrder>> {
+    const subject = new Subject<Map<string, DisplayOrder>>();
+    this.window.SESSION_API.changeSessionsOrder(query)
+      .then((orderMap) => {
+        subject.next(orderMap);
+        subject.complete();
+      })
+      .catch((error) => {
+        subject.error(error);
         subject.complete();
       });
     return subject.asObservable();

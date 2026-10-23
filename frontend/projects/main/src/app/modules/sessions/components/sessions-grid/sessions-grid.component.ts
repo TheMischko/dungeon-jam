@@ -5,6 +5,7 @@ import {
   input,
   output,
 } from '@angular/core';
+import { CdkDrag, CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop';
 import { SessionData } from '@shared/models/session.model';
 import { GridItemComponent } from '../../../../components/grid/grid-item/grid-item.component';
 import { iconSet } from '@general/icons/icons';
@@ -16,7 +17,7 @@ import { GridControlsComponent } from '../../../../components/grid/grid-controls
 
 @Component({
   selector: 'app-sessions-grid',
-  imports: [GridItemComponent, GridControlsComponent],
+  imports: [GridItemComponent, GridControlsComponent, CdkDropList, CdkDrag],
   templateUrl: './sessions-grid.component.html',
   styleUrl: './sessions-grid.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -29,10 +30,12 @@ export class SessionsGridComponent {
   readonly availableSizes = input<GridItemSizeConfig[]>(AllSizeGridItemConfigs);
   readonly currentSizeIndex = input<number>(0);
   readonly imageMap = input<Record<string, string | null>>();
+  readonly reorderingEnabled = input<boolean>(false);
 
   readonly sessionClick = output<SessionData>();
   readonly sizeChange = output<number>();
   readonly search = output<string>();
+  readonly reorderDrop = output<CdkDragDrop<SessionData[]>>();
 
   readonly SessionIcon = iconSet.SessionIcon;
 

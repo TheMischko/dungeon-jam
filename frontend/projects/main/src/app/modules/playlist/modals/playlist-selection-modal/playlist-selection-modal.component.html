@@ -1,0 +1,28 @@
+<div class="wrapper">
+  <div class="header">
+    <h1>Select playlist</h1>
+  </div>
+
+  <div class="content">
+    <app-playlist-grid-smart
+      [itemPlayable]="false"
+      [itemSelectable]="true"
+      [itemDetailNavigation]="false"
+      [reorderingEnabled]="false"
+      [showActions]="false"
+      [initialSize]="0.25"
+      [initialSelection]="initialSelection()"
+      (selected)="updateSelection($event)"
+    />
+  </div>
+
+  <div class="footer">
+    <div class="current-selection">
+      Currently selected: {{ selectedPlaylistText() }}
+    </div>
+    <div class="buttons">
+      <button mat-flat-button (click)="save()">Save</button>
+      <button mat-flat-button (click)="cancel()" color="neutral">Cancel</button>
+    </div>
+  </div>
+</div>
