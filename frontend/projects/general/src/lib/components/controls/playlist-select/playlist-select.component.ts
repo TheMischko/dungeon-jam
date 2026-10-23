@@ -56,13 +56,13 @@ import { NgStyle } from '@angular/common';
 export class PlaylistSelectComponent implements OnInit, ControlValueAccessor {
   private readonly playlistStore = inject(PlaylistStore);
 
-  readonly textControl = new FormControl<string | Playlist>('');
-
+  readonly label = input('Select Playlist');
   readonly omitPlaylist = input<Playlist | undefined>(undefined);
+
+  readonly textControl = new FormControl<string | Playlist>('');
 
   readonly value = signal<Playlist | null>(null);
   readonly disabled = signal(false);
-  readonly label = input('Select Playlist');
 
   readonly playlists = this.playlistStore.entities;
   readonly loading = this.playlistStore.loading;
@@ -77,9 +77,7 @@ export class PlaylistSelectComponent implements OnInit, ControlValueAccessor {
       ? fullOptions.filter((o) => matchedIds.has(o.playlist.id))
       : fullOptions;
     if (omitPlaylist) {
-      return matchedOptions.filter(
-        (p) => p.playlist.id !== omitPlaylist.id
-      );
+      return matchedOptions.filter((p) => p.playlist.id !== omitPlaylist.id);
     }
     return matchedOptions;
   });
